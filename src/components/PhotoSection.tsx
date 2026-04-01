@@ -5,62 +5,86 @@ import photo3 from "@/assets/photo-3.jpg";
 import photo4 from "@/assets/photo-4.jpg";
 
 const photos = [
-  { id: 1, title: "Skyline", location: "Chicago", image: photo1, height: "h-[60vh]", mt: "mt-[5vh]" },
-  { id: 2, title: "Process", location: "Brooklyn", image: photo2, height: "h-[38vh]", mt: "mt-[25vh]" },
-  { id: 3, title: "Light & Ruin", location: "Detroit", image: photo3, height: "h-[52vh]", mt: "mt-0" },
-  { id: 4, title: "Vanishing Point", location: "Brussels", image: photo4, height: "h-[34vh]", mt: "mt-[18vh]" },
+  { id: 1, title: "Skyline", location: "Chicago", image: photo1 },
+  { id: 2, title: "Process", location: "Brooklyn", image: photo2 },
+  { id: 3, title: "Light & Ruin", location: "Detroit", image: photo3 },
+  { id: 4, title: "Vanishing Point", location: "Brussels", image: photo4 },
 ];
 
 const PhotoSection = () => {
   return (
-    <section className="snap-section relative flex items-start min-w-[200vw] overflow-visible">
-      <div className="absolute top-12 left-16 z-10">
-        <motion.p
-          className="mono-text mb-2"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          02 — Visual Journal
-        </motion.p>
-        <motion.h2
-          className="section-title"
-          initial={{ opacity: 0, x: -50 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1, ease: "easeOut" }}
-        >
-          Photos
-        </motion.h2>
+    <section className="py-24 px-12 md:px-24">
+      <div className="flex items-end justify-between mb-12">
+        <div>
+          <p className="section-label">03 — Visual Journal</p>
+          <h2 className="section-heading mb-0">Photos</h2>
+        </div>
+        <a href="#" className="mono-text hover:text-foreground transition-colors duration-200 pb-1">
+          View all →
+        </a>
       </div>
 
-      <div className="flex items-start gap-4 pt-[28vh] px-16 pb-8">
-        {photos.map((photo, index) => (
+      {/* Asymmetric 4:3 grid — 2 rows, interesting layout */}
+      <div className="grid grid-cols-12 gap-1">
+        {/* Large feature left */}
+        <motion.div
+          className="grid-item col-span-7 aspect-[4/3]"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.4 }}
+        >
+          <img src={photos[0].image} alt={photos[0].title} loading="lazy" className="w-full h-full object-cover" />
+          <div className="grid-item-overlay">
+            <p className="mono-text mb-1">{photos[0].location}</p>
+            <h3 className="text-sm font-medium text-foreground">{photos[0].title}</h3>
+          </div>
+        </motion.div>
+
+        {/* Stacked right */}
+        <div className="col-span-5 grid grid-rows-2 gap-1">
           <motion.div
-            key={photo.id}
-            className={`grid-item w-[22vw] ${photo.height} ${photo.mt} flex-shrink-0`}
-            initial={{ opacity: 0, y: 60 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: index * 0.15, duration: 0.8, ease: "easeOut" }}
+            className="grid-item aspect-[4/3]"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ delay: 0.05, duration: 0.4 }}
           >
-            <img
-              src={photo.image}
-              alt={photo.title}
-              loading="lazy"
-              className="w-full h-full object-cover"
-            />
+            <img src={photos[1].image} alt={photos[1].title} loading="lazy" className="w-full h-full object-cover" />
             <div className="grid-item-overlay">
-              <p className="mono-text mb-1">{photo.location}</p>
-              <h3 className="text-xl font-bold tracking-tight text-foreground font-display">
-                {photo.title}
-              </h3>
+              <p className="mono-text mb-1">{photos[1].location}</p>
+              <h3 className="text-sm font-medium text-foreground">{photos[1].title}</h3>
             </div>
           </motion.div>
-        ))}
+          <motion.div
+            className="grid-item aspect-[4/3]"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ delay: 0.1, duration: 0.4 }}
+          >
+            <img src={photos[2].image} alt={photos[2].title} loading="lazy" className="w-full h-full object-cover" />
+            <div className="grid-item-overlay">
+              <p className="mono-text mb-1">{photos[2].location}</p>
+              <h3 className="text-sm font-medium text-foreground">{photos[2].title}</h3>
+            </div>
+          </motion.div>
+        </div>
 
-        <div className="flex-shrink-0 w-[10vw]" />
+        {/* Full width bottom */}
+        <motion.div
+          className="grid-item col-span-12 aspect-[4/3] max-h-[50vh]"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ delay: 0.15, duration: 0.4 }}
+        >
+          <img src={photos[3].image} alt={photos[3].title} loading="lazy" className="w-full h-full object-cover" />
+          <div className="grid-item-overlay">
+            <p className="mono-text mb-1">{photos[3].location}</p>
+            <h3 className="text-sm font-medium text-foreground">{photos[3].title}</h3>
+          </div>
+        </motion.div>
       </div>
     </section>
   );

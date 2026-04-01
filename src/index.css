@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -44,9 +44,6 @@
     --sidebar-accent-foreground: 200 20% 85%;
     --sidebar-border: 60 10% 14%;
     --sidebar-ring: 200 20% 85%;
-
-    --font-display: 'Space Grotesk', sans-serif;
-    --font-mono: 'JetBrains Mono', monospace;
   }
 }
 
@@ -57,28 +54,20 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: var(--font-display);
-    overflow: hidden;
+    font-family: 'Inter', sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-display);
-    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
     letter-spacing: -0.03em;
   }
 }
 
 @layer components {
-  .section-title {
-    @apply text-7xl md:text-9xl font-bold tracking-tighter uppercase;
-    font-family: var(--font-display);
-    -webkit-text-stroke: 1px hsl(var(--accent));
-    color: transparent;
-  }
-
-  .section-title-filled {
-    @apply text-7xl md:text-9xl font-bold tracking-tighter uppercase text-foreground;
-    font-family: var(--font-display);
+  .mono-text {
+    font-family: 'IBM Plex Mono', monospace;
+    @apply text-xs tracking-widest uppercase text-muted-foreground;
   }
 
   .grid-item {
@@ -86,43 +75,30 @@
   }
 
   .grid-item img {
-    @apply w-full h-full object-cover transition-all duration-700;
+    @apply w-full h-full object-cover transition-all duration-700 ease-out;
     filter: grayscale(100%);
   }
 
   .grid-item:hover img {
     filter: grayscale(0%);
-    transform: scale(1.05);
+    transform: scale(1.03);
   }
 
   .grid-item-overlay {
-    @apply absolute inset-0 flex flex-col justify-end p-4 opacity-0 transition-opacity duration-500;
-    background: linear-gradient(to top, hsl(var(--background) / 0.9) 0%, transparent 60%);
+    @apply absolute inset-0 flex flex-col justify-end p-4 opacity-0 transition-opacity duration-300;
+    background: linear-gradient(to top, hsl(var(--background) / 0.9) 0%, transparent 50%);
   }
 
   .grid-item:hover .grid-item-overlay {
     @apply opacity-100;
   }
 
-  .mono-text {
-    font-family: var(--font-mono);
-    @apply text-xs tracking-widest uppercase text-muted-foreground;
-  }
-}
-
-@layer utilities {
-  .horizontal-scroll {
-    @apply flex h-screen overflow-x-auto overflow-y-hidden;
-    scroll-behavior: smooth;
-    scroll-snap-type: x mandatory;
+  .section-label {
+    @apply text-xs tracking-widest uppercase text-muted-foreground mb-4;
+    font-family: 'IBM Plex Mono', monospace;
   }
 
-  .horizontal-scroll::-webkit-scrollbar {
-    display: none;
-  }
-
-  .snap-section {
-    @apply flex-shrink-0 h-screen;
-    scroll-snap-align: start;
+  .section-heading {
+    @apply text-4xl md:text-5xl font-semibold tracking-tight text-foreground mb-12;
   }
 }

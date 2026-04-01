@@ -6,6 +6,7 @@ import ProjectsSection from "@/components/ProjectsSection";
 import NewsSection from "@/components/NewsSection";
 import PhotoSection from "@/components/PhotoSection";
 import AboutSection from "@/components/AboutSection";
+import Footer from "@/components/Footer";
 
 const navItems = [
   { id: "hero", label: "Home" },
@@ -29,7 +30,7 @@ const Index = () => {
       {/* Sidebar trigger */}
       <button
         onClick={() => setSidebarOpen(true)}
-        className="fixed top-6 left-6 z-50 w-10 h-10 flex items-center justify-center text-foreground hover:text-muted-foreground transition-colors duration-200"
+        className="fixed top-5 left-5 z-50 w-10 h-10 flex items-center justify-center text-foreground hover:text-muted-foreground transition-colors duration-200"
         aria-label="Open menu"
       >
         <Menu className="w-5 h-5" />
@@ -48,7 +49,7 @@ const Index = () => {
               onClick={() => setSidebarOpen(false)}
             />
             <motion.nav
-              className="fixed left-0 top-0 h-screen w-72 bg-sidebar border-r border-sidebar-border z-50 flex flex-col justify-between py-12 px-8"
+              className="fixed left-0 top-0 h-screen w-64 bg-sidebar border-r border-sidebar-border z-50 flex flex-col justify-between py-10 px-6"
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
@@ -57,7 +58,7 @@ const Index = () => {
               <div>
                 <button
                   onClick={() => setSidebarOpen(false)}
-                  className="mb-12 text-sidebar-foreground hover:text-sidebar-primary transition-colors duration-200"
+                  className="mb-10 text-sidebar-foreground hover:text-sidebar-primary transition-colors duration-200"
                   aria-label="Close menu"
                 >
                   <X className="w-5 h-5" />
@@ -68,7 +69,7 @@ const Index = () => {
                     <motion.button
                       key={item.id}
                       onClick={() => handleNavigate(item.id)}
-                      className="text-left py-3 text-lg font-medium text-sidebar-foreground hover:text-sidebar-primary transition-colors duration-200"
+                      className="text-left py-2.5 text-lg font-medium text-sidebar-foreground hover:text-sidebar-primary transition-colors duration-200"
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.1 + i * 0.05, duration: 0.3 }}
@@ -92,6 +93,7 @@ const Index = () => {
         <div id="news"><NewsSection /></div>
         <div id="photos"><PhotoSection /></div>
         <div id="about"><AboutSection /></div>
+        <Footer />
       </main>
     </div>
   );

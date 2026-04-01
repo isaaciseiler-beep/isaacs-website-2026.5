@@ -1,6 +1,7 @@
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { useState, useRef } from "react";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
+import { ChevronRight } from "lucide-react";
+import Logo from "@/components/Logo";
 import HeroSection from "@/components/HeroSection";
 import ProjectsSection from "@/components/ProjectsSection";
 import NewsSection from "@/components/NewsSection";
@@ -16,6 +17,24 @@ const navItems = [
   { id: "about", label: "About" },
 ];
 
+const SectionDivider = () => {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  });
+  const scaleX = useTransform(scrollYProgress, [0, 0.5, 1], [0, 1, 1]);
+
+  return (
+    <div ref={ref} className="px-6 md:px-8">
+      <motion.div
+        className="h-px bg-border origin-left"
+        style={{ scaleX }}
+      />
+    </div>
+  );
+};
+
 const Index = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -27,57 +46,72 @@ const Index = () => {
 
   return (
     <div className="relative">
-      {/* Sidebar trigger */}
-      <button
-        onClick={() => setSidebarOpen(true)}
-        className="fixed top-5 left-5 z-50 w-10 h-10 flex items-center justify-center text-foreground hover:text-muted-foreground transition-colors duration-200"
-        aria-label="Open menu"
-      >
-        <Menu className="w-5 h-5" />
-      </button>
+      {/* Fixed header: logo + chevron */}
+      <div className="fixed top-0 left-0 z-50 flex items-center gap-1 px-6 md:px-8 py-5">
+        <Logo />
+        <motion.button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="w-6 h-6 flex items-center justify-center text-foreground hover:text-muted-foreground transition-colors duration-200"
+          aria-label="Toggle menu"
+          animate={{ rotate: sidebarOpen ? 180 : 0 }}
+          transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+        >
+          <ChevronRight className="w-4 h-4" />
+        </motion.button>
+      </div>
 
-      {/* Sidebar overlay */}
+      {/* Push layout wrapper */}
+      <motion.div
+        animate={{ x: sidebarOpen ? 260 : 0 }}
+        transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+      >
+        {/* Main content */}
+        <main>
+          <div id="hero"><HeroSection /></div>
+          <SectionDivider />
+          <div id="projects"><ProjectsSection /></div>
+          <SectionDivider />
+          <div id="news"><NewsSection /></div>
+          <SectionDivider />
+          <div id="photos"><PhotoSection /></div>
+          <SectionDivider />
+          <div id="about"><AboutSection /></div>
+          <Footer />
+        </main>
+      </motion.div>
+
+      {/* Sidebar - sits behind the pushed content */}
       <AnimatePresence>
         {sidebarOpen && (
           <>
+            {/* Click-away overlay on the pushed content */}
             <motion.div
-              className="fixed inset-0 bg-background/60 backdrop-blur-sm z-50"
+              className="fixed inset-0 z-40"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
               onClick={() => setSidebarOpen(false)}
             />
             <motion.nav
-              className="fixed left-0 top-0 h-screen w-64 bg-sidebar border-r border-sidebar-border z-50 flex flex-col justify-between py-10 px-6"
-              initial={{ x: "-100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "-100%" }}
-              transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+              className="fixed left-0 top-0 h-screen w-[260px] bg-sidebar border-r border-sidebar-border z-30 flex flex-col justify-between py-16 px-6"
+              initial={{ x: -20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -20, opacity: 0 }}
+              transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
             >
-              <div>
-                <button
-                  onClick={() => setSidebarOpen(false)}
-                  className="mb-10 text-sidebar-foreground hover:text-sidebar-primary transition-colors duration-200"
-                  aria-label="Close menu"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-
-                <div className="flex flex-col gap-1">
-                  {navItems.map((item, i) => (
-                    <motion.button
-                      key={item.id}
-                      onClick={() => handleNavigate(item.id)}
-                      className="text-left py-2.5 text-lg font-medium text-sidebar-foreground hover:text-sidebar-primary transition-colors duration-200"
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.1 + i * 0.05, duration: 0.3 }}
-                    >
-                      {item.label}
-                    </motion.button>
-                  ))}
-                </div>
+              <div className="flex flex-col gap-1 mt-4">
+                {navItems.map((item, i) => (
+                  <motion.button
+                    key={item.id}
+                    onClick={() => handleNavigate(item.id)}
+                    className="text-left py-2.5 text-lg font-medium text-sidebar-foreground hover:text-sidebar-primary transition-colors duration-200"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.05 + i * 0.04, duration: 0.25 }}
+                  >
+                    {item.label}
+                  </motion.button>
+                ))}
               </div>
 
               <p className="mono-text">© 2026</p>
@@ -85,16 +119,6 @@ const Index = () => {
           </>
         )}
       </AnimatePresence>
-
-      {/* Main content */}
-      <main>
-        <div id="hero"><HeroSection /></div>
-        <div id="projects"><ProjectsSection /></div>
-        <div id="news"><NewsSection /></div>
-        <div id="photos"><PhotoSection /></div>
-        <div id="about"><AboutSection /></div>
-        <Footer />
-      </main>
     </div>
   );
 };

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -54,12 +54,12 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Syne', sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 600;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
     letter-spacing: -0.03em;
   }
 }
@@ -94,6 +94,6 @@
   }
 
   .section-heading {
-    @apply text-4xl md:text-5xl font-semibold tracking-tight text-foreground mb-8;
+    @apply text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-8;
   }
 }

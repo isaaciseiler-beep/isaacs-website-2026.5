@@ -12,11 +12,11 @@ const AboutSection = () => {
   });
 
   return (
-    <section className="py-16 px-6 md:px-12">
+    <section className="py-12 px-5 md:px-6">
       <h2 className="section-heading">About</h2>
 
-      <div className="max-w-4xl" ref={containerRef}>
-        <p className="text-3xl md:text-5xl leading-snug font-light tracking-tight">
+      <div className="max-w-3xl" ref={containerRef}>
+        <p className="text-2xl md:text-3xl leading-snug font-light tracking-tight">
           {words.map((word, i) => {
             const start = i / words.length;
             const end = start + 1 / words.length;
@@ -25,14 +25,13 @@ const AboutSection = () => {
         </p>
 
         <motion.p
-          className="text-base text-muted-foreground mt-10 leading-relaxed max-w-xl"
+          className="text-sm text-muted-foreground mt-8 leading-relaxed max-w-md"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          Currently available for freelance projects and collaborations.
-          Based nowhere specific — working everywhere.
+          Currently available for select projects and collaborations.
         </motion.p>
       </div>
     </section>
@@ -43,7 +42,7 @@ const Word = ({ children, progress, range }: { children: string; progress: any; 
   const opacity = useTransform(progress, range, [0.08, 1]);
 
   return (
-    <span className="inline-block mr-[0.3em]">
+    <span className="inline-block mr-[0.25em]">
       <motion.span style={{ opacity }} className="inline-block text-foreground">
         {children}
       </motion.span>

@@ -26,7 +26,7 @@ const SectionDivider = () => {
   const scaleX = useTransform(scrollYProgress, [0, 0.5, 1], [0, 1, 1]);
 
   return (
-    <div ref={ref} className="px-6 md:px-8">
+    <div ref={ref} className="px-5 md:px-6">
       <motion.div
         className="h-px bg-border origin-left"
         style={{ scaleX }}
@@ -46,26 +46,25 @@ const Index = () => {
 
   return (
     <div className="relative">
-      {/* Fixed header: logo + chevron */}
-      <div className="fixed top-0 left-0 z-50 flex items-center gap-1 px-6 md:px-8 py-5">
+      {/* Fixed header */}
+      <div className="fixed top-0 left-0 z-50 flex items-center gap-1 px-5 md:px-6 py-4">
         <Logo />
         <motion.button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="w-6 h-6 flex items-center justify-center text-foreground hover:text-muted-foreground transition-colors duration-200"
+          className="w-5 h-5 flex items-center justify-center text-foreground hover:text-muted-foreground transition-colors duration-200"
           aria-label="Toggle menu"
           animate={{ rotate: sidebarOpen ? 180 : 0 }}
           transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
         >
-          <ChevronRight className="w-4 h-4" />
+          <ChevronRight className="w-3.5 h-3.5" />
         </motion.button>
       </div>
 
       {/* Push layout wrapper */}
       <motion.div
-        animate={{ x: sidebarOpen ? 260 : 0 }}
+        animate={{ x: sidebarOpen ? 240 : 0 }}
         transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
       >
-        {/* Main content */}
         <main>
           <div id="hero"><HeroSection /></div>
           <SectionDivider />
@@ -80,11 +79,10 @@ const Index = () => {
         </main>
       </motion.div>
 
-      {/* Sidebar - sits behind the pushed content */}
+      {/* Sidebar */}
       <AnimatePresence>
         {sidebarOpen && (
           <>
-            {/* Click-away overlay on the pushed content */}
             <motion.div
               className="fixed inset-0 z-40"
               initial={{ opacity: 0 }}
@@ -93,21 +91,21 @@ const Index = () => {
               onClick={() => setSidebarOpen(false)}
             />
             <motion.nav
-              className="fixed left-0 top-0 h-screen w-[260px] bg-sidebar border-r border-sidebar-border z-30 flex flex-col justify-between py-16 px-6"
-              initial={{ x: -20, opacity: 0 }}
+              className="fixed left-0 top-0 h-screen w-[240px] bg-sidebar border-r border-sidebar-border z-30 flex flex-col justify-between py-14 px-5"
+              initial={{ x: -16, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
-              exit={{ x: -20, opacity: 0 }}
-              transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+              exit={{ x: -16, opacity: 0 }}
+              transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
             >
-              <div className="flex flex-col gap-1 mt-4">
+              <div className="flex flex-col gap-0.5 mt-4">
                 {navItems.map((item, i) => (
                   <motion.button
                     key={item.id}
                     onClick={() => handleNavigate(item.id)}
-                    className="text-left py-2.5 text-lg font-medium text-sidebar-foreground hover:text-sidebar-primary transition-colors duration-200"
-                    initial={{ opacity: 0, x: -10 }}
+                    className="text-left py-2 text-sm font-medium text-sidebar-foreground hover:text-sidebar-primary transition-colors duration-200"
+                    initial={{ opacity: 0, x: -8 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.05 + i * 0.04, duration: 0.25 }}
+                    transition={{ delay: 0.04 + i * 0.03, duration: 0.2 }}
                   >
                     {item.label}
                   </motion.button>

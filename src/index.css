@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Serif+Display&family=JetBrains+Mono:wght@300;400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,43 +6,43 @@
 
 @layer base {
   :root {
-    --background: 60 33% 5%;
+    --background: 50 33% 7%;
     --foreground: 200 20% 85%;
 
-    --card: 60 20% 8%;
+    --card: 50 20% 9%;
     --card-foreground: 200 20% 85%;
 
-    --popover: 60 20% 8%;
+    --popover: 50 20% 9%;
     --popover-foreground: 200 20% 85%;
 
     --primary: 200 20% 85%;
-    --primary-foreground: 60 33% 5%;
+    --primary-foreground: 50 33% 7%;
 
-    --secondary: 60 10% 12%;
+    --secondary: 50 10% 12%;
     --secondary-foreground: 200 20% 85%;
 
-    --muted: 60 10% 11%;
+    --muted: 50 10% 11%;
     --muted-foreground: 200 15% 50%;
 
     --accent: 200 20% 85%;
-    --accent-foreground: 60 33% 5%;
+    --accent-foreground: 50 33% 7%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 60 10% 15%;
-    --input: 60 10% 15%;
+    --border: 50 10% 14%;
+    --input: 50 10% 14%;
     --ring: 200 20% 85%;
 
     --radius: 0px;
 
-    --sidebar-background: 60 33% 3%;
+    --sidebar-background: 50 33% 5%;
     --sidebar-foreground: 200 20% 65%;
     --sidebar-primary: 200 20% 85%;
-    --sidebar-primary-foreground: 60 33% 5%;
-    --sidebar-accent: 60 10% 10%;
+    --sidebar-primary-foreground: 50 33% 7%;
+    --sidebar-accent: 50 10% 10%;
     --sidebar-accent-foreground: 200 20% 85%;
-    --sidebar-border: 60 10% 12%;
+    --sidebar-border: 50 10% 12%;
     --sidebar-ring: 200 20% 85%;
   }
 }
@@ -54,20 +54,24 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Syne', sans-serif;
+    font-family: 'Space Grotesk', sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    letter-spacing: -0.03em;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.02em;
   }
 }
 
 @layer components {
   .mono-text {
     font-family: 'JetBrains Mono', monospace;
-    @apply text-xs tracking-widest uppercase text-muted-foreground;
+    @apply text-[10px] tracking-widest uppercase text-muted-foreground;
+  }
+
+  .logo-font {
+    font-family: 'DM Serif Display', serif;
   }
 
   .grid-item {
@@ -81,7 +85,7 @@
 
   .grid-item:hover img {
     filter: grayscale(0%);
-    transform: scale(1.03);
+    transform: scale(1.02);
   }
 
   .grid-item-overlay {
@@ -94,6 +98,6 @@
   }
 
   .section-heading {
-    @apply text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-8;
+    @apply text-2xl font-semibold tracking-tight text-foreground mb-6;
   }
 }

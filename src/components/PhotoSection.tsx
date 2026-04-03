@@ -12,12 +12,6 @@ const photos = [
   { id: 4, title: "Vanishing Point", location: "Brussels", image: photo4 },
   { id: 5, title: "Underpass", location: "Tokyo", image: photo1 },
   { id: 6, title: "Grain", location: "Berlin", image: photo2 },
-  { id: 7, title: "Aperture", location: "London", image: photo3 },
-  { id: 8, title: "Contour", location: "São Paulo", image: photo4 },
-  { id: 9, title: "Residue", location: "Portland", image: photo1 },
-  { id: 10, title: "Echo", location: "Seoul", image: photo2 },
-  { id: 11, title: "Fragment", location: "Mexico City", image: photo3 },
-  { id: 12, title: "Dissolve", location: "Lisbon", image: photo4 },
 ];
 
 const PhotoItem = ({ photo, index }: { photo: typeof photos[0]; index: number }) => {
@@ -26,16 +20,19 @@ const PhotoItem = ({ photo, index }: { photo: typeof photos[0]; index: number })
     target: ref,
     offset: ["start end", "end start"],
   });
-  const y = useTransform(scrollYProgress, [0, 1], [15, -15]);
+  const y = useTransform(scrollYProgress, [0, 1], [10, -10]);
+
+  // Stagger: odd items get a top offset
+  const isOdd = index % 2 === 1;
 
   return (
     <motion.div
       ref={ref}
-      className="grid-item aspect-[4/3]"
+      className={`grid-item aspect-[4/3] ${isOdd ? "mt-8 md:mt-12" : ""}`}
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
-      viewport={{ once: true, margin: "-30px" }}
-      transition={{ delay: index * 0.03, duration: 0.4 }}
+      viewport={{ once: true, margin: "-20px" }}
+      transition={{ delay: index * 0.04, duration: 0.4 }}
     >
       <motion.img
         src={photo.image}
@@ -45,8 +42,8 @@ const PhotoItem = ({ photo, index }: { photo: typeof photos[0]; index: number })
         style={{ y }}
       />
       <div className="grid-item-overlay">
-        <p className="mono-text mb-1">{photo.location}</p>
-        <h3 className="text-sm font-medium text-foreground">{photo.title}</h3>
+        <p className="mono-text mb-0.5">{photo.location}</p>
+        <h3 className="text-xs font-medium text-foreground">{photo.title}</h3>
       </div>
     </motion.div>
   );
@@ -54,15 +51,15 @@ const PhotoItem = ({ photo, index }: { photo: typeof photos[0]; index: number })
 
 const PhotoSection = () => {
   return (
-    <section className="py-16 px-6 md:px-12">
-      <div className="flex items-end justify-between mb-8">
+    <section className="py-12 px-5 md:px-6">
+      <div className="flex items-end justify-between mb-6">
         <h2 className="section-heading mb-0">Photos</h2>
-        <a href="#" className="mono-text hover:text-foreground transition-colors duration-200 pb-1">
+        <a href="#" className="mono-text hover:text-foreground transition-colors duration-200 pb-0.5">
           View all →
         </a>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-1">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-[3px]">
         {photos.map((photo, index) => (
           <PhotoItem key={photo.id} photo={photo} index={index} />
         ))}

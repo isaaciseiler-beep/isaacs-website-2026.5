@@ -9,7 +9,7 @@ const newsItems = [
 
 const NewsSection = () => {
   return (
-    <section className="py-16 px-6 md:px-12">
+    <section className="py-12 px-5 md:px-6">
       <h2 className="section-heading">News</h2>
 
       <div className="border-t border-border">
@@ -17,18 +17,18 @@ const NewsSection = () => {
           <motion.a
             key={item.id}
             href="#"
-            className="group flex items-start md:items-center justify-between py-5 border-b border-border hover:bg-card/50 -mx-3 px-3 transition-colors duration-200"
-            initial={{ opacity: 0, y: 10 }}
+            className="group flex items-start md:items-center justify-between py-4 border-b border-border hover:bg-card/50 -mx-2 px-2 transition-colors duration-200"
+            initial={{ opacity: 0, y: 8 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-30px" }}
-            transition={{ delay: index * 0.05, duration: 0.3 }}
+            viewport={{ once: true, margin: "-20px" }}
+            transition={{ delay: index * 0.04, duration: 0.3 }}
           >
             <div className="flex-1">
-              <p className="mono-text mb-1">{item.date}</p>
-              <h3 className="text-lg font-medium text-foreground group-hover:text-muted-foreground transition-colors duration-200">
+              <p className="mono-text mb-0.5">{item.date}</p>
+              <h3 className="text-sm font-medium text-foreground group-hover:text-muted-foreground transition-colors duration-200">
                 {item.title}
               </h3>
-              <p className="text-sm text-muted-foreground mt-1 hidden md:block">{item.description}</p>
+              <p className="text-xs text-muted-foreground mt-0.5 hidden md:block">{item.description}</p>
             </div>
             <span className="mono-text opacity-0 group-hover:opacity-100 transition-opacity duration-200 ml-4">→</span>
           </motion.a>

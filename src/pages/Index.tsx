@@ -34,7 +34,7 @@ const Index = () => {
   return (
     <div className="relative">
       {/* Fixed header */}
-      <div className="fixed top-0 left-0 z-50 flex items-center gap-1 px-3 md:px-3 py-4">
+      <div className="fixed top-0 left-0 z-50 flex items-center gap-1 px-6 md:px-6 py-4">
         <Logo />
         <motion.button
           onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -66,7 +66,7 @@ const Index = () => {
 
       {/* Sidebar */}
       <motion.nav
-        className="fixed left-0 top-0 h-screen w-[240px] bg-sidebar border-r border-sidebar-border z-30 flex flex-col justify-between py-14 px-5"
+        className="fixed left-0 top-0 h-screen w-[240px] bg-sidebar border-r border-sidebar-border z-30 flex flex-col justify-between py-14 px-6"
         animate={{ x: sidebarOpen ? 0 : -240 }}
         transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
       >

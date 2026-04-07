@@ -21,10 +21,7 @@ const allProjects = [
 ];
 
 const COLS = 3;
-const VISIBLE_ROWS = 2;
-const INITIAL_COUNT = COLS * VISIBLE_ROWS; // 6
-const PEEK_COUNT = COLS; // 3 more (row 3, half visible via fade)
-const GAP = 3; // px
+const GAP = 3;
 
 const ProjectItem = ({
   project,
@@ -73,13 +70,13 @@ const ProjectItem = ({
 const ProjectsSection = () => {
   const [expanded, setExpanded] = useState(false);
 
-  // Row 1-2: fully interactive, Row 3: peek (no hover), Rest: expanded
-  const visibleProjects = allProjects.slice(0, INITIAL_COUNT);
-  const peekProjects = allProjects.slice(INITIAL_COUNT, INITIAL_COUNT + PEEK_COUNT);
-  const remainingProjects = allProjects.slice(INITIAL_COUNT + PEEK_COUNT);
+  // Row 1: fully visible (3 items). Row 2: peek row, gradient covers bottom 70%.
+  const visibleProjects = allProjects.slice(0, COLS); // row 1
+  const peekProjects = allProjects.slice(COLS, COLS * 2); // row 2 (partially visible)
+  const remainingProjects = allProjects.slice(COLS * 2); // rest
 
   return (
-    <section className="py-12 px-3 md:px-3">
+    <section className="py-12 px-6 md:px-6">
       <h2 className="section-heading">Projects</h2>
 
       <div className="relative">
@@ -87,17 +84,17 @@ const ProjectsSection = () => {
           className="grid grid-cols-2 md:grid-cols-3"
           style={{ gap: `${GAP}px` }}
         >
-          {/* Rows 1 & 2 — fully interactive */}
+          {/* Row 1 — fully interactive */}
           {visibleProjects.map((project, index) => (
             <ProjectItem key={project.id} project={project} index={index} />
           ))}
 
-          {/* Row 3 — peek row, no hover until expanded */}
+          {/* Row 2 — peek row, no hover until expanded */}
           {peekProjects.map((project, index) => (
             <ProjectItem
               key={project.id}
               project={project}
-              index={INITIAL_COUNT + index}
+              index={COLS + index}
               hoverEnabled={expanded}
             />
           ))}
@@ -115,24 +112,26 @@ const ProjectsSection = () => {
                 >
                   <ProjectItem
                     project={project}
-                    index={INITIAL_COUNT + PEEK_COUNT + index}
+                    index={COLS * 2 + index}
                   />
                 </motion.div>
               ))}
           </AnimatePresence>
         </div>
 
-        {/* Fade overlay + pill button */}
+        {/* Fade overlay starting 30% down row 2 + pill button */}
         {!expanded && (
           <div
-            className="absolute bottom-0 left-0 right-0 h-48 flex items-end justify-center pb-6 pointer-events-none"
+            className="absolute bottom-0 left-0 right-0 flex items-end justify-center pb-6 pointer-events-none"
             style={{
-              background: `linear-gradient(to bottom, transparent, hsl(var(--background)))`,
+              height: "70%",
+              background: `linear-gradient(to bottom, transparent 0%, hsl(var(--background)) 55%)`,
+              /* This div covers bottom 70% of the 2-row area, so gradient starts ~30% into row 2 */
             }}
           >
             <button
               onClick={() => setExpanded(true)}
-              className="mono-text pointer-events-auto px-6 py-2 rounded-full bg-white text-[hsl(var(--background))] font-medium text-xs tracking-widest uppercase hover:opacity-80 transition-opacity duration-200"
+              className="pill-button pointer-events-auto"
             >
               See all
             </button>
@@ -143,7 +142,7 @@ const ProjectsSection = () => {
           <div className="flex justify-center mt-4">
             <button
               onClick={() => setExpanded(false)}
-              className="mono-text px-6 py-2 rounded-full bg-white text-[hsl(var(--background))] font-medium text-xs tracking-widest uppercase hover:opacity-80 transition-opacity duration-200"
+              className="pill-button"
             >
               Show less
             </button>

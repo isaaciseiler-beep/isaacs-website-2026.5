@@ -12,7 +12,7 @@ const Logo = () => {
   const nameSpace = useTransform(progress, [0, 0.7], ["0.35em", "0em"]);
 
   // "EILER" collapses
-  const eilerWidth = useTransform(progress, [0, 0.7], ["2.9em", "0em"]);
+  const eilerWidth = useTransform(progress, [0, 0.7], ["3.5em", "0em"]);
   const eilerOpacity = useTransform(progress, [0, 0.5], [1, 0]);
 
   // Middle "I" appears

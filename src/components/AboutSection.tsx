@@ -8,7 +8,7 @@ const AboutSection = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ["start 0.8", "start 0.15"],
+    offset: ["start 0.9", "end 0.85"],
   });
 
   return (
@@ -25,7 +25,7 @@ const AboutSection = () => {
         </p>
 
         <motion.p
-          className="text-sm text-muted-foreground mt-8 leading-relaxed max-w-md"
+          className="text-sm text-foreground/50 mt-8 leading-relaxed max-w-md"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}

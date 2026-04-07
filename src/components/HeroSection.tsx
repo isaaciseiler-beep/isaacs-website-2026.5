@@ -6,7 +6,7 @@ const HeroSection = () => {
 
   return (
     <section className="relative h-screen flex items-end overflow-hidden">
-      {/* Subtle sandstorm gradient — barely deviates from base */}
+      {/* Subtle sandstorm gradient */}
       <div className="absolute inset-0">
         <div
           className="absolute inset-0"
@@ -33,18 +33,20 @@ const HeroSection = () => {
       />
 
       <motion.div
-        className="relative z-10 px-5 md:px-6 pb-8 md:pb-10 max-w-2xl"
+        className="relative z-10 px-5 md:px-6 pb-8 md:pb-10 max-w-3xl"
         style={{ opacity: textOpacity }}
       >
         <motion.h1
-          className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tighter leading-[0.92] text-foreground"
+          className="text-5xl md:text-7xl lg:text-8xl font-semibold tracking-tighter leading-[0.92] text-foreground"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
         >
-          Design
+          Crafting visual
           <br />
-          <span className="text-foreground">&amp; Build</span>
+          experiences that
+          <br />
+          <span className="text-foreground">resonate.</span>
         </motion.h1>
       </motion.div>
     </section>

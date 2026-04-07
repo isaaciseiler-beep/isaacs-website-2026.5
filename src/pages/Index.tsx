@@ -3,15 +3,18 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronRight } from "lucide-react";
 import Logo from "@/components/Logo";
 import HeroSection from "@/components/HeroSection";
+import FeaturedSection from "@/components/FeaturedSection";
 import ProjectsSection from "@/components/ProjectsSection";
 import NewsSection from "@/components/NewsSection";
 import PhotoSection from "@/components/PhotoSection";
 import InspirationBoard from "@/components/InspirationBoard";
 import AboutSection from "@/components/AboutSection";
 import Footer from "@/components/Footer";
+import ChatOrb from "@/components/ChatOrb";
 
 const navItems = [
   { id: "hero", label: "Home" },
+  { id: "featured", label: "Featured" },
   { id: "projects", label: "Projects" },
   { id: "news", label: "News" },
   { id: "photos", label: "Photos" },
@@ -31,7 +34,7 @@ const Index = () => {
   return (
     <div className="relative">
       {/* Fixed header */}
-      <div className="fixed top-0 left-0 z-50 flex items-center gap-1 px-5 md:px-6 py-4">
+      <div className="fixed top-0 left-0 z-50 flex items-center gap-1 px-3 md:px-3 py-4">
         <Logo />
         <motion.button
           onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -51,6 +54,7 @@ const Index = () => {
       >
         <main>
           <div id="hero"><HeroSection /></div>
+          <div id="featured"><FeaturedSection /></div>
           <div id="projects"><ProjectsSection /></div>
           <div id="news"><NewsSection /></div>
           <div id="photos"><PhotoSection /></div>
@@ -92,6 +96,9 @@ const Index = () => {
           />
         )}
       </AnimatePresence>
+
+      {/* Chat orb */}
+      <ChatOrb />
     </div>
   );
 };

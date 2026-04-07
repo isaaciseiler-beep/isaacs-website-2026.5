@@ -113,11 +113,9 @@ const ChatOrb = () => {
             transition={fastSlowTransition}
             aria-label="Open chat"
           >
-            <motion.div
+            <div
               className="rounded-full"
               style={{ width: 8, height: 8, background: orbColor }}
-              animate={{ scale: [1, 1.3, 1] }}
-              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             />
           </motion.button>
         )}
@@ -233,6 +231,7 @@ const ChatOrb = () => {
                   placeholder={mode === "ai" ? "Ask me anything…" : "Search my work…"}
                   className="flex-1 bg-transparent text-xs text-background placeholder:text-background/25 outline-none min-w-0"
                 />
+                <div className="flex-1" />
                 <AnimatePresence>
                   {mode === "ai" && input.trim() && (
                     <motion.button
@@ -246,35 +245,23 @@ const ChatOrb = () => {
                     </motion.button>
                   )}
                 </AnimatePresence>
-                <div className="flex-1" />
-                <button
-                  onClick={() => setIsOpen(false)}
-                  className="w-6 h-6 flex items-center justify-center shrink-0 hover:opacity-70 transition-opacity"
-                  aria-label="Close chat"
-                >
-                  <div className="rounded-full" style={{ width: 8, height: 8, background: orbColor }} />
-                </button>
               </div>
 
               {/* Mode buttons + disclosure */}
               <div className="w-full flex items-center justify-between mt-2.5 px-1">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <button
                     onClick={() => setMode("search")}
-                    className={`font-mono text-[11px] tracking-widest uppercase px-3 py-1 border transition-colors duration-200 ${
-                      mode === "search"
-                        ? "text-foreground/80 border-foreground/30"
-                        : "text-foreground/25 border-foreground/10 hover:text-foreground/40 hover:border-foreground/20"
+                    className={`pill-button !px-4 !py-1.5 !text-[10px] ${
+                      mode === "search" ? "opacity-100" : "opacity-30 hover:opacity-50"
                     }`}
                   >
                     Search
                   </button>
                   <button
                     onClick={() => setMode("ai")}
-                    className={`font-mono text-[11px] tracking-widest uppercase px-3 py-1 border transition-colors duration-200 ${
-                      mode === "ai"
-                        ? "text-foreground/80 border-foreground/30"
-                        : "text-foreground/25 border-foreground/10 hover:text-foreground/40 hover:border-foreground/20"
+                    className={`pill-button !px-4 !py-1.5 !text-[10px] ${
+                      mode === "ai" ? "opacity-100" : "opacity-30 hover:opacity-50"
                     }`}
                   >
                     AI

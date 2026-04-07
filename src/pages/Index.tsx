@@ -14,27 +14,35 @@ import ChatOrb from "@/components/ChatOrb";
 
 const navItems = [
   { id: "hero", label: "Home" },
-  { id: "featured", label: "Featured" },
-  { id: "projects", label: "Projects" },
-  { id: "news", label: "News" },
   { id: "photos", label: "Photos" },
-  { id: "inspiration", label: "Inspiration" },
-  { id: "about", label: "About" },
+  { id: "linkedin", label: "LinkedIn", href: "https://www.linkedin.com" },
 ];
 
 const Index = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const handleNavigate = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: "smooth" });
+  const handleNavigate = (item: typeof navItems[number]) => {
+    if (item.href) {
+      window.open(item.href, "_blank", "noopener");
+    } else {
+      const el = document.getElementById(item.id);
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+    }
     setSidebarOpen(false);
   };
 
   return (
     <div className="relative">
-      {/* Fixed header with gradient */}
-      <div className="fixed top-0 left-0 right-0 z-50 pointer-events-none" style={{ height: 80, background: "linear-gradient(to bottom, hsl(var(--background)) 40%, transparent)" }} />
+      {/* Header gradient — short, smooth fade */}
+      <div
+        className="fixed top-0 left-0 right-0 z-40 pointer-events-none"
+        style={{
+          height: 64,
+          background: "linear-gradient(to bottom, hsl(var(--background)) 0%, hsl(var(--background) / 0.85) 50%, transparent 100%)",
+        }}
+      />
+
+      {/* Fixed header */}
       <div className="fixed top-0 left-0 z-50 flex items-center gap-1 px-6 md:px-6 py-4">
         <Logo />
         <motion.button
@@ -65,24 +73,23 @@ const Index = () => {
         </main>
       </motion.div>
 
-      {/* Sidebar */}
+      {/* Sidebar — no border, above gradient */}
       <motion.nav
-        className="fixed left-0 top-0 h-screen w-[240px] bg-sidebar border-r border-sidebar-border z-30 flex flex-col justify-between py-14 px-6"
+        className="fixed left-0 top-0 h-screen w-[240px] bg-background z-[45] flex flex-col justify-center px-6"
         animate={{ x: sidebarOpen ? 0 : -240 }}
         transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
       >
-        <div className="flex flex-col gap-0.5 mt-4">
+        <div className="flex flex-col gap-0.5">
           {navItems.map((item) => (
             <button
               key={item.id}
-              onClick={() => handleNavigate(item.id)}
-              className="text-left py-2 text-sm font-medium text-sidebar-foreground hover:text-sidebar-primary transition-colors duration-200"
+              onClick={() => handleNavigate(item)}
+              className="text-left py-2 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors duration-200"
             >
               {item.label}
             </button>
           ))}
         </div>
-        <p className="mono-text">© 2026</p>
       </motion.nav>
 
       {/* Overlay to close sidebar */}

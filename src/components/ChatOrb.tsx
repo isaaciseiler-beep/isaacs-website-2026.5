@@ -8,13 +8,21 @@ interface Message {
   content: string;
 }
 
-// Match the pill height (py-2.5 = 10px*2 + ~16px content = 36px)
 const DOT_SIZE = 36;
 const DOT_BOTTOM = 20;
 const DOT_RIGHT = 20;
 
+// Fast-to-slow easing: starts quick, decelerates
+const fastSlowTransition = {
+  type: "spring" as const,
+  stiffness: 400,
+  damping: 32,
+  mass: 0.6,
+};
+
 const ChatOrb = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
   const [mode, setMode] = useState<"search" | "ai">("search");
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
@@ -23,7 +31,18 @@ const ChatOrb = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const lastScrollY = useRef(0);
 
-  // Collapse on scroll
+  // Show orb only after scrolling past hero (~80% of viewport)
+  useEffect(() => {
+    const handleScroll = () => {
+      const threshold = window.innerHeight * 0.8;
+      setIsVisible(window.scrollY > threshold);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Collapse on scroll while open
   useEffect(() => {
     if (!isOpen) return;
     const handleScroll = () => {
@@ -38,7 +57,7 @@ const ChatOrb = () => {
 
   useEffect(() => {
     if (isOpen && inputRef.current) {
-      setTimeout(() => inputRef.current?.focus(), 400);
+      setTimeout(() => inputRef.current?.focus(), 300);
     }
     lastScrollY.current = window.scrollY;
   }, [isOpen]);
@@ -68,15 +87,16 @@ const ChatOrb = () => {
     }, 1200);
   };
 
-  // The orb color — light blue from the site palette
   const orbColor = "hsl(200 20% 85%)";
   const bgShadow = "hsl(var(--background))";
 
+  if (!isVisible && !isOpen) return null;
+
   return (
     <>
-      {/* Closed: circle matching pill height */}
+      {/* Closed: circle */}
       <AnimatePresence>
-        {!isOpen && (
+        {!isOpen && isVisible && (
           <motion.button
             className="fixed z-[60] flex items-center justify-center rounded-full"
             style={{
@@ -91,16 +111,12 @@ const ChatOrb = () => {
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 500, damping: 30 }}
+            transition={fastSlowTransition}
             aria-label="Open chat"
           >
             <motion.div
               className="rounded-full"
-              style={{
-                width: 8,
-                height: 8,
-                background: orbColor,
-              }}
+              style={{ width: 8, height: 8, background: orbColor }}
               animate={{ scale: [1, 1.3, 1] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             />
@@ -108,11 +124,10 @@ const ChatOrb = () => {
         )}
       </AnimatePresence>
 
-      {/* Open: expands from the dot position */}
+      {/* Open: morphs from circle */}
       <AnimatePresence>
         {isOpen && (
           <>
-            {/* Backdrop */}
             <motion.div
               className="fixed inset-0 z-[55]"
               initial={{ opacity: 0 }}
@@ -121,11 +136,6 @@ const ChatOrb = () => {
               onClick={() => setIsOpen(false)}
             />
 
-            {/* 
-              Container is anchored at bottom-right (same as dot).
-              It morphs from a tiny circle to the full chat panel.
-              transformOrigin bottom-right keeps expansion rooted at the dot.
-            */}
             <motion.div
               className="fixed z-[60] flex flex-col items-stretch overflow-hidden"
               style={{
@@ -151,12 +161,7 @@ const ChatOrb = () => {
                 borderRadius: DOT_SIZE / 2,
                 opacity: 0,
               }}
-              transition={{
-                type: "spring",
-                stiffness: 260,
-                damping: 26,
-                mass: 0.7,
-              }}
+              transition={fastSlowTransition}
             >
               {/* Conversation area */}
               <AnimatePresence>
@@ -172,7 +177,7 @@ const ChatOrb = () => {
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
-                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    transition={fastSlowTransition}
                   >
                     <div className="px-5 py-4 space-y-3">
                       {messages.map((msg) => (
@@ -191,7 +196,6 @@ const ChatOrb = () => {
                           </p>
                         </div>
                       ))}
-
                       {isLoading && (
                         <div className="flex justify-start">
                           <div className="flex gap-1">
@@ -230,7 +234,6 @@ const ChatOrb = () => {
                   placeholder={mode === "ai" ? "Ask me anything…" : "Search my work…"}
                   className="flex-1 bg-transparent text-xs text-background placeholder:text-background/25 outline-none min-w-0"
                 />
-
                 <AnimatePresence>
                   {input.trim() && (
                     <motion.button
@@ -244,21 +247,12 @@ const ChatOrb = () => {
                     </motion.button>
                   )}
                 </AnimatePresence>
-
-                {/* Close dot */}
                 <button
                   onClick={() => setIsOpen(false)}
                   className="w-6 h-6 flex items-center justify-center shrink-0 hover:opacity-70 transition-opacity"
                   aria-label="Close chat"
                 >
-                  <div
-                    className="rounded-full"
-                    style={{
-                      width: 8,
-                      height: 8,
-                      background: orbColor,
-                    }}
-                  />
+                  <div className="rounded-full" style={{ width: 8, height: 8, background: orbColor }} />
                 </button>
               </div>
 
@@ -286,7 +280,6 @@ const ChatOrb = () => {
                     AI
                   </button>
                 </div>
-
                 <AnimatePresence>
                   {mode === "ai" && (
                     <motion.p

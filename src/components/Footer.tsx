@@ -1,20 +1,8 @@
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
 import { Linkedin, Github } from "lucide-react";
 
 const Footer = () => {
-  const footerRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: footerRef,
-    offset: ["start end", "end end"],
-  });
-
-  const nameScale = useTransform(scrollYProgress, [0.3, 1], [0.8, 1]);
-  const nameOpacity = useTransform(scrollYProgress, [0.2, 0.6], [0, 1]);
-  const nameY = useTransform(scrollYProgress, [0.3, 1], [60, 0]);
-
   return (
-    <footer ref={footerRef} id="footer" className="border-t border-border overflow-hidden">
+    <footer id="footer" className="border-t border-border overflow-hidden relative">
       <div className="px-6 md:px-6 pt-12 pb-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
@@ -40,18 +28,19 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* Large name with parallax reveal */}
-      <motion.div
-        className="relative w-full mt-8 pb-4 px-2"
-        style={{ scale: nameScale, opacity: nameOpacity, y: nameY }}
-      >
+      {/* Fixed-style name anchored at bottom, edge to edge, slightly darker */}
+      <div className="w-full overflow-hidden" style={{ lineHeight: 0.85 }}>
         <h2
-          className="text-[12vw] md:text-[10vw] font-semibold tracking-tighter leading-none text-foreground text-center whitespace-nowrap overflow-hidden"
-          style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif" }}
+          className="font-semibold tracking-tighter leading-none w-full text-center"
+          style={{
+            fontFamily: "-apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif",
+            fontSize: "min(12vw, 220px)",
+            color: "hsl(var(--foreground) / 0.06)",
+          }}
         >
           ISAAC SEILER
         </h2>
-      </motion.div>
+      </div>
     </footer>
   );
 };

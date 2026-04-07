@@ -23,6 +23,7 @@ const allProjects = [
 
 const COLS = 2;
 const GAP = 6;
+const VISIBLE_ROWS = 2;
 
 const ProjectItem = ({
   project,
@@ -71,12 +72,12 @@ const ProjectItem = ({
 const ProjectsSection = () => {
   const [expanded, setExpanded] = useState(false);
 
-  const visibleProjects = allProjects.slice(0, COLS * 2);
-  const peekProjects = allProjects.slice(COLS * 2, COLS * 3);
-  const remainingProjects = allProjects.slice(COLS * 3);
+  // 2 rows visible = 4 items, then peek row, then rest
+  const visibleProjects = allProjects.slice(0, COLS * VISIBLE_ROWS);
+  const remainingProjects = allProjects.slice(COLS * VISIBLE_ROWS);
 
   return (
-    <section className="py-12 px-6 md:px-6">
+    <section className="py-6 px-6 md:px-6">
       <h2 className="section-heading">Projects</h2>
 
       <div className="relative">
@@ -86,15 +87,6 @@ const ProjectsSection = () => {
         >
           {visibleProjects.map((project, index) => (
             <ProjectItem key={project.id} project={project} index={index} />
-          ))}
-
-          {peekProjects.map((project, index) => (
-            <ProjectItem
-              key={project.id}
-              project={project}
-              index={COLS * 2 + index}
-              hoverEnabled={expanded}
-            />
           ))}
 
           <AnimatePresence initial={false}>
@@ -109,23 +101,12 @@ const ProjectsSection = () => {
                 >
                   <ProjectItem
                     project={project}
-                    index={COLS * 3 + index}
+                    index={COLS * VISIBLE_ROWS + index}
                   />
                 </motion.div>
               ))}
           </AnimatePresence>
         </div>
-
-        {/* Fade overlay for peek row */}
-        {!expanded && (
-          <div
-            className="absolute bottom-0 left-0 right-0 flex items-end justify-center pb-6 pointer-events-none"
-            style={{
-              height: "50%",
-              background: `linear-gradient(to bottom, transparent 0%, hsl(var(--background)) 55%)`,
-            }}
-          />
-        )}
 
         {/* Chevron toggle */}
         <div className="flex justify-center mt-4">

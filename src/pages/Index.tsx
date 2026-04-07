@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronRight } from "lucide-react";
+import { useTheme } from "@/components/ThemeProvider";
+import { ChevronRight } from "lucide-react";
 import Logo from "@/components/Logo";
 import HeroSection from "@/components/HeroSection";
 import FeaturedSection from "@/components/FeaturedSection";
@@ -90,6 +92,9 @@ const Index = () => {
             </button>
           ))}
         </div>
+
+        {/* Theme switch */}
+        <ThemeSwitch />
       </motion.nav>
 
       {/* Overlay to close sidebar */}

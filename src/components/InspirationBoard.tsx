@@ -12,19 +12,17 @@ interface PinItem {
   y: number;
   rotation: number;
   width: number;
-  color?: string;
-  depth?: number; // 0=back, 1=mid, 2=front for layering
 }
 
 const initialPins: PinItem[] = [
-  { id: 1, type: "image", content: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&h=200&fit=crop", label: "Alpine Light", url: "https://unsplash.com", x: 40, y: 30, rotation: -3, width: 220, depth: 2 },
-  { id: 2, type: "quote", content: "\"Design is not just what it looks like. Design is how it works.\"", label: "Steve Jobs", x: 320, y: 60, rotation: 2, width: 200, depth: 1 },
-  { id: 3, type: "image", content: "https://images.unsplash.com/photo-1493612276216-ee3925520721?w=300&h=200&fit=crop", label: "Color Theory", url: "https://unsplash.com", x: 580, y: 20, rotation: -1, width: 200, depth: 0 },
-  { id: 4, type: "link", content: "The Future of Creative Tools", label: "Wired", url: "https://wired.com", x: 60, y: 280, rotation: 1, width: 190, depth: 1 },
-  { id: 5, type: "note", content: "Explore brutalist web aesthetics — raw, honest, confrontational design.", label: "Personal Note", x: 300, y: 310, rotation: -2, width: 200, depth: 2 },
-  { id: 6, type: "quote", content: "\"Simplicity is the ultimate sophistication.\"", label: "Leonardo da Vinci", x: 600, y: 270, rotation: 3, width: 180, depth: 0 },
-  { id: 7, type: "link", content: "Why Brutalism is Making a Comeback", label: "It's Nice That", url: "https://itsnicethat.com", x: 160, y: 480, rotation: -1, width: 200, depth: 1 },
-  { id: 8, type: "image", content: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=200&fit=crop", label: "Street Typography", url: "https://unsplash.com", x: 440, y: 460, rotation: 2, width: 210, depth: 2 },
+  { id: 1, type: "image", content: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&h=200&fit=crop", label: "Alpine Light", url: "https://unsplash.com", x: 40, y: 30, rotation: -3, width: 220 },
+  { id: 2, type: "quote", content: "\"Design is not just what it looks like. Design is how it works.\"", label: "Steve Jobs", x: 320, y: 60, rotation: 2, width: 200 },
+  { id: 3, type: "image", content: "https://images.unsplash.com/photo-1493612276216-ee3925520721?w=300&h=200&fit=crop", label: "Color Theory", url: "https://unsplash.com", x: 580, y: 20, rotation: -1, width: 200 },
+  { id: 4, type: "link", content: "The Future of Creative Tools", label: "Wired", url: "https://wired.com", x: 60, y: 280, rotation: 1, width: 190 },
+  { id: 5, type: "note", content: "Explore brutalist web aesthetics — raw, honest, confrontational design.", label: "Personal Note", x: 300, y: 310, rotation: -2, width: 200 },
+  { id: 6, type: "quote", content: "\"Simplicity is the ultimate sophistication.\"", label: "Leonardo da Vinci", x: 600, y: 270, rotation: 3, width: 180 },
+  { id: 7, type: "link", content: "Why Brutalism is Making a Comeback", label: "It's Nice That", url: "https://itsnicethat.com", x: 160, y: 480, rotation: -1, width: 200 },
+  { id: 8, type: "image", content: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=200&fit=crop", label: "Street Typography", url: "https://unsplash.com", x: 440, y: 460, rotation: 2, width: 210 },
 ];
 
 const typeIcon = {
@@ -34,40 +32,36 @@ const typeIcon = {
   note: BookOpen,
 };
 
-const depthStyles = [
-  { scale: 0.92, blur: 1, opacity: 0.7 },  // back
-  { scale: 0.96, blur: 0, opacity: 0.85 },  // mid
-  { scale: 1, blur: 0, opacity: 1 },         // front
-];
-
 const InspirationBoard = () => {
   const [pins, setPins] = useState(initialPins);
   const boardRef = useRef<HTMLDivElement>(null);
   const dragItem = useRef<number | null>(null);
   const dragOffset = useRef({ x: 0, y: 0 });
+  const hasDragged = useRef(false);
 
   const handleDragStart = (id: number, e: React.PointerEvent) => {
     const pin = pins.find((p) => p.id === id);
     if (!pin || !boardRef.current) return;
     const rect = boardRef.current.getBoundingClientRect();
     dragItem.current = id;
+    hasDragged.current = false;
     dragOffset.current = { x: e.clientX - rect.left - pin.x, y: e.clientY - rect.top - pin.y };
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
-    // Bring to front
-    setPins((prev) => prev.map((p) => p.id === id ? { ...p, depth: 2 } : p));
   };
 
   const handleDragMove = (e: React.PointerEvent) => {
     if (dragItem.current === null || !boardRef.current) return;
+    hasDragged.current = true;
     const rect = boardRef.current.getBoundingClientRect();
     const newX = e.clientX - rect.left - dragOffset.current.x;
     const newY = e.clientY - rect.top - dragOffset.current.y;
-    setPins((prev) => prev.map((p) => p.id === dragItem.current ? { ...p, x: Math.max(0, newX), y: Math.max(0, newY) } : p));
+    setPins((prev) => prev.map((p) => p.id === dragItem.current ? { ...p, x: newX, y: Math.max(-20, newY) } : p));
   };
 
   const handleDragEnd = () => { dragItem.current = null; };
 
   const handleClick = (pin: PinItem) => {
+    if (hasDragged.current) return; // Don't navigate if dragged
     if (pin.url) window.open(pin.url, "_blank", "noopener");
   };
 
@@ -75,12 +69,16 @@ const InspirationBoard = () => {
     <section className="py-12 px-6 md:px-6">
       <h2 className="section-heading">My Inspiration</h2>
 
-      <div
+      <motion.div
         ref={boardRef}
-        className="relative w-full border border-border overflow-hidden bg-card/30"
-        style={{ height: 620 }}
+        className="relative w-full border border-border bg-card/30"
+        style={{ height: 620, overflow: "visible" }}
         onPointerMove={handleDragMove}
         onPointerUp={handleDragEnd}
+        initial={{ opacity: 0, scale: 0.95 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
       >
         {/* Dot grid */}
         <div
@@ -91,8 +89,7 @@ const InspirationBoard = () => {
           }}
         />
 
-        {pins.map((pin) => {
-          const depth = depthStyles[pin.depth ?? 1];
+        {pins.map((pin, i) => {
           const Icon = typeIcon[pin.type];
           const isDragging = dragItem.current === pin.id;
 
@@ -105,14 +102,15 @@ const InspirationBoard = () => {
                 top: pin.y,
                 width: pin.width,
                 rotate: pin.rotation,
-                zIndex: isDragging ? 50 : (pin.depth ?? 1) * 10 + 10,
-                filter: depth.blur ? `blur(${depth.blur}px)` : undefined,
-                opacity: depth.opacity,
+                zIndex: isDragging ? 50 : 10,
               }}
               onPointerDown={(e) => handleDragStart(pin.id, e)}
               whileHover={{ scale: 1.04, rotate: 0 }}
-              animate={{ scale: isDragging ? 1.06 : depth.scale }}
-              transition={{ duration: 0.15 }}
+              animate={{ scale: isDragging ? 1.06 : 1 }}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.06, duration: 0.5 }}
             >
               {pin.type === "image" && (
                 <div
@@ -176,8 +174,7 @@ const InspirationBoard = () => {
             </motion.div>
           );
         })}
-      </div>
-      <p className="mono-text mt-3 text-center">Drag to rearrange · Click to explore</p>
+      </motion.div>
     </section>
   );
 };

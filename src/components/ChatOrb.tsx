@@ -8,9 +8,10 @@ interface Message {
   content: string;
 }
 
-const DOT_SIZE = 14;
-const DOT_BOTTOM = 24;
-const DOT_RIGHT = 24;
+// Match the pill height (py-2.5 = 10px*2 + ~16px content = 36px)
+const DOT_SIZE = 36;
+const DOT_BOTTOM = 20;
+const DOT_RIGHT = 20;
 
 const ChatOrb = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -68,17 +69,24 @@ const ChatOrb = () => {
   };
 
   // The orb color — light blue from the site palette
-  const orbColor = "hsl(200 60% 78%)";
+  const orbColor = "hsl(200 20% 85%)";
   const bgShadow = "hsl(var(--background))";
 
   return (
     <>
-      {/* Closed: circle dot */}
+      {/* Closed: circle matching pill height */}
       <AnimatePresence>
         {!isOpen && (
           <motion.button
-            className="fixed z-[60] flex items-center justify-center"
-            style={{ bottom: DOT_BOTTOM, right: DOT_RIGHT }}
+            className="fixed z-[60] flex items-center justify-center rounded-full"
+            style={{
+              bottom: DOT_BOTTOM,
+              right: DOT_RIGHT,
+              width: DOT_SIZE,
+              height: DOT_SIZE,
+              background: "hsl(var(--foreground))",
+              boxShadow: `0 2px 20px -2px ${bgShadow}`,
+            }}
             onClick={() => setIsOpen(true)}
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -89,12 +97,11 @@ const ChatOrb = () => {
             <motion.div
               className="rounded-full"
               style={{
-                width: DOT_SIZE,
-                height: DOT_SIZE,
+                width: 8,
+                height: 8,
                 background: orbColor,
-                boxShadow: `0 0 16px 4px ${bgShadow}, 0 0 6px 1px hsl(200 60% 78% / 0.15)`,
               }}
-              animate={{ scale: [1, 1.25, 1] }}
+              animate={{ scale: [1, 1.3, 1] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             />
           </motion.button>
@@ -120,17 +127,17 @@ const ChatOrb = () => {
               transformOrigin bottom-right keeps expansion rooted at the dot.
             */}
             <motion.div
-              className="fixed z-[60] flex flex-col items-stretch"
+              className="fixed z-[60] flex flex-col items-stretch overflow-hidden"
               style={{
-                bottom: DOT_BOTTOM - 4,
-                right: DOT_RIGHT - 4,
+                bottom: DOT_BOTTOM,
+                right: DOT_RIGHT,
                 transformOrigin: "bottom right",
               }}
               initial={{
                 width: DOT_SIZE,
                 height: DOT_SIZE,
                 borderRadius: DOT_SIZE / 2,
-                opacity: 0.6,
+                opacity: 0.8,
               }}
               animate={{
                 width: "min(50vw, 560px)",
@@ -247,8 +254,8 @@ const ChatOrb = () => {
                   <div
                     className="rounded-full"
                     style={{
-                      width: DOT_SIZE - 4,
-                      height: DOT_SIZE - 4,
+                      width: 8,
+                      height: 8,
                       background: orbColor,
                     }}
                   />

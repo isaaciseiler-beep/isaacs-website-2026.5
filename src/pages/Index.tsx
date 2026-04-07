@@ -46,7 +46,7 @@ const ThemeSwitch = () => {
   );
 };
 
-
+const Index = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleNavigate = (item: typeof navItems[number]) => {

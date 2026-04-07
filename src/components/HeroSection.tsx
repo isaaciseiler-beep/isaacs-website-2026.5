@@ -44,7 +44,7 @@ const HeroSection = () => {
         >
           Design
           <br />
-          <span className="text-muted-foreground">&amp; Build</span>
+          <span className="text-foreground">&amp; Build</span>
         </motion.h1>
       </motion.div>
     </section>

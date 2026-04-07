@@ -28,7 +28,7 @@ const Logo = () => {
 
   return (
     <div className="flex items-center select-none">
-      <span className="font-sans text-[14px] font-semibold tracking-[0.06em] uppercase text-foreground flex overflow-hidden whitespace-nowrap leading-none">
+      <span className="font-sans text-[14px] font-medium tracking-[0.08em] uppercase text-foreground flex overflow-hidden whitespace-nowrap leading-none">
         {/* I */}
         <span>I</span>
         {/* SAAC */}

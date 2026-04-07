@@ -127,17 +127,17 @@ const ChatOrb = () => {
               transformOrigin bottom-right keeps expansion rooted at the dot.
             */}
             <motion.div
-              className="fixed z-[60] flex flex-col items-stretch"
+              className="fixed z-[60] flex flex-col items-stretch overflow-hidden"
               style={{
-                bottom: DOT_BOTTOM - 4,
-                right: DOT_RIGHT - 4,
+                bottom: DOT_BOTTOM,
+                right: DOT_RIGHT,
                 transformOrigin: "bottom right",
               }}
               initial={{
                 width: DOT_SIZE,
                 height: DOT_SIZE,
                 borderRadius: DOT_SIZE / 2,
-                opacity: 0.6,
+                opacity: 0.8,
               }}
               animate={{
                 width: "min(50vw, 560px)",

@@ -9,7 +9,7 @@ const newsItems = [
 
 const NewsSection = () => {
   return (
-    <section className="py-12 px-3 md:px-3">
+    <section className="py-12 px-6 md:px-6">
       <h2 className="section-heading">News</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

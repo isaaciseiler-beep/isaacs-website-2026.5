@@ -33,7 +33,7 @@ const HeroSection = () => {
       />
 
       <motion.div
-        className="relative z-10 px-3 md:px-3 pb-8 md:pb-10 max-w-3xl"
+        className="relative z-10 px-6 md:px-6 pb-8 md:pb-10 max-w-3xl"
         style={{ opacity: textOpacity }}
       >
         <motion.h1

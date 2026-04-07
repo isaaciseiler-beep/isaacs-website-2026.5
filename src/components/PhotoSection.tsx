@@ -44,7 +44,7 @@ const PhotoSection = () => {
 
   return (
     <section className="py-12">
-      <div className="px-5 md:px-6 mb-6">
+      <div className="px-3 md:px-3 mb-6">
         <h2 className="section-heading mb-0">Photos</h2>
       </div>
 
@@ -52,7 +52,7 @@ const PhotoSection = () => {
         {/* Scroll container */}
         <div
           ref={scrollRef}
-          className="flex gap-[3px] overflow-x-auto scrollbar-hide px-5 md:px-6"
+          className="flex gap-[3px] overflow-x-auto scrollbar-hide px-3 md:px-3"
           style={{ scrollSnapType: "x mandatory" }}
         >
           {photos.map((photo, index) => (

@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 
 const Footer = () => {
   return (
-    <footer className="border-t border-border px-6 md:px-12 py-12 overflow-hidden">
+    <footer className="border-t border-border px-3 md:px-6 py-12 overflow-hidden">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div>
           <p className="mono-text mb-2">Expertise</p>
@@ -27,7 +27,7 @@ const Footer = () => {
 
       {/* Large bottom name */}
       <motion.div
-        className="mt-16 -mb-4 -mx-6 md:-mx-12"
+        className="mt-16 -mb-4 -mx-3 md:-mx-6"
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-40px" }}

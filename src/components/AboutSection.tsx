@@ -12,7 +12,7 @@ const AboutSection = () => {
   });
 
   return (
-    <section className="py-12 px-5 md:px-6">
+    <section className="py-12 px-3 md:px-3">
       <h2 className="section-heading">About</h2>
 
       <div className="max-w-3xl" ref={containerRef}>

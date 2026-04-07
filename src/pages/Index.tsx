@@ -38,7 +38,7 @@ const Index = () => {
         className="fixed top-0 left-0 right-0 z-40 pointer-events-none"
         style={{
           height: 64,
-          background: "linear-gradient(to bottom, hsl(var(--background)) 0%, hsl(var(--background) / 0.85) 50%, transparent 100%)",
+          background: "linear-gradient(to bottom, hsl(var(--background)) 0%, hsl(var(--background) / 0.6) 60%, transparent 100%)",
         }}
       />
 

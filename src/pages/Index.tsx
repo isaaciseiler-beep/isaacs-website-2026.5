@@ -1,5 +1,5 @@
-import { useState, useRef } from "react";
-import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { ChevronRight } from "lucide-react";
 import Logo from "@/components/Logo";
 import HeroSection from "@/components/HeroSection";
@@ -16,24 +16,6 @@ const navItems = [
   { id: "photos", label: "Photos" },
   { id: "about", label: "About" },
 ];
-
-const SectionDivider = () => {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
-  const scaleX = useTransform(scrollYProgress, [0, 0.5, 1], [0, 1, 1]);
-
-  return (
-    <div ref={ref} className="px-5 md:px-6">
-      <motion.div
-        className="h-px bg-border origin-left"
-        style={{ scaleX }}
-      />
-    </div>
-  );
-};
 
 const Index = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -67,19 +49,15 @@ const Index = () => {
       >
         <main>
           <div id="hero"><HeroSection /></div>
-          <SectionDivider />
           <div id="projects"><ProjectsSection /></div>
-          <SectionDivider />
           <div id="news"><NewsSection /></div>
-          <SectionDivider />
           <div id="photos"><PhotoSection /></div>
-          <SectionDivider />
           <div id="about"><AboutSection /></div>
           <Footer />
         </main>
       </motion.div>
 
-      {/* Sidebar — always rendered, slides in/out */}
+      {/* Sidebar */}
       <motion.nav
         className="fixed left-0 top-0 h-screen w-[240px] bg-sidebar border-r border-sidebar-border z-30 flex flex-col justify-between py-14 px-5"
         animate={{ x: sidebarOpen ? 0 : -240 }}
@@ -96,7 +74,6 @@ const Index = () => {
             </button>
           ))}
         </div>
-
         <p className="mono-text">© 2026</p>
       </motion.nav>
 

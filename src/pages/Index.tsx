@@ -79,42 +79,37 @@ const Index = () => {
         </main>
       </motion.div>
 
-      {/* Sidebar */}
+      {/* Sidebar — always rendered, slides in/out */}
+      <motion.nav
+        className="fixed left-0 top-0 h-screen w-[240px] bg-sidebar border-r border-sidebar-border z-30 flex flex-col justify-between py-14 px-5"
+        animate={{ x: sidebarOpen ? 0 : -240 }}
+        transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+      >
+        <div className="flex flex-col gap-0.5 mt-4">
+          {navItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => handleNavigate(item.id)}
+              className="text-left py-2 text-sm font-medium text-sidebar-foreground hover:text-sidebar-primary transition-colors duration-200"
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+
+        <p className="mono-text">© 2026</p>
+      </motion.nav>
+
+      {/* Overlay to close sidebar */}
       <AnimatePresence>
         {sidebarOpen && (
-          <>
-            <motion.div
-              className="fixed inset-0 z-40"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setSidebarOpen(false)}
-            />
-            <motion.nav
-              className="fixed left-0 top-0 h-screen w-[240px] bg-sidebar border-r border-sidebar-border z-30 flex flex-col justify-between py-14 px-5"
-              initial={{ x: -16, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: -16, opacity: 0 }}
-              transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
-            >
-              <div className="flex flex-col gap-0.5 mt-4">
-                {navItems.map((item, i) => (
-                  <motion.button
-                    key={item.id}
-                    onClick={() => handleNavigate(item.id)}
-                    className="text-left py-2 text-sm font-medium text-sidebar-foreground hover:text-sidebar-primary transition-colors duration-200"
-                    initial={{ opacity: 0, x: -8 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.04 + i * 0.03, duration: 0.2 }}
-                  >
-                    {item.label}
-                  </motion.button>
-                ))}
-              </div>
-
-              <p className="mono-text">© 2026</p>
-            </motion.nav>
-          </>
+          <motion.div
+            className="fixed inset-0 z-20"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSidebarOpen(false)}
+          />
         )}
       </AnimatePresence>
     </div>

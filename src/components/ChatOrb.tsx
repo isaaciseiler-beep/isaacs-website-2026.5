@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send } from "lucide-react";
+import { ArrowUp } from "lucide-react";
 
 interface Message {
   id: string;
@@ -234,7 +234,7 @@ const ChatOrb = () => {
                   className="flex-1 bg-transparent text-xs text-background placeholder:text-background/25 outline-none min-w-0"
                 />
                 <AnimatePresence>
-                  {input.trim() && (
+                  {mode === "ai" && input.trim() && (
                     <motion.button
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
@@ -242,10 +242,11 @@ const ChatOrb = () => {
                       onClick={handleSend}
                       className="w-6 h-6 rounded-full bg-background flex items-center justify-center hover:opacity-80 transition-opacity shrink-0"
                     >
-                      <Send className="w-3 h-3 text-foreground" />
+                      <ArrowUp className="w-3 h-3 text-foreground" />
                     </motion.button>
                   )}
                 </AnimatePresence>
+                <div className="flex-1" />
                 <button
                   onClick={() => setIsOpen(false)}
                   className="w-6 h-6 flex items-center justify-center shrink-0 hover:opacity-70 transition-opacity"

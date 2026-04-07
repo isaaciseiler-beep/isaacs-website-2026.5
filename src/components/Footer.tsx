@@ -1,34 +1,47 @@
-import { useRef, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
+const FOOTER_TEXT = "ISAAC SEILER";
+const BASE_FONT_SIZE = 200;
+const FONT_FAMILY = "-apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif";
+
+type FooterTextMetrics = {
+  viewBoxWidth: number;
+  viewBoxHeight: number;
+  textX: number;
+  textY: number;
+};
+
 const Footer = () => {
-  const textRef = useRef<HTMLDivElement>(null);
-  const [fontSize, setFontSize] = useState("10vw");
+  const [metrics, setMetrics] = useState<FooterTextMetrics | null>(null);
 
   useEffect(() => {
-    const resize = () => {
-      const el = textRef.current;
-      if (!el) return;
-      const containerWidth = window.innerWidth;
-      const span = el.querySelector("span") as HTMLSpanElement;
-      if (!span) return;
-      let lo = 10, hi = 500, best = 10;
-      for (let i = 0; i < 25; i++) {
-        const mid = (lo + hi) / 2;
-        span.style.fontSize = `${mid}px`;
-        if (span.scrollWidth <= containerWidth) {
-          best = mid;
-          lo = mid;
-        } else {
-          hi = mid;
-        }
-      }
-      span.style.fontSize = `${best}px`;
-      setFontSize(`${best}px`);
+    const measure = () => {
+      const canvas = document.createElement("canvas");
+      const context = canvas.getContext("2d");
+      if (!context) return;
+
+      context.font = `600 ${BASE_FONT_SIZE}px ${FONT_FAMILY}`;
+      const textMetrics = context.measureText(FOOTER_TEXT);
+
+      const left = textMetrics.actualBoundingBoxLeft ?? 0;
+      const right = textMetrics.actualBoundingBoxRight ?? textMetrics.width;
+      const ascent = textMetrics.actualBoundingBoxAscent ?? BASE_FONT_SIZE * 0.72;
+      const descent = textMetrics.actualBoundingBoxDescent ?? BASE_FONT_SIZE * 0.08;
+
+      setMetrics({
+        viewBoxWidth: Math.max(1, left + right),
+        viewBoxHeight: Math.max(1, ascent + descent),
+        textX: left,
+        textY: ascent,
+      });
     };
-    resize();
-    window.addEventListener("resize", resize);
-    return () => window.removeEventListener("resize", resize);
+
+    if (document.fonts?.ready) {
+      document.fonts.ready.then(measure);
+    } else {
+      measure();
+    }
   }, []);
 
   return (
@@ -57,29 +70,31 @@ const Footer = () => {
         <p className="mono-text mt-10">© 2026</p>
       </div>
 
-      {/* Large bottom name — flush to all edges, no padding/margin below */}
       <motion.div
-        ref={textRef}
+        className="relative left-1/2 mt-16 w-[calc(100vw+6px)] -translate-x-1/2 overflow-hidden"
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-40px" }}
         transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
-        style={{ lineHeight: 0, marginBottom: 0, paddingBottom: 0 }}
       >
-        <span
-          className="block font-semibold select-none whitespace-nowrap"
-          style={{
-            color: "hsl(50 33% 5%)",
-            fontSize,
-            letterSpacing: "-0.04em",
-            lineHeight: 0.78,
-            display: "block",
-            marginBottom: 0,
-            paddingBottom: 0,
-          }}
-        >
-          ISAAC SEILER
-        </span>
+        {metrics && (
+          <svg
+            aria-hidden="true"
+            viewBox={`0 0 ${metrics.viewBoxWidth} ${metrics.viewBoxHeight}`}
+            style={{ display: "block", width: "100%", height: "auto", color: "hsl(50 33% 5%)" }}
+          >
+            <text
+              x={metrics.textX}
+              y={metrics.textY}
+              fill="currentColor"
+              fontSize={BASE_FONT_SIZE}
+              fontWeight="600"
+              style={{ fontFamily: FONT_FAMILY }}
+            >
+              {FOOTER_TEXT}
+            </text>
+          </svg>
+        )}
       </motion.div>
     </footer>
   );

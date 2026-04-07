@@ -69,17 +69,24 @@ const ChatOrb = () => {
   };
 
   // The orb color — light blue from the site palette
-  const orbColor = "hsl(200 60% 78%)";
+  const orbColor = "hsl(200 20% 85%)";
   const bgShadow = "hsl(var(--background))";
 
   return (
     <>
-      {/* Closed: circle dot */}
+      {/* Closed: circle matching pill height */}
       <AnimatePresence>
         {!isOpen && (
           <motion.button
-            className="fixed z-[60] flex items-center justify-center"
-            style={{ bottom: DOT_BOTTOM, right: DOT_RIGHT }}
+            className="fixed z-[60] flex items-center justify-center rounded-full"
+            style={{
+              bottom: DOT_BOTTOM,
+              right: DOT_RIGHT,
+              width: DOT_SIZE,
+              height: DOT_SIZE,
+              background: "hsl(var(--foreground))",
+              boxShadow: `0 2px 20px -2px ${bgShadow}`,
+            }}
             onClick={() => setIsOpen(true)}
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -90,12 +97,11 @@ const ChatOrb = () => {
             <motion.div
               className="rounded-full"
               style={{
-                width: DOT_SIZE,
-                height: DOT_SIZE,
+                width: 8,
+                height: 8,
                 background: orbColor,
-                boxShadow: `0 0 16px 4px ${bgShadow}, 0 0 6px 1px hsl(200 60% 78% / 0.15)`,
               }}
-              animate={{ scale: [1, 1.25, 1] }}
+              animate={{ scale: [1, 1.3, 1] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             />
           </motion.button>

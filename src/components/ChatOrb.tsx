@@ -254,8 +254,8 @@ const ChatOrb = () => {
                   <div
                     className="rounded-full"
                     style={{
-                      width: DOT_SIZE - 4,
-                      height: DOT_SIZE - 4,
+                      width: 8,
+                      height: 8,
                       background: orbColor,
                     }}
                   />

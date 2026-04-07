@@ -8,9 +8,10 @@ interface Message {
   content: string;
 }
 
-const DOT_SIZE = 14;
-const DOT_BOTTOM = 24;
-const DOT_RIGHT = 24;
+// Match the pill height (py-2.5 = 10px*2 + ~16px content = 36px)
+const DOT_SIZE = 36;
+const DOT_BOTTOM = 20;
+const DOT_RIGHT = 20;
 
 const ChatOrb = () => {
   const [isOpen, setIsOpen] = useState(false);

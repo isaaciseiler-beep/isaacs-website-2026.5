@@ -33,7 +33,8 @@ const Index = () => {
 
   return (
     <div className="relative">
-      {/* Fixed header */}
+      {/* Fixed header with gradient */}
+      <div className="fixed top-0 left-0 right-0 z-50 pointer-events-none" style={{ height: 80, background: "linear-gradient(to bottom, hsl(var(--background)) 40%, transparent)" }} />
       <div className="fixed top-0 left-0 z-50 flex items-center gap-1 px-6 md:px-6 py-4">
         <Logo />
         <motion.button

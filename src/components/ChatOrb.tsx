@@ -45,7 +45,7 @@ const ChatOrb = () => {
   useEffect(() => {
     if (!isOpen) return;
     const handleScroll = () => {
-      if (Math.abs(window.scrollY - lastScrollY.current) > 30) {
+      if (Math.abs(window.scrollY - lastScrollY.current) > 2) {
         setIsOpen(false);
       }
       lastScrollY.current = window.scrollY;
@@ -166,10 +166,11 @@ const ChatOrb = () => {
                   <motion.div
                     className="w-full mb-2 max-h-[50vh] overflow-y-auto scrollbar-hide"
                     style={{
+                      borderRadius: 24,
                       background: "hsl(var(--background) / 0.35)",
                       backdropFilter: "blur(40px)",
                       WebkitBackdropFilter: "blur(40px)",
-                      boxShadow: `0 4px 30px -4px ${bgShadow}`,
+                      boxShadow: `0 4px 24px -4px ${bgShadow}`,
                     }}
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
@@ -215,12 +216,8 @@ const ChatOrb = () => {
 
               {/* Input pill */}
               <div
-                className="w-full flex items-center gap-2 px-4 py-2.5"
-                style={{
-                  borderRadius: 100,
-                  background: "hsl(var(--foreground))",
-                  boxShadow: `0 4px 24px -4px ${bgShadow}`,
-                }}
+                className="w-full flex items-center gap-2 px-4"
+                style={{ borderRadius: 100, background: "hsl(var(--foreground))", boxShadow: `0 4px 24px -4px ${bgShadow}`, height: DOT_SIZE }}
               >
                 <input
                   ref={inputRef}
@@ -249,7 +246,7 @@ const ChatOrb = () => {
 
               {/* Mode buttons + disclosure */}
               <div className="w-full flex items-center justify-between mt-2.5 px-1">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3" style={{ filter: `drop-shadow(0 4px 12px ${bgShadow})` }}>
                   <button
                     onClick={() => setMode("search")}
                     className={`pill-button !px-4 !py-1.5 !text-[10px] ${

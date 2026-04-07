@@ -20,9 +20,21 @@ const allProjects = [
   { id: 12, title: "Void", category: "Identity", image: project4 },
 ];
 
-const INITIAL_COUNT = 6;
+const COLS = 3;
+const VISIBLE_ROWS = 2;
+const INITIAL_COUNT = COLS * VISIBLE_ROWS; // 6
+const PEEK_COUNT = COLS; // 3 more (row 3, half visible via fade)
+const GAP = 3; // px
 
-const ProjectItem = ({ project, index }: { project: typeof allProjects[0]; index: number }) => {
+const ProjectItem = ({
+  project,
+  index,
+  hoverEnabled = true,
+}: {
+  project: (typeof allProjects)[0];
+  index: number;
+  hoverEnabled?: boolean;
+}) => {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -33,7 +45,7 @@ const ProjectItem = ({ project, index }: { project: typeof allProjects[0]; index
   return (
     <motion.div
       ref={ref}
-      className="grid-item aspect-[4/3]"
+      className={`grid-item aspect-[4/3] ${!hoverEnabled ? "pointer-events-none" : ""}`}
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true, margin: "-20px" }}
@@ -46,12 +58,14 @@ const ProjectItem = ({ project, index }: { project: typeof allProjects[0]; index
         className="w-full h-full object-cover"
         style={{ y }}
       />
-      <div className="grid-item-overlay">
-        <p className="mono-text mb-0.5">{project.category}</p>
-        <h3 className="text-xs font-medium tracking-tight text-foreground">
-          {project.title}
-        </h3>
-      </div>
+      {hoverEnabled && (
+        <div className="grid-item-overlay">
+          <p className="mono-text mb-0.5">{project.category}</p>
+          <h3 className="text-xs font-medium tracking-tight text-foreground">
+            {project.title}
+          </h3>
+        </div>
+      )}
     </motion.div>
   );
 };
@@ -59,20 +73,39 @@ const ProjectItem = ({ project, index }: { project: typeof allProjects[0]; index
 const ProjectsSection = () => {
   const [expanded, setExpanded] = useState(false);
 
+  // Row 1-2: fully interactive, Row 3: peek (no hover), Rest: expanded
+  const visibleProjects = allProjects.slice(0, INITIAL_COUNT);
+  const peekProjects = allProjects.slice(INITIAL_COUNT, INITIAL_COUNT + PEEK_COUNT);
+  const remainingProjects = allProjects.slice(INITIAL_COUNT + PEEK_COUNT);
+
   return (
     <section className="py-12 px-5 md:px-6">
       <h2 className="section-heading">Projects</h2>
 
       <div className="relative">
-        {/* Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-[3px]">
-          {allProjects.slice(0, INITIAL_COUNT).map((project, index) => (
+        <div
+          className="grid grid-cols-2 md:grid-cols-3"
+          style={{ gap: `${GAP}px` }}
+        >
+          {/* Rows 1 & 2 — fully interactive */}
+          {visibleProjects.map((project, index) => (
             <ProjectItem key={project.id} project={project} index={index} />
           ))}
 
+          {/* Row 3 — peek row, no hover until expanded */}
+          {peekProjects.map((project, index) => (
+            <ProjectItem
+              key={project.id}
+              project={project}
+              index={INITIAL_COUNT + index}
+              hoverEnabled={expanded}
+            />
+          ))}
+
+          {/* Remaining rows — only when expanded */}
           <AnimatePresence>
             {expanded &&
-              allProjects.slice(INITIAL_COUNT).map((project, index) => (
+              remainingProjects.map((project, index) => (
                 <motion.div
                   key={project.id}
                   initial={{ opacity: 0, y: 12 }}
@@ -80,23 +113,26 @@ const ProjectsSection = () => {
                   exit={{ opacity: 0, y: 12 }}
                   transition={{ delay: index * 0.03, duration: 0.3 }}
                 >
-                  <ProjectItem project={project} index={INITIAL_COUNT + index} />
+                  <ProjectItem
+                    project={project}
+                    index={INITIAL_COUNT + PEEK_COUNT + index}
+                  />
                 </motion.div>
               ))}
           </AnimatePresence>
         </div>
 
-        {/* Fade overlay + toggle button */}
+        {/* Fade overlay + pill button */}
         {!expanded && (
           <div
-            className="absolute bottom-0 left-0 right-0 h-40 flex items-end justify-center pb-6 pointer-events-none"
+            className="absolute bottom-0 left-0 right-0 h-48 flex items-end justify-center pb-6 pointer-events-none"
             style={{
               background: `linear-gradient(to bottom, transparent, hsl(var(--background)))`,
             }}
           >
             <button
               onClick={() => setExpanded(true)}
-              className="mono-text hover:text-foreground transition-colors duration-200 pointer-events-auto px-4 py-2 border border-border bg-background"
+              className="mono-text pointer-events-auto px-6 py-2 rounded-full bg-white text-[hsl(var(--background))] font-medium text-xs tracking-widest uppercase hover:opacity-80 transition-opacity duration-200"
             >
               See all
             </button>
@@ -107,7 +143,7 @@ const ProjectsSection = () => {
           <div className="flex justify-center mt-4">
             <button
               onClick={() => setExpanded(false)}
-              className="mono-text hover:text-foreground transition-colors duration-200 px-4 py-2 border border-border bg-background"
+              className="mono-text px-6 py-2 rounded-full bg-white text-[hsl(var(--background))] font-medium text-xs tracking-widest uppercase hover:opacity-80 transition-opacity duration-200"
             >
               Show less
             </button>

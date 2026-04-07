@@ -22,7 +22,7 @@
     --secondary-foreground: 200 20% 85%;
 
     --muted: 50 10% 11%;
-    --muted-foreground: 200 15% 50%;
+    --muted-foreground: 200 20% 85%;
 
     --accent: 200 20% 85%;
     --accent-foreground: 50 33% 7%;
@@ -37,7 +37,7 @@
     --radius: 0px;
 
     --sidebar-background: 50 33% 5%;
-    --sidebar-foreground: 200 20% 65%;
+    --sidebar-foreground: 200 20% 85%;
     --sidebar-primary: 200 20% 85%;
     --sidebar-primary-foreground: 50 33% 7%;
     --sidebar-accent: 50 10% 10%;
@@ -67,7 +67,7 @@
 @layer components {
   .mono-text {
     font-family: 'JetBrains Mono', monospace;
-    @apply text-[10px] tracking-widest uppercase text-muted-foreground;
+    @apply text-[10px] tracking-widest uppercase text-foreground/50;
   }
 
   .logo-font {
@@ -99,5 +99,13 @@
 
   .section-heading {
     @apply text-2xl font-semibold tracking-tight text-foreground mb-6;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 }

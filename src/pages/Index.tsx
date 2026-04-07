@@ -6,6 +6,7 @@ import HeroSection from "@/components/HeroSection";
 import ProjectsSection from "@/components/ProjectsSection";
 import NewsSection from "@/components/NewsSection";
 import PhotoSection from "@/components/PhotoSection";
+import InspirationBoard from "@/components/InspirationBoard";
 import AboutSection from "@/components/AboutSection";
 import Footer from "@/components/Footer";
 
@@ -14,6 +15,7 @@ const navItems = [
   { id: "projects", label: "Projects" },
   { id: "news", label: "News" },
   { id: "photos", label: "Photos" },
+  { id: "inspiration", label: "Inspiration" },
   { id: "about", label: "About" },
 ];
 
@@ -33,7 +35,7 @@ const Index = () => {
         <Logo />
         <motion.button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="w-5 h-5 flex items-center justify-center text-foreground hover:text-muted-foreground transition-colors duration-200"
+          className="w-5 h-5 flex items-center justify-center text-foreground hover:text-foreground/60 transition-colors duration-200"
           aria-label="Toggle menu"
           animate={{ rotate: sidebarOpen ? 180 : 0 }}
           transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
@@ -52,6 +54,7 @@ const Index = () => {
           <div id="projects"><ProjectsSection /></div>
           <div id="news"><NewsSection /></div>
           <div id="photos"><PhotoSection /></div>
+          <div id="inspiration"><InspirationBoard /></div>
           <div id="about"><AboutSection /></div>
           <Footer />
         </main>

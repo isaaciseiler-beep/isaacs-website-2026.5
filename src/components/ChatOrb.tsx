@@ -45,7 +45,7 @@ const ChatOrb = () => {
   useEffect(() => {
     if (!isOpen) return;
     const handleScroll = () => {
-      if (Math.abs(window.scrollY - lastScrollY.current) > 30) {
+      if (Math.abs(window.scrollY - lastScrollY.current) > 2) {
         setIsOpen(false);
       }
       lastScrollY.current = window.scrollY;
@@ -215,7 +215,8 @@ const ChatOrb = () => {
 
               {/* Input pill */}
               <div
-                className="w-full flex items-center gap-2 px-4 py-2.5"
+                className="w-full flex items-center gap-2 px-4"
+                style={{ borderRadius: 100, background: "hsl(var(--foreground))", boxShadow: `0 4px 24px -4px ${bgShadow}`, height: DOT_SIZE }}
                 style={{
                   borderRadius: 100,
                   background: "hsl(var(--foreground))",
@@ -249,7 +250,7 @@ const ChatOrb = () => {
 
               {/* Mode buttons + disclosure */}
               <div className="w-full flex items-center justify-between mt-2.5 px-1">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3" style={{ filter: `drop-shadow(0 4px 12px ${bgShadow})` }}>
                   <button
                     onClick={() => setMode("search")}
                     className={`pill-button !px-4 !py-1.5 !text-[10px] ${

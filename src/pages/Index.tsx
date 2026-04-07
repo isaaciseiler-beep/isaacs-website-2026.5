@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronRight } from "lucide-react";
+import { useTheme } from "@/components/ThemeProvider";
 import Logo from "@/components/Logo";
 import HeroSection from "@/components/HeroSection";
 import FeaturedSection from "@/components/FeaturedSection";
@@ -17,6 +18,33 @@ const navItems = [
   { id: "photos", label: "Photos" },
   { id: "linkedin", label: "LinkedIn", href: "https://www.linkedin.com" },
 ];
+const themeOptions = ["Dark", "Light", "System"] as const;
+const themeMap = { Dark: "dark", Light: "light", System: "system" } as const;
+
+const ThemeSwitch = () => {
+  const { theme, setTheme } = useTheme();
+  return (
+    <div className="flex items-center gap-1 mt-8">
+      {themeOptions.map((opt) => {
+        const val = themeMap[opt];
+        const active = theme === val;
+        return (
+          <button
+            key={opt}
+            onClick={() => setTheme(val)}
+            className={`font-mono text-[10px] tracking-widest uppercase px-2.5 py-1 border transition-colors duration-200 ${
+              active
+                ? "text-foreground/80 border-foreground/30"
+                : "text-foreground/20 border-foreground/8 hover:text-foreground/40 hover:border-foreground/15"
+            }`}
+          >
+            {opt}
+          </button>
+        );
+      })}
+    </div>
+  );
+};
 
 const Index = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -38,7 +66,7 @@ const Index = () => {
         className="fixed top-0 left-0 right-0 z-40 pointer-events-none"
         style={{
           height: 64,
-          background: "linear-gradient(to bottom, hsl(var(--background)) 0%, hsl(var(--background) / 0.85) 50%, transparent 100%)",
+          background: "linear-gradient(to bottom, hsl(var(--background)) 0%, hsl(var(--background) / 0.6) 60%, transparent 100%)",
         }}
       />
 
@@ -90,6 +118,9 @@ const Index = () => {
             </button>
           ))}
         </div>
+
+        {/* Theme switch */}
+        <ThemeSwitch />
       </motion.nav>
 
       {/* Overlay to close sidebar */}

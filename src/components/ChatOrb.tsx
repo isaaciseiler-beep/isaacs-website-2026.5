@@ -34,8 +34,7 @@ const ChatOrb = () => {
   // Show orb only after scrolling past hero (~80% of viewport)
   useEffect(() => {
     const handleScroll = () => {
-      const threshold = window.innerHeight * 0.8;
-      setIsVisible(window.scrollY > threshold);
+      setIsVisible(window.scrollY > 10);
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();

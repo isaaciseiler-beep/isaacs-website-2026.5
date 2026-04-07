@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect, useCallback } from "react";
-import { motion, AnimatePresence, useScroll } from "framer-motion";
+import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Send } from "lucide-react";
 
 interface Message {
@@ -7,6 +7,10 @@ interface Message {
   role: "user" | "assistant";
   content: string;
 }
+
+const DOT_SIZE = 14;
+const DOT_BOTTOM = 24;
+const DOT_RIGHT = 24;
 
 const ChatOrb = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,15 +22,14 @@ const ChatOrb = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const lastScrollY = useRef(0);
 
-  // Collapse on scroll down, but preserve messages
+  // Collapse on scroll
   useEffect(() => {
     if (!isOpen) return;
     const handleScroll = () => {
-      const currentY = window.scrollY;
-      if (Math.abs(currentY - lastScrollY.current) > 30) {
+      if (Math.abs(window.scrollY - lastScrollY.current) > 30) {
         setIsOpen(false);
       }
-      lastScrollY.current = currentY;
+      lastScrollY.current = window.scrollY;
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
@@ -64,14 +67,18 @@ const ChatOrb = () => {
     }, 1200);
   };
 
+  // The orb color — light blue from the site palette
+  const orbColor = "hsl(200 60% 78%)";
+  const bgShadow = "hsl(var(--background))";
+
   return (
     <>
-      {/* Closed state: pulsing dot bottom-right */}
+      {/* Closed: circle dot */}
       <AnimatePresence>
         {!isOpen && (
           <motion.button
             className="fixed z-[60] flex items-center justify-center"
-            style={{ bottom: 24, right: 24 }}
+            style={{ bottom: DOT_BOTTOM, right: DOT_RIGHT }}
             onClick={() => setIsOpen(true)}
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -79,29 +86,22 @@ const ChatOrb = () => {
             transition={{ type: "spring", stiffness: 500, damping: 30 }}
             aria-label="Open chat"
           >
-            {/* Self-pulsing dot — scales itself, no outer ring */}
             <motion.div
-              className="relative w-3 h-3 rounded-full overflow-hidden"
-              animate={{ scale: [1, 1.3, 1] }}
-              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              className="rounded-full"
               style={{
-                boxShadow: "0 0 12px 2px hsl(var(--foreground) / 0.15), 0 0 4px 1px hsl(var(--highlight) / 0.1)",
+                width: DOT_SIZE,
+                height: DOT_SIZE,
+                background: orbColor,
+                boxShadow: `0 0 16px 4px ${bgShadow}, 0 0 6px 1px hsl(200 60% 78% / 0.15)`,
               }}
-            >
-              <motion.div
-                className="absolute inset-0 rounded-full"
-                style={{
-                  background: "conic-gradient(from 0deg, hsl(var(--foreground)), hsl(var(--highlight)), hsl(200 60% 78%), hsl(var(--foreground)))",
-                }}
-                animate={{ rotate: 360 }}
-                transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
-              />
-            </motion.div>
+              animate={{ scale: [1, 1.25, 1] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            />
           </motion.button>
         )}
       </AnimatePresence>
 
-      {/* Open state: pill expands from bottom-right */}
+      {/* Open: expands from the dot position */}
       <AnimatePresence>
         {isOpen && (
           <>
@@ -114,18 +114,41 @@ const ChatOrb = () => {
               onClick={() => setIsOpen(false)}
             />
 
-            {/* Anchored to bottom-right, expands leftward */}
+            {/* 
+              Container is anchored at bottom-right (same as dot).
+              It morphs from a tiny circle to the full chat panel.
+              transformOrigin bottom-right keeps expansion rooted at the dot.
+            */}
             <motion.div
-              className="fixed z-[60] flex flex-col items-end"
-              style={{ bottom: 16, right: 16 }}
-              initial={{ width: 12, opacity: 0 }}
-              animate={{ width: "min(50vw, 600px)", opacity: 1 }}
-              exit={{ width: 12, opacity: 0 }}
+              className="fixed z-[60] flex flex-col items-stretch"
+              style={{
+                bottom: DOT_BOTTOM - 4,
+                right: DOT_RIGHT - 4,
+                transformOrigin: "bottom right",
+              }}
+              initial={{
+                width: DOT_SIZE,
+                height: DOT_SIZE,
+                borderRadius: DOT_SIZE / 2,
+                opacity: 0.6,
+              }}
+              animate={{
+                width: "min(50vw, 560px)",
+                height: "auto",
+                borderRadius: 0,
+                opacity: 1,
+              }}
+              exit={{
+                width: DOT_SIZE,
+                height: DOT_SIZE,
+                borderRadius: DOT_SIZE / 2,
+                opacity: 0,
+              }}
               transition={{
                 type: "spring",
-                stiffness: 280,
-                damping: 28,
-                mass: 0.8,
+                stiffness: 260,
+                damping: 26,
+                mass: 0.7,
               }}
             >
               {/* Conversation area */}
@@ -134,11 +157,10 @@ const ChatOrb = () => {
                   <motion.div
                     className="w-full mb-2 max-h-[50vh] overflow-y-auto scrollbar-hide"
                     style={{
-                      borderRadius: 16,
                       background: "hsl(var(--background) / 0.35)",
                       backdropFilter: "blur(40px)",
                       WebkitBackdropFilter: "blur(40px)",
-                      boxShadow: "0 4px 30px -4px hsl(var(--foreground) / 0.08), 0 0 20px -4px hsl(var(--foreground) / 0.04)",
+                      boxShadow: `0 4px 30px -4px ${bgShadow}`,
                     }}
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
@@ -189,10 +211,9 @@ const ChatOrb = () => {
                 style={{
                   borderRadius: 100,
                   background: "hsl(var(--foreground))",
-                  boxShadow: "0 4px 24px -4px hsl(var(--foreground) / 0.12), 0 0 16px -4px hsl(var(--foreground) / 0.06)",
+                  boxShadow: `0 4px 24px -4px ${bgShadow}`,
                 }}
               >
-                {/* Input */}
                 <input
                   ref={inputRef}
                   type="text"
@@ -203,7 +224,6 @@ const ChatOrb = () => {
                   className="flex-1 bg-transparent text-xs text-background placeholder:text-background/25 outline-none min-w-0"
                 />
 
-                {/* Send */}
                 <AnimatePresence>
                   {input.trim() && (
                     <motion.button
@@ -218,43 +238,43 @@ const ChatOrb = () => {
                   )}
                 </AnimatePresence>
 
-                {/* Close (dot) */}
+                {/* Close dot */}
                 <button
                   onClick={() => setIsOpen(false)}
                   className="w-6 h-6 flex items-center justify-center shrink-0 hover:opacity-70 transition-opacity"
                   aria-label="Close chat"
                 >
                   <div
-                    className="w-2.5 h-2.5 rounded-full"
+                    className="rounded-full"
                     style={{
-                      background: "conic-gradient(from 0deg, hsl(var(--background) / 0.8), hsl(var(--highlight) / 0.6), hsl(200 60% 78% / 0.6), hsl(var(--background) / 0.8))",
+                      width: DOT_SIZE - 4,
+                      height: DOT_SIZE - 4,
+                      background: orbColor,
                     }}
                   />
                 </button>
               </div>
 
-              {/* Mode buttons + disclosure — below the pill */}
-              <div className="w-full flex items-center justify-between mt-2 px-2">
-                <div className="flex items-center gap-1">
+              {/* Mode buttons + disclosure */}
+              <div className="w-full flex items-center justify-between mt-2.5 px-1">
+                <div className="flex items-center gap-2">
                   <button
                     onClick={() => setMode("search")}
-                    className={`mono-text px-2.5 py-1 transition-colors duration-200 ${
+                    className={`font-mono text-[11px] tracking-widest uppercase px-3 py-1 border transition-colors duration-200 ${
                       mode === "search"
-                        ? "text-foreground/80"
-                        : "text-foreground/25 hover:text-foreground/40"
+                        ? "text-foreground/80 border-foreground/30"
+                        : "text-foreground/25 border-foreground/10 hover:text-foreground/40 hover:border-foreground/20"
                     }`}
-                    style={{ fontSize: 9 }}
                   >
                     Search
                   </button>
                   <button
                     onClick={() => setMode("ai")}
-                    className={`mono-text px-2.5 py-1 transition-colors duration-200 ${
+                    className={`font-mono text-[11px] tracking-widest uppercase px-3 py-1 border transition-colors duration-200 ${
                       mode === "ai"
-                        ? "text-foreground/80"
-                        : "text-foreground/25 hover:text-foreground/40"
+                        ? "text-foreground/80 border-foreground/30"
+                        : "text-foreground/25 border-foreground/10 hover:text-foreground/40 hover:border-foreground/20"
                     }`}
-                    style={{ fontSize: 9 }}
                   >
                     AI
                   </button>

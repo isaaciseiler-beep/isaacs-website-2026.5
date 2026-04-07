@@ -18,8 +18,35 @@ const navItems = [
   { id: "photos", label: "Photos" },
   { id: "linkedin", label: "LinkedIn", href: "https://www.linkedin.com" },
 ];
+const themeOptions = ["Dark", "Light", "System"] as const;
+const themeMap = { Dark: "dark", Light: "light", System: "system" } as const;
 
-const Index = () => {
+const ThemeSwitch = () => {
+  const { theme, setTheme } = useTheme();
+  return (
+    <div className="flex items-center gap-1 mt-8">
+      {themeOptions.map((opt) => {
+        const val = themeMap[opt];
+        const active = theme === val;
+        return (
+          <button
+            key={opt}
+            onClick={() => setTheme(val)}
+            className={`font-mono text-[10px] tracking-widest uppercase px-2.5 py-1 border transition-colors duration-200 ${
+              active
+                ? "text-foreground/80 border-foreground/30"
+                : "text-foreground/20 border-foreground/8 hover:text-foreground/40 hover:border-foreground/15"
+            }`}
+          >
+            {opt}
+          </button>
+        );
+      })}
+    </div>
+  );
+};
+
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleNavigate = (item: typeof navItems[number]) => {

@@ -12,7 +12,6 @@ const DOT_SIZE = 36;
 const DOT_BOTTOM = 20;
 const DOT_RIGHT = 20;
 
-// Fast-to-slow easing: starts quick, decelerates
 const fastSlowTransition = {
   type: "spring" as const,
   stiffness: 400,
@@ -27,14 +26,26 @@ const ChatOrb = () => {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [bottomOffset, setBottomOffset] = useState(DOT_BOTTOM);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const lastScrollY = useRef(0);
 
-  // Show orb only after scrolling past hero (~80% of viewport)
+  // Show orb after scrolling, and clamp to footer top
   useEffect(() => {
     const handleScroll = () => {
       setIsVisible(window.scrollY > 10);
+
+      const footer = document.getElementById("footer");
+      if (footer) {
+        const footerTop = footer.getBoundingClientRect().top;
+        const windowH = window.innerHeight;
+        if (footerTop < windowH) {
+          setBottomOffset(windowH - footerTop + DOT_BOTTOM);
+        } else {
+          setBottomOffset(DOT_BOTTOM);
+        }
+      }
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
@@ -99,7 +110,7 @@ const ChatOrb = () => {
           <motion.button
             className="fixed z-[60] flex items-center justify-center rounded-full"
             style={{
-              bottom: DOT_BOTTOM,
+              bottom: bottomOffset,
               right: DOT_RIGHT,
               width: DOT_SIZE,
               height: DOT_SIZE,
@@ -136,7 +147,7 @@ const ChatOrb = () => {
             <motion.div
               className="fixed z-[60] flex flex-col items-stretch overflow-hidden"
               style={{
-                bottom: DOT_BOTTOM,
+                bottom: bottomOffset,
                 right: DOT_RIGHT,
                 transformOrigin: "bottom right",
               }}
@@ -228,7 +239,6 @@ const ChatOrb = () => {
                   placeholder={mode === "ai" ? "Ask me anything…" : "Search my work…"}
                   className="flex-1 bg-transparent text-xs text-background placeholder:text-background/25 outline-none min-w-0"
                 />
-                <div className="flex-1" />
                 <AnimatePresence>
                   {mode === "ai" && input.trim() && (
                     <motion.button
@@ -244,7 +254,7 @@ const ChatOrb = () => {
                 </AnimatePresence>
               </div>
 
-              {/* Mode buttons + disclosure */}
+              {/* Mode buttons */}
               <div className="w-full flex items-center justify-between mt-2.5 px-1">
                 <div className="flex items-center gap-3" style={{ filter: `drop-shadow(0 4px 12px ${bgShadow})` }}>
                   <button

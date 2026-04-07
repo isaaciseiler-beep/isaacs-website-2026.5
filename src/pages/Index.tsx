@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronRight } from "lucide-react";
+import { Linkedin, Github } from "lucide-react";
 import { useTheme } from "@/components/ThemeProvider";
 import Logo from "@/components/Logo";
 import HeroSection from "@/components/HeroSection";
@@ -13,11 +14,18 @@ import AboutSection from "@/components/AboutSection";
 import Footer from "@/components/Footer";
 import ChatOrb from "@/components/ChatOrb";
 
-const navItems = [
+const sitemapItems = [
   { id: "hero", label: "Home" },
   { id: "photos", label: "Photos" },
-  { id: "linkedin", label: "LinkedIn", href: "https://www.linkedin.com" },
+  { id: "about", label: "About" },
 ];
+
+const menuItems = [
+  { id: "contact", label: "Contact", href: "/contact" },
+  { id: "linkedin", label: "LinkedIn", href: "https://www.linkedin.com", icon: Linkedin },
+  { id: "github", label: "GitHub", href: "https://github.com", icon: Github },
+];
+
 const themeOptions = ["Dark", "Light", "System"] as const;
 const themeMap = { Dark: "dark", Light: "light", System: "system" } as const;
 
@@ -32,10 +40,10 @@ const ThemeSwitch = () => {
           <button
             key={opt}
             onClick={() => setTheme(val)}
-            className={`font-mono text-[10px] tracking-widest uppercase px-2.5 py-1 border transition-colors duration-200 ${
+            className={`pill-button !text-[10px] !px-2.5 !py-1 ${
               active
-                ? "text-foreground/80 border-foreground/30"
-                : "text-foreground/20 border-foreground/8 hover:text-foreground/40 hover:border-foreground/15"
+                ? "opacity-100"
+                : "opacity-30 hover:opacity-50"
             }`}
           >
             {opt}
@@ -49,19 +57,24 @@ const ThemeSwitch = () => {
 const Index = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const handleNavigate = (item: typeof navItems[number]) => {
-    if (item.href) {
+  const handleSitemapNavigate = (item: typeof sitemapItems[number]) => {
+    const el = document.getElementById(item.id);
+    if (el) el.scrollIntoView({ behavior: "smooth" });
+    setSidebarOpen(false);
+  };
+
+  const handleMenuNavigate = (item: typeof menuItems[number]) => {
+    if (item.href?.startsWith("http")) {
       window.open(item.href, "_blank", "noopener");
-    } else {
-      const el = document.getElementById(item.id);
-      if (el) el.scrollIntoView({ behavior: "smooth" });
+    } else if (item.href) {
+      window.location.href = item.href;
     }
     setSidebarOpen(false);
   };
 
   return (
     <div className="relative">
-      {/* Header gradient — short, smooth fade */}
+      {/* Header gradient */}
       <div
         className="fixed top-0 left-0 right-0 z-40 pointer-events-none"
         style={{
@@ -101,17 +114,19 @@ const Index = () => {
         </main>
       </motion.div>
 
-      {/* Sidebar — no border, above gradient */}
+      {/* Sidebar */}
       <motion.nav
         className="fixed left-0 top-0 h-screen w-[240px] bg-background z-[45] flex flex-col justify-center px-6"
         animate={{ x: sidebarOpen ? 0 : -240 }}
         transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
       >
+        {/* Sitemap section */}
+        <p className="mono-text mb-3">Sitemap</p>
         <div className="flex flex-col gap-0.5">
-          {navItems.map((item) => (
+          {sitemapItems.map((item) => (
             <button
               key={item.id}
-              onClick={() => handleNavigate(item)}
+              onClick={() => handleSitemapNavigate(item)}
               className="text-left py-2 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors duration-200"
             >
               {item.label}
@@ -119,7 +134,21 @@ const Index = () => {
           ))}
         </div>
 
-        {/* Theme switch */}
+        {/* Menu section */}
+        <p className="mono-text mb-3 mt-8">Menu</p>
+        <div className="flex flex-col gap-0.5">
+          {menuItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => handleMenuNavigate(item)}
+              className="text-left py-2 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors duration-200 flex items-center gap-2"
+            >
+              {item.icon && <item.icon className="w-4 h-4" />}
+              {item.label}
+            </button>
+          ))}
+        </div>
+
         <ThemeSwitch />
       </motion.nav>
 
@@ -136,7 +165,6 @@ const Index = () => {
         )}
       </AnimatePresence>
 
-      {/* Chat orb */}
       <ChatOrb />
     </div>
   );

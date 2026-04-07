@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
+import { ChevronDown } from "lucide-react";
 import project1 from "@/assets/project-1.jpg";
 import project2 from "@/assets/project-2.jpg";
 import project3 from "@/assets/project-3.jpg";
@@ -20,8 +21,8 @@ const allProjects = [
   { id: 12, title: "Void", category: "Identity", image: project4 },
 ];
 
-const COLS = 3;
-const GAP = 3;
+const COLS = 2;
+const GAP = 6;
 
 const ProjectItem = ({
   project,
@@ -70,10 +71,9 @@ const ProjectItem = ({
 const ProjectsSection = () => {
   const [expanded, setExpanded] = useState(false);
 
-  // Row 1: fully visible (3 items). Row 2: peek row, gradient covers bottom 70%.
-  const visibleProjects = allProjects.slice(0, COLS); // row 1
-  const peekProjects = allProjects.slice(COLS, COLS * 2); // row 2 (partially visible)
-  const remainingProjects = allProjects.slice(COLS * 2); // rest
+  const visibleProjects = allProjects.slice(0, COLS * 2);
+  const peekProjects = allProjects.slice(COLS * 2, COLS * 3);
+  const remainingProjects = allProjects.slice(COLS * 3);
 
   return (
     <section className="py-12 px-6 md:px-6">
@@ -81,73 +81,64 @@ const ProjectsSection = () => {
 
       <div className="relative">
         <div
-          className="grid grid-cols-2 md:grid-cols-3"
+          className="grid grid-cols-2"
           style={{ gap: `${GAP}px` }}
         >
-          {/* Row 1 — fully interactive */}
           {visibleProjects.map((project, index) => (
             <ProjectItem key={project.id} project={project} index={index} />
           ))}
 
-          {/* Row 2 — peek row, no hover until expanded */}
           {peekProjects.map((project, index) => (
             <ProjectItem
               key={project.id}
               project={project}
-              index={COLS + index}
+              index={COLS * 2 + index}
               hoverEnabled={expanded}
             />
           ))}
 
-          {/* Remaining rows — only when expanded */}
-          <AnimatePresence>
+          <AnimatePresence initial={false}>
             {expanded &&
               remainingProjects.map((project, index) => (
                 <motion.div
                   key={project.id}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 12 }}
-                  transition={{ delay: index * 0.03, duration: 0.3 }}
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
                 >
                   <ProjectItem
                     project={project}
-                    index={COLS * 2 + index}
+                    index={COLS * 3 + index}
                   />
                 </motion.div>
               ))}
           </AnimatePresence>
         </div>
 
-        {/* Fade overlay starting 30% down row 2 + pill button */}
+        {/* Fade overlay for peek row */}
         {!expanded && (
           <div
             className="absolute bottom-0 left-0 right-0 flex items-end justify-center pb-6 pointer-events-none"
             style={{
-              height: "70%",
+              height: "50%",
               background: `linear-gradient(to bottom, transparent 0%, hsl(var(--background)) 55%)`,
-              /* This div covers bottom 70% of the 2-row area, so gradient starts ~30% into row 2 */
             }}
-          >
-            <button
-              onClick={() => setExpanded(true)}
-              className="pill-button pointer-events-auto"
-            >
-              See all
-            </button>
-          </div>
+          />
         )}
 
-        {expanded && (
-          <div className="flex justify-center mt-4">
-            <button
-              onClick={() => setExpanded(false)}
-              className="pill-button"
-            >
-              Show less
-            </button>
-          </div>
-        )}
+        {/* Chevron toggle */}
+        <div className="flex justify-center mt-4">
+          <motion.button
+            onClick={() => setExpanded(!expanded)}
+            className="w-10 h-10 rounded-full bg-foreground text-background flex items-center justify-center hover:opacity-80 transition-opacity"
+            aria-label={expanded ? "Show less" : "See all"}
+            animate={{ rotate: expanded ? 180 : 0 }}
+            transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+          >
+            <ChevronDown className="w-4 h-4" />
+          </motion.button>
+        </div>
       </div>
     </section>
   );

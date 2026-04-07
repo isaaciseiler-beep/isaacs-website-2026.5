@@ -15,6 +15,12 @@ const photos = [
   { id: 6, title: "Grain", location: "Berlin", image: photo2 },
 ];
 
+// Preload all photos
+photos.forEach((p) => {
+  const img = new Image();
+  img.src = p.image;
+});
+
 const PhotoSection = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -67,7 +73,6 @@ const PhotoSection = () => {
               <img
                 src={photo.image}
                 alt={photo.title}
-                loading="lazy"
                 className="w-full h-full object-cover"
               />
               <div className="grid-item-overlay">

@@ -1,10 +1,10 @@
 import { motion } from "framer-motion";
 
 const newsItems = [
-  { id: 1, date: "Mar 2026", title: "Selected for ADC Annual Awards", description: "Urban Canvas project recognized in the branding category.", tag: "Award" },
-  { id: 2, date: "Feb 2026", title: "Speaking at Config 2026", description: "Presenting on the intersection of street culture and digital design.", tag: "Event" },
-  { id: 3, date: "Jan 2026", title: "Studio Expansion — Brooklyn", description: "New workspace opening in Williamsburg, Q2 2026.", tag: "Studio" },
-  { id: 4, date: "Dec 2025", title: "Year in Review Published", description: "Reflecting on 14 projects shipped across 6 countries.", tag: "Editorial" },
+  { id: 1, date: "Mar 2026", title: "Selected for ADC Annual Awards", description: "Urban Canvas project recognized in the branding category.", tag: "Award", logo: "" },
+  { id: 2, date: "Feb 2026", title: "Speaking at Config 2026", description: "Presenting on the intersection of street culture and digital design.", tag: "Event", logo: "" },
+  { id: 3, date: "Jan 2026", title: "Studio Expansion — Brooklyn", description: "New workspace opening in Williamsburg, Q2 2026.", tag: "Studio", logo: "" },
+  { id: 4, date: "Dec 2025", title: "Year in Review Published", description: "Reflecting on 14 projects shipped across 6 countries.", tag: "Editorial", logo: "" },
 ];
 
 const NewsSection = () => {
@@ -18,15 +18,26 @@ const NewsSection = () => {
             key={item.id}
             href="#"
             className="group relative block border border-border p-6 hover:bg-card/60 transition-colors duration-300 overflow-hidden"
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
             viewport={{ once: true, margin: "-20px" }}
             transition={{ delay: index * 0.06, duration: 0.4 }}
           >
-            {/* Tag pill */}
-            <span className="inline-block mono-text px-2 py-0.5 border border-border mb-4 text-foreground">
-              {item.tag}
-            </span>
+            <div className="flex items-start justify-between mb-4">
+              {/* Tag pill */}
+              <span className="inline-block mono-text px-3 py-1 rounded-full bg-foreground text-background">
+                {item.tag}
+              </span>
+
+              {/* Logo spot — replace src with actual white PNG logos */}
+              <div className="w-16 h-8 flex items-center justify-end opacity-40 group-hover:opacity-70 transition-opacity duration-300">
+                {item.logo ? (
+                  <img src={item.logo} alt={`${item.tag} logo`} className="max-h-full max-w-full object-contain" />
+                ) : (
+                  <span className="mono-text text-foreground/30 text-[8px]">LOGO</span>
+                )}
+              </div>
+            </div>
 
             <h3 className="text-lg font-semibold tracking-tight text-foreground mb-2 group-hover:text-foreground/80 transition-colors duration-200">
               {item.title}
@@ -42,7 +53,6 @@ const NewsSection = () => {
               </span>
             </div>
 
-            {/* Subtle bottom accent line on hover */}
             <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-foreground scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
           </motion.a>
         ))}

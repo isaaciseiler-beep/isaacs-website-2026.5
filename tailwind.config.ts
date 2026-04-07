@@ -14,8 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["Space Grotesk", "sans-serif"],
-        serif: ["DM Serif Display", "serif"],
+        sans: ["-apple-system", "BlinkMacSystemFont", "'Helvetica Neue'", "Helvetica", "Arial", "sans-serif"],
         mono: ["JetBrains Mono", "monospace"],
       },
       colors: {

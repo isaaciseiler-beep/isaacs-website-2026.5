@@ -166,10 +166,11 @@ const ChatOrb = () => {
                   <motion.div
                     className="w-full mb-2 max-h-[50vh] overflow-y-auto scrollbar-hide"
                     style={{
+                      borderRadius: 24,
                       background: "hsl(var(--background) / 0.35)",
                       backdropFilter: "blur(40px)",
                       WebkitBackdropFilter: "blur(40px)",
-                      boxShadow: `0 4px 30px -4px ${bgShadow}`,
+                      boxShadow: `0 4px 24px -4px ${bgShadow}`,
                     }}
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}

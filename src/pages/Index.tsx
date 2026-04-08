@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
-import { ChevronRight, Moon, Sun, Monitor } from "lucide-react";
+import { ChevronRight, Moon, Sun, Laptop, Mail } from "lucide-react";
 import { useTheme } from "@/components/ThemeProvider";
 import Logo from "@/components/Logo";
 import HeroSection from "@/components/HeroSection";
@@ -50,7 +50,7 @@ const socialLinks = [
     href: "https://substack.com",
     icon: (
       <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-        <path d="M22.539 8.242H1.46V5.406h21.08v2.836zM1.46 10.812V24l9.6-5.55 9.54 5.55V10.812H1.46zM22.54 0H1.46v2.836h21.08V0z"/>
+        <path d="M22.539 8.242H1.46V5.406h21.08v2.836zM1.46 10.812V24l9.6-5.55 9.48 5.55V10.812H1.46zM22.54 0H1.46v2.836h21.08V0z"/>
       </svg>
     ),
   },
@@ -59,25 +59,27 @@ const socialLinks = [
 const themeOptions = [
   { value: "dark" as const, label: "Dark", icon: Moon },
   { value: "light" as const, label: "Light", icon: Sun },
-  { value: "system" as const, label: "System", icon: Monitor },
+  { value: "system" as const, label: "System", icon: Laptop },
 ];
 
 const ThemeSwitch = () => {
   const { theme, setTheme } = useTheme();
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-2">
       {themeOptions.map((opt) => {
         const active = theme === opt.value;
         return (
           <button
             key={opt.value}
             onClick={() => setTheme(opt.value)}
-            className={`pill-button !text-[10px] !px-2.5 !py-1 flex items-center gap-1 ${
-              active ? "opacity-100" : "opacity-30 hover:opacity-50"
+            className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 ${
+              active
+                ? "bg-foreground/20 text-foreground"
+                : "bg-foreground/10 text-foreground/40 hover:bg-foreground/15 hover:text-foreground/70"
             }`}
+            aria-label={opt.label}
           >
-            <opt.icon className="w-3 h-3" />
-            {opt.label}
+            <opt.icon className="w-4 h-4" />
           </button>
         );
       })}
@@ -188,56 +190,60 @@ const Index = () => {
 
       {/* Sidebar */}
       <motion.nav
-        className="fixed left-0 top-0 h-screen w-[240px] bg-background z-[45] flex flex-col justify-center px-6 overflow-y-auto"
+        className="fixed left-0 top-0 h-screen w-[240px] bg-background z-[45] flex flex-col justify-between px-6 py-20 overflow-y-auto"
         animate={{ x: sidebarOpen ? 0 : -240 }}
         transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
       >
-        {/* Sitemap section */}
-        <p className="mono-text mb-3">Sitemap</p>
-        <div className="flex flex-col gap-0.5">
-          {sitemapItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => handleSitemapNavigate(item)}
-              className={`text-left py-1.5 text-sm font-medium transition-colors duration-200 ${
-                activeSection === item.id
-                  ? "text-foreground"
-                  : "text-foreground/40 hover:text-foreground/70"
-              }`}
-            >
-              {item.label}
-            </button>
-          ))}
+        {/* Sitemap section — top */}
+        <div>
+          <p className="mono-text mb-3">Sitemap</p>
+          <div className="flex flex-col gap-0.5">
+            {sitemapItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => handleSitemapNavigate(item)}
+                className={`text-left py-1.5 text-sm font-medium transition-colors duration-200 ${
+                  activeSection === item.id
+                    ? "text-foreground"
+                    : "text-foreground/40 hover:text-foreground/70"
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Get in Touch section */}
-        <p className="mono-text mb-3 mt-8">Get in Touch</p>
-        <button
-          onClick={() => {
-            window.location.href = "/contact";
-            setSidebarOpen(false);
-          }}
-          className="text-left py-1.5 text-sm font-medium text-foreground/40 hover:text-foreground/70 transition-colors duration-200"
-        >
-          Contact
-        </button>
+        {/* Bottom section — Get in Touch + Appearance */}
+        <div>
+          <p className="mono-text mb-3">Get in Touch</p>
+          <button
+            onClick={() => {
+              window.location.href = "/contact";
+              setSidebarOpen(false);
+            }}
+            className="w-9 h-9 rounded-full bg-foreground/10 hover:bg-foreground/20 text-foreground/70 hover:text-foreground flex items-center justify-center transition-all duration-200 mb-3"
+            aria-label="Contact"
+          >
+            <Mail className="w-4 h-4" />
+          </button>
 
-        <div className="flex items-center gap-2 mt-3">
-          {socialLinks.map((link) => (
-            <button
-              key={link.id}
-              onClick={() => handleSocialClick(link.href)}
-              className="w-9 h-9 rounded-md bg-foreground/10 hover:bg-foreground/20 text-foreground/70 hover:text-foreground flex items-center justify-center transition-all duration-200"
-              aria-label={link.label}
-            >
-              {link.icon}
-            </button>
-          ))}
+          <div className="flex items-center gap-2">
+            {socialLinks.map((link) => (
+              <button
+                key={link.id}
+                onClick={() => handleSocialClick(link.href)}
+                className="w-9 h-9 rounded-full bg-foreground/10 hover:bg-foreground/20 text-foreground/70 hover:text-foreground flex items-center justify-center transition-all duration-200"
+                aria-label={link.label}
+              >
+                {link.icon}
+              </button>
+            ))}
+          </div>
+
+          <p className="mono-text mb-3 mt-6">Appearance</p>
+          <ThemeSwitch />
         </div>
-
-        {/* Appearance section */}
-        <p className="mono-text mb-3 mt-8">Appearance</p>
-        <ThemeSwitch />
       </motion.nav>
 
       {/* Overlay to close sidebar */}

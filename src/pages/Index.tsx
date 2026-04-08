@@ -237,10 +237,15 @@ const Index = () => {
         <AnimatePresence>
           {sidebarOpen && (
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              transition={{ delay: 0.15, duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+              initial={{ opacity: 0, y: 16, scale: 0.94, filter: "blur(6px)" }}
+              animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+              exit={{ opacity: 0, y: 12, scale: 0.96, filter: "blur(4px)" }}
+              transition={{
+                delay: 0.25,
+                duration: 0.5,
+                ease: [0.16, 1, 0.3, 1],
+                filter: { duration: 0.6, delay: 0.3 },
+              }}
             >
               <p className="mono-text mb-3">Get in Touch</p>
               <div className="grid grid-cols-4 gap-2">

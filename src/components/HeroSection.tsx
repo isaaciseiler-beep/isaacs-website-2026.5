@@ -27,7 +27,7 @@ const HeroSection = () => {
       <div className="absolute inset-0 bg-background" />
 
       <motion.div
-        className="relative z-10 px-6 md:px-6 pb-8 md:pb-10 max-w-3xl"
+        className="relative z-10 px-6 pb-6"
         style={{ opacity: textOpacity }}
       >
         <h1 className="text-5xl md:text-7xl lg:text-8xl font-semibold tracking-tighter leading-[0.92] text-foreground">

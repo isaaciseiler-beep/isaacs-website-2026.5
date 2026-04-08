@@ -1,27 +1,58 @@
-import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 
-const statement = "A multidisciplinary creative working at the intersection of design, photography, and technology. Focused on building experiences that feel both intentional and alive.";
-const words = statement.split(" ");
+const lines = [
+  "A multidisciplinary creative",
+  "working at the intersection of",
+  "design, photography, and",
+  "technology. Focused on building",
+  "experiences that feel both",
+  "intentional and alive.",
+];
+
+const letterVariants = {
+  hidden: { opacity: 0, y: 30, filter: "blur(8px)" },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: {
+      delay: i * 0.015,
+      duration: 0.5,
+      ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number],
+    },
+  }),
+};
 
 const AboutSection = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start 0.9", "end 0.85"],
-  });
+  let globalIndex = 0;
 
   return (
     <section className="py-12 px-6 md:px-6">
       <h2 className="section-heading">About</h2>
 
-      <div className="max-w-3xl" ref={containerRef}>
-        <p className="text-2xl md:text-3xl leading-snug font-light tracking-tight">
-          {words.map((word, i) => {
-            const start = i / words.length;
-            const end = start + 1 / words.length;
-            return <Word key={i} progress={scrollYProgress} range={[start, end]}>{word}</Word>;
-          })}
+      <div className="max-w-3xl">
+        <p className="text-2xl md:text-3xl leading-snug font-light tracking-tight text-foreground">
+          {lines.map((line, lineIdx) => (
+            <span key={lineIdx} className="block">
+              {line.split("").map((char) => {
+                const i = globalIndex++;
+                return (
+                  <motion.span
+                    key={`${lineIdx}-${i}`}
+                    className="inline-block"
+                    style={{ whiteSpace: char === " " ? "pre" : undefined }}
+                    variants={letterVariants}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-100px" }}
+                    custom={i}
+                  >
+                    {char}
+                  </motion.span>
+                );
+              })}
+            </span>
+          ))}
         </p>
 
         <motion.p
@@ -29,24 +60,12 @@ const AboutSection = () => {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
+          transition={{ delay: 0.8, duration: 0.5 }}
         >
           Currently available for select projects and collaborations.
         </motion.p>
       </div>
     </section>
-  );
-};
-
-const Word = ({ children, progress, range }: { children: string; progress: any; range: [number, number] }) => {
-  const opacity = useTransform(progress, range, [0.08, 1]);
-
-  return (
-    <span className="inline-block mr-[0.25em]">
-      <motion.span style={{ opacity }} className="inline-block text-foreground">
-        {children}
-      </motion.span>
-    </span>
   );
 };
 

@@ -200,54 +200,71 @@ const Index = () => {
         animate={{ x: sidebarOpen ? 0 : -240 }}
         transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
       >
-        {/* Sitemap — top, pushed down a bit */}
-        <div className="mt-4">
-          <div className="flex flex-col gap-0.5">
-            {sitemapItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => handleSitemapNavigate(item)}
-                className={`text-left py-1.5 text-sm font-medium transition-colors duration-200 ${
-                  activeSection === item.id
-                    ? "text-foreground"
-                    : "text-foreground/40 hover:text-foreground/70"
-                }`}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
-        </div>
+        {/* Sitemap — top */}
+        <AnimatePresence>
+          {sidebarOpen && (
+            <div className="mt-4">
+              <div className="flex flex-col gap-0.5">
+                {sitemapItems.map((item, i) => (
+                  <motion.button
+                    key={item.id}
+                    initial={{ opacity: 0, x: -12, filter: "blur(4px)" }}
+                    animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+                    exit={{ opacity: 0, x: -12, filter: "blur(4px)" }}
+                    transition={{ delay: 0.05 + i * 0.04, duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
+                    onClick={() => handleSitemapNavigate(item)}
+                    className={`text-left py-1.5 text-sm font-medium transition-colors duration-200 ${
+                      activeSection === item.id
+                        ? "text-foreground"
+                        : "text-foreground/40 hover:text-foreground/70"
+                    }`}
+                  >
+                    {item.label}
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+          )}
+        </AnimatePresence>
 
         {/* Bottom section — Get in Touch + Appearance */}
-        <div>
-          <p className="mono-text mb-3">Get in Touch</p>
-          <div className="grid grid-cols-4 gap-2">
-            <button
-              onClick={() => {
-                window.location.href = "/contact";
-                setSidebarOpen(false);
-              }}
-              className="w-10 h-10 rounded-xl bg-foreground/10 hover:bg-foreground/15 text-foreground flex items-center justify-center transition-all duration-200"
-              aria-label="Contact"
+        <AnimatePresence>
+          {sidebarOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ delay: 0.15, duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
             >
-              <Mail className="w-4 h-4" />
-            </button>
-            {socialLinks.map((link) => (
-              <button
-                key={link.id}
-                onClick={() => handleSocialClick(link.href)}
-                className="w-10 h-10 rounded-xl bg-foreground/10 hover:bg-foreground/15 text-foreground flex items-center justify-center transition-all duration-200"
-                aria-label={link.label}
-              >
-                {link.icon}
-              </button>
-            ))}
-          </div>
+              <p className="mono-text mb-3">Get in Touch</p>
+              <div className="grid grid-cols-4 gap-2">
+                {[
+                  <button
+                    key="contact"
+                    onClick={() => { window.location.href = "/contact"; setSidebarOpen(false); }}
+                    className="w-10 h-10 rounded-xl bg-foreground/10 hover:bg-foreground/15 text-foreground flex items-center justify-center transition-all duration-200"
+                    aria-label="Contact"
+                  >
+                    <Mail className="w-4 h-4" />
+                  </button>,
+                  ...socialLinks.map((link) => (
+                    <button
+                      key={link.id}
+                      onClick={() => handleSocialClick(link.href)}
+                      className="w-10 h-10 rounded-xl bg-foreground/10 hover:bg-foreground/15 text-foreground flex items-center justify-center transition-all duration-200"
+                      aria-label={link.label}
+                    >
+                      {link.icon}
+                    </button>
+                  )),
+                ]}
+              </div>
 
-          <p className="mono-text mb-3 mt-6">Appearance</p>
-          <ThemeSwitch />
-        </div>
+              <p className="mono-text mb-3 mt-6">Appearance</p>
+              <ThemeSwitch />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.nav>
 
       {/* Overlay to close sidebar */}

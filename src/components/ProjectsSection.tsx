@@ -27,24 +27,45 @@ allProjects.forEach((p) => {
   img.src = p.image;
 });
 
+const chevronVariants = {
+  initial: (dir: "left" | "right") => ({
+    opacity: 0,
+    x: dir === "left" ? -20 : 20,
+  }),
+  animate: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.35, ease: [0.16, 1, 0.3, 1] },
+  },
+  exit: (dir: "left" | "right") => ({
+    opacity: 0,
+    x: dir === "left" ? -20 : 20,
+    transition: { duration: 0.25, ease: [0.4, 0, 1, 1] },
+  }),
+};
+
 const ProjectsSection = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
+  const [canScrollRight, setCanScrollRight] = useState(false);
 
   const checkScroll = () => {
     const el = scrollRef.current;
     if (!el) return;
-    setCanScrollLeft(el.scrollLeft > 10);
-    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 10);
+    setCanScrollLeft(el.scrollLeft > 2);
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 2);
   };
 
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
     checkScroll();
-    el.addEventListener("scroll", checkScroll);
-    return () => el.removeEventListener("scroll", checkScroll);
+    el.addEventListener("scroll", checkScroll, { passive: true });
+    window.addEventListener("resize", checkScroll);
+    return () => {
+      el.removeEventListener("scroll", checkScroll);
+      window.removeEventListener("resize", checkScroll);
+    };
   }, []);
 
   const scroll = (dir: "left" | "right") => {
@@ -60,14 +81,14 @@ const ProjectsSection = () => {
         <h2 className="section-heading mb-0">Projects</h2>
       </div>
 
-      <div className="relative group/projects">
+      <div className="relative">
         <div
           ref={scrollRef}
-          className="overflow-x-auto scrollbar-hide px-6 md:px-6"
+          className="overflow-x-auto scrollbar-hide pl-6 md:pl-6"
           style={{ scrollSnapType: "x mandatory" }}
         >
           <div
-            className="grid grid-rows-2 grid-flow-col gap-[3px]"
+            className="grid grid-rows-2 grid-flow-col gap-[3px] pr-6"
             style={{ width: "max-content" }}
           >
             {allProjects.map((project, index) => (
@@ -104,16 +125,17 @@ const ProjectsSection = () => {
           {canScrollLeft && (
             <motion.button
               key="scroll-left"
+              custom="left"
+              variants={chevronVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
               onClick={() => scroll("left")}
-              className="absolute left-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-foreground text-background flex items-center justify-center"
-              initial={{ opacity: 0, x: 10, scale: 0.8 }}
-              animate={{ opacity: 1, x: 0, scale: 1 }}
-              exit={{ opacity: 0, x: 10, scale: 0.8 }}
-              whileHover={{ scale: 1.15 }}
-              whileTap={{ scale: 0.9 }}
-              transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
+              className="absolute left-8 top-1/2 -translate-y-1/2 text-foreground/80 hover:text-foreground transition-colors"
+              whileHover={{ x: -3 }}
+              whileTap={{ scale: 0.85 }}
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-6 h-6" strokeWidth={1.5} />
             </motion.button>
           )}
         </AnimatePresence>
@@ -122,16 +144,17 @@ const ProjectsSection = () => {
           {canScrollRight && (
             <motion.button
               key="scroll-right"
+              custom="right"
+              variants={chevronVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
               onClick={() => scroll("right")}
-              className="absolute right-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-foreground text-background flex items-center justify-center"
-              initial={{ opacity: 0, x: -10, scale: 0.8 }}
-              animate={{ opacity: 1, x: 0, scale: 1 }}
-              exit={{ opacity: 0, x: -10, scale: 0.8 }}
-              whileHover={{ scale: 1.15 }}
-              whileTap={{ scale: 0.9 }}
-              transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
+              className="absolute right-8 top-1/2 -translate-y-1/2 text-foreground/80 hover:text-foreground transition-colors"
+              whileHover={{ x: 3 }}
+              whileTap={{ scale: 0.85 }}
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-6 h-6" strokeWidth={1.5} />
             </motion.button>
           )}
         </AnimatePresence>

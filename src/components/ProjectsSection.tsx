@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import project1 from "@/assets/project-1.jpg";
 import project2 from "@/assets/project-2.jpg";
@@ -100,23 +100,41 @@ const ProjectsSection = () => {
           </div>
         </div>
 
-        {canScrollLeft && (
-          <button
-            onClick={() => scroll("left")}
-            className="absolute left-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center text-foreground opacity-0 group-hover/projects:opacity-100 transition-opacity duration-300 hover:bg-background"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-        )}
+        <AnimatePresence>
+          {canScrollLeft && (
+            <motion.button
+              key="scroll-left"
+              onClick={() => scroll("left")}
+              className="absolute left-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-foreground text-background flex items-center justify-center"
+              initial={{ opacity: 0, x: 10, scale: 0.8 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: 10, scale: 0.8 }}
+              whileHover={{ scale: 1.15 }}
+              whileTap={{ scale: 0.9 }}
+              transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </motion.button>
+          )}
+        </AnimatePresence>
 
-        {canScrollRight && (
-          <button
-            onClick={() => scroll("right")}
-            className="absolute right-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center text-foreground opacity-0 group-hover/projects:opacity-100 transition-opacity duration-300 hover:bg-background"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
-        )}
+        <AnimatePresence>
+          {canScrollRight && (
+            <motion.button
+              key="scroll-right"
+              onClick={() => scroll("right")}
+              className="absolute right-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-foreground text-background flex items-center justify-center"
+              initial={{ opacity: 0, x: -10, scale: 0.8 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: -10, scale: 0.8 }}
+              whileHover={{ scale: 1.15 }}
+              whileTap={{ scale: 0.9 }}
+              transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
+            >
+              <ChevronRight className="w-4 h-4" />
+            </motion.button>
+          )}
+        </AnimatePresence>
       </div>
     </section>
   );

@@ -190,56 +190,60 @@ const Index = () => {
 
       {/* Sidebar */}
       <motion.nav
-        className="fixed left-0 top-0 h-screen w-[240px] bg-background z-[45] flex flex-col justify-center px-6 overflow-y-auto"
+        className="fixed left-0 top-0 h-screen w-[240px] bg-background z-[45] flex flex-col justify-between px-6 py-20 overflow-y-auto"
         animate={{ x: sidebarOpen ? 0 : -240 }}
         transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
       >
-        {/* Sitemap section */}
-        <p className="mono-text mb-3">Sitemap</p>
-        <div className="flex flex-col gap-0.5">
-          {sitemapItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => handleSitemapNavigate(item)}
-              className={`text-left py-1.5 text-sm font-medium transition-colors duration-200 ${
-                activeSection === item.id
-                  ? "text-foreground"
-                  : "text-foreground/40 hover:text-foreground/70"
-              }`}
-            >
-              {item.label}
-            </button>
-          ))}
+        {/* Sitemap section — top */}
+        <div>
+          <p className="mono-text mb-3">Sitemap</p>
+          <div className="flex flex-col gap-0.5">
+            {sitemapItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => handleSitemapNavigate(item)}
+                className={`text-left py-1.5 text-sm font-medium transition-colors duration-200 ${
+                  activeSection === item.id
+                    ? "text-foreground"
+                    : "text-foreground/40 hover:text-foreground/70"
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Get in Touch section */}
-        <p className="mono-text mb-3 mt-8">Get in Touch</p>
-        <button
-          onClick={() => {
-            window.location.href = "/contact";
-            setSidebarOpen(false);
-          }}
-          className="text-left py-1.5 text-sm font-medium text-foreground/40 hover:text-foreground/70 transition-colors duration-200"
-        >
-          Contact
-        </button>
+        {/* Bottom section — Get in Touch + Appearance */}
+        <div>
+          <p className="mono-text mb-3">Get in Touch</p>
+          <button
+            onClick={() => {
+              window.location.href = "/contact";
+              setSidebarOpen(false);
+            }}
+            className="w-9 h-9 rounded-full bg-foreground/10 hover:bg-foreground/20 text-foreground/70 hover:text-foreground flex items-center justify-center transition-all duration-200 mb-3"
+            aria-label="Contact"
+          >
+            <Mail className="w-4 h-4" />
+          </button>
 
-        <div className="flex items-center gap-2 mt-3">
-          {socialLinks.map((link) => (
-            <button
-              key={link.id}
-              onClick={() => handleSocialClick(link.href)}
-              className="w-9 h-9 rounded-md bg-foreground/10 hover:bg-foreground/20 text-foreground/70 hover:text-foreground flex items-center justify-center transition-all duration-200"
-              aria-label={link.label}
-            >
-              {link.icon}
-            </button>
-          ))}
+          <div className="flex items-center gap-2">
+            {socialLinks.map((link) => (
+              <button
+                key={link.id}
+                onClick={() => handleSocialClick(link.href)}
+                className="w-9 h-9 rounded-full bg-foreground/10 hover:bg-foreground/20 text-foreground/70 hover:text-foreground flex items-center justify-center transition-all duration-200"
+                aria-label={link.label}
+              >
+                {link.icon}
+              </button>
+            ))}
+          </div>
+
+          <p className="mono-text mb-3 mt-6">Appearance</p>
+          <ThemeSwitch />
         </div>
-
-        {/* Appearance section */}
-        <p className="mono-text mb-3 mt-8">Appearance</p>
-        <ThemeSwitch />
       </motion.nav>
 
       {/* Overlay to close sidebar */}

@@ -22,7 +22,7 @@ const allProjects = [
 ];
 
 const COLS = 2;
-const GAP = 6;
+const GAP = 3;
 const VISIBLE_ROWS = 2;
 
 const ProjectItem = ({

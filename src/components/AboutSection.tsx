@@ -24,7 +24,7 @@ const AboutSection = () => {
       <h2 className="section-heading">About</h2>
 
       <div>
-        <p className="text-3xl md:text-5xl lg:text-6xl leading-tight font-light tracking-tight text-foreground">
+        <p className="text-2xl md:text-3xl leading-snug font-light tracking-tight text-foreground">
           {words.map((word, i) => {
             const idx = i;
             return (

@@ -10,7 +10,7 @@ const letterVariants = {
     y: 0,
     filter: "blur(0px)",
     transition: {
-      delay: i * 0.015,
+    delay: i * 0.04,
       duration: 0.5,
       ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number],
     },
@@ -18,7 +18,6 @@ const letterVariants = {
 };
 
 const AboutSection = () => {
-  let globalIndex = 0;
 
   return (
     <section className="py-12 px-6 md:px-6">

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
-import { ChevronRight, Sun, Laptop, Mail, Moon } from "lucide-react";
+import { ChevronRight, Sun, Laptop, Mail } from "lucide-react";
 import { useTheme } from "@/components/ThemeProvider";
 import Logo from "@/components/Logo";
 import HeroSection from "@/components/HeroSection";
@@ -56,8 +56,14 @@ const socialLinks = [
   },
 ];
 
+const SlimMoon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+  </svg>
+);
+
 const themeOptions = [
-  { value: "dark" as const, label: "Dark", icon: Moon },
+  { value: "dark" as const, label: "Dark", icon: SlimMoon },
   { value: "light" as const, label: "Light", icon: Sun },
   { value: "system" as const, label: "System", icon: Laptop },
 ];

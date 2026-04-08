@@ -1,6 +1,6 @@
-import { useState, useRef } from "react";
-import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import { ChevronDown } from "lucide-react";
+import { useRef, useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import project1 from "@/assets/project-1.jpg";
 import project2 from "@/assets/project-2.jpg";
 import project3 from "@/assets/project-3.jpg";
@@ -21,105 +21,102 @@ const allProjects = [
   { id: 12, title: "Void", category: "Identity", image: project4 },
 ];
 
-const COLS = 2;
-const GAP = 3;
-const VISIBLE_ROWS = 2;
-
-const ProjectItem = ({
-  project,
-  index,
-  hoverEnabled = true,
-}: {
-  project: (typeof allProjects)[0];
-  index: number;
-  hoverEnabled?: boolean;
-}) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
-  const y = useTransform(scrollYProgress, [0, 1], [8, -8]);
-
-  return (
-    <motion.div
-      ref={ref}
-      className={`grid-item aspect-[4/3] ${!hoverEnabled ? "pointer-events-none" : ""}`}
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ once: true, margin: "-20px" }}
-      transition={{ delay: index * 0.03, duration: 0.4 }}
-    >
-      <motion.img
-        src={project.image}
-        alt={project.title}
-        loading="lazy"
-        className="w-full h-full object-cover"
-        style={{ y }}
-      />
-      {hoverEnabled && (
-        <div className="grid-item-overlay">
-          <p className="mono-text mb-0.5">{project.category}</p>
-          <h3 className="text-xs font-medium tracking-tight text-foreground">
-            {project.title}
-          </h3>
-        </div>
-      )}
-    </motion.div>
-  );
-};
+// Preload project images
+allProjects.forEach((p) => {
+  const img = new Image();
+  img.src = p.image;
+});
 
 const ProjectsSection = () => {
-  const [expanded, setExpanded] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
 
-  // 2 rows visible = 4 items, then peek row, then rest
-  const visibleProjects = allProjects.slice(0, COLS * VISIBLE_ROWS);
-  const remainingProjects = allProjects.slice(COLS * VISIBLE_ROWS);
+  const checkScroll = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 10);
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 10);
+  };
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    checkScroll();
+    el.addEventListener("scroll", checkScroll);
+    return () => el.removeEventListener("scroll", checkScroll);
+  }, []);
+
+  const scroll = (dir: "left" | "right") => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const amount = el.clientWidth * 0.6;
+    el.scrollBy({ left: dir === "left" ? -amount : amount, behavior: "smooth" });
+  };
 
   return (
-    <section className="py-6 px-6 md:px-6">
-      <h2 className="section-heading">Projects</h2>
+    <section className="py-6">
+      <div className="px-6 md:px-6 mb-4">
+        <h2 className="section-heading mb-0">Projects</h2>
+      </div>
 
-      <div className="relative">
+      <div className="relative group/projects">
         <div
-          className="grid grid-cols-2"
-          style={{ gap: `${GAP}px` }}
+          ref={scrollRef}
+          className="overflow-x-auto scrollbar-hide px-6 md:px-6"
+          style={{ scrollSnapType: "x mandatory" }}
         >
-          {visibleProjects.map((project, index) => (
-            <ProjectItem key={project.id} project={project} index={index} />
-          ))}
-
-          <AnimatePresence initial={false}>
-            {expanded &&
-              remainingProjects.map((project, index) => (
-                <motion.div
-                  key={project.id}
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
-                >
-                  <ProjectItem
-                    project={project}
-                    index={COLS * VISIBLE_ROWS + index}
-                  />
-                </motion.div>
-              ))}
-          </AnimatePresence>
-        </div>
-
-        {/* Chevron toggle */}
-        <div className="flex justify-center mt-4">
-          <motion.button
-            onClick={() => setExpanded(!expanded)}
-            className="w-10 h-10 rounded-full bg-foreground text-background flex items-center justify-center hover:opacity-80 transition-opacity"
-            aria-label={expanded ? "Show less" : "See all"}
-            animate={{ rotate: expanded ? 180 : 0 }}
-            transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+          <div
+            className="grid grid-rows-2 grid-flow-col gap-[3px]"
+            style={{ width: "max-content" }}
           >
-            <ChevronDown className="w-4 h-4" />
-          </motion.button>
+            {allProjects.map((project, index) => (
+              <motion.div
+                key={project.id}
+                className="grid-item"
+                style={{
+                  width: "calc(33vw - 12px)",
+                  aspectRatio: "4/3",
+                  scrollSnapAlign: index % 2 === 0 ? "start" : undefined,
+                }}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true, margin: "-20px" }}
+                transition={{ delay: index * 0.03, duration: 0.4 }}
+              >
+                <img
+                  src={project.image}
+                  alt={project.title}
+                  className="w-full h-full object-cover"
+                />
+                <div className="grid-item-overlay">
+                  <p className="mono-text mb-0.5">{project.category}</p>
+                  <h3 className="text-xs font-medium tracking-tight text-foreground">
+                    {project.title}
+                  </h3>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
+
+        {canScrollLeft && (
+          <button
+            onClick={() => scroll("left")}
+            className="absolute left-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center text-foreground opacity-0 group-hover/projects:opacity-100 transition-opacity duration-300 hover:bg-background"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+        )}
+
+        {canScrollRight && (
+          <button
+            onClick={() => scroll("right")}
+            className="absolute right-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center text-foreground opacity-0 group-hover/projects:opacity-100 transition-opacity duration-300 hover:bg-background"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        )}
       </div>
     </section>
   );

@@ -84,11 +84,11 @@ const ProjectsSection = () => {
       <div className="relative">
         <div
           ref={scrollRef}
-          className="overflow-x-auto scrollbar-hide pl-6 md:pl-6"
-          style={{ scrollSnapType: "x mandatory" }}
+          className="overflow-x-auto scrollbar-hide"
+          style={{ scrollSnapType: "x mandatory", scrollPaddingLeft: 24 }}
         >
           <div
-            className="grid grid-rows-2 grid-flow-col gap-[3px] pr-6"
+            className="grid grid-rows-2 grid-flow-col gap-[3px] px-6"
             style={{ width: "max-content" }}
           >
             {allProjects.map((project, index) => (

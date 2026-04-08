@@ -78,8 +78,8 @@ const PhotoSection = () => {
       <div className="relative">
         <div
           ref={scrollRef}
-          className="flex gap-[3px] overflow-x-auto scrollbar-hide pl-6 md:pl-6"
-          style={{ scrollSnapType: "x mandatory" }}
+          className="flex gap-[3px] overflow-x-auto scrollbar-hide px-6"
+          style={{ scrollSnapType: "x mandatory", scrollPaddingLeft: 24 }}
         >
           {photos.map((photo, index) => (
             <motion.div

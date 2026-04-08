@@ -205,15 +205,21 @@ const Index = () => {
           {sidebarOpen && (
             <div className="mt-4">
               <div className="flex flex-col gap-0.5">
-                {sitemapItems.map((item, i) => (
+                 {sitemapItems.map((item, i) => (
                   <motion.button
                     key={item.id}
-                    initial={{ opacity: 0, x: -12, filter: "blur(4px)" }}
-                    animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-                    exit={{ opacity: 0, x: -12, filter: "blur(4px)" }}
-                    transition={{ delay: 0.05 + i * 0.04, duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
+                    initial={{ opacity: 0, x: -20, scale: 0.92, filter: "blur(6px)", rotateY: -15 }}
+                    animate={{ opacity: 1, x: 0, scale: 1, filter: "blur(0px)", rotateY: 0 }}
+                    exit={{ opacity: 0, x: -14, scale: 0.95, filter: "blur(4px)", rotateY: -10 }}
+                    transition={{
+                      delay: 0.08 + i * 0.06,
+                      duration: 0.5,
+                      ease: [0.16, 1, 0.3, 1],
+                      opacity: { duration: 0.4 },
+                      filter: { duration: 0.6, delay: 0.1 + i * 0.06 },
+                    }}
                     onClick={() => handleSitemapNavigate(item)}
-                    className={`text-left py-1.5 text-sm font-medium transition-colors duration-200 ${
+                    className={`text-left py-1.5 text-sm font-medium transition-colors duration-200 origin-left ${
                       activeSection === item.id
                         ? "text-foreground"
                         : "text-foreground/40 hover:text-foreground/70"

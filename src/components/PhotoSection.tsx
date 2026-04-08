@@ -57,30 +57,39 @@ const PhotoSection = () => {
       <div className="relative group/photos">
         <div
           ref={scrollRef}
-          className="flex gap-[3px] overflow-x-auto scrollbar-hide px-6 md:px-6"
+          className="overflow-x-auto scrollbar-hide px-6 md:px-6"
           style={{ scrollSnapType: "x mandatory" }}
         >
-          {photos.map((photo, index) => (
-            <motion.div
-              key={photo.id}
-              className="grid-item flex-shrink-0"
-              style={{ width: "calc(66% - 2px)", scrollSnapAlign: "start", aspectRatio: "3/2" }}
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: "-20px" }}
-              transition={{ delay: index * 0.05, duration: 0.4 }}
-            >
-              <img
-                src={photo.image}
-                alt={photo.title}
-                className="w-full h-full object-cover"
-              />
-              <div className="grid-item-overlay">
-                <p className="mono-text mb-0.5">{photo.location}</p>
-                <h3 className="text-xs font-medium text-foreground">{photo.title}</h3>
-              </div>
-            </motion.div>
-          ))}
+          <div
+            className="grid grid-rows-2 grid-flow-col gap-[3px]"
+            style={{ width: "max-content" }}
+          >
+            {photos.map((photo, index) => (
+              <motion.div
+                key={photo.id}
+                className="grid-item"
+                style={{
+                  width: "calc(33vw - 12px)",
+                  aspectRatio: "3/2",
+                  scrollSnapAlign: index % 2 === 0 ? "start" : undefined,
+                }}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true, margin: "-20px" }}
+                transition={{ delay: index * 0.05, duration: 0.4 }}
+              >
+                <img
+                  src={photo.image}
+                  alt={photo.title}
+                  className="w-full h-full object-cover"
+                />
+                <div className="grid-item-overlay">
+                  <p className="mono-text mb-0.5">{photo.location}</p>
+                  <h3 className="text-xs font-medium text-foreground">{photo.title}</h3>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
 
         {canScrollLeft && (

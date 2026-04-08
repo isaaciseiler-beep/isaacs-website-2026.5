@@ -1,13 +1,7 @@
 import { motion } from "framer-motion";
 
-const lines = [
-  "A multidisciplinary creative",
-  "working at the intersection of",
-  "design, photography, and",
-  "technology. Focused on building",
-  "experiences that feel both",
-  "intentional and alive.",
-];
+const statement = "A multidisciplinary creative working at the intersection of design, photography, and technology. Focused on building experiences that feel both intentional and alive.";
+const words = statement.split(" ");
 
 const letterVariants = {
   hidden: { opacity: 0, y: 30, filter: "blur(8px)" },
@@ -30,29 +24,24 @@ const AboutSection = () => {
     <section className="py-12 px-6 md:px-6">
       <h2 className="section-heading">About</h2>
 
-      <div className="max-w-3xl">
-        <p className="text-2xl md:text-3xl leading-snug font-light tracking-tight text-foreground">
-          {lines.map((line, lineIdx) => (
-            <span key={lineIdx} className="block">
-              {line.split("").map((char) => {
-                const i = globalIndex++;
-                return (
-                  <motion.span
-                    key={`${lineIdx}-${i}`}
-                    className="inline-block"
-                    style={{ whiteSpace: char === " " ? "pre" : undefined }}
-                    variants={letterVariants}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true, margin: "-100px" }}
-                    custom={i}
-                  >
-                    {char}
-                  </motion.span>
-                );
-              })}
-            </span>
-          ))}
+      <div>
+        <p className="text-3xl md:text-5xl lg:text-6xl leading-tight font-light tracking-tight text-foreground">
+          {words.map((word, i) => {
+            const idx = i;
+            return (
+              <motion.span
+                key={idx}
+                className="inline-block mr-[0.3em]"
+                variants={letterVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-100px" }}
+                custom={idx}
+              >
+                {word}
+              </motion.span>
+            );
+          })}
         </p>
 
         <motion.p

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
-import { ChevronRight, Sun, Laptop, Mail, Eclipse } from "lucide-react";
+import { ChevronRight, Sun, Laptop, Mail, Moon } from "lucide-react";
 import { useTheme } from "@/components/ThemeProvider";
 import Logo from "@/components/Logo";
 import HeroSection from "@/components/HeroSection";
@@ -50,14 +50,14 @@ const socialLinks = [
     href: "https://substack.com",
     icon: (
       <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-        <path d="M22.539 8.242H1.46V5.406h21.08v2.836zM1.46 10.812V24l9.6-5.55 9.48 5.55V10.812H1.46zM22.54 0H1.46v2.836h21.08V0z"/>
+        <path d="M22.539 8.242H1.461V5.406h21.078v2.836zM1.461 10.812V24L12 18.11 22.539 24V10.812H1.461zM22.539 0H1.461v2.836h21.078V0z"/>
       </svg>
     ),
   },
 ];
 
 const themeOptions = [
-  { value: "dark" as const, label: "Dark", icon: Eclipse },
+  { value: "dark" as const, label: "Dark", icon: Moon },
   { value: "light" as const, label: "Light", icon: Sun },
   { value: "system" as const, label: "System", icon: Laptop },
 ];

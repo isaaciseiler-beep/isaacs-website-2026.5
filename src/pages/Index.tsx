@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
-import { ChevronRight, Moon, Sun, Laptop, Mail } from "lucide-react";
+import { ChevronRight, Sun, Laptop, Mail, Eclipse } from "lucide-react";
 import { useTheme } from "@/components/ThemeProvider";
 import Logo from "@/components/Logo";
 import HeroSection from "@/components/HeroSection";
@@ -57,7 +57,7 @@ const socialLinks = [
 ];
 
 const themeOptions = [
-  { value: "dark" as const, label: "Dark", icon: Moon },
+  { value: "dark" as const, label: "Dark", icon: Eclipse },
   { value: "light" as const, label: "Light", icon: Sun },
   { value: "system" as const, label: "System", icon: Laptop },
 ];
@@ -72,10 +72,10 @@ const ThemeSwitch = () => {
           <button
             key={opt.value}
             onClick={() => setTheme(opt.value)}
-            className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 ${
+            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 ${
               active
-                ? "bg-foreground/20 text-foreground"
-                : "bg-foreground/10 text-foreground/40 hover:bg-foreground/15 hover:text-foreground/70"
+                ? "bg-white text-black shadow-sm"
+                : "bg-foreground/10 text-foreground hover:bg-foreground/15"
             }`}
             aria-label={opt.label}
           >
@@ -194,9 +194,8 @@ const Index = () => {
         animate={{ x: sidebarOpen ? 0 : -240 }}
         transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
       >
-        {/* Sitemap section — top */}
-        <div>
-          <p className="mono-text mb-3">Sitemap</p>
+        {/* Sitemap — top, pushed down a bit */}
+        <div className="mt-4">
           <div className="flex flex-col gap-0.5">
             {sitemapItems.map((item) => (
               <button
@@ -217,23 +216,22 @@ const Index = () => {
         {/* Bottom section — Get in Touch + Appearance */}
         <div>
           <p className="mono-text mb-3">Get in Touch</p>
-          <button
-            onClick={() => {
-              window.location.href = "/contact";
-              setSidebarOpen(false);
-            }}
-            className="w-9 h-9 rounded-full bg-foreground/10 hover:bg-foreground/20 text-foreground/70 hover:text-foreground flex items-center justify-center transition-all duration-200 mb-3"
-            aria-label="Contact"
-          >
-            <Mail className="w-4 h-4" />
-          </button>
-
-          <div className="flex items-center gap-2">
+          <div className="grid grid-cols-4 gap-2">
+            <button
+              onClick={() => {
+                window.location.href = "/contact";
+                setSidebarOpen(false);
+              }}
+              className="w-10 h-10 rounded-xl bg-foreground/10 hover:bg-foreground/15 text-foreground flex items-center justify-center transition-all duration-200"
+              aria-label="Contact"
+            >
+              <Mail className="w-4 h-4" />
+            </button>
             {socialLinks.map((link) => (
               <button
                 key={link.id}
                 onClick={() => handleSocialClick(link.href)}
-                className="w-9 h-9 rounded-full bg-foreground/10 hover:bg-foreground/20 text-foreground/70 hover:text-foreground flex items-center justify-center transition-all duration-200"
+                className="w-10 h-10 rounded-xl bg-foreground/10 hover:bg-foreground/15 text-foreground flex items-center justify-center transition-all duration-200"
                 aria-label={link.label}
               >
                 {link.icon}

@@ -52,7 +52,7 @@ const Footer = () => {
         className="absolute inset-0 z-0"
         style={{
           background:
-            "linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--background)) 15%, hsl(200 28% 88% / 0.08) 40%, hsl(200 28% 88% / 0.25) 65%, hsl(200 28% 88% / 0.45) 85%, hsl(200 28% 88% / 0.55) 100%)",
+            "linear-gradient(180deg, hsl(var(--background)) 0%, hsl(200 28% 88% / 0.03) 25%, hsl(200 28% 88% / 0.1) 45%, hsl(200 28% 88% / 0.2) 60%, hsl(200 28% 88% / 0.32) 75%, hsl(200 28% 88% / 0.42) 88%, hsl(200 28% 88% / 0.5) 100%)",
         }}
       />
 
@@ -83,7 +83,7 @@ const Footer = () => {
         <svg
           viewBox="0 0 1000 135"
           preserveAspectRatio="none"
-          className="block h-[clamp(88px,10.5vw,132px)] w-full"
+          className="block h-[clamp(176px,21vw,264px)] w-full"
           aria-hidden
         >
           <text

@@ -19,37 +19,45 @@ const FeaturedSection = () => {
     offset: ["start end", "end start"],
   });
 
-  const horizontalPadding = useTransform(
+  // Padding: starts at 24, shrinks to 0 when content is fully in view, grows back on exit
+  const padding = useTransform(
     scrollYProgress,
-    [0, 0.15, 0.30, 0.66, 0.80, 1],
+    [0, 0.15, 0.28, 0.65, 0.78, 1],
     [24, 24, 0, 0, 24, 24]
   );
 
   const gap = useTransform(
     scrollYProgress,
-    [0, 0.15, 0.30, 0.66, 0.80, 1],
+    [0, 0.15, 0.28, 0.65, 0.78, 1],
     [3, 3, 0, 0, 3, 3]
   );
 
-  const topGrayscale = useTransform(scrollYProgress, [0.28, 0.42], [1, 0]);
-  const bottomRightGrayscale = useTransform(scrollYProgress, [0.40, 0.54], [1, 0]);
-  const bottomLeftGrayscale = useTransform(scrollYProgress, [0.52, 0.66], [1, 0]);
+  // Sequential color reveal
+  const topGrayscale = useTransform(scrollYProgress, [0.26, 0.38], [1, 0]);
+  const bottomRightGrayscale = useTransform(scrollYProgress, [0.36, 0.48], [1, 0]);
+  const bottomLeftGrayscale = useTransform(scrollYProgress, [0.46, 0.58], [1, 0]);
 
   const topFilter = useTransform(topGrayscale, (v) => `grayscale(${v * 100}%)`);
   const blFilter = useTransform(bottomLeftGrayscale, (v) => `grayscale(${v * 100}%)`);
   const brFilter = useTransform(bottomRightGrayscale, (v) => `grayscale(${v * 100}%)`);
 
   return (
-    <section ref={sectionRef} className="relative -mt-8 md:-mt-12" style={{ minHeight: "200vh" }}>
+    <section ref={sectionRef} className="relative -mt-4 md:-mt-6" style={{ minHeight: "200vh" }}>
       <div className="sticky top-0 h-screen flex flex-col overflow-hidden">
-        {/* Header positioned below the header gradient (top ~64px) */}
-        <div className="px-6 pt-[72px] mb-2">
+        {/* Header — sits just below the header gradient */}
+        <div className="px-6 pt-[68px] pb-4">
           <SectionHeading className="mb-0">Featured</SectionHeading>
         </div>
 
+        {/* Content area fills remaining space with animated padding on all sides */}
         <motion.div
-          className="flex flex-col flex-1"
-          style={{ paddingLeft: horizontalPadding, paddingRight: horizontalPadding, gap }}
+          className="flex flex-col flex-1 min-h-0"
+          style={{
+            paddingLeft: padding,
+            paddingRight: padding,
+            paddingBottom: padding,
+            gap,
+          }}
         >
           {/* Hero feature card — takes remaining space */}
           <div className="relative overflow-hidden cursor-pointer flex-1 min-h-0">
@@ -61,8 +69,12 @@ const FeaturedSection = () => {
                 style={{ filter: topFilter }}
               />
             </div>
-            <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6"
-              style={{ background: "linear-gradient(to top, hsl(var(--background) / 0.85) 0%, hsl(var(--background) / 0.4) 60%, transparent 100%)" }}
+            <div
+              className="absolute bottom-0 left-0 right-0 p-4 md:p-6"
+              style={{
+                background:
+                  "linear-gradient(to top, hsl(var(--background) / 0.85) 0%, hsl(var(--background) / 0.4) 60%, transparent 100%)",
+              }}
             >
               <h3 className="text-2xl md:text-4xl font-semibold tracking-tighter text-foreground leading-tight">
                 {projectItems[0].title}
@@ -83,8 +95,12 @@ const FeaturedSection = () => {
                 className="w-full h-full object-cover"
                 style={{ filter: blFilter }}
               />
-              <div className="absolute bottom-0 left-0 right-0 p-3"
-                style={{ background: "linear-gradient(to top, hsl(var(--background) / 0.85) 0%, hsl(var(--background) / 0.3) 70%, transparent 100%)" }}
+              <div
+                className="absolute bottom-0 left-0 right-0 p-3"
+                style={{
+                  background:
+                    "linear-gradient(to top, hsl(var(--background) / 0.85) 0%, hsl(var(--background) / 0.3) 70%, transparent 100%)",
+                }}
               >
                 <p className="text-xs font-medium text-foreground">{projectItems[1].title}</p>
                 <p className="text-[10px] text-foreground/60 mt-0.5">{projectItems[1].subtitle}</p>
@@ -99,8 +115,12 @@ const FeaturedSection = () => {
                 className="w-full h-full object-cover"
                 style={{ filter: brFilter }}
               />
-              <div className="absolute bottom-0 left-0 right-0 p-3"
-                style={{ background: "linear-gradient(to top, hsl(var(--background) / 0.85) 0%, hsl(var(--background) / 0.3) 70%, transparent 100%)" }}
+              <div
+                className="absolute bottom-0 left-0 right-0 p-3"
+                style={{
+                  background:
+                    "linear-gradient(to top, hsl(var(--background) / 0.85) 0%, hsl(var(--background) / 0.3) 70%, transparent 100%)",
+                }}
               >
                 <p className="text-xs font-medium text-foreground">{projectItems[2].title}</p>
                 <p className="text-[10px] text-foreground/60 mt-0.5">{projectItems[2].subtitle}</p>

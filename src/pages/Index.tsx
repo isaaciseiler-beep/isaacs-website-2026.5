@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { ChevronRight, Sun, Laptop, Mail } from "lucide-react";
 import { useTheme } from "@/components/ThemeProvider";
 import Logo from "@/components/Logo";
@@ -93,24 +93,6 @@ const ThemeSwitch = () => {
   );
 };
 
-const ScrollProgress = () => {
-  const { scrollYProgress } = useScroll();
-  const scaleY = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001,
-  });
-
-  return (
-    <div className="fixed left-0 top-0 bottom-0 w-[2px] z-50 pointer-events-none">
-      <motion.div
-        className="w-full bg-foreground/20 origin-top"
-        style={{ scaleY, height: "100%" }}
-      />
-    </div>
-  );
-};
-
 const Index = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("hero");
@@ -152,8 +134,6 @@ const Index = () => {
 
   return (
     <div className="relative">
-      <ScrollProgress />
-
       {/* Header gradient */}
       <div
         className="fixed top-0 left-0 right-0 z-40 pointer-events-none"
@@ -180,7 +160,7 @@ const Index = () => {
       {/* Compress layout wrapper */}
       <motion.div
         className="overflow-hidden"
-        animate={{ marginLeft: sidebarOpen ? 240 : 0 }}
+        animate={{ marginLeft: sidebarOpen ? 240 : 0, marginRight: 0 }}
         transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
       >
         <main>

@@ -1,5 +1,5 @@
 import { useState, useRef, useMemo } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, MotionValue } from "framer-motion";
 import { ExternalLink, Quote, BookOpen, Image as ImageIcon } from "lucide-react";
 import SectionHeading from "@/components/SectionHeading";
 
@@ -33,6 +33,103 @@ const typeIcon = {
   note: BookOpen,
 };
 
+interface WindPinProps {
+  pin: PinItem;
+  index: number;
+  windSeed: { xDrift: number; yDrift: number; rotDrift: number };
+  scrollYProgress: MotionValue<number>;
+  isDragging: boolean;
+  onDragStart: (id: number, e: React.PointerEvent) => void;
+  onClick: (pin: PinItem) => void;
+}
+
+const WindPin = ({ pin, index, windSeed, scrollYProgress, isDragging, onDragStart, onClick }: WindPinProps) => {
+  const Icon = typeIcon[pin.type];
+
+  const pinX = useTransform(scrollYProgress, [0.72, 0.92], [0, windSeed.xDrift]);
+  const pinY = useTransform(scrollYProgress, [0.72, 0.92], [0, windSeed.yDrift]);
+  const pinRotate = useTransform(scrollYProgress, [0.72, 0.92], [0, windSeed.rotDrift]);
+  const pinOpacity = useTransform(scrollYProgress, [0.72, 0.88], [1, 0]);
+
+  return (
+    <motion.div
+      className="absolute cursor-grab active:cursor-grabbing select-none"
+      style={{
+        left: pin.x,
+        top: pin.y,
+        width: pin.width,
+        rotate: pin.rotation,
+        zIndex: isDragging ? 50 : 10,
+        x: pinX,
+        y: pinY,
+        rotateZ: pinRotate,
+        opacity: pinOpacity,
+      }}
+      onPointerDown={(e) => onDragStart(pin.id, e)}
+      whileHover={{ scale: 1.04, rotate: 0 }}
+      animate={{ scale: isDragging ? 1.06 : 1 }}
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: index * 0.06, duration: 0.5 }}
+    >
+      {pin.type === "image" && (
+        <div
+          className="group overflow-hidden border border-border/40 bg-white shadow-lg hover:shadow-xl transition-shadow duration-300"
+          onClick={() => onClick(pin)}
+        >
+          <img
+            src={pin.content}
+            alt={pin.label}
+            className="w-full aspect-[3/2] object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+            draggable={false}
+          />
+          <div className="px-3 py-2 flex items-center gap-1.5">
+            <Icon className="w-3 h-3 text-neutral-400" />
+            <p className="font-mono text-[10px] tracking-widest uppercase text-neutral-600">{pin.label}</p>
+          </div>
+        </div>
+      )}
+
+      {pin.type === "quote" && (
+        <div className="border border-border/40 bg-white p-4 shadow-lg hover:shadow-xl transition-shadow duration-300"
+          style={{ borderLeft: "3px solid hsl(var(--highlight))" }}
+        >
+          <Icon className="w-3 h-3 text-neutral-300 mb-2" />
+          <p className="text-sm text-neutral-800 leading-relaxed italic">{pin.content}</p>
+          <p className="font-mono text-[10px] tracking-widest uppercase text-neutral-500 mt-2">— {pin.label}</p>
+        </div>
+      )}
+
+      {pin.type === "link" && (
+        <div
+          className="group border border-border/40 bg-white p-4 shadow-lg hover:shadow-xl hover:bg-neutral-50 transition-all duration-200"
+          onClick={() => onClick(pin)}
+        >
+          <div className="flex items-center gap-1.5 mb-2">
+            <Icon className="w-3 h-3 text-neutral-400" />
+            <p className="font-mono text-[10px] tracking-widest uppercase text-neutral-600">{pin.label}</p>
+          </div>
+          <p className="text-sm text-neutral-800 font-medium leading-snug">{pin.content}</p>
+          <span className="font-mono text-[10px] tracking-widest uppercase mt-2 block opacity-0 group-hover:opacity-100 transition-opacity duration-200" style={{ color: "hsl(var(--highlight))" }}>
+            Open →
+          </span>
+        </div>
+      )}
+
+      {pin.type === "note" && (
+        <div className="border border-dashed border-neutral-300 bg-white/60 p-4 shadow-lg hover:shadow-xl transition-shadow duration-300">
+          <div className="flex items-center gap-1.5 mb-2">
+            <Icon className="w-3 h-3 text-neutral-400" />
+            <p className="font-mono text-[10px] tracking-widest uppercase text-neutral-500">{pin.label}</p>
+          </div>
+          <p className="text-sm text-neutral-700 leading-relaxed">{pin.content}</p>
+        </div>
+      )}
+    </motion.div>
+  );
+};
+
 const InspirationBoard = () => {
   const [pins, setPins] = useState(initialPins);
   const boardRef = useRef<HTMLDivElement>(null);
@@ -46,35 +143,21 @@ const InspirationBoard = () => {
     offset: ["start end", "end start"],
   });
 
-  // Section enters → fullscreen takeover
   const horizontalPadding = useTransform(scrollYProgress, [0.05, 0.2], [24, 0]);
-  // Background transitions to light blue
   const bgColor = useTransform(
     scrollYProgress,
     [0.1, 0.3, 0.7, 0.85],
-    [
-      "hsl(var(--background))",
-      "hsl(200 30% 90%)",
-      "hsl(200 30% 90%)",
-      "hsl(var(--background))",
-    ]
+    ["hsl(var(--background))", "hsl(200 30% 90%)", "hsl(200 30% 90%)", "hsl(var(--background))"]
   );
-  // Text color adapts
   const textColor = useTransform(
     scrollYProgress,
     [0.1, 0.3, 0.7, 0.85],
-    [
-      "hsl(var(--foreground))",
-      "hsl(210 20% 15%)",
-      "hsl(210 20% 15%)",
-      "hsl(var(--foreground))",
-    ]
+    ["hsl(var(--foreground))", "hsl(210 20% 15%)", "hsl(210 20% 15%)", "hsl(var(--foreground))"]
   );
 
-  // Wind exit effect: each pin gets unique wind params
   const windSeeds = useMemo(() =>
     initialPins.map(() => ({
-      xDrift: (Math.random() - 0.3) * 800, // mostly rightward
+      xDrift: (Math.random() - 0.3) * 800,
       yDrift: (Math.random() - 0.5) * 300,
       rotDrift: (Math.random() - 0.5) * 60,
     })),
@@ -128,7 +211,6 @@ const InspirationBoard = () => {
               onPointerMove={handleDragMove}
               onPointerUp={handleDragEnd}
             >
-              {/* Dot grid */}
               <div
                 className="absolute inset-0 opacity-[0.06]"
                 style={{
@@ -137,118 +219,18 @@ const InspirationBoard = () => {
                 }}
               />
 
-              {pins.map((pin, i) => {
-                const Icon = typeIcon[pin.type];
-                const isDragging = dragItem.current === pin.id;
-                const wind = windSeeds[i];
-
-                // Wind-blown exit transforms
-                const pinX = useTransform(
-                  scrollYProgress,
-                  [0.72, 0.92],
-                  [0, wind.xDrift]
-                );
-                const pinY = useTransform(
-                  scrollYProgress,
-                  [0.72, 0.92],
-                  [0, wind.yDrift]
-                );
-                const pinRotate = useTransform(
-                  scrollYProgress,
-                  [0.72, 0.92],
-                  [0, wind.rotDrift]
-                );
-                const pinOpacity = useTransform(
-                  scrollYProgress,
-                  [0.72, 0.88],
-                  [1, 0]
-                );
-
-                return (
-                  <motion.div
-                    key={pin.id}
-                    className="absolute cursor-grab active:cursor-grabbing select-none"
-                    style={{
-                      left: pin.x,
-                      top: pin.y,
-                      width: pin.width,
-                      rotate: pin.rotation,
-                      zIndex: isDragging ? 50 : 10,
-                      x: pinX,
-                      y: pinY,
-                      rotateZ: pinRotate,
-                      opacity: pinOpacity,
-                    }}
-                    onPointerDown={(e) => handleDragStart(pin.id, e)}
-                    whileHover={{ scale: 1.04, rotate: 0 }}
-                    animate={{ scale: isDragging ? 1.06 : 1 }}
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.06, duration: 0.5 }}
-                  >
-                    {pin.type === "image" && (
-                      <div
-                        className="group overflow-hidden border border-border/40 bg-white shadow-lg hover:shadow-xl transition-shadow duration-300"
-                        onClick={() => handleClick(pin)}
-                      >
-                        <img
-                          src={pin.content}
-                          alt={pin.label}
-                          className="w-full aspect-[3/2] object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
-                          draggable={false}
-                        />
-                        <div className="px-3 py-2 flex items-center gap-1.5">
-                          <Icon className="w-3 h-3 text-neutral-400" />
-                          <p className="font-mono text-[10px] tracking-widest uppercase text-neutral-600">{pin.label}</p>
-                        </div>
-                      </div>
-                    )}
-
-                    {pin.type === "quote" && (
-                      <div className="border border-border/40 bg-white p-4 shadow-lg hover:shadow-xl transition-shadow duration-300"
-                        style={{ borderLeft: "3px solid hsl(var(--highlight))" }}
-                      >
-                        <Icon className="w-3 h-3 text-neutral-300 mb-2" />
-                        <p className="text-sm text-neutral-800 leading-relaxed italic">
-                          {pin.content}
-                        </p>
-                        <p className="font-mono text-[10px] tracking-widest uppercase text-neutral-500 mt-2">— {pin.label}</p>
-                      </div>
-                    )}
-
-                    {pin.type === "link" && (
-                      <div
-                        className="group border border-border/40 bg-white p-4 shadow-lg hover:shadow-xl hover:bg-neutral-50 transition-all duration-200"
-                        onClick={() => handleClick(pin)}
-                      >
-                        <div className="flex items-center gap-1.5 mb-2">
-                          <Icon className="w-3 h-3 text-neutral-400" />
-                          <p className="font-mono text-[10px] tracking-widest uppercase text-neutral-600">{pin.label}</p>
-                        </div>
-                        <p className="text-sm text-neutral-800 font-medium leading-snug">
-                          {pin.content}
-                        </p>
-                        <span className="font-mono text-[10px] tracking-widest uppercase mt-2 block opacity-0 group-hover:opacity-100 transition-opacity duration-200" style={{ color: "hsl(var(--highlight))" }}>
-                          Open →
-                        </span>
-                      </div>
-                    )}
-
-                    {pin.type === "note" && (
-                      <div className="border border-dashed border-neutral-300 bg-white/60 p-4 shadow-lg hover:shadow-xl transition-shadow duration-300">
-                        <div className="flex items-center gap-1.5 mb-2">
-                          <Icon className="w-3 h-3 text-neutral-400" />
-                          <p className="font-mono text-[10px] tracking-widest uppercase text-neutral-500">{pin.label}</p>
-                        </div>
-                        <p className="text-sm text-neutral-700 leading-relaxed">
-                          {pin.content}
-                        </p>
-                      </div>
-                    )}
-                  </motion.div>
-                );
-              })}
+              {pins.map((pin, i) => (
+                <WindPin
+                  key={pin.id}
+                  pin={pin}
+                  index={i}
+                  windSeed={windSeeds[i]}
+                  scrollYProgress={scrollYProgress}
+                  isDragging={dragItem.current === pin.id}
+                  onDragStart={handleDragStart}
+                  onClick={handleClick}
+                />
+              ))}
             </motion.div>
           </div>
         </motion.div>

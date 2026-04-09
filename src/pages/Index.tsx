@@ -177,9 +177,10 @@ const Index = () => {
         </motion.button>
       </div>
 
-      {/* Push layout wrapper */}
+      {/* Compress layout wrapper */}
       <motion.div
-        animate={{ x: sidebarOpen ? 240 : 0 }}
+        className="overflow-hidden"
+        animate={{ marginLeft: sidebarOpen ? 240 : 0 }}
         transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
       >
         <main>

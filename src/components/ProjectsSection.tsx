@@ -22,7 +22,6 @@ const allProjects = [
   { id: 12, title: "Void", category: "Identity", image: project4 },
 ];
 
-// Preload project images
 allProjects.forEach((p) => {
   const img = new Image();
   img.src = p.image;
@@ -45,10 +44,14 @@ const chevronVariants = {
   }),
 };
 
+const VISIBLE_ROWS = 2.5;
+
 const ProjectsSection = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
+  const [rowHeight, setRowHeight] = useState(0);
 
   const checkScroll = () => {
     const el = scrollRef.current;
@@ -63,9 +66,23 @@ const ProjectsSection = () => {
     checkScroll();
     el.addEventListener("scroll", checkScroll, { passive: true });
     window.addEventListener("resize", checkScroll);
+
+    // Calculate row height so we show exactly 2.5 rows
+    const updateRowHeight = () => {
+      const containerW = containerRef.current?.clientWidth;
+      if (!containerW) return;
+      // Each item is 33vw - 12px wide, aspect 3/2
+      const itemW = (window.innerWidth * 0.33) - 12;
+      const itemH = itemW / 1.5; // aspect ratio 3/2
+      setRowHeight(itemH);
+    };
+    updateRowHeight();
+    window.addEventListener("resize", updateRowHeight);
+
     return () => {
       el.removeEventListener("scroll", checkScroll);
       window.removeEventListener("resize", checkScroll);
+      window.removeEventListener("resize", updateRowHeight);
     };
   }, []);
 
@@ -76,8 +93,11 @@ const ProjectsSection = () => {
     el.scrollBy({ left: dir === "left" ? -amount : amount, behavior: "smooth" });
   };
 
+  // Total height = 2.5 rows * rowHeight + 2.5 gaps (3px each)
+  const containerHeight = rowHeight > 0 ? (rowHeight * VISIBLE_ROWS) + (3 * VISIBLE_ROWS) : "auto";
+
   return (
-    <section className="py-6">
+    <section className="py-6" ref={containerRef}>
       <div className="px-6 md:px-6 mb-4">
         <SectionHeading className="mb-0">Projects</SectionHeading>
       </div>
@@ -85,8 +105,12 @@ const ProjectsSection = () => {
       <div className="relative">
         <div
           ref={scrollRef}
-          className="overflow-x-auto scrollbar-hide"
-          style={{ scrollSnapType: "x mandatory", scrollPaddingLeft: 24 }}
+          className="overflow-x-auto overflow-y-hidden scrollbar-hide"
+          style={{
+            scrollSnapType: "x mandatory",
+            scrollPaddingLeft: 24,
+            maxHeight: typeof containerHeight === "number" ? containerHeight : undefined,
+          }}
         >
           <div
             className="grid grid-rows-2 grid-flow-col gap-[3px] px-6"
@@ -98,7 +122,7 @@ const ProjectsSection = () => {
                 className="grid-item"
                 style={{
                   width: "calc(33vw - 12px)",
-                  aspectRatio: "4/3",
+                  aspectRatio: "3/2",
                   scrollSnapAlign: index % 2 === 0 ? "start" : undefined,
                 }}
                 initial={{ opacity: 0 }}
@@ -128,7 +152,7 @@ const ProjectsSection = () => {
           style={{ background: "linear-gradient(to left, hsl(var(--background)) 0%, hsl(var(--background) / 0.6) 40%, transparent 100%)" }}
         />
 
-        {/* Left edge gradient — only when scrolled */}
+        {/* Left edge gradient */}
         <div
           className="absolute top-0 left-0 bottom-0 w-14 pointer-events-none z-10 transition-opacity duration-500 ease-out"
           style={{

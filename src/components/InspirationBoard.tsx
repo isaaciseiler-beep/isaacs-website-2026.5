@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef } from "react";
 import { motion, useScroll, useTransform, MotionValue } from "framer-motion";
 import { ExternalLink, Quote, BookOpen, Image as ImageIcon } from "lucide-react";
 import SectionHeading from "@/components/SectionHeading";
@@ -33,23 +33,23 @@ const typeIcon = {
   note: BookOpen,
 };
 
-interface WindPinProps {
+interface PinCardProps {
   pin: PinItem;
   index: number;
-  windSeed: { xDrift: number; yDrift: number; rotDrift: number };
   scrollYProgress: MotionValue<number>;
   isDragging: boolean;
   onDragStart: (id: number, e: React.PointerEvent) => void;
   onClick: (pin: PinItem) => void;
 }
 
-const WindPin = ({ pin, index, windSeed, scrollYProgress, isDragging, onDragStart, onClick }: WindPinProps) => {
+const PinCard = ({ pin, index, scrollYProgress, isDragging, onDragStart, onClick }: PinCardProps) => {
   const Icon = typeIcon[pin.type];
 
-  const pinX = useTransform(scrollYProgress, [0.72, 0.92], [0, windSeed.xDrift]);
-  const pinY = useTransform(scrollYProgress, [0.72, 0.92], [0, windSeed.yDrift]);
-  const pinRotate = useTransform(scrollYProgress, [0.72, 0.92], [0, windSeed.rotDrift]);
-  const pinOpacity = useTransform(scrollYProgress, [0.72, 0.88], [1, 0]);
+  // Fade in when entering, fade out when leaving — inspired by hero text
+  const pinOpacity = useTransform(scrollYProgress, [0.08, 0.22, 0.72, 0.85], [0, 1, 1, 0]);
+  const pinY = useTransform(scrollYProgress, [0.08, 0.22, 0.72, 0.85], [30, 0, 0, -20]);
+  const pinBlur = useTransform(scrollYProgress, [0.08, 0.22, 0.72, 0.85], [8, 0, 0, 6]);
+  const filterStr = useTransform(pinBlur, (v) => `blur(${v}px)`);
 
   return (
     <motion.div
@@ -60,18 +60,14 @@ const WindPin = ({ pin, index, windSeed, scrollYProgress, isDragging, onDragStar
         width: pin.width,
         rotate: pin.rotation,
         zIndex: isDragging ? 50 : 10,
-        x: pinX,
-        y: pinY,
-        rotateZ: pinRotate,
         opacity: pinOpacity,
+        y: pinY,
+        filter: filterStr,
       }}
       onPointerDown={(e) => onDragStart(pin.id, e)}
       whileHover={{ scale: 1.04, rotate: 0 }}
       animate={{ scale: isDragging ? 1.06 : 1 }}
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ delay: index * 0.06, duration: 0.5 }}
+      transition={{ duration: 0.5, delay: index * 0.04 }}
     >
       {pin.type === "image" && (
         <div
@@ -143,26 +139,11 @@ const InspirationBoard = () => {
     offset: ["start end", "end start"],
   });
 
-  const horizontalPadding = useTransform(scrollYProgress, [0.05, 0.2], [24, 0]);
-  const bgColor = useTransform(
-    scrollYProgress,
-    [0.1, 0.3, 0.7, 0.85],
-    ["hsl(var(--background))", "hsl(200 30% 90%)", "hsl(200 30% 90%)", "hsl(var(--background))"]
-  );
-  const textColor = useTransform(
-    scrollYProgress,
-    [0.1, 0.3, 0.7, 0.85],
-    ["hsl(var(--foreground))", "hsl(210 20% 15%)", "hsl(210 20% 15%)", "hsl(var(--foreground))"]
-  );
-
-  const windSeeds = useMemo(() =>
-    initialPins.map(() => ({
-      xDrift: (Math.random() - 0.3) * 800,
-      yDrift: (Math.random() - 0.5) * 300,
-      rotDrift: (Math.random() - 0.5) * 60,
-    })),
-    []
-  );
+  // Board border and padding animate: border disappears as section takes over
+  const boardBorderOpacity = useTransform(scrollYProgress, [0.12, 0.25, 0.7, 0.82], [1, 0, 0, 1]);
+  const horizontalPadding = useTransform(scrollYProgress, [0.12, 0.25, 0.7, 0.82], [24, 0, 0, 24]);
+  // Dotted bg covers the whole sticky area when expanded
+  const dotOpacity = useTransform(scrollYProgress, [0.12, 0.25, 0.7, 0.82], [0.06, 0.06, 0.06, 0.06]);
 
   const handleDragStart = (id: number, e: React.PointerEvent) => {
     const pin = pins.find((p) => p.id === id);
@@ -192,39 +173,40 @@ const InspirationBoard = () => {
 
   return (
     <section ref={sectionRef} className="relative" style={{ minHeight: "180vh" }}>
-      <motion.div
-        className="sticky top-0 min-h-screen flex flex-col justify-start overflow-hidden"
-        style={{ backgroundColor: bgColor }}
-      >
+      <div className="sticky top-0 min-h-screen flex flex-col justify-start overflow-hidden">
         <motion.div style={{ paddingLeft: horizontalPadding, paddingRight: horizontalPadding }} className="pt-12">
           <div className="px-6">
-            <motion.div style={{ color: textColor }}>
-              <SectionHeading>My Inspiration</SectionHeading>
-            </motion.div>
+            <SectionHeading>Inspiration</SectionHeading>
           </div>
 
           <div className="px-6">
             <motion.div
               ref={boardRef}
-              className="relative w-full border border-border/30"
-              style={{ height: 620, overflow: "visible" }}
+              className="relative w-full"
+              style={{
+                height: 620,
+                overflow: "visible",
+                borderWidth: 1,
+                borderStyle: "solid",
+                borderColor: useTransform(boardBorderOpacity, (v) => `hsl(var(--border) / ${v * 0.3})`),
+              }}
               onPointerMove={handleDragMove}
               onPointerUp={handleDragEnd}
             >
               <div
-                className="absolute inset-0 opacity-[0.06]"
+                className="absolute inset-0"
                 style={{
                   backgroundImage: "radial-gradient(circle, currentColor 1px, transparent 1px)",
                   backgroundSize: "24px 24px",
+                  opacity: 0.06,
                 }}
               />
 
               {pins.map((pin, i) => (
-                <WindPin
+                <PinCard
                   key={pin.id}
                   pin={pin}
                   index={i}
-                  windSeed={windSeeds[i]}
                   scrollYProgress={scrollYProgress}
                   isDragging={dragItem.current === pin.id}
                   onDragStart={handleDragStart}
@@ -234,7 +216,7 @@ const InspirationBoard = () => {
             </motion.div>
           </div>
         </motion.div>
-      </motion.div>
+      </div>
     </section>
   );
 };

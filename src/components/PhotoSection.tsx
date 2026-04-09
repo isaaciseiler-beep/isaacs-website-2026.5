@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import SectionHeading from "@/components/SectionHeading";
 import photo1 from "@/assets/photo-1.jpg";
 import photo2 from "@/assets/photo-2.jpg";
 import photo3 from "@/assets/photo-3.jpg";
@@ -72,7 +73,7 @@ const PhotoSection = () => {
   return (
     <section className="py-12">
       <div className="px-6 md:px-6 mb-6">
-        <h2 className="section-heading mb-0">Photos</h2>
+        <SectionHeading className="mb-0">Photos</SectionHeading>
       </div>
 
       <div className="relative">

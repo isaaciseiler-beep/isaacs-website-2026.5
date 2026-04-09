@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import SectionHeading from "@/components/SectionHeading";
 
 const newsItems = [
   { id: 1, date: "Mar 2026", title: "Selected for ADC Annual Awards", description: "Urban Canvas project recognized in the branding category.", tag: "Award" },
@@ -66,7 +67,7 @@ const NewsSection = () => {
   return (
     <section className="py-12">
       <div className="px-6 mb-6">
-        <h2 className="section-heading mb-0">News</h2>
+        <SectionHeading className="mb-0">News</SectionHeading>
       </div>
 
       <div className="relative">

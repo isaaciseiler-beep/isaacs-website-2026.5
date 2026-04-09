@@ -23,7 +23,7 @@ const HeroSection = () => {
   let globalIndex = 0;
 
   return (
-    <section className="relative h-screen flex items-end overflow-hidden">
+    <section className="relative h-screen flex items-end overflow-hidden mb-16 md:mb-24">
       <div className="absolute inset-0 bg-background" />
 
       <motion.div

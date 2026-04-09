@@ -52,7 +52,7 @@ const Footer = () => {
         className="absolute inset-0 z-0"
         style={{
           background:
-            "linear-gradient(180deg, hsl(var(--background)) 0%, hsl(200 28% 88% / 0.03) 25%, hsl(200 28% 88% / 0.1) 45%, hsl(200 28% 88% / 0.2) 60%, hsl(200 28% 88% / 0.32) 75%, hsl(200 28% 88% / 0.42) 88%, hsl(200 28% 88% / 0.5) 100%)",
+            "linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--background)) 5%, hsl(200 28% 88% / 0.02) 20%, hsl(200 28% 88% / 0.05) 30%, hsl(200 28% 88% / 0.09) 38%, hsl(200 28% 88% / 0.14) 46%, hsl(200 28% 88% / 0.2) 54%, hsl(200 28% 88% / 0.27) 62%, hsl(200 28% 88% / 0.34) 70%, hsl(200 28% 88% / 0.4) 80%, hsl(200 28% 88% / 0.46) 90%, hsl(200 28% 88% / 0.5) 100%)",
         }}
       />
 
@@ -79,16 +79,16 @@ const Footer = () => {
       </div>
 
       {/* Full-width graffiti wordmark */}
-      <div className="relative z-10 w-full overflow-hidden leading-none">
+      <div className="relative z-10 w-full overflow-hidden leading-none -mb-[2px]">
         <svg
-          viewBox="0 0 1000 135"
+          viewBox="0 0 1000 130"
           preserveAspectRatio="none"
           className="block h-[clamp(176px,21vw,264px)] w-full"
           aria-hidden
         >
           <text
             x="0"
-            y="110"
+            y="126"
             textLength="1000"
             lengthAdjust="spacingAndGlyphs"
             fill="hsl(var(--foreground) / 0.06)"

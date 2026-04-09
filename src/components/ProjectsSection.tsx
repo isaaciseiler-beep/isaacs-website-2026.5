@@ -92,7 +92,7 @@ const ProjectsSection = () => {
   };
 
   return (
-    <section className="py-6" ref={containerRef}>
+    <section className="py-12" ref={containerRef}>
       <div className="px-6 mb-6">
         <SectionHeading className="mb-0">Projects</SectionHeading>
       </div>

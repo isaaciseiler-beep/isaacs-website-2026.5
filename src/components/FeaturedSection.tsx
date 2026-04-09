@@ -11,45 +11,43 @@ const projectItems = [
   { id: 3, title: "Neon Nights", subtitle: "A photographic exploration of city light", image: project3 },
 ];
 
-const BUFFER = 24; // px — matches site horizontal padding
+const BUFFER = 24;
 
 const FeaturedSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
 
+  // offset: section-top hits viewport-bottom → section-bottom hits viewport-top
+  // With 300vh section + 100vh viewport = 400vh total scroll travel
+  // progress 0.25 = section top at viewport top (sticky engages)
+  // progress 0.75 = section bottom at viewport top (sticky releases)
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"],
   });
 
-  // Timeline (0→1 over the full scroll of the section):
-  //
-  // 0.00–0.18  Section scrolls into view, content has buffers, all grayscale
-  // 0.18       Content fully visible with buffers on all sides — HOLD
-  // 0.18–0.35  Expand: buffers shrink to 0, gap shrinks to 0
-  // 0.28–0.36  Top card → color
-  // 0.33–0.41  Bottom-left → color
-  // 0.38–0.46  Bottom-right → color
-  // 0.46–0.65  HOLD at full bleed, all color
-  // 0.65–0.82  Contract: buffers grow back, gap returns
-  // 0.82–1.00  Section scrolls out
+  // Phase 1 (0.25–0.32): HOLD — content visible with buffers, all grayscale
+  // Phase 2 (0.32–0.44): EXPAND — buffers shrink to 0, gap closes
+  // Phase 3 (0.36–0.52): COLOR — sequential reveal (top → BL → BR)
+  // Phase 4 (0.52–0.58): HOLD — full bleed, all color
+  // Phase 5 (0.58–0.70): CONTRACT — buffers return, gap reopens
+  // Phase 6 (0.70+): scrolls out naturally
 
-  // Padding animation: buffer → 0 → hold → 0 → buffer
   const padding = useTransform(
     scrollYProgress,
-    [0, 0.18, 0.35, 0.65, 0.82, 1],
-    [BUFFER, BUFFER, 0, 0, BUFFER, BUFFER]
+    [0, 0.25, 0.32, 0.44, 0.58, 0.70, 1],
+    [BUFFER, BUFFER, BUFFER, 0, 0, BUFFER, BUFFER]
   );
 
   const gap = useTransform(
     scrollYProgress,
-    [0, 0.18, 0.35, 0.65, 0.82, 1],
-    [3, 3, 0, 0, 3, 3]
+    [0, 0.25, 0.32, 0.44, 0.58, 0.70, 1],
+    [3, 3, 3, 0, 0, 3, 3]
   );
 
-  // Sequential color reveal — starts AFTER expansion begins
-  const topGrayscale = useTransform(scrollYProgress, [0.28, 0.36], [1, 0]);
-  const blGrayscale = useTransform(scrollYProgress, [0.33, 0.41], [1, 0]);
-  const brGrayscale = useTransform(scrollYProgress, [0.38, 0.46], [1, 0]);
+  // Color reveals — sequential, starting mid-expansion
+  const topGrayscale = useTransform(scrollYProgress, [0.36, 0.42], [1, 0]);
+  const blGrayscale = useTransform(scrollYProgress, [0.42, 0.48], [1, 0]);
+  const brGrayscale = useTransform(scrollYProgress, [0.48, 0.54], [1, 0]);
 
   const topFilter = useTransform(topGrayscale, (v) => `grayscale(${v * 100}%)`);
   const blFilter = useTransform(blGrayscale, (v) => `grayscale(${v * 100}%)`);
@@ -62,12 +60,12 @@ const FeaturedSection = () => {
       style={{ height: "300vh" }}
     >
       <div className="sticky top-0 h-screen flex flex-col overflow-hidden">
-        {/* Header — fixed below the top gradient */}
+        {/* Header — fixed below top gradient */}
         <div className="px-6 pt-[68px] pb-4">
           <SectionHeading className="mb-0">Featured</SectionHeading>
         </div>
 
-        {/* Content area with animated buffers */}
+        {/* Content with animated buffers */}
         <motion.div
           className="flex flex-col flex-1 min-h-0"
           style={{
@@ -105,7 +103,6 @@ const FeaturedSection = () => {
 
           {/* Bottom thumbnails */}
           <motion.div className="grid grid-cols-2 shrink-0" style={{ gap, height: "28vh" }}>
-            {/* Bottom left */}
             <div className="relative overflow-hidden cursor-pointer">
               <motion.img
                 src={projectItems[1].image}
@@ -125,7 +122,6 @@ const FeaturedSection = () => {
               </div>
             </div>
 
-            {/* Bottom right */}
             <div className="relative overflow-hidden cursor-pointer">
               <motion.img
                 src={projectItems[2].image}

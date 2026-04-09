@@ -16,38 +16,42 @@ const BUFFER = 24;
 const FeaturedSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
 
-  // offset: section-top hits viewport-bottom → section-bottom hits viewport-top
-  // With 300vh section + 100vh viewport = 400vh total scroll travel
-  // progress 0.25 = section top at viewport top (sticky engages)
-  // progress 0.75 = section bottom at viewport top (sticky releases)
+  // 350vh section + 100vh viewport = 450vh total scroll travel
+  // progress 0.22 ≈ section top at viewport top → sticky engages
+  // progress 0.78 ≈ sticky releases
+  //
+  // TIMELINE:
+  // 0.00–0.22: Section scrolls into view from below
+  // 0.22–0.36: FREEZE — content locked on screen, buffers visible, all grayscale
+  // 0.36–0.46: EXPAND — buffers shrink to 0, gaps close
+  // 0.42–0.47: Top card → color
+  // 0.47–0.52: Bottom-left → color
+  // 0.52–0.57: Bottom-right → color
+  // 0.57–0.64: HOLD — full bleed, all color
+  // 0.64–0.74: CONTRACT — buffers return
+  // 0.74–1.00: Scrolls out
+
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"],
   });
 
-  // Phase 1 (0.25–0.32): HOLD — content visible with buffers, all grayscale
-  // Phase 2 (0.32–0.44): EXPAND — buffers shrink to 0, gap closes
-  // Phase 3 (0.36–0.52): COLOR — sequential reveal (top → BL → BR)
-  // Phase 4 (0.52–0.58): HOLD — full bleed, all color
-  // Phase 5 (0.58–0.70): CONTRACT — buffers return, gap reopens
-  // Phase 6 (0.70+): scrolls out naturally
-
   const padding = useTransform(
     scrollYProgress,
-    [0, 0.25, 0.32, 0.44, 0.58, 0.70, 1],
-    [BUFFER, BUFFER, BUFFER, 0, 0, BUFFER, BUFFER]
+    [0,    0.22, 0.36, 0.46, 0.57, 0.64, 0.74, 1],
+    [BUFFER, BUFFER, BUFFER, 0,    0,    0,    BUFFER, BUFFER]
   );
 
   const gap = useTransform(
     scrollYProgress,
-    [0, 0.25, 0.32, 0.44, 0.58, 0.70, 1],
-    [3, 3, 3, 0, 0, 3, 3]
+    [0,  0.22, 0.36, 0.46, 0.57, 0.64, 0.74, 1],
+    [3,  3,    3,    0,    0,    0,    3,    3]
   );
 
-  // Color reveals — sequential, starting mid-expansion
-  const topGrayscale = useTransform(scrollYProgress, [0.36, 0.42], [1, 0]);
-  const blGrayscale = useTransform(scrollYProgress, [0.42, 0.48], [1, 0]);
-  const brGrayscale = useTransform(scrollYProgress, [0.48, 0.54], [1, 0]);
+  // Color reveals — staggered during/after expansion
+  const topGrayscale = useTransform(scrollYProgress, [0.42, 0.47], [1, 0]);
+  const blGrayscale = useTransform(scrollYProgress, [0.47, 0.52], [1, 0]);
+  const brGrayscale = useTransform(scrollYProgress, [0.52, 0.57], [1, 0]);
 
   const topFilter = useTransform(topGrayscale, (v) => `grayscale(${v * 100}%)`);
   const blFilter = useTransform(blGrayscale, (v) => `grayscale(${v * 100}%)`);
@@ -57,10 +61,10 @@ const FeaturedSection = () => {
     <section
       ref={sectionRef}
       className="relative"
-      style={{ height: "300vh" }}
+      style={{ height: "350vh" }}
     >
       <div className="sticky top-0 h-screen flex flex-col overflow-hidden">
-        {/* Header — fixed below top gradient */}
+        {/* Header */}
         <div className="px-6 pt-[68px] pb-4">
           <SectionHeading className="mb-0">Featured</SectionHeading>
         </div>

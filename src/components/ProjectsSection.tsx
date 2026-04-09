@@ -123,13 +123,13 @@ const ProjectsSection = () => {
 
         {/* Right edge gradient */}
         <div
-          className="absolute top-0 right-0 bottom-0 w-24 pointer-events-none z-10"
+          className="absolute top-0 right-0 bottom-0 w-14 pointer-events-none z-10"
           style={{ background: "linear-gradient(to left, hsl(var(--background)) 0%, hsl(var(--background) / 0.6) 40%, transparent 100%)" }}
         />
 
         {/* Left edge gradient — only when scrolled */}
         <div
-          className="absolute top-0 left-0 bottom-0 w-24 pointer-events-none z-10 transition-opacity duration-500 ease-out"
+          className="absolute top-0 left-0 bottom-0 w-14 pointer-events-none z-10 transition-opacity duration-500 ease-out"
           style={{
             background: "linear-gradient(to right, hsl(var(--background)) 0%, hsl(var(--background) / 0.6) 40%, transparent 100%)",
             opacity: canScrollLeft ? 1 : 0,
@@ -146,7 +146,7 @@ const ProjectsSection = () => {
               animate="animate"
               exit="exit"
               onClick={() => scroll("left")}
-              className="absolute left-8 top-1/2 -translate-y-1/2 text-foreground/80 hover:text-foreground transition-colors"
+              className="absolute left-8 top-1/2 -translate-y-1/2 z-20 text-foreground hover:text-foreground transition-colors drop-shadow-[0_0_8px_hsl(var(--background))]"
               whileHover={{ x: -3 }}
               whileTap={{ scale: 0.85 }}
             >
@@ -165,7 +165,7 @@ const ProjectsSection = () => {
               animate="animate"
               exit="exit"
               onClick={() => scroll("right")}
-              className="absolute right-8 top-1/2 -translate-y-1/2 text-foreground/80 hover:text-foreground transition-colors"
+              className="absolute right-8 top-1/2 -translate-y-1/2 z-20 text-foreground hover:text-foreground transition-colors drop-shadow-[0_0_8px_hsl(var(--background))]"
               whileHover={{ x: 3 }}
               whileTap={{ scale: 0.85 }}
             >

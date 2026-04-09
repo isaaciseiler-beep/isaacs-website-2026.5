@@ -169,7 +169,7 @@ const InspirationBoard = () => {
   };
 
   return (
-    <section ref={sectionRef} className="relative" style={{ minHeight: "200vh" }}>
+    <section ref={sectionRef} className="relative" style={{ minHeight: "140vh" }}>
       <div className="sticky top-0 h-screen flex flex-col overflow-hidden">
         {/* Header — fixed position, just below header gradient */}
         <div className="px-6 pt-[68px] pb-4">

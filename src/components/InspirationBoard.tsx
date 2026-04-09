@@ -139,6 +139,8 @@ const InspirationBoard = () => {
     offset: ["start end", "end start"],
   });
 
+  const boardBorderOpacity = useTransform(scrollYProgress, [0.12, 0.25, 0.7, 0.82], [1, 0, 0, 1]);
+  const horizontalPadding = useTransform(scrollYProgress, [0.12, 0.25, 0.7, 0.82], [24, 0, 0, 24]);
   const boardBorderColor = useTransform(boardBorderOpacity, (v) => `hsl(var(--border) / ${v * 0.3})`);
 
 

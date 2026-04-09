@@ -12,24 +12,21 @@ const projectItems = [
 ];
 
 const BUFFER = 24;
+const SECTION_HEIGHT = "200vh";
+const STAGES = {
+  enterEnd: 0.33,
+  freezeEnd: 0.4,
+  expandEnd: 0.48,
+  topColorStart: 0.44,
+  topColorEnd: 0.48,
+  bottomLeftColorEnd: 0.52,
+  bottomRightColorEnd: 0.56,
+  holdEnd: 0.6,
+  contractEnd: 0.67,
+} as const;
 
 const FeaturedSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
-
-  // 350vh section + 100vh viewport = 450vh total scroll travel
-  // progress 0.22 ≈ section top at viewport top → sticky engages
-  // progress 0.78 ≈ sticky releases
-  //
-  // TIMELINE:
-  // 0.00–0.22: Section scrolls into view from below
-  // 0.22–0.36: FREEZE — content locked on screen, buffers visible, all grayscale
-  // 0.36–0.46: EXPAND — buffers shrink to 0, gaps close
-  // 0.42–0.47: Top card → color
-  // 0.47–0.52: Bottom-left → color
-  // 0.52–0.57: Bottom-right → color
-  // 0.57–0.64: HOLD — full bleed, all color
-  // 0.64–0.74: CONTRACT — buffers return
-  // 0.74–1.00: Scrolls out
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -38,38 +35,39 @@ const FeaturedSection = () => {
 
   const padding = useTransform(
     scrollYProgress,
-    [0,    0.22, 0.36, 0.46, 0.57, 0.64, 0.74, 1],
-    [BUFFER, BUFFER, BUFFER, 0,    0,    0,    BUFFER, BUFFER]
+    [0, STAGES.enterEnd, STAGES.freezeEnd, STAGES.expandEnd, STAGES.holdEnd, STAGES.contractEnd, 1],
+    [BUFFER, BUFFER, BUFFER, 0, 0, BUFFER, BUFFER]
   );
 
   const gap = useTransform(
     scrollYProgress,
-    [0,  0.22, 0.36, 0.46, 0.57, 0.64, 0.74, 1],
-    [3,  3,    3,    0,    0,    0,    3,    3]
+    [0, STAGES.enterEnd, STAGES.freezeEnd, STAGES.expandEnd, STAGES.holdEnd, STAGES.contractEnd, 1],
+    [3, 3, 3, 0, 0, 3, 3]
   );
 
-  // Color reveals — staggered during/after expansion
-  const topGrayscale = useTransform(scrollYProgress, [0.42, 0.47], [1, 0]);
-  const blGrayscale = useTransform(scrollYProgress, [0.47, 0.52], [1, 0]);
-  const brGrayscale = useTransform(scrollYProgress, [0.52, 0.57], [1, 0]);
+  const topGrayscale = useTransform(scrollYProgress, [STAGES.topColorStart, STAGES.topColorEnd], [1, 0]);
+  const bottomLeftGrayscale = useTransform(
+    scrollYProgress,
+    [STAGES.topColorEnd, STAGES.bottomLeftColorEnd],
+    [1, 0]
+  );
+  const bottomRightGrayscale = useTransform(
+    scrollYProgress,
+    [STAGES.bottomLeftColorEnd, STAGES.bottomRightColorEnd],
+    [1, 0]
+  );
 
-  const topFilter = useTransform(topGrayscale, (v) => `grayscale(${v * 100}%)`);
-  const blFilter = useTransform(blGrayscale, (v) => `grayscale(${v * 100}%)`);
-  const brFilter = useTransform(brGrayscale, (v) => `grayscale(${v * 100}%)`);
+  const topFilter = useTransform(topGrayscale, (value) => `grayscale(${value * 100}%)`);
+  const bottomLeftFilter = useTransform(bottomLeftGrayscale, (value) => `grayscale(${value * 100}%)`);
+  const bottomRightFilter = useTransform(bottomRightGrayscale, (value) => `grayscale(${value * 100}%)`);
 
   return (
-    <section
-      ref={sectionRef}
-      className="relative"
-      style={{ height: "350vh" }}
-    >
+    <section ref={sectionRef} className="relative" style={{ height: SECTION_HEIGHT }}>
       <div className="sticky top-0 h-screen flex flex-col overflow-hidden">
-        {/* Header */}
         <div className="px-6 pt-[68px] pb-4">
           <SectionHeading className="mb-0">Featured</SectionHeading>
         </div>
 
-        {/* Content with animated buffers */}
         <motion.div
           className="flex flex-col flex-1 min-h-0"
           style={{
@@ -79,7 +77,6 @@ const FeaturedSection = () => {
             gap,
           }}
         >
-          {/* Hero card */}
           <div className="relative overflow-hidden cursor-pointer flex-1 min-h-0">
             <div className="w-full h-full overflow-hidden">
               <motion.img
@@ -99,20 +96,17 @@ const FeaturedSection = () => {
               <h3 className="text-2xl md:text-4xl font-semibold tracking-tighter text-foreground leading-tight">
                 {projectItems[0].title}
               </h3>
-              <p className="text-sm text-foreground/60 mt-1 max-w-md">
-                {projectItems[0].subtitle}
-              </p>
+              <p className="text-sm text-foreground/60 mt-1 max-w-md">{projectItems[0].subtitle}</p>
             </div>
           </div>
 
-          {/* Bottom thumbnails */}
           <motion.div className="grid grid-cols-2 shrink-0" style={{ gap, height: "28vh" }}>
             <div className="relative overflow-hidden cursor-pointer">
               <motion.img
                 src={projectItems[1].image}
                 alt={projectItems[1].title}
                 className="w-full h-full object-cover"
-                style={{ filter: blFilter }}
+                style={{ filter: bottomLeftFilter }}
               />
               <div
                 className="absolute bottom-0 left-0 right-0 p-3"
@@ -131,7 +125,7 @@ const FeaturedSection = () => {
                 src={projectItems[2].image}
                 alt={projectItems[2].title}
                 className="w-full h-full object-cover"
-                style={{ filter: brFilter }}
+                style={{ filter: bottomRightFilter }}
               />
               <div
                 className="absolute bottom-0 left-0 right-0 p-3"

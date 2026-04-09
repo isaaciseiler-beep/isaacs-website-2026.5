@@ -72,7 +72,7 @@ const PhotoSection = () => {
   return (
     <section className="py-12">
       <div className="px-6 md:px-6 mb-6">
-        <h2 className="section-heading mb-0">Photos</h2>
+        <SectionHeading className="mb-0">Photos</SectionHeading>
       </div>
 
       <div className="relative">

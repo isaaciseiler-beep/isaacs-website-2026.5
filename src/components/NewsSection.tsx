@@ -66,7 +66,7 @@ const NewsSection = () => {
   return (
     <section className="py-12">
       <div className="px-6 mb-6">
-        <h2 className="section-heading mb-0">News</h2>
+        <SectionHeading className="mb-0">News</SectionHeading>
       </div>
 
       <div className="relative">

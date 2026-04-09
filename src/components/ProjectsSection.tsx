@@ -78,7 +78,7 @@ const ProjectsSection = () => {
   return (
     <section className="py-6">
       <div className="px-6 md:px-6 mb-4">
-        <h2 className="section-heading mb-0">Projects</h2>
+        <SectionHeading className="mb-0">Projects</SectionHeading>
       </div>
 
       <div className="relative">

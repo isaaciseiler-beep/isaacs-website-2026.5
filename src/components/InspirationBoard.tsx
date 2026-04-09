@@ -187,7 +187,7 @@ const InspirationBoard = () => {
                 overflow: "visible",
                 borderWidth: 1,
                 borderStyle: "solid",
-                borderColor: useTransform(boardBorderOpacity, (v) => `hsl(var(--border) / ${v * 0.3})`),
+                borderColor: boardBorderColor,
               }}
               onPointerMove={handleDragMove}
               onPointerUp={handleDragEnd}

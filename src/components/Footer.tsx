@@ -92,7 +92,7 @@ const Footer = () => {
             textLength="1000"
             lengthAdjust="spacingAndGlyphs"
             fill="hsl(var(--foreground) / 0.06)"
-            fontFamily="'Bungee Shade', cursive"
+            fontFamily="'Rubik Bubbles', cursive"
             fontWeight="400"
             fontSize="130"
           >

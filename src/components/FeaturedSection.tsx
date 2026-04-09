@@ -42,7 +42,7 @@ const FeaturedSection = () => {
   const brFilter = useTransform(bottomRightGrayscale, (v) => `grayscale(${v * 100}%)`);
 
   return (
-    <section ref={sectionRef} className="relative -mt-4 md:-mt-6" style={{ minHeight: "140vh" }}>
+    <section ref={sectionRef} className="relative -mt-4 md:-mt-6" style={{ minHeight: "110vh" }}>
       <div className="sticky top-0 h-screen flex flex-col overflow-hidden">
         {/* Header — sits just below the header gradient */}
         <div className="px-6 pt-[68px] pb-4">

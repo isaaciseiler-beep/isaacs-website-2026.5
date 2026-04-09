@@ -40,19 +40,20 @@ const FeaturedSection = () => {
   const brFilter = useTransform(bottomRightGrayscale, (v) => `grayscale(${v * 100}%)`);
 
   return (
-    <section ref={sectionRef} className="relative" style={{ minHeight: "200vh" }}>
-      <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden">
-        <div className="px-6 mb-4">
+    <section ref={sectionRef} className="relative -mt-8 md:-mt-12" style={{ minHeight: "200vh" }}>
+      <div className="sticky top-0 h-screen flex flex-col overflow-hidden">
+        {/* Header positioned below the header gradient (top ~64px) */}
+        <div className="px-6 pt-[72px] mb-2">
           <SectionHeading className="mb-0">Featured</SectionHeading>
         </div>
 
         <motion.div
-          className="flex flex-col"
+          className="flex flex-col flex-1"
           style={{ paddingLeft: horizontalPadding, paddingRight: horizontalPadding, gap }}
         >
-          {/* Hero feature card */}
-          <div className="relative overflow-hidden cursor-pointer">
-            <div className="aspect-[16/7] md:aspect-[21/9] overflow-hidden">
+          {/* Hero feature card — takes remaining space */}
+          <div className="relative overflow-hidden cursor-pointer flex-1 min-h-0">
+            <div className="w-full h-full overflow-hidden">
               <motion.img
                 src={projectItems[0].image}
                 alt={projectItems[0].title}
@@ -72,10 +73,10 @@ const FeaturedSection = () => {
             </div>
           </div>
 
-          {/* Thumbnail strip */}
-          <motion.div className="grid grid-cols-2" style={{ gap }}>
+          {/* Thumbnail strip — fixed height */}
+          <motion.div className="grid grid-cols-2 shrink-0" style={{ gap, height: "28vh" }}>
             {/* Bottom left */}
-            <div className="relative overflow-hidden cursor-pointer aspect-[16/9]">
+            <div className="relative overflow-hidden cursor-pointer">
               <motion.img
                 src={projectItems[1].image}
                 alt={projectItems[1].title}
@@ -91,7 +92,7 @@ const FeaturedSection = () => {
             </div>
 
             {/* Bottom right */}
-            <div className="relative overflow-hidden cursor-pointer aspect-[16/9]">
+            <div className="relative overflow-hidden cursor-pointer">
               <motion.img
                 src={projectItems[2].image}
                 alt={projectItems[2].title}

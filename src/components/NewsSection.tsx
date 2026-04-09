@@ -138,7 +138,7 @@ const NewsSection = () => {
               animate="animate"
               exit="exit"
               onClick={() => scroll("left")}
-              className="absolute left-8 top-1/2 -translate-y-1/2 text-foreground/80 hover:text-foreground transition-colors"
+              className="absolute left-8 top-1/2 -translate-y-1/2 z-20 text-foreground hover:text-foreground transition-colors drop-shadow-[0_0_8px_hsl(var(--background))]"
               whileHover={{ x: -3 }}
               whileTap={{ scale: 0.85 }}
             >

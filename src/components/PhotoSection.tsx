@@ -16,7 +16,6 @@ const photos = [
   { id: 6, title: "Grain", location: "Berlin", image: photo2 },
 ];
 
-// Preload all photos
 photos.forEach((p) => {
   const img = new Image();
   img.src = p.image;
@@ -39,10 +38,14 @@ const chevronVariants = {
   }),
 };
 
+const VISIBLE_ROWS = 1.5;
+const GAP = 3;
+
 const PhotoSection = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
+  const [containerHeight, setContainerHeight] = useState<number | undefined>(undefined);
 
   const checkScroll = () => {
     const el = scrollRef.current;
@@ -56,10 +59,21 @@ const PhotoSection = () => {
     if (!el) return;
     checkScroll();
     el.addEventListener("scroll", checkScroll, { passive: true });
+
+    const updateHeight = () => {
+      // Each item width = 50vw - 12px, aspect 3/2
+      const itemW = (window.innerWidth * 0.5) - 12;
+      const itemH = itemW / 1.5;
+      setContainerHeight(itemH * VISIBLE_ROWS + GAP * (VISIBLE_ROWS - 0.5));
+    };
+    updateHeight();
+    window.addEventListener("resize", updateHeight);
     window.addEventListener("resize", checkScroll);
+
     return () => {
       el.removeEventListener("scroll", checkScroll);
       window.removeEventListener("resize", checkScroll);
+      window.removeEventListener("resize", updateHeight);
     };
   }, []);
 
@@ -72,37 +86,50 @@ const PhotoSection = () => {
 
   return (
     <section className="py-12">
-      <div className="px-6 md:px-6 mb-6">
+      <div className="px-6 mb-6">
         <SectionHeading className="mb-0">Photos</SectionHeading>
       </div>
 
       <div className="relative">
         <div
           ref={scrollRef}
-          className="flex gap-[3px] overflow-x-auto scrollbar-hide px-6"
-          style={{ scrollSnapType: "x mandatory", scrollPaddingLeft: 24 }}
+          className="overflow-x-auto overflow-y-hidden scrollbar-hide"
+          style={{
+            scrollSnapType: "x mandatory",
+            scrollPaddingLeft: 24,
+            maxHeight: containerHeight,
+          }}
         >
-          {photos.map((photo, index) => (
-            <motion.div
-              key={photo.id}
-              className="grid-item flex-shrink-0"
-              style={{ width: "calc(66% - 2px)", scrollSnapAlign: "start", aspectRatio: "3/2", marginRight: index === photos.length - 1 ? "24px" : undefined }}
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: "-20px" }}
-              transition={{ delay: index * 0.05, duration: 0.4 }}
-            >
-              <img
-                src={photo.image}
-                alt={photo.title}
-                className="w-full h-full object-cover"
-              />
-              <div className="grid-item-overlay">
-                <p className="mono-text mb-0.5">{photo.location}</p>
-                <h3 className="text-xs font-medium text-foreground">{photo.title}</h3>
-              </div>
-            </motion.div>
-          ))}
+          <div
+            className="grid grid-rows-2 grid-flow-col gap-[3px] px-6"
+            style={{ width: "max-content" }}
+          >
+            {photos.map((photo, index) => (
+              <motion.div
+                key={photo.id}
+                className="grid-item"
+                style={{
+                  width: "calc(50vw - 12px)",
+                  aspectRatio: "3/2",
+                  scrollSnapAlign: index % 2 === 0 ? "start" : undefined,
+                }}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true, margin: "-20px" }}
+                transition={{ delay: index * 0.05, duration: 0.4 }}
+              >
+                <img
+                  src={photo.image}
+                  alt={photo.title}
+                  className="w-full h-full object-cover"
+                />
+                <div className="grid-item-overlay">
+                  <p className="mono-text mb-0.5">{photo.location}</p>
+                  <h3 className="text-xs font-medium text-foreground">{photo.title}</h3>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
 
         {/* Right edge gradient */}
@@ -111,7 +138,7 @@ const PhotoSection = () => {
           style={{ background: "linear-gradient(to left, hsl(var(--background)) 0%, hsl(var(--background) / 0.6) 40%, transparent 100%)" }}
         />
 
-        {/* Left edge gradient — only when scrolled */}
+        {/* Left edge gradient */}
         <div
           className="absolute top-0 left-0 bottom-0 w-14 pointer-events-none z-10 transition-opacity duration-500 ease-out"
           style={{

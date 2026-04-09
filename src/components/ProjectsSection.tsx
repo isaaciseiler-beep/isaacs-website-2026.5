@@ -45,13 +45,14 @@ const chevronVariants = {
 };
 
 const VISIBLE_ROWS = 2.5;
+const GAP = 3;
 
 const ProjectsSection = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
-  const [rowHeight, setRowHeight] = useState(0);
+  const [containerHeight, setContainerHeight] = useState<number | undefined>(undefined);
 
   const checkScroll = () => {
     const el = scrollRef.current;
@@ -65,24 +66,21 @@ const ProjectsSection = () => {
     if (!el) return;
     checkScroll();
     el.addEventListener("scroll", checkScroll, { passive: true });
-    window.addEventListener("resize", checkScroll);
 
-    // Calculate row height so we show exactly 2.5 rows
-    const updateRowHeight = () => {
-      const containerW = containerRef.current?.clientWidth;
-      if (!containerW) return;
-      // Each item is 33vw - 12px wide, aspect 3/2
+    const updateHeight = () => {
+      // Each item width = 33vw - 12px, aspect 3/2
       const itemW = (window.innerWidth * 0.33) - 12;
-      const itemH = itemW / 1.5; // aspect ratio 3/2
-      setRowHeight(itemH);
+      const itemH = itemW / 1.5;
+      setContainerHeight(itemH * VISIBLE_ROWS + GAP * (VISIBLE_ROWS - 0.5));
     };
-    updateRowHeight();
-    window.addEventListener("resize", updateRowHeight);
+    updateHeight();
+    window.addEventListener("resize", updateHeight);
+    window.addEventListener("resize", checkScroll);
 
     return () => {
       el.removeEventListener("scroll", checkScroll);
       window.removeEventListener("resize", checkScroll);
-      window.removeEventListener("resize", updateRowHeight);
+      window.removeEventListener("resize", updateHeight);
     };
   }, []);
 
@@ -93,12 +91,9 @@ const ProjectsSection = () => {
     el.scrollBy({ left: dir === "left" ? -amount : amount, behavior: "smooth" });
   };
 
-  // Total height = 2.5 rows * rowHeight + 2.5 gaps (3px each)
-  const containerHeight = rowHeight > 0 ? (rowHeight * VISIBLE_ROWS) + (3 * VISIBLE_ROWS) : "auto";
-
   return (
     <section className="py-6" ref={containerRef}>
-      <div className="px-6 md:px-6 mb-4">
+      <div className="px-6 mb-6">
         <SectionHeading className="mb-0">Projects</SectionHeading>
       </div>
 
@@ -109,11 +104,11 @@ const ProjectsSection = () => {
           style={{
             scrollSnapType: "x mandatory",
             scrollPaddingLeft: 24,
-            maxHeight: typeof containerHeight === "number" ? containerHeight : undefined,
+            maxHeight: containerHeight,
           }}
         >
           <div
-            className="grid grid-rows-2 grid-flow-col gap-[3px] px-6"
+            className="grid grid-rows-3 grid-flow-col gap-[3px] px-6"
             style={{ width: "max-content" }}
           >
             {allProjects.map((project, index) => (
@@ -123,7 +118,7 @@ const ProjectsSection = () => {
                 style={{
                   width: "calc(33vw - 12px)",
                   aspectRatio: "3/2",
-                  scrollSnapAlign: index % 2 === 0 ? "start" : undefined,
+                  scrollSnapAlign: index % 3 === 0 ? "start" : undefined,
                 }}
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}

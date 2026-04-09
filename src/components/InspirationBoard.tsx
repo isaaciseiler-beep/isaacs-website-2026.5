@@ -45,11 +45,10 @@ interface PinCardProps {
 const PinCard = ({ pin, index, scrollYProgress, isDragging, onDragStart, onClick }: PinCardProps) => {
   const Icon = typeIcon[pin.type];
 
-  // Fade in when entering, fade out when leaving — inspired by hero text
-  const pinOpacity = useTransform(scrollYProgress, [0.08, 0.22, 0.72, 0.85], [0, 1, 1, 0]);
-  const pinY = useTransform(scrollYProgress, [0.08, 0.22, 0.72, 0.85], [30, 0, 0, -20]);
-  const pinBlur = useTransform(scrollYProgress, [0.08, 0.22, 0.72, 0.85], [8, 0, 0, 6]);
-  const filterStr = useTransform(pinBlur, (v) => `blur(${v}px)`);
+  // Slide in from bottom, slide out to bottom
+  const delay = index * 0.015;
+  const pinOpacity = useTransform(scrollYProgress, [0.10 + delay, 0.20 + delay, 0.75, 0.85], [0, 1, 1, 0]);
+  const pinY = useTransform(scrollYProgress, [0.10 + delay, 0.20 + delay, 0.75, 0.85], [60, 0, 0, 40]);
 
   return (
     <motion.div
@@ -62,7 +61,6 @@ const PinCard = ({ pin, index, scrollYProgress, isDragging, onDragStart, onClick
         zIndex: isDragging ? 50 : 10,
         opacity: pinOpacity,
         y: pinY,
-        filter: filterStr,
       }}
       onPointerDown={(e) => onDragStart(pin.id, e)}
       whileHover={{ scale: 1.04, rotate: 0 }}
@@ -139,10 +137,10 @@ const InspirationBoard = () => {
     offset: ["start end", "end start"],
   });
 
-  const boardBorderOpacity = useTransform(scrollYProgress, [0.12, 0.25, 0.7, 0.82], [1, 0, 0, 1]);
-  const horizontalPadding = useTransform(scrollYProgress, [0.12, 0.25, 0.7, 0.82], [24, 0, 0, 24]);
+  // Same expansion model as Featured: padding shrinks to 0 when content is in view
+  const padding = useTransform(scrollYProgress, [0, 0.12, 0.25, 0.70, 0.82, 1], [24, 24, 0, 0, 24, 24]);
+  const boardBorderOpacity = useTransform(scrollYProgress, [0.12, 0.25, 0.70, 0.82], [1, 0, 0, 1]);
   const boardBorderColor = useTransform(boardBorderOpacity, (v) => `hsl(var(--border) / ${v * 0.3})`);
-
 
   const handleDragStart = (id: number, e: React.PointerEvent) => {
     const pin = pins.find((p) => p.id === id);
@@ -171,49 +169,55 @@ const InspirationBoard = () => {
   };
 
   return (
-    <section ref={sectionRef} className="relative" style={{ minHeight: "180vh" }}>
-      <div className="sticky top-0 min-h-screen flex flex-col justify-start overflow-hidden">
-        <motion.div style={{ paddingLeft: horizontalPadding, paddingRight: horizontalPadding }} className="pt-12">
-          <div className="px-6">
-            <SectionHeading>Inspiration</SectionHeading>
-          </div>
+    <section ref={sectionRef} className="relative" style={{ minHeight: "200vh" }}>
+      <div className="sticky top-0 h-screen flex flex-col overflow-hidden">
+        {/* Header — fixed position, just below header gradient */}
+        <div className="px-6 pt-[68px] pb-4">
+          <SectionHeading className="mb-0">Inspiration</SectionHeading>
+        </div>
 
-          <div className="px-6">
-            <motion.div
-              ref={boardRef}
-              className="relative w-full"
+        {/* Board fills remaining space with animated padding */}
+        <motion.div
+          className="flex-1 min-h-0 flex flex-col"
+          style={{
+            paddingLeft: padding,
+            paddingRight: padding,
+            paddingBottom: padding,
+          }}
+        >
+          <motion.div
+            ref={boardRef}
+            className="relative flex-1 min-h-0 overflow-hidden"
+            style={{
+              borderWidth: 1,
+              borderStyle: "solid",
+              borderColor: boardBorderColor,
+            }}
+            onPointerMove={handleDragMove}
+            onPointerUp={handleDragEnd}
+          >
+            {/* Dotted background */}
+            <div
+              className="absolute inset-0"
               style={{
-                height: 620,
-                overflow: "visible",
-                borderWidth: 1,
-                borderStyle: "solid",
-                borderColor: boardBorderColor,
+                backgroundImage: "radial-gradient(circle, currentColor 1px, transparent 1px)",
+                backgroundSize: "24px 24px",
+                opacity: 0.06,
               }}
-              onPointerMove={handleDragMove}
-              onPointerUp={handleDragEnd}
-            >
-              <div
-                className="absolute inset-0"
-                style={{
-                  backgroundImage: "radial-gradient(circle, currentColor 1px, transparent 1px)",
-                  backgroundSize: "24px 24px",
-                  opacity: 0.06,
-                }}
-              />
+            />
 
-              {pins.map((pin, i) => (
-                <PinCard
-                  key={pin.id}
-                  pin={pin}
-                  index={i}
-                  scrollYProgress={scrollYProgress}
-                  isDragging={dragItem.current === pin.id}
-                  onDragStart={handleDragStart}
-                  onClick={handleClick}
-                />
-              ))}
-            </motion.div>
-          </div>
+            {pins.map((pin, i) => (
+              <PinCard
+                key={pin.id}
+                pin={pin}
+                index={i}
+                scrollYProgress={scrollYProgress}
+                isDragging={dragItem.current === pin.id}
+                onDragStart={handleDragStart}
+                onClick={handleClick}
+              />
+            ))}
+          </motion.div>
         </motion.div>
       </div>
     </section>

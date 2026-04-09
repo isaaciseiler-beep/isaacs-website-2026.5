@@ -92,7 +92,7 @@ const Footer = () => {
             textLength="1000"
             lengthAdjust="spacingAndGlyphs"
             fill="hsl(var(--foreground) / 0.06)"
-            fontFamily="'Permanent Marker', cursive"
+            fontFamily="'Bungee Shade', cursive"
             fontWeight="400"
             fontSize="130"
           >

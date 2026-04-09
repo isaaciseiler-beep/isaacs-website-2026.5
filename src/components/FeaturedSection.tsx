@@ -12,57 +12,51 @@ const projectItems = [
 ];
 
 const BUFFER = 24;
-const SECTION_HEIGHT = "200vh";
-const STAGES = {
-  enterEnd: 0.33,
-  freezeEnd: 0.4,
-  expandEnd: 0.48,
-  topColorStart: 0.44,
-  topColorEnd: 0.48,
-  bottomLeftColorEnd: 0.52,
-  bottomRightColorEnd: 0.56,
-  holdEnd: 0.6,
-  contractEnd: 0.67,
-} as const;
 
 const FeaturedSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
 
+  // offset: ["start start", "end end"] means progress 0→1 maps exactly
+  // to the sticky window (section-top at viewport-top → section-bottom
+  // at viewport-bottom). For a 200vh section that's 100vh of scroll —
+  // the entire range is usable, no wasted enter/exit dead space.
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ["start end", "end start"],
+    offset: ["start start", "end end"],
   });
+
+  // TIMELINE (progress 0–1 = 100vh of scroll while sticky):
+  // 0.00–0.15  FREEZE — content locked, buffers visible, all grayscale
+  // 0.15–0.35  EXPAND — padding/gap shrink to 0
+  // 0.25–0.35  Top card → color
+  // 0.35–0.45  Bottom-left → color
+  // 0.45–0.55  Bottom-right → color
+  // 0.55–0.70  HOLD — full bleed, all color
+  // 0.70–0.90  CONTRACT — buffers return
+  // 0.90–1.00  Ready to scroll out
 
   const padding = useTransform(
     scrollYProgress,
-    [0, STAGES.enterEnd, STAGES.freezeEnd, STAGES.expandEnd, STAGES.holdEnd, STAGES.contractEnd, 1],
-    [BUFFER, BUFFER, BUFFER, 0, 0, BUFFER, BUFFER]
+    [0, 0.15, 0.35, 0.55, 0.70, 0.90, 1],
+    [BUFFER, BUFFER, 0, 0, 0, BUFFER, BUFFER]
   );
 
   const gap = useTransform(
     scrollYProgress,
-    [0, STAGES.enterEnd, STAGES.freezeEnd, STAGES.expandEnd, STAGES.holdEnd, STAGES.contractEnd, 1],
-    [3, 3, 3, 0, 0, 3, 3]
+    [0, 0.15, 0.35, 0.55, 0.70, 0.90, 1],
+    [3, 3, 0, 0, 0, 3, 3]
   );
 
-  const topGrayscale = useTransform(scrollYProgress, [STAGES.topColorStart, STAGES.topColorEnd], [1, 0]);
-  const bottomLeftGrayscale = useTransform(
-    scrollYProgress,
-    [STAGES.topColorEnd, STAGES.bottomLeftColorEnd],
-    [1, 0]
-  );
-  const bottomRightGrayscale = useTransform(
-    scrollYProgress,
-    [STAGES.bottomLeftColorEnd, STAGES.bottomRightColorEnd],
-    [1, 0]
-  );
+  const topGrayscale = useTransform(scrollYProgress, [0.25, 0.35], [1, 0]);
+  const blGrayscale = useTransform(scrollYProgress, [0.35, 0.45], [1, 0]);
+  const brGrayscale = useTransform(scrollYProgress, [0.45, 0.55], [1, 0]);
 
-  const topFilter = useTransform(topGrayscale, (value) => `grayscale(${value * 100}%)`);
-  const bottomLeftFilter = useTransform(bottomLeftGrayscale, (value) => `grayscale(${value * 100}%)`);
-  const bottomRightFilter = useTransform(bottomRightGrayscale, (value) => `grayscale(${value * 100}%)`);
+  const topFilter = useTransform(topGrayscale, (v) => `grayscale(${v * 100}%)`);
+  const blFilter = useTransform(blGrayscale, (v) => `grayscale(${v * 100}%)`);
+  const brFilter = useTransform(brGrayscale, (v) => `grayscale(${v * 100}%)`);
 
   return (
-    <section ref={sectionRef} className="relative" style={{ height: SECTION_HEIGHT }}>
+    <section ref={sectionRef} className="relative" style={{ height: "200vh" }}>
       <div className="sticky top-0 h-screen flex flex-col overflow-hidden">
         <div className="px-6 pt-[68px] pb-4">
           <SectionHeading className="mb-0">Featured</SectionHeading>
@@ -77,6 +71,7 @@ const FeaturedSection = () => {
             gap,
           }}
         >
+          {/* Hero card */}
           <div className="relative overflow-hidden cursor-pointer flex-1 min-h-0">
             <div className="w-full h-full overflow-hidden">
               <motion.img
@@ -100,13 +95,14 @@ const FeaturedSection = () => {
             </div>
           </div>
 
+          {/* Bottom thumbnails */}
           <motion.div className="grid grid-cols-2 shrink-0" style={{ gap, height: "28vh" }}>
             <div className="relative overflow-hidden cursor-pointer">
               <motion.img
                 src={projectItems[1].image}
                 alt={projectItems[1].title}
                 className="w-full h-full object-cover"
-                style={{ filter: bottomLeftFilter }}
+                style={{ filter: blFilter }}
               />
               <div
                 className="absolute bottom-0 left-0 right-0 p-3"
@@ -125,7 +121,7 @@ const FeaturedSection = () => {
                 src={projectItems[2].image}
                 alt={projectItems[2].title}
                 className="w-full h-full object-cover"
-                style={{ filter: bottomRightFilter }}
+                style={{ filter: brFilter }}
               />
               <div
                 className="absolute bottom-0 left-0 right-0 p-3"

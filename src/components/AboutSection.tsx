@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import SectionHeading from "@/components/SectionHeading";
@@ -49,7 +49,42 @@ const statement =
 const AboutSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const pillRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
+  const imgRef = useRef<HTMLDivElement>(null);
   const [hasDeployedPopdown, setHasDeployedPopdown] = useState(false);
+  const [bioFontSize, setBioFontSize] = useState<number | null>(null);
+
+  const fitBioText = useCallback(() => {
+    const textEl = textRef.current;
+    const imgEl = imgRef.current;
+    if (!textEl || !imgEl) return;
+
+    const imgHeight = imgEl.getBoundingClientRect().height;
+    if (imgHeight <= 0) return;
+
+    textEl.style.fontSize = "";
+    let lo = 12, hi = 42, best = lo;
+
+    for (let i = 0; i < 20; i++) {
+      const mid = (lo + hi) / 2;
+      textEl.style.fontSize = `${mid}px`;
+      if (textEl.scrollHeight <= imgHeight) {
+        best = mid;
+        lo = mid + 0.5;
+      } else {
+        hi = mid - 0.5;
+      }
+    }
+
+    textEl.style.fontSize = "";
+    setBioFontSize(best);
+  }, []);
+
+  useEffect(() => {
+    fitBioText();
+    window.addEventListener("resize", fitBioText);
+    return () => window.removeEventListener("resize", fitBioText);
+  }, [fitBioText]);
 
   useEffect(() => {
     if (hasDeployedPopdown) return;
@@ -93,9 +128,12 @@ const AboutSection = () => {
       <SectionHeading>About</SectionHeading>
 
       <div className="max-w-5xl">
-        <div className="flex flex-col md:flex-row gap-10 md:gap-16 md:items-stretch">
-          <div className="flex-1 min-w-0 flex items-center">
-            <p className="text-[1.65rem] md:text-[2.1rem] lg:text-[2.65rem] leading-[1.38] font-light tracking-tight text-foreground">
+        <div className="flex flex-col md:flex-row gap-10 md:gap-16 items-start">
+          <div ref={textRef} className="flex-1 min-w-0 overflow-hidden">
+            <p
+              className="leading-[1.38] font-light tracking-tight text-foreground"
+              style={bioFontSize ? { fontSize: `${bioFontSize}px` } : undefined}
+            >
               {words.map((word) => {
                 const ci = idx++;
                 return (
@@ -116,6 +154,7 @@ const AboutSection = () => {
           </div>
 
           <motion.div
+            ref={imgRef}
             className="shrink-0"
             initial={{ opacity: 0, scale: 0.95, filter: "blur(8px)" }}
             whileInView={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
@@ -137,11 +176,13 @@ const AboutSection = () => {
         <div className="mt-8 md:mt-10 relative group/pill">
           <div
             ref={pillRef}
-            className="relative flex items-center gap-3 px-6 py-3.5 rounded-full border-2 border-foreground bg-background w-full z-10"
+            className="relative flex items-center gap-3 px-6 py-3.5 border-2 border-foreground bg-background w-full z-10"
+            style={{ borderRadius: "9999px" }}
           >
             {/* Highlight border overlay — clip-path reveal left-to-right on hover */}
             <span
-              className="absolute inset-[-2px] rounded-full border-2 border-[hsl(var(--highlight))] pointer-events-none transition-[clip-path] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] [clip-path:inset(0_100%_0_0)] group-hover/pill:[clip-path:inset(0_0%_0_0)]"
+              className="absolute inset-[-2px] border-2 border-[hsl(var(--highlight))] pointer-events-none transition-[clip-path] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] [clip-path:inset(0_100%_0_0)] group-hover/pill:[clip-path:inset(0_0%_0_0)]"
+              style={{ borderRadius: "9999px" }}
             />
             <motion.span
               className="rounded-full w-2.5 h-2.5 bg-foreground shrink-0"
@@ -152,7 +193,7 @@ const AboutSection = () => {
                 ease: "easeInOut",
               }}
             />
-            <span className="text-base md:text-lg tracking-[0.02em] text-foreground whitespace-nowrap overflow-hidden text-ellipsis">
+            <span className="text-base md:text-lg tracking-[0.02em] text-foreground">
               Based in Taipei — open to tech communications, GTM & marketing roles
             </span>
           </div>

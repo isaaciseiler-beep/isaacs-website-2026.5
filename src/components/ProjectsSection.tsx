@@ -169,12 +169,17 @@ const ProjectsSection = () => {
       {/* Explore button */}
       <div className="px-6 mt-6">
         <motion.button
-          className="group w-full py-2.5 text-sm font-mono tracking-[0.2em] uppercase rounded-full bg-foreground text-background transition-colors duration-300 hover:bg-[hsl(68,100%,81%)] flex items-center justify-center"
+          className="group relative w-full py-2.5 text-sm font-mono tracking-[0.2em] uppercase rounded-full bg-foreground overflow-hidden flex items-center justify-center"
           whileTap={{ scale: 0.995 }}
         >
-          Explore my work
-          <span className="inline-flex overflow-hidden max-w-0 group-hover:max-w-[2rem] opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">
-            <ArrowRight className="w-4 h-4 ml-2 shrink-0" strokeWidth={1.5} />
+          <span
+            className="absolute inset-0 bg-[hsl(68,100%,81%)] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+          />
+          <span className="relative z-10 text-background flex items-center justify-center">
+            Explore my work
+            <span className="inline-flex overflow-hidden max-w-0 group-hover:max-w-[2rem] opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">
+              <ArrowRight className="w-4 h-4 ml-2 shrink-0" strokeWidth={1.5} />
+            </span>
           </span>
         </motion.button>
       </div>

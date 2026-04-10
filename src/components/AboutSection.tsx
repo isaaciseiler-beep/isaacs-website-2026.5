@@ -3,23 +3,25 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import SectionHeading from "@/components/SectionHeading";
 import headshot from "@/assets/headshot.jpg";
 
-const statement =
-  "A multidisciplinary creative working at the intersection of design, photography, and technology. Focused on building experiences that feel both intentional and alive.";
-const words = statement.split(" ");
+const ease = [0.16, 1, 0.3, 1] as [number, number, number, number];
 
-const wordVariants = {
+const fragmentVariants = {
   hidden: { opacity: 0, y: 30, filter: "blur(8px)" },
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
     filter: "blur(0px)",
     transition: {
-      delay: i * 0.04,
+      delay: i * 0.06,
       duration: 0.5,
       ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number],
     },
   }),
 };
+
+// Split statement into fragments with the photo inserted mid-flow
+const before = "A multidisciplinary creative working at the intersection of";
+const after = "design, photography, and technology. Focused on building experiences that feel both intentional and alive.";
 
 const AboutSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -28,87 +30,92 @@ const AboutSection = () => {
     offset: ["start end", "end start"],
   });
 
-  const imgY = useTransform(scrollYProgress, [0, 1], [40, -40]);
-  const imgRotate = useTransform(scrollYProgress, [0, 1], [2, -1]);
+  const imgY = useTransform(scrollYProgress, [0, 1], [20, -20]);
+
+  const beforeWords = before.split(" ");
+  const afterWords = after.split(" ");
+  const totalBefore = beforeWords.length;
 
   return (
     <section ref={sectionRef} className="py-12 px-6">
       <SectionHeading>About</SectionHeading>
 
-      <div className="relative flex flex-col md:flex-row md:items-start gap-8 md:gap-0">
-        {/* Text — wraps around the photo on desktop */}
-        <div className="md:flex-1 md:pr-6">
-          <p className="text-2xl md:text-3xl leading-snug font-light tracking-tight text-foreground">
-            {words.map((word, i) => (
-              <motion.span
-                key={i}
-                className="inline-block mr-[0.3em]"
-                variants={wordVariants}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-100px" }}
-                custom={i}
-              >
-                {word}
-              </motion.span>
-            ))}
-          </p>
+      <div className="max-w-4xl">
+        {/* Statement with inline headshot */}
+        <p className="text-2xl md:text-[2rem] lg:text-4xl leading-[1.3] font-light tracking-tight text-foreground">
+          {beforeWords.map((word, i) => (
+            <motion.span
+              key={`b-${i}`}
+              className="inline-block mr-[0.3em]"
+              variants={fragmentVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-80px" }}
+              custom={i}
+            >
+              {word}
+            </motion.span>
+          ))}
 
-          <motion.p
-            className="text-sm text-foreground/50 mt-8 leading-relaxed max-w-md"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.8, duration: 0.5 }}
-          >
-            Currently available for select projects and collaborations.
-          </motion.p>
-        </div>
-
-        {/* Headshot — overlapping, diagonal-clipped, parallax-driven */}
-        <motion.div
-          className="relative md:w-[220px] lg:w-[260px] shrink-0 self-start"
-          style={{ y: imgY, rotate: imgRotate }}
-        >
-          <motion.div
-            className="relative overflow-hidden"
-            style={{
-              clipPath: "polygon(8% 0%, 100% 0%, 100% 100%, 0% 100%)",
-            }}
-            initial={{ opacity: 0, scale: 0.92, filter: "blur(10px)" }}
-            whileInView={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <img
-              src={headshot}
-              alt="Portrait"
-              className="w-full aspect-[3/4] object-cover grayscale hover:grayscale-0 transition-all duration-700"
-              loading="lazy"
-              width={768}
-              height={1024}
-            />
-
-            {/* Scan-line overlay for texture */}
-            <div
-              className="absolute inset-0 pointer-events-none opacity-[0.03]"
-              style={{
-                backgroundImage:
-                  "repeating-linear-gradient(0deg, transparent, transparent 2px, currentColor 2px, currentColor 3px)",
-              }}
-            />
-          </motion.div>
-
-          {/* Floating label */}
+          {/* Inline headshot — sits in the text flow like a word */}
           <motion.span
-            className="absolute -bottom-3 -left-2 text-[10px] font-mono tracking-[0.3em] text-foreground/30 uppercase"
-            initial={{ opacity: 0, x: -10 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.6, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="inline-block align-middle mr-[0.3em] relative"
+            variants={fragmentVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-80px" }}
+            custom={totalBefore}
           >
-            Est. 2019
+            <motion.span
+              className="inline-block overflow-hidden relative"
+              style={{ y: imgY }}
+            >
+              <img
+                src={headshot}
+                alt="Portrait"
+                className="w-[72px] h-[90px] md:w-[100px] md:h-[125px] lg:w-[120px] lg:h-[150px] object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                loading="lazy"
+                width={768}
+                height={1024}
+              />
+              {/* Subtle noise overlay */}
+              <span
+                className="absolute inset-0 pointer-events-none opacity-[0.04] mix-blend-overlay"
+                style={{
+                  backgroundImage:
+                    "repeating-linear-gradient(0deg, transparent, transparent 1px, currentColor 1px, currentColor 2px)",
+                }}
+              />
+            </motion.span>
           </motion.span>
+
+          {afterWords.map((word, i) => (
+            <motion.span
+              key={`a-${i}`}
+              className="inline-block mr-[0.3em]"
+              variants={fragmentVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-80px" }}
+              custom={totalBefore + 1 + i}
+            >
+              {word}
+            </motion.span>
+          ))}
+        </p>
+
+        {/* Availability note */}
+        <motion.div
+          className="mt-10 flex items-center gap-3"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 1.2, duration: 0.5 }}
+        >
+          <span className="w-1.5 h-1.5 bg-[hsl(68,100%,81%)] animate-pulse" />
+          <span className="text-sm font-mono tracking-[0.15em] text-foreground/40 uppercase">
+            Available for select projects
+          </span>
         </motion.div>
       </div>
     </section>

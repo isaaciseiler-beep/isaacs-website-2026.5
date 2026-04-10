@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 import SectionHeading from "@/components/SectionHeading";
 import project1 from "@/assets/project-1.jpg";
 import project2 from "@/assets/project-2.jpg";

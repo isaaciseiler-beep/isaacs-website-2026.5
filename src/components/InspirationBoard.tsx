@@ -484,8 +484,9 @@ const InspirationBoard = () => {
           className="flex-1 min-h-0 flex flex-col"
           style={{ paddingLeft: padding, paddingRight: padding, paddingBottom: padding }}
         >
-          <div className="relative flex-1 min-h-0 overflow-hidden border border-border/30">
+          <div className="relative flex-1 min-h-0 overflow-hidden border border-border/30" style={{ minHeight: "400px" }}>
             <Canvas
+              style={{ width: "100%", height: "100%", background: "#f8f8f3" }}
               shadows
               camera={{ position: [5, 7, 8], fov: 40 }}
               style={{ background: "#f8f8f3" }}

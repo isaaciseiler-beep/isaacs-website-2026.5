@@ -165,7 +165,7 @@ const Index = () => {
       >
         <main>
           <div id="hero"><HeroSection /></div>
-          <div id="featured"><FeaturedSection /></div>
+          <ParallaxSection id="featured" offset={50} clip={false}><FeaturedSection /></ParallaxSection>
           <ParallaxSection id="about" offset={60}><AboutSection /></ParallaxSection>
           <ParallaxSection id="projects" offset={70}><ProjectsSection /></ParallaxSection>
           <ParallaxSection id="news" offset={55}><NewsSection /></ParallaxSection>

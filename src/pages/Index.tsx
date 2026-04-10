@@ -12,6 +12,7 @@ import InspirationBoard from "@/components/InspirationBoard";
 import AboutSection from "@/components/AboutSection";
 import Footer from "@/components/Footer";
 import ChatOrb from "@/components/ChatOrb";
+import ParallaxSection from "@/components/ParallaxSection";
 
 const sitemapItems = [
   { id: "hero", label: "Home" },

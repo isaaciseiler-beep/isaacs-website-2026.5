@@ -12,6 +12,7 @@ import InspirationBoard from "@/components/InspirationBoard";
 import AboutSection from "@/components/AboutSection";
 import Footer from "@/components/Footer";
 import ChatOrb from "@/components/ChatOrb";
+import ParallaxSection from "@/components/ParallaxSection";
 
 const sitemapItems = [
   { id: "hero", label: "Home" },
@@ -164,12 +165,12 @@ const Index = () => {
       >
         <main>
           <div id="hero"><HeroSection /></div>
-          <div id="featured"><FeaturedSection /></div>
-          <div id="about"><AboutSection /></div>
-          <div id="projects"><ProjectsSection /></div>
-          <div id="news"><NewsSection /></div>
-          <div id="photos"><PhotoSection /></div>
-          <div id="inspiration"><InspirationBoard /></div>
+          <ParallaxSection id="featured" offset={30}><FeaturedSection /></ParallaxSection>
+          <ParallaxSection id="about" offset={35}><AboutSection /></ParallaxSection>
+          <ParallaxSection id="projects" offset={40}><ProjectsSection /></ParallaxSection>
+          <ParallaxSection id="news" offset={30}><NewsSection /></ParallaxSection>
+          <ParallaxSection id="photos" offset={45}><PhotoSection /></ParallaxSection>
+          <ParallaxSection id="inspiration" offset={30}><InspirationBoard /></ParallaxSection>
           <Footer />
         </main>
       </motion.div>

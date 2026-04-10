@@ -82,7 +82,7 @@ const AboutSection = () => {
         {/* Status pill + pop-down CTA */}
         <div className="mt-8 md:mt-10 relative">
           {/* Pill outline */}
-          <div className="flex items-center gap-3 px-6 py-3.5 rounded-full border-2 border-foreground/40 bg-background w-full relative z-10">
+          <div className="flex items-center gap-3 px-6 py-3.5 rounded-full border-2 border-foreground bg-background w-full relative z-10">
             <motion.span
               className="rounded-full w-2.5 h-2.5 bg-foreground shrink-0"
               animate={{ scale: [1, 1.4, 1] }}
@@ -107,7 +107,7 @@ const AboutSection = () => {
               className="overflow-hidden rounded-b-3xl"
             >
               <button
-                className="group relative w-full pt-6 pb-3 bg-foreground overflow-hidden flex items-center justify-center cursor-pointer"
+                className="group relative w-full pt-6 pb-4 bg-foreground overflow-hidden flex items-center justify-center cursor-pointer"
                 onClick={() => window.location.href = "/contact"}
               >
                 <span

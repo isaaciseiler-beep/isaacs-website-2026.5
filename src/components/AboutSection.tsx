@@ -1,5 +1,5 @@
-import { useRef } from "react";
-import { motion, useInView, useScroll, useTransform } from "framer-motion";
+import { useRef, useState, useEffect } from "react";
+import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import SectionHeading from "@/components/SectionHeading";
 import headshot1 from "@/assets/headshot.jpg";
@@ -50,15 +50,18 @@ const AboutSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const pillRef = useRef<HTMLDivElement>(null);
 
+  const { scrollYProgress: pageProgress } = useScroll();
+  const [hasDeployedPopdown, setHasDeployedPopdown] = useState(false);
+
+  useMotionValueEvent(pageProgress, "change", (v) => {
+    if (!hasDeployedPopdown && v >= 0.2) {
+      setHasDeployedPopdown(true);
+    }
+  });
+
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"],
-  });
-
-  const hasDeployedPopdown = useInView(pillRef, {
-    once: true,
-    amount: 1,
-    margin: "0px 0px -72px 0px",
   });
 
   const imgY = useTransform(scrollYProgress, [0, 1], [40, -40]);
@@ -117,9 +120,9 @@ const AboutSection = () => {
             ref={pillRef}
             className="relative flex items-center gap-3 px-6 py-3.5 rounded-full border-2 border-foreground bg-background w-full z-10"
           >
-            {/* Highlight border overlay — sweeps left-to-right on hover */}
+            {/* Highlight border overlay — clip-path reveal left-to-right on hover */}
             <span
-              className="absolute inset-[-2px] rounded-full border-2 border-[hsl(var(--highlight))] pointer-events-none origin-left scale-x-0 group-hover/pill:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+              className="absolute inset-[-2px] rounded-full border-2 border-[hsl(var(--highlight))] pointer-events-none transition-[clip-path] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] [clip-path:inset(0_100%_0_0)] group-hover/pill:[clip-path:inset(0_0%_0_0)]"
             />
             <motion.span
               className="rounded-full w-2.5 h-2.5 bg-foreground shrink-0"

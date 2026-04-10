@@ -23,7 +23,6 @@ const statement =
 
 const AboutSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const pillRef = useRef<HTMLDivElement>(null);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -31,14 +30,6 @@ const AboutSection = () => {
   });
 
   const imgY = useTransform(scrollYProgress, [0, 1], [40, -40]);
-
-  // Pop-down slides out as pill scrolls into upper portion of viewport
-  const { scrollYProgress: pillScroll } = useScroll({
-    target: pillRef,
-    offset: ["start 0.7", "start 0.3"],
-  });
-  const popdownY = useTransform(pillScroll, [0, 1], [-100, 0]);
-  const popdownOpacity = useTransform(pillScroll, [0, 0.4, 1], [0, 0, 1]);
 
   const words = statement.split(" ");
   let idx = 0;
@@ -70,7 +61,6 @@ const AboutSection = () => {
             </p>
           </div>
 
-          {/* Square headshot — colorful on hover */}
           <motion.div
             className="shrink-0"
             initial={{ opacity: 0, scale: 0.95, filter: "blur(8px)" }}
@@ -90,9 +80,9 @@ const AboutSection = () => {
         </div>
 
         {/* Status pill + pop-down CTA */}
-        <div ref={pillRef} className="mt-8 md:mt-10 relative">
+        <div className="mt-8 md:mt-10 relative">
           {/* Pill outline */}
-          <div className="flex items-center gap-3 px-6 py-3.5 rounded-full border border-foreground/30 bg-background w-full relative z-10">
+          <div className="flex items-center gap-3 px-6 py-3.5 rounded-full border-2 border-foreground/40 bg-background w-full relative z-10">
             <motion.span
               className="rounded-full w-2.5 h-2.5 bg-foreground shrink-0"
               animate={{ scale: [1, 1.4, 1] }}
@@ -107,26 +97,31 @@ const AboutSection = () => {
             </span>
           </div>
 
-          {/* Pop-down CTA — slides out from under the pill on scroll */}
-          <motion.div
-            className="absolute left-0 right-0 top-full z-0 overflow-hidden"
-            style={{ y: popdownY, opacity: popdownOpacity }}
-          >
-            <button
-              className="group relative w-full py-3 mt-[-1px] rounded-b-[1.5rem] bg-foreground overflow-hidden flex items-center justify-center cursor-pointer"
-              onClick={() => window.location.href = "/contact"}
+          {/* Pop-down CTA — grows from center of pill, triggered once on viewport entry */}
+          <div className="absolute left-0 right-0 z-0 overflow-hidden" style={{ top: "50%" }}>
+            <motion.div
+              initial={{ height: 0 }}
+              whileInView={{ height: "auto" }}
+              viewport={{ once: true, margin: "-20px" }}
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              className="overflow-hidden"
             >
-              <span
-                className="absolute inset-0 bg-[hsl(68,100%,81%)] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
-              />
-              <span className="relative z-10 text-background flex items-center justify-center text-sm tracking-[0.08em]">
-                Get in touch
-                <span className="inline-flex overflow-hidden max-w-0 group-hover:max-w-[2rem] opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">
-                  <ArrowRight className="w-4 h-4 ml-2 shrink-0" strokeWidth={1.5} />
+              <button
+                className="group relative w-full pt-6 pb-2.5 rounded-b-full bg-foreground overflow-hidden flex items-center justify-center cursor-pointer"
+                onClick={() => window.location.href = "/contact"}
+              >
+                <span
+                  className="absolute inset-0 bg-[hsl(68,100%,81%)] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                />
+                <span className="relative z-10 text-background flex items-center justify-center text-sm font-mono tracking-[0.2em] uppercase">
+                  Get in touch
+                  <span className="inline-flex overflow-hidden max-w-0 group-hover:max-w-[2rem] opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">
+                    <ArrowRight className="w-4 h-4 ml-2 shrink-0" strokeWidth={1.5} />
+                  </span>
                 </span>
-              </span>
-            </button>
-          </motion.div>
+              </button>
+            </motion.div>
+          </div>
         </div>
       </div>
     </section>

@@ -131,7 +131,7 @@
 
   .grid-item-overlay {
     @apply absolute inset-0 flex flex-col justify-end p-3 opacity-0 transition-opacity duration-300;
-    background: linear-gradient(to top, hsl(var(--background) / 0.9) 0%, transparent 50%);
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, transparent 50%);
   }
 
   .grid-item:hover .grid-item-overlay {

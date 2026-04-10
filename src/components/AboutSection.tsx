@@ -93,8 +93,8 @@ const AboutSection = () => {
       <SectionHeading>About</SectionHeading>
 
       <div className="max-w-5xl">
-        <div className="flex flex-col md:flex-row gap-10 md:gap-16 items-start">
-          <div className="flex-1 min-w-0">
+        <div className="flex flex-col md:flex-row gap-10 md:gap-16 md:items-stretch">
+          <div className="flex-1 min-w-0 flex items-center">
             <p className="text-[1.65rem] md:text-[2.1rem] lg:text-[2.65rem] leading-[1.38] font-light tracking-tight text-foreground">
               {words.map((word) => {
                 const ci = idx++;
@@ -152,7 +152,7 @@ const AboutSection = () => {
                 ease: "easeInOut",
               }}
             />
-            <span className="text-base md:text-lg tracking-[0.02em] text-foreground">
+            <span className="text-base md:text-lg tracking-[0.02em] text-foreground whitespace-nowrap overflow-hidden text-ellipsis">
               Based in Taipei — open to tech communications, GTM & marketing roles
             </span>
           </div>

@@ -38,7 +38,7 @@ const chevronVariants = {
   }),
 };
 
-const VISIBLE_ROWS = 1.5;
+const VISIBLE_COLS = 1.5;
 const GAP = 3;
 
 const PhotoSection = () => {
@@ -61,10 +61,10 @@ const PhotoSection = () => {
     el.addEventListener("scroll", checkScroll, { passive: true });
 
     const updateHeight = () => {
-      // Each item width = 50vw - 12px, aspect 3/2
-      const itemW = (window.innerWidth * 0.5) - 12;
-      const itemH = itemW / 1.5;
-      setContainerHeight(itemH * VISIBLE_ROWS + GAP * (VISIBLE_ROWS - 0.5));
+      // Single row: item width fills VISIBLE_COLS across viewport
+      const itemW = (window.innerWidth - 48) / VISIBLE_COLS; // 48 = px-6 * 2
+      const itemH = itemW / 1.5; // aspect 3/2
+      setContainerHeight(itemH);
     };
     updateHeight();
     window.addEventListener("resize", updateHeight);
@@ -101,17 +101,17 @@ const PhotoSection = () => {
           }}
         >
           <div
-            className="grid grid-rows-2 grid-flow-col gap-[3px] px-6"
+            className="flex gap-[3px] px-6"
             style={{ width: "max-content" }}
           >
             {photos.map((photo, index) => (
               <motion.div
                 key={photo.id}
-                className="grid-item"
+                className="grid-item shrink-0"
                 style={{
-                  width: "calc(50vw - 12px)",
+                  width: `calc((100vw - 48px) / ${VISIBLE_COLS})`,
                   aspectRatio: "3/2",
-                  scrollSnapAlign: index % 2 === 0 ? "start" : undefined,
+                  scrollSnapAlign: "start",
                 }}
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}

@@ -165,12 +165,12 @@ const Index = () => {
       >
         <main>
           <div id="hero"><HeroSection /></div>
-          <ParallaxSection id="featured" offset={30}><FeaturedSection /></ParallaxSection>
-          <ParallaxSection id="about" offset={35}><AboutSection /></ParallaxSection>
-          <ParallaxSection id="projects" offset={40}><ProjectsSection /></ParallaxSection>
-          <ParallaxSection id="news" offset={30}><NewsSection /></ParallaxSection>
-          <ParallaxSection id="photos" offset={45}><PhotoSection /></ParallaxSection>
-          <ParallaxSection id="inspiration" offset={30}><InspirationBoard /></ParallaxSection>
+          <ParallaxSection id="featured" offset={60}><FeaturedSection /></ParallaxSection>
+          <ParallaxSection id="about" offset={70}><AboutSection /></ParallaxSection>
+          <ParallaxSection id="projects" offset={80}><ProjectsSection /></ParallaxSection>
+          <ParallaxSection id="news" offset={60}><NewsSection /></ParallaxSection>
+          <ParallaxSection id="photos" offset={90}><PhotoSection /></ParallaxSection>
+          <ParallaxSection id="inspiration" offset={65}><InspirationBoard /></ParallaxSection>
           <Footer />
         </main>
       </motion.div>

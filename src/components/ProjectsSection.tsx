@@ -70,10 +70,10 @@ const ProjectsSection = () => {
               animate={{
                 flex: isActive ? 6 : hasActive ? 0.8 : 1,
               }}
-              transition={{ duration: 0.7, ease }}
+              transition={{ duration: 0.85, ease }}
               onMouseEnter={() => setActiveIndex(i)}
             >
-              {/* Image with ken burns */}
+              {/* Image */}
               <motion.img
                 src={project.image}
                 alt={project.title}
@@ -82,23 +82,17 @@ const ProjectsSection = () => {
                   filter: isActive ? "grayscale(0%) brightness(1)" : "grayscale(100%) brightness(0.7)",
                   scale: isActive ? 1.0 : 1.2,
                 }}
-                transition={{ duration: 0.8, ease }}
+                transition={{ duration: 0.85, ease }}
               />
 
-              {/* Collapsed: vertical label + line */}
+              {/* Collapsed: vertical label */}
               <motion.div
                 className="absolute inset-0 flex flex-col items-center justify-end pb-5"
                 animate={{ opacity: isActive ? 0 : 1 }}
                 transition={{ duration: 0.2 }}
               >
-                {/* Thin vertical line */}
-                <motion.div
-                  className="w-px bg-foreground/20 mb-3"
-                  animate={{ height: hasActive && !isActive ? 40 : 24 }}
-                  transition={{ duration: 0.5, ease }}
-                />
                 <span
-                  className="text-[10px] font-mono tracking-[0.3em] text-foreground/50 uppercase whitespace-nowrap"
+                  className="text-xs font-medium tracking-[0.35em] text-foreground/70 uppercase whitespace-nowrap drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]"
                   style={{
                     writingMode: "vertical-lr",
                     transform: "rotate(180deg)",
@@ -118,7 +112,6 @@ const ProjectsSection = () => {
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.3 }}
                   >
-                    {/* Gradient */}
                     <div
                       className="absolute inset-0"
                       style={{
@@ -127,9 +120,7 @@ const ProjectsSection = () => {
                       }}
                     />
 
-                    {/* Content */}
                     <div className="relative z-10 p-5 md:p-7">
-                      {/* Meta row */}
                       <motion.div
                         className="flex items-center gap-2 mb-3"
                         initial={{ opacity: 0, y: 8 }}
@@ -148,7 +139,6 @@ const ProjectsSection = () => {
                         </span>
                       </motion.div>
 
-                      {/* Title with stagger per character */}
                       <motion.h3
                         className="text-2xl md:text-4xl font-semibold tracking-tighter text-foreground leading-[0.92] mb-2"
                         initial={{ opacity: 0, y: 12 }}
@@ -158,7 +148,6 @@ const ProjectsSection = () => {
                         {project.title}
                       </motion.h3>
 
-                      {/* Description */}
                       <motion.p
                         className="text-[13px] text-foreground/45 leading-relaxed max-w-sm"
                         initial={{ opacity: 0, y: 10 }}
@@ -167,15 +156,6 @@ const ProjectsSection = () => {
                       >
                         {project.description}
                       </motion.p>
-
-                      {/* Underline accent */}
-                      <motion.div
-                        className="h-px bg-foreground/15 mt-4"
-                        initial={{ scaleX: 0 }}
-                        animate={{ scaleX: 1 }}
-                        transition={{ duration: 0.6, ease, delay: 0.3 }}
-                        style={{ transformOrigin: "left" }}
-                      />
                     </div>
                   </motion.div>
                 )}
@@ -183,6 +163,16 @@ const ProjectsSection = () => {
             </motion.div>
           );
         })}
+      </div>
+
+      {/* Explore button */}
+      <div className="px-6 mt-6">
+        <motion.button
+          className="w-full py-4 text-sm font-mono tracking-[0.2em] uppercase border border-foreground/15 text-foreground bg-foreground/5 transition-colors duration-300 hover:bg-[hsl(68,100%,81%)] hover:text-background hover:border-transparent"
+          whileTap={{ scale: 0.995 }}
+        >
+          Explore my work
+        </motion.button>
       </div>
     </section>
   );

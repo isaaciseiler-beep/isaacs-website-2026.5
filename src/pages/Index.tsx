@@ -165,11 +165,11 @@ const Index = () => {
         <main>
           <div id="hero"><HeroSection /></div>
           <div id="featured"><FeaturedSection /></div>
+          <div id="about"><AboutSection /></div>
           <div id="projects"><ProjectsSection /></div>
           <div id="news"><NewsSection /></div>
           <div id="photos"><PhotoSection /></div>
           <div id="inspiration"><InspirationBoard /></div>
-          <div id="about"><AboutSection /></div>
           <Footer />
         </main>
       </motion.div>

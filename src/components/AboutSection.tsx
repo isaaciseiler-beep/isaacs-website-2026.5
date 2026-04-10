@@ -52,7 +52,8 @@ const AboutSection = () => {
 
   const hasDeployedPopdown = useInView(pillRef, {
     once: true,
-    margin: "0px 0px -100px 0px",
+    amount: "all",
+    margin: "0px 0px -20% 0px",
   });
 
   const { scrollYProgress } = useScroll({

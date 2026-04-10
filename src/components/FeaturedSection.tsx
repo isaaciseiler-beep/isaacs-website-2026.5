@@ -12,7 +12,7 @@ const projectItems = [
 ];
 
 const BUFFER = 24;
-const GAP = 6;
+const GAP = 3;
 
 const FeaturedSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);

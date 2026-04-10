@@ -104,7 +104,7 @@ const AboutSection = () => {
               whileInView={{ height: "auto" }}
               viewport={{ once: true, margin: "-20px" }}
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="overflow-hidden rounded-b-full"
+              className="overflow-hidden rounded-b-3xl"
             >
               <button
                 className="group relative w-full pt-6 pb-3 bg-foreground overflow-hidden flex items-center justify-center cursor-pointer"
@@ -118,7 +118,7 @@ const AboutSection = () => {
                   initial={{ opacity: 0 }}
                   whileInView={{ opacity: 1 }}
                   viewport={{ once: true }}
-                  transition={{ delay: 0.45, duration: 0.35, ease: "easeOut" }}
+                  transition={{ delay: 0.65, duration: 0.35, ease: "easeOut" }}
                 >
                   Get in touch
                   <span className="inline-flex overflow-hidden max-w-0 group-hover:max-w-[2rem] opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">

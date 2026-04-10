@@ -27,19 +27,17 @@ const AboutSection = () => {
     offset: ["start end", "end start"],
   });
 
-  const imgY = useTransform(scrollYProgress, [0, 1], [20, -20]);
+  const imgY = useTransform(scrollYProgress, [0, 1], [40, -40]);
 
   const words = statement.split(" ");
   let idx = 0;
 
   return (
-    <section ref={sectionRef} className="py-20 md:py-32 px-6">
+    <section ref={sectionRef} className="py-12 px-6">
       <SectionHeading>About</SectionHeading>
 
       <div className="max-w-5xl">
-        {/* Two-column: text left, photo right */}
         <div className="flex flex-col md:flex-row gap-10 md:gap-16 items-start">
-          {/* Text */}
           <div className="flex-1 min-w-0">
             <p className="text-[1.65rem] md:text-[2.1rem] lg:text-[2.65rem] leading-[1.38] font-light tracking-tight text-foreground">
               {words.map((word) => {
@@ -61,7 +59,7 @@ const AboutSection = () => {
             </p>
           </div>
 
-          {/* Square headshot — right */}
+          {/* Square headshot with its own parallax */}
           <motion.div
             className="shrink-0"
             initial={{ opacity: 0, scale: 0.95, filter: "blur(8px)" }}
@@ -80,16 +78,16 @@ const AboutSection = () => {
           </motion.div>
         </div>
 
-        {/* Status pill */}
+        {/* Status pill — left-to-right reveal */}
         <motion.div
-          className="mt-12 md:mt-16"
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.6, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="mt-8 md:mt-10"
+          initial={{ opacity: 0, x: -60, scaleX: 0.85 }}
+          whileInView={{ opacity: 1, x: 0, scaleX: 1 }}
+          viewport={{ once: true, margin: "-40px" }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          style={{ originX: 0 }}
         >
           <div className="flex items-center gap-3 px-6 py-3.5 rounded-full bg-foreground w-full">
-            {/* Single breathing circle — dark green */}
             <motion.span
               className="rounded-full w-2.5 h-2.5 bg-background shrink-0"
               animate={{ scale: [1, 1.5, 1] }}

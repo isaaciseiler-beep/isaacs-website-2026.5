@@ -1,5 +1,5 @@
-import { useRef } from "react";
-import { motion, useInView, useScroll, useTransform } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import SectionHeading from "@/components/SectionHeading";
 import headshot1 from "@/assets/headshot.jpg";
@@ -49,12 +49,34 @@ const statement =
 const AboutSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const pillRef = useRef<HTMLDivElement>(null);
+  const [hasDeployedPopdown, setHasDeployedPopdown] = useState(false);
 
-  const hasDeployedPopdown = useInView(pillRef, {
-    once: true,
-    amount: "all",
-    margin: "0px 0px -20% 0px",
-  });
+  useEffect(() => {
+    if (hasDeployedPopdown) return;
+
+    const handleScrollTrigger = () => {
+      const pill = pillRef.current;
+      if (!pill) return;
+
+      const rect = pill.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const isVisible = rect.top < viewportHeight && rect.bottom > 0;
+      const hasBufferBelow = rect.bottom <= viewportHeight * 0.8;
+
+      if (isVisible && hasBufferBelow) {
+        setHasDeployedPopdown(true);
+      }
+    };
+
+    handleScrollTrigger();
+    window.addEventListener("scroll", handleScrollTrigger, { passive: true });
+    window.addEventListener("resize", handleScrollTrigger);
+
+    return () => {
+      window.removeEventListener("scroll", handleScrollTrigger);
+      window.removeEventListener("resize", handleScrollTrigger);
+    };
+  }, [hasDeployedPopdown]);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,

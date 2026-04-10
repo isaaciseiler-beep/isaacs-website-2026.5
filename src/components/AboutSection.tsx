@@ -41,7 +41,7 @@ const AboutSection = () => {
         <div className="flex flex-col md:flex-row gap-10 md:gap-16 items-start">
           {/* Text */}
           <div className="flex-1 min-w-0">
-            <p className="text-[1.5rem] md:text-[1.9rem] lg:text-[2.4rem] leading-[1.38] font-light tracking-tight text-foreground">
+            <p className="text-[1.65rem] md:text-[2.1rem] lg:text-[2.65rem] leading-[1.38] font-light tracking-tight text-foreground">
               {words.map((word) => {
                 const ci = idx++;
                 return (
@@ -88,7 +88,7 @@ const AboutSection = () => {
           viewport={{ once: true }}
           transition={{ delay: 0.6, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         >
-          <div className="inline-flex items-center gap-3 px-5 py-3 rounded-full bg-foreground">
+          <div className="flex items-center gap-3 px-6 py-3.5 rounded-full bg-foreground w-full">
             {/* Single breathing circle — dark green */}
             <motion.span
               className="rounded-full w-2.5 h-2.5 bg-background shrink-0"
@@ -99,7 +99,7 @@ const AboutSection = () => {
                 ease: "easeInOut",
               }}
             />
-            <span className="text-sm tracking-[0.02em] text-background">
+            <span className="text-base md:text-lg tracking-[0.02em] text-background">
               Based in Taipei — open to tech communications, GTM & marketing roles
             </span>
           </div>

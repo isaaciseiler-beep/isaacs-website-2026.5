@@ -1,5 +1,5 @@
-import { useRef, useState, useEffect } from "react";
-import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
+import { useRef } from "react";
+import { motion, useInView, useScroll, useTransform } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import SectionHeading from "@/components/SectionHeading";
 import headshot1 from "@/assets/headshot.jpg";
@@ -50,13 +50,9 @@ const AboutSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const pillRef = useRef<HTMLDivElement>(null);
 
-  const { scrollYProgress: pageProgress } = useScroll();
-  const [hasDeployedPopdown, setHasDeployedPopdown] = useState(false);
-
-  useMotionValueEvent(pageProgress, "change", (v) => {
-    if (!hasDeployedPopdown && v >= 0.2) {
-      setHasDeployedPopdown(true);
-    }
+  const hasDeployedPopdown = useInView(pillRef, {
+    once: true,
+    margin: "0px 0px -100px 0px",
   });
 
   const { scrollYProgress } = useScroll({

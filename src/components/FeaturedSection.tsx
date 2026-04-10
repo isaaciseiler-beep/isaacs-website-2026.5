@@ -103,11 +103,13 @@ const FeaturedSection = () => {
                 className="absolute bottom-0 left-0 right-0 p-3"
                 style={{
                   background:
-                    "linear-gradient(to top, hsl(var(--background) / 0.85) 0%, hsl(var(--background) / 0.3) 70%, transparent 100%)",
+                    "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 70%, transparent 100%)",
                 }}
               >
-                <p className="text-xs font-medium text-foreground">{projectItems[1].title}</p>
-                <p className="text-[10px] text-foreground/60 mt-0.5">{projectItems[1].subtitle}</p>
+                <h3 className="text-base md:text-[1.625rem] font-semibold tracking-tighter text-foreground leading-tight">
+                  {projectItems[1].title}
+                </h3>
+                <p className="text-sm text-foreground/60 mt-1">{projectItems[1].subtitle}</p>
               </div>
             </div>
 

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 import SectionHeading from "@/components/SectionHeading";
 import project1 from "@/assets/project-1.jpg";
 import project2 from "@/assets/project-2.jpg";
@@ -55,7 +56,7 @@ const ProjectsSection = () => {
 
       <div
         className="flex px-6"
-        style={{ gap: GAP, height: "55vh", minHeight: 360 }}
+        style={{ gap: GAP, height: "44vh", minHeight: 290 }}
         onMouseLeave={() => setActiveIndex(null)}
       >
         {projects.map((project, i) => {
@@ -92,7 +93,7 @@ const ProjectsSection = () => {
                 transition={{ duration: 0.2 }}
               >
                 <span
-                  className="text-xs font-medium tracking-[0.35em] text-foreground/70 uppercase whitespace-nowrap drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]"
+                  className="text-[11px] font-mono tracking-[0.25em] text-foreground/70 uppercase whitespace-nowrap drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]"
                   style={{
                     writingMode: "vertical-lr",
                     transform: "rotate(180deg)",
@@ -168,10 +169,13 @@ const ProjectsSection = () => {
       {/* Explore button */}
       <div className="px-6 mt-6">
         <motion.button
-          className="w-full py-4 text-sm font-mono tracking-[0.2em] uppercase border border-foreground/15 text-foreground bg-foreground/5 transition-colors duration-300 hover:bg-[hsl(68,100%,81%)] hover:text-background hover:border-transparent"
+          className="group w-full py-3.5 text-sm font-mono tracking-[0.2em] uppercase rounded-full bg-foreground text-background transition-colors duration-300 hover:bg-[hsl(68,100%,81%)] flex items-center justify-center"
           whileTap={{ scale: 0.995 }}
         >
           Explore my work
+          <span className="inline-flex overflow-hidden max-w-0 group-hover:max-w-[2rem] opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">
+            <ArrowRight className="w-4 h-4 ml-2 shrink-0" strokeWidth={1.5} />
+          </span>
         </motion.button>
       </div>
     </section>

@@ -77,7 +77,7 @@ const FeaturedSection = () => {
               />
             </div>
             <div
-              className="absolute bottom-0 left-0 right-0 p-4 md:p-6"
+              className="absolute bottom-0 left-0 right-0 p-3"
               style={{
                 background:
                   "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 60%, transparent 100%)",

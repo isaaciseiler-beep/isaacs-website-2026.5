@@ -80,9 +80,9 @@ const AboutSection = () => {
         </div>
 
         {/* Status pill + pop-down CTA */}
-        <div className="mt-8 md:mt-10 relative">
-          {/* Pill outline */}
-          <div className="flex items-center gap-3 px-6 py-3.5 rounded-full border-2 border-foreground bg-background w-full relative z-10">
+        <div className="mt-8 md:mt-10 relative group/pill">
+          {/* Pill outline — border changes to highlight on CTA hover */}
+          <div className="flex items-center gap-3 px-6 py-3.5 rounded-full border-2 border-foreground group-hover/pill:border-[hsl(var(--highlight))] transition-colors duration-500 bg-background w-full relative z-10">
             <motion.span
               className="rounded-full w-2.5 h-2.5 bg-foreground shrink-0"
               animate={{ scale: [1, 1.4, 1] }}
@@ -97,31 +97,31 @@ const AboutSection = () => {
             </span>
           </div>
 
-          {/* Pop-down CTA — grows from center of pill, triggered once on viewport entry */}
+          {/* Pop-down CTA */}
           <div className="absolute left-0 right-0 z-0" style={{ top: "50%" }}>
             <motion.div
-              initial={{ height: 0 }}
-              whileInView={{ height: "auto" }}
+              initial={{ clipPath: "inset(0 0 100% 0)" }}
+              whileInView={{ clipPath: "inset(0 0 0% 0)" }}
               viewport={{ once: true, margin: "-20px" }}
-              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="overflow-hidden rounded-b-3xl"
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              className="rounded-b-3xl overflow-hidden"
             >
               <button
-                className="group relative w-full pt-6 pb-4 bg-foreground overflow-hidden flex items-center justify-center cursor-pointer"
+                className="relative w-full pt-8 pb-5 bg-foreground overflow-hidden flex items-center justify-center cursor-pointer"
                 onClick={() => window.location.href = "/contact"}
               >
                 <span
-                  className="absolute inset-0 bg-[hsl(var(--highlight))] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                  className="absolute inset-0 bg-[hsl(var(--highlight))] origin-left scale-x-0 group-hover/pill:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
                 />
                 <motion.span
                   className="relative z-10 text-background flex items-center justify-center text-sm font-mono tracking-[0.2em] uppercase"
                   initial={{ opacity: 0 }}
                   whileInView={{ opacity: 1 }}
                   viewport={{ once: true }}
-                  transition={{ delay: 0.65, duration: 0.35, ease: "easeOut" }}
+                  transition={{ delay: 0.7, duration: 0.35, ease: "easeOut" }}
                 >
                   Get in touch
-                  <span className="inline-flex overflow-hidden max-w-0 group-hover:max-w-[2rem] opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">
+                  <span className="inline-flex overflow-hidden max-w-0 group-hover/pill:max-w-[2rem] opacity-0 group-hover/pill:opacity-100 transition-all duration-300 ease-out">
                     <ArrowRight className="w-4 h-4 ml-2 shrink-0" strokeWidth={1.5} />
                   </span>
                 </motion.span>

@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 import SectionHeading from "@/components/SectionHeading";
 import headshot1 from "@/assets/headshot.jpg";
 
@@ -22,12 +23,22 @@ const statement =
 
 const AboutSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
+  const pillRef = useRef<HTMLDivElement>(null);
+
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"],
   });
 
   const imgY = useTransform(scrollYProgress, [0, 1], [40, -40]);
+
+  // Pop-down slides out as pill scrolls into upper portion of viewport
+  const { scrollYProgress: pillScroll } = useScroll({
+    target: pillRef,
+    offset: ["start 0.7", "start 0.3"],
+  });
+  const popdownY = useTransform(pillScroll, [0, 1], [-100, 0]);
+  const popdownOpacity = useTransform(pillScroll, [0, 0.4, 1], [0, 0, 1]);
 
   const words = statement.split(" ");
   let idx = 0;
@@ -59,7 +70,7 @@ const AboutSection = () => {
             </p>
           </div>
 
-          {/* Square headshot with its own parallax */}
+          {/* Square headshot — colorful on hover */}
           <motion.div
             className="shrink-0"
             initial={{ opacity: 0, scale: 0.95, filter: "blur(8px)" }}
@@ -78,30 +89,45 @@ const AboutSection = () => {
           </motion.div>
         </div>
 
-        {/* Status pill — left-to-right reveal */}
-        <motion.div
-          className="mt-8 md:mt-10"
-          initial={{ opacity: 0, x: -60, scaleX: 0.85 }}
-          whileInView={{ opacity: 1, x: 0, scaleX: 1 }}
-          viewport={{ once: true, margin: "-40px" }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          style={{ originX: 0 }}
-        >
-          <div className="flex items-center gap-3 px-6 py-3.5 rounded-full bg-foreground w-full">
+        {/* Status pill + pop-down CTA */}
+        <div ref={pillRef} className="mt-8 md:mt-10 relative">
+          {/* Pill outline */}
+          <div className="flex items-center gap-3 px-6 py-3.5 rounded-full border border-foreground/30 bg-background w-full relative z-10">
             <motion.span
-              className="rounded-full w-2.5 h-2.5 bg-background shrink-0"
-              animate={{ scale: [1, 1.5, 1] }}
+              className="rounded-full w-2.5 h-2.5 bg-foreground shrink-0"
+              animate={{ scale: [1, 1.4, 1] }}
               transition={{
                 duration: 2.2,
                 repeat: Infinity,
                 ease: "easeInOut",
               }}
             />
-            <span className="text-base md:text-lg tracking-[0.02em] text-background">
+            <span className="text-base md:text-lg tracking-[0.02em] text-foreground">
               Based in Taipei — open to tech communications, GTM & marketing roles
             </span>
           </div>
-        </motion.div>
+
+          {/* Pop-down CTA — slides out from under the pill on scroll */}
+          <motion.div
+            className="absolute left-0 right-0 top-full z-0 overflow-hidden"
+            style={{ y: popdownY, opacity: popdownOpacity }}
+          >
+            <button
+              className="group relative w-full py-3 mt-[-1px] rounded-b-[1.5rem] bg-foreground overflow-hidden flex items-center justify-center cursor-pointer"
+              onClick={() => window.location.href = "/contact"}
+            >
+              <span
+                className="absolute inset-0 bg-[hsl(68,100%,81%)] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+              />
+              <span className="relative z-10 text-background flex items-center justify-center text-sm tracking-[0.08em]">
+                Get in touch
+                <span className="inline-flex overflow-hidden max-w-0 group-hover:max-w-[2rem] opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">
+                  <ArrowRight className="w-4 h-4 ml-2 shrink-0" strokeWidth={1.5} />
+                </span>
+              </span>
+            </button>
+          </motion.div>
+        </div>
       </div>
     </section>
   );

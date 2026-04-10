@@ -12,44 +12,39 @@ const projectItems = [
 ];
 
 const BUFFER = 24;
+const GAP = 6;
 
 const FeaturedSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
 
-  // offset: ["start start", "end end"] means progress 0→1 maps exactly
-  // to the sticky window (section-top at viewport-top → section-bottom
-  // at viewport-bottom). For a 200vh section that's 100vh of scroll —
-  // the entire range is usable, no wasted enter/exit dead space.
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end end"],
   });
 
   // TIMELINE (progress 0–1 = 100vh of scroll while sticky):
-  // 0.00–0.15  FREEZE — content locked, buffers visible, all grayscale
-  // 0.15–0.35  EXPAND — padding/gap shrink to 0
-  // 0.25–0.35  Top card → color
-  // 0.35–0.45  Bottom-left → color
-  // 0.45–0.55  Bottom-right → color
-  // 0.55–0.70  HOLD — full bleed, all color
-  // 0.70–0.90  CONTRACT — buffers return
-  // 0.90–1.00  Ready to scroll out
+  // 0.00–0.10  FREEZE — content locked, gaps visible, all grayscale
+  // 0.10–0.30  EXPAND — padding shrinks to 0 (gaps stay)
+  // 0.20–0.30  Top card → color
+  // 0.30–0.38  Bottom-left → color
+  // 0.38–0.46  Bottom-right → color
+  // 0.46–0.54  HOLD — full bleed, all color
+  // 0.54–0.62  BR → grayscale
+  // 0.62–0.70  BL → grayscale
+  // 0.70–0.78  Top → grayscale
+  // 0.78–0.92  CONTRACT — padding returns
+  // 0.92–1.00  Ready to scroll out
 
   const padding = useTransform(
     scrollYProgress,
-    [0, 0.15, 0.35, 0.55, 0.70, 0.90, 1],
+    [0, 0.10, 0.30, 0.46, 0.78, 0.92, 1],
     [BUFFER, BUFFER, 0, 0, 0, BUFFER, BUFFER]
   );
 
-  const gap = useTransform(
-    scrollYProgress,
-    [0, 0.15, 0.35, 0.55, 0.70, 0.90, 1],
-    [3, 3, 0, 0, 0, 3, 3]
-  );
-
-  const topGrayscale = useTransform(scrollYProgress, [0.25, 0.35], [1, 0]);
-  const blGrayscale = useTransform(scrollYProgress, [0.35, 0.45], [1, 0]);
-  const brGrayscale = useTransform(scrollYProgress, [0.45, 0.55], [1, 0]);
+  // Color in then back out (symmetric)
+  const topGrayscale = useTransform(scrollYProgress, [0.20, 0.30, 0.70, 0.78], [1, 0, 0, 1]);
+  const blGrayscale = useTransform(scrollYProgress, [0.30, 0.38, 0.62, 0.70], [1, 0, 0, 1]);
+  const brGrayscale = useTransform(scrollYProgress, [0.38, 0.46, 0.54, 0.62], [1, 0, 0, 1]);
 
   const topFilter = useTransform(topGrayscale, (v) => `grayscale(${v * 100}%)`);
   const blFilter = useTransform(blGrayscale, (v) => `grayscale(${v * 100}%)`);
@@ -68,7 +63,7 @@ const FeaturedSection = () => {
             paddingLeft: padding,
             paddingRight: padding,
             paddingBottom: padding,
-            gap,
+            gap: GAP,
           }}
         >
           {/* Hero card */}
@@ -96,7 +91,7 @@ const FeaturedSection = () => {
           </div>
 
           {/* Bottom thumbnails */}
-          <motion.div className="grid grid-cols-2 shrink-0" style={{ gap, height: "28vh" }}>
+          <div className="grid grid-cols-2 shrink-0" style={{ gap: GAP, height: "28vh" }}>
             <div className="relative overflow-hidden cursor-pointer">
               <motion.img
                 src={projectItems[1].image}
@@ -134,7 +129,7 @@ const FeaturedSection = () => {
                 <p className="text-[10px] text-foreground/60 mt-0.5">{projectItems[2].subtitle}</p>
               </div>
             </div>
-          </motion.div>
+          </div>
         </motion.div>
       </div>
     </section>

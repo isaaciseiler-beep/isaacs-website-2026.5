@@ -56,7 +56,7 @@ const ProjectsSection = () => {
 
       <div
         className="flex px-6"
-        style={{ gap: GAP, height: "55vh", minHeight: 360 }}
+        style={{ gap: GAP, height: "44vh", minHeight: 290 }}
         onMouseLeave={() => setActiveIndex(null)}
       >
         {projects.map((project, i) => {
@@ -93,7 +93,7 @@ const ProjectsSection = () => {
                 transition={{ duration: 0.2 }}
               >
                 <span
-                  className="text-xs font-medium tracking-[0.35em] text-foreground/70 uppercase whitespace-nowrap drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]"
+                  className="text-[11px] font-mono tracking-[0.25em] text-foreground/70 uppercase whitespace-nowrap drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]"
                   style={{
                     writingMode: "vertical-lr",
                     transform: "rotate(180deg)",

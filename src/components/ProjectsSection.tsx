@@ -56,7 +56,7 @@ const ProjectsSection = () => {
 
       <div
         className="flex px-6"
-        style={{ gap: GAP, height: "44vh", minHeight: 290 }}
+        style={{ gap: GAP, height: "55vh", minHeight: 340 }}
         onMouseLeave={() => setActiveIndex(null)}
       >
         {projects.map((project, i) => {
@@ -169,7 +169,7 @@ const ProjectsSection = () => {
       {/* Explore button */}
       <div className="px-6 mt-6">
         <motion.button
-          className="group w-full py-3.5 text-sm font-mono tracking-[0.2em] uppercase rounded-full bg-foreground text-background transition-colors duration-300 hover:bg-[hsl(68,100%,81%)] flex items-center justify-center"
+          className="group w-full py-2.5 text-sm font-mono tracking-[0.2em] uppercase rounded-full bg-foreground text-background transition-colors duration-300 hover:bg-[hsl(68,100%,81%)] flex items-center justify-center"
           whileTap={{ scale: 0.995 }}
         >
           Explore my work

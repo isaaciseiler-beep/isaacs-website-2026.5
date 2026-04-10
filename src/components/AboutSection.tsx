@@ -98,27 +98,33 @@ const AboutSection = () => {
           </div>
 
           {/* Pop-down CTA — grows from center of pill, triggered once on viewport entry */}
-          <div className="absolute left-0 right-0 z-0 overflow-hidden" style={{ top: "50%" }}>
+          <div className="absolute left-0 right-0 z-0" style={{ top: "50%" }}>
             <motion.div
               initial={{ height: 0 }}
               whileInView={{ height: "auto" }}
               viewport={{ once: true, margin: "-20px" }}
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="overflow-hidden"
+              className="overflow-hidden rounded-b-full"
             >
               <button
-                className="group relative w-full pt-6 pb-2.5 rounded-b-full bg-foreground overflow-hidden flex items-center justify-center cursor-pointer"
+                className="group relative w-full pt-6 pb-3 bg-foreground overflow-hidden flex items-center justify-center cursor-pointer"
                 onClick={() => window.location.href = "/contact"}
               >
                 <span
-                  className="absolute inset-0 bg-[hsl(68,100%,81%)] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                  className="absolute inset-0 bg-[hsl(var(--highlight))] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
                 />
-                <span className="relative z-10 text-background flex items-center justify-center text-sm font-mono tracking-[0.2em] uppercase">
+                <motion.span
+                  className="relative z-10 text-background flex items-center justify-center text-sm font-mono tracking-[0.2em] uppercase"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.45, duration: 0.35, ease: "easeOut" }}
+                >
                   Get in touch
                   <span className="inline-flex overflow-hidden max-w-0 group-hover:max-w-[2rem] opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">
                     <ArrowRight className="w-4 h-4 ml-2 shrink-0" strokeWidth={1.5} />
                   </span>
-                </span>
+                </motion.span>
               </button>
             </motion.div>
           </div>

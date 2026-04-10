@@ -6,20 +6,20 @@ interface ParallaxSectionProps {
   offset?: number;
   className?: string;
   id?: string;
+  clip?: boolean;
 }
 
-const ParallaxSection = ({ children, offset = 60, className, id }: ParallaxSectionProps) => {
+const ParallaxSection = ({ children, offset = 60, className, id, clip = true }: ParallaxSectionProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"],
   });
 
-  // Non-linear curve: strong at edges (0–0.12, 0.88–1), gentle in middle
   const y = useTransform(scrollYProgress, [0, 0.16, 0.84, 1], [offset, offset * 0.05, -offset * 0.05, -offset]);
 
   return (
-    <div ref={ref} id={id} className={className} style={{ overflow: "hidden" }}>
+    <div ref={ref} id={id} className={className} style={clip ? { overflow: "hidden" } : undefined}>
       <motion.div style={{ y }}>
         {children}
       </motion.div>

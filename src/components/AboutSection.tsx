@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useInView, useScroll, useTransform } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import SectionHeading from "@/components/SectionHeading";
 import headshot1 from "@/assets/headshot.jpg";
@@ -18,15 +18,47 @@ const wordVariants = {
   }),
 };
 
+const popdownVariants = {
+  closed: { height: 0, y: -18 },
+  open: {
+    height: 68,
+    y: 0,
+    transition: {
+      duration: 0.58,
+      ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
+    },
+  },
+};
+
+const popdownTextVariants = {
+  closed: { opacity: 0, y: -4 },
+  open: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: 0.46,
+      duration: 0.28,
+      ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
+    },
+  },
+};
+
 const statement =
   "A multidisciplinary creative working at the intersection of design, photography, and technology — building experiences that feel intentional and alive.";
 
 const AboutSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
+  const pillRef = useRef<HTMLDivElement>(null);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"],
+  });
+
+  const hasDeployedPopdown = useInView(pillRef, {
+    once: true,
+    amount: 1,
+    margin: "0px 0px -72px 0px",
   });
 
   const imgY = useTransform(scrollYProgress, [0, 1], [40, -40]);
@@ -81,8 +113,10 @@ const AboutSection = () => {
 
         {/* Status pill + pop-down CTA */}
         <div className="mt-8 md:mt-10 relative group/pill">
-          {/* Pill outline — border changes to highlight on CTA hover */}
-          <div className="flex items-center gap-3 px-6 py-3.5 rounded-full border-2 border-foreground group-hover/pill:border-[hsl(var(--highlight))] transition-colors duration-500 bg-background w-full relative z-10">
+          <div
+            ref={pillRef}
+            className="flex items-center gap-3 px-6 py-3.5 rounded-full border-2 border-foreground group-hover/pill:border-[hsl(var(--highlight))] transition-colors duration-500 bg-background w-full relative z-10"
+          >
             <motion.span
               className="rounded-full w-2.5 h-2.5 bg-foreground shrink-0"
               animate={{ scale: [1, 1.4, 1] }}
@@ -97,31 +131,28 @@ const AboutSection = () => {
             </span>
           </div>
 
-          {/* Pop-down CTA */}
-          <div className="absolute left-0 right-0 z-0" style={{ top: "50%" }}>
+          <div className="absolute left-0 right-0 z-0 pointer-events-none" style={{ top: "50%" }}>
             <motion.div
-              initial={{ clipPath: "inset(0 0 100% 0)" }}
-              whileInView={{ clipPath: "inset(0 0 0% 0)" }}
-              viewport={{ once: true, margin: "-20px" }}
-              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="rounded-b-3xl overflow-hidden"
+              initial="closed"
+              animate={hasDeployedPopdown ? "open" : "closed"}
+              variants={popdownVariants}
+              className="overflow-hidden rounded-b-[26px]"
             >
               <button
-                className="relative w-full pt-8 pb-5 bg-foreground overflow-hidden flex items-center justify-center cursor-pointer"
+                className="relative pointer-events-auto h-[68px] w-full rounded-b-[26px] bg-foreground overflow-hidden cursor-pointer"
                 onClick={() => window.location.href = "/contact"}
               >
                 <span
                   className="absolute inset-0 bg-[hsl(var(--highlight))] origin-left scale-x-0 group-hover/pill:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
                 />
                 <motion.span
-                  className="relative z-10 text-background flex items-center justify-center text-sm font-mono tracking-[0.2em] uppercase"
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.7, duration: 0.35, ease: "easeOut" }}
+                  variants={popdownTextVariants}
+                  initial="closed"
+                  animate={hasDeployedPopdown ? "open" : "closed"}
+                  className="relative z-10 flex h-full items-center justify-center px-6 pt-[26px] text-sm font-mono tracking-[0.2em] uppercase text-background"
                 >
                   Get in touch
-                  <span className="inline-flex overflow-hidden max-w-0 group-hover/pill:max-w-[2rem] opacity-0 group-hover/pill:opacity-100 transition-all duration-300 ease-out">
+                  <span className="inline-flex overflow-hidden max-w-0 opacity-0 transition-all duration-300 ease-out group-hover/pill:max-w-[2rem] group-hover/pill:opacity-100">
                     <ArrowRight className="w-4 h-4 ml-2 shrink-0" strokeWidth={1.5} />
                   </span>
                 </motion.span>
@@ -135,3 +166,4 @@ const AboutSection = () => {
 };
 
 export default AboutSection;
+

@@ -115,8 +115,12 @@ const AboutSection = () => {
         <div className="mt-8 md:mt-10 relative group/pill">
           <div
             ref={pillRef}
-            className="flex items-center gap-3 px-6 py-3.5 rounded-full border-2 border-foreground group-hover/pill:border-[hsl(var(--highlight))] transition-colors duration-500 bg-background w-full relative z-10"
+            className="relative flex items-center gap-3 px-6 py-3.5 rounded-full border-2 border-foreground bg-background w-full z-10"
           >
+            {/* Highlight border overlay — sweeps left-to-right on hover */}
+            <span
+              className="absolute inset-[-2px] rounded-full border-2 border-[hsl(var(--highlight))] pointer-events-none origin-left scale-x-0 group-hover/pill:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+            />
             <motion.span
               className="rounded-full w-2.5 h-2.5 bg-foreground shrink-0"
               animate={{ scale: [1, 1.4, 1] }}

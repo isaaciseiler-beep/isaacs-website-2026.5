@@ -16,7 +16,7 @@ const ParallaxSection = ({ children, offset = 60, className, id }: ParallaxSecti
   });
 
   // Non-linear curve: strong at edges (0–0.12, 0.88–1), gentle in middle
-  const y = useTransform(scrollYProgress, [0, 0.12, 0.88, 1], [offset, offset * 0.08, -offset * 0.08, -offset]);
+  const y = useTransform(scrollYProgress, [0, 0.16, 0.84, 1], [offset, offset * 0.05, -offset * 0.05, -offset]);
 
   return (
     <div ref={ref} id={id} className={className} style={{ overflow: "hidden" }}>

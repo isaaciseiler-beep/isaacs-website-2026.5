@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { ChevronRight, ChevronLeft, X } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Logo from "@/components/Logo";
 import Footer from "@/components/Footer";
+import Sidebar from "@/components/Sidebar";
 import photo1 from "@/assets/photo-1.jpg";
 import photo2 from "@/assets/photo-2.jpg";
 import photo3 from "@/assets/photo-3.jpg";
@@ -46,19 +47,16 @@ const EASE_TEXT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 
 const AlbumCover = ({ album, onClick }: { album: Album; onClick: () => void }) => {
   const [hovering, setHovering] = useState(false);
-  const [flashIdx, setFlashIdx] = useState(0);
+  const [flashIdx, setFlashIdx] = useState(-1);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     if (hovering) {
-      setFlashIdx(0);
-      // cycle through 3 photos then stop on cover
       let tick = 0;
       const maxFlashes = Math.min(album.photos.length, 3);
       intervalRef.current = setInterval(() => {
         tick++;
         if (tick > maxFlashes) {
-          // reset to cover
           setFlashIdx(-1);
           if (intervalRef.current) clearInterval(intervalRef.current);
         } else {
@@ -96,30 +94,17 @@ const AlbumCover = ({ album, onClick }: { album: Album; onClick: () => void }) =
           />
         </AnimatePresence>
       </div>
-
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{ background: "linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 35%)" }}
-      />
+      <div className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 35%)" }} />
       <div className="absolute bottom-0 left-0 right-0 p-4">
         <h3 className="text-sm font-medium tracking-tight text-white/90">{album.location}</h3>
-        <p className="font-mono text-[8px] tracking-[0.2em] uppercase text-white/30 mt-0.5">
-          {album.photos.length}
-        </p>
+        <p className="font-mono text-[8px] tracking-[0.2em] uppercase text-white/30 mt-0.5">{album.photos.length}</p>
       </div>
     </div>
   );
 };
 
-/* ── sidebar items ────────────────────────────────────── */
+/* ── layout patterns ──────────────────────────────────── */
 
-const sidebarItems = [
-  { id: "home", label: "Home", path: "/" },
-  { id: "photos", label: "Photos", path: "/photos" },
-];
-
-/* ── layout patterns for album interiors ──────────────── */
-// Each entry is a row: "full" = one photo full width, "pair" = two side by side, "offset" = one photo with left margin
 type RowLayout = "full" | "pair" | "offset-right" | "offset-left";
 const layoutPatterns: RowLayout[][] = [
   ["full", "pair", "offset-right", "full", "pair"],
@@ -134,14 +119,12 @@ const PhotosPage = () => {
   const [openAlbum, setOpenAlbum] = useState<string | null>(null);
   const [previewIdx, setPreviewIdx] = useState<number | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const navigate = useNavigate();
 
   const filtered = filter === "All" ? albums : albums.filter((a) => a.location === filter);
   const currentAlbum = openAlbum ? albums.find((a) => a.location === openAlbum) : null;
 
   const closePreview = useCallback(() => setPreviewIdx(null), []);
 
-  // keyboard nav for preview
   useEffect(() => {
     if (previewIdx === null || !currentAlbum) return;
     const handler = (e: KeyboardEvent) => {
@@ -159,20 +142,17 @@ const PhotosPage = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [openAlbum]);
 
-  // Build rows from photos using a layout pattern
   const buildRows = (photos: Photo[], albumIdx: number) => {
     const pattern = layoutPatterns[albumIdx % layoutPatterns.length];
     const rows: { layout: RowLayout; photos: Photo[]; startIdx: number }[] = [];
     let photoIdx = 0;
-
     for (let r = 0; photoIdx < photos.length; r++) {
       const layout = pattern[r % pattern.length];
       if (layout === "pair" && photoIdx + 1 < photos.length) {
         rows.push({ layout, photos: [photos[photoIdx], photos[photoIdx + 1]], startIdx: photoIdx });
         photoIdx += 2;
       } else {
-        const actualLayout = layout === "pair" ? "full" : layout;
-        rows.push({ layout: actualLayout, photos: [photos[photoIdx]], startIdx: photoIdx });
+        rows.push({ layout: layout === "pair" ? "full" : layout, photos: [photos[photoIdx]], startIdx: photoIdx });
         photoIdx += 1;
       }
     }
@@ -187,55 +167,17 @@ const PhotosPage = () => {
       {/* header */}
       <div className="fixed top-0 left-0 z-50 flex items-center gap-1 px-6 py-4">
         <Link to="/" className="contents"><Logo /></Link>
-        <motion.button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="w-5 h-5 flex items-center justify-center text-foreground hover:text-foreground/60 transition-colors duration-200"
-          aria-label="Toggle menu"
-          animate={{ rotate: sidebarOpen ? 180 : 0 }}
-          transition={{ duration: 0.3, ease: EASE_TEXT }}
-        >
-          <ChevronRight className="w-3.5 h-3.5" />
-        </motion.button>
+        <Sidebar
+          open={sidebarOpen}
+          onToggle={() => setSidebarOpen(!sidebarOpen)}
+        />
       </div>
 
-      {/* sidebar */}
-      <motion.nav
-        className="fixed left-0 top-0 h-screen w-[240px] bg-background z-[45] flex flex-col px-6 py-20"
-        animate={{ x: sidebarOpen ? 0 : -240 }}
+      {/* content wrapper */}
+      <motion.div
+        animate={{ marginLeft: sidebarOpen ? 240 : 0 }}
         transition={{ duration: 0.4, ease: EASE_TEXT }}
       >
-        <AnimatePresence>
-          {sidebarOpen && (
-            <div className="mt-4 flex flex-col gap-0.5">
-              {sidebarItems.map((item, i) => (
-                <motion.button
-                  key={item.id}
-                  initial={{ opacity: 0, x: -20, filter: "blur(6px)" }}
-                  animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-                  exit={{ opacity: 0, x: -14, filter: "blur(4px)" }}
-                  transition={{ delay: 0.08 + i * 0.06, duration: 0.5, ease: EASE }}
-                  onClick={() => { navigate(item.path); setSidebarOpen(false); }}
-                  className={`text-left py-1.5 text-sm font-medium transition-colors duration-200 ${
-                    item.path === "/photos" ? "text-foreground" : "text-foreground/40 hover:text-foreground/70"
-                  }`}
-                >
-                  {item.label}
-                </motion.button>
-              ))}
-            </div>
-          )}
-        </AnimatePresence>
-      </motion.nav>
-
-      {/* sidebar overlay */}
-      <AnimatePresence>
-        {sidebarOpen && (
-          <motion.div className="fixed inset-0 z-20" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSidebarOpen(false)} />
-        )}
-      </AnimatePresence>
-
-      {/* content wrapper */}
-      <motion.div animate={{ marginLeft: sidebarOpen ? 240 : 0 }} transition={{ duration: 0.4, ease: EASE_TEXT }}>
         <main className="pt-28 pb-0">
           {/* centered filter */}
           <div className="flex justify-center mb-16">
@@ -268,7 +210,6 @@ const PhotosPage = () => {
 
           <AnimatePresence mode="wait">
             {openAlbum && currentAlbum ? (
-              /* ── album interior ──── */
               <motion.div
                 key={`album-${openAlbum}`}
                 initial={{ opacity: 0 }}
@@ -284,12 +225,9 @@ const PhotosPage = () => {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.1, duration: 0.3, ease: EASE }}
                 >
-                  <span className="font-mono text-[9px] tracking-[0.2em] uppercase">
-                    ← {currentAlbum.location}
-                  </span>
+                  <span className="font-mono text-[9px] tracking-[0.2em] uppercase">← {currentAlbum.location}</span>
                 </motion.button>
 
-                {/* artistic layout rows */}
                 <div className="flex flex-col gap-6">
                   {buildRows(currentAlbum.photos, albums.indexOf(currentAlbum)).map((row, rowIdx) => {
                     if (row.layout === "pair") {
@@ -312,19 +250,12 @@ const PhotosPage = () => {
                         </div>
                       );
                     }
-
                     const photo = row.photos[0];
                     const isOffset = row.layout === "offset-right" || row.layout === "offset-left";
                     return (
                       <motion.div
                         key={photo.id}
-                        className={`cursor-pointer overflow-hidden ${
-                          isOffset
-                            ? row.layout === "offset-right"
-                              ? "ml-auto w-[75%]"
-                              : "mr-auto w-[75%]"
-                            : "w-full"
-                        }`}
+                        className={`cursor-pointer overflow-hidden ${isOffset ? (row.layout === "offset-right" ? "ml-auto w-[75%]" : "mr-auto w-[75%]") : "w-full"}`}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: row.startIdx * 0.05, duration: 0.5, ease: EASE }}
@@ -338,13 +269,9 @@ const PhotosPage = () => {
                   })}
                 </div>
 
-                {/* small location tag */}
-                <p className="font-mono text-[8px] tracking-[0.2em] uppercase text-foreground/20 mt-10 text-right">
-                  {currentAlbum.location}
-                </p>
+                <p className="font-mono text-[8px] tracking-[0.2em] uppercase text-foreground/20 mt-10 text-right">{currentAlbum.location}</p>
               </motion.div>
             ) : (
-              /* ── album covers ──── */
               <motion.div
                 key={`overview-${filter}`}
                 initial={{ opacity: 0 }}
@@ -373,7 +300,7 @@ const PhotosPage = () => {
         </main>
       </motion.div>
 
-      {/* ── preview overlay with chevrons ──────────────── */}
+      {/* preview overlay */}
       <AnimatePresence>
         {previewIdx !== null && currentAlbum && (
           <motion.div
@@ -383,19 +310,8 @@ const PhotosPage = () => {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
           >
-            {/* backdrop */}
-            <div
-              className="absolute inset-0"
-              onClick={closePreview}
-              style={{ background: "rgba(0,0,0,0.85)", backdropFilter: "blur(30px)", WebkitBackdropFilter: "blur(30px)" }}
-            />
-
-            {/* close */}
-            <button onClick={closePreview} className="absolute top-6 right-6 z-10 text-white/30 hover:text-white/60 transition-colors">
-              <X className="w-4 h-4" />
-            </button>
-
-            {/* image */}
+            <div className="absolute inset-0" onClick={closePreview} style={{ background: "rgba(0,0,0,0.85)", backdropFilter: "blur(30px)", WebkitBackdropFilter: "blur(30px)" }} />
+            <button onClick={closePreview} className="absolute top-6 right-6 z-10 text-white/30 hover:text-white/60 transition-colors"><X className="w-4 h-4" /></button>
             <motion.img
               key={previewIdx}
               src={currentAlbum.photos[previewIdx].image}
@@ -406,36 +322,16 @@ const PhotosPage = () => {
               exit={{ opacity: 0, scale: 0.96 }}
               transition={{ duration: 0.25, ease: EASE }}
             />
-
-            {/* prev chevron */}
             <AnimatePresence>
               {previewIdx > 0 && (
-                <motion.button
-                  key="prev"
-                  className="absolute left-6 top-1/2 -translate-y-1/2 z-10 text-white/30 hover:text-white/60 transition-colors"
-                  initial={{ opacity: 0, x: -12 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -12 }}
-                  transition={{ duration: 0.2, ease: EASE }}
-                  onClick={() => setPreviewIdx(previewIdx - 1)}
-                >
+                <motion.button key="prev" className="absolute left-6 top-1/2 -translate-y-1/2 z-10 text-white/30 hover:text-white/60 transition-colors" initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }} transition={{ duration: 0.2, ease: EASE }} onClick={() => setPreviewIdx(previewIdx - 1)}>
                   <ChevronLeft className="w-5 h-5" strokeWidth={1.5} />
                 </motion.button>
               )}
             </AnimatePresence>
-
-            {/* next chevron */}
             <AnimatePresence>
               {previewIdx < currentAlbum.photos.length - 1 && (
-                <motion.button
-                  key="next"
-                  className="absolute right-6 top-1/2 -translate-y-1/2 z-10 text-white/30 hover:text-white/60 transition-colors"
-                  initial={{ opacity: 0, x: 12 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 12 }}
-                  transition={{ duration: 0.2, ease: EASE }}
-                  onClick={() => setPreviewIdx(previewIdx + 1)}
-                >
+                <motion.button key="next" className="absolute right-6 top-1/2 -translate-y-1/2 z-10 text-white/30 hover:text-white/60 transition-colors" initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 12 }} transition={{ duration: 0.2, ease: EASE }} onClick={() => setPreviewIdx(previewIdx + 1)}>
                   <ChevronRight className="w-5 h-5" strokeWidth={1.5} />
                 </motion.button>
               )}

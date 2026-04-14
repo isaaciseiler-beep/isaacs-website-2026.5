@@ -43,6 +43,16 @@ const locations = ["All", ...albums.map((a) => a.location)];
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const EASE_TEXT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 
+/* ── preload all photo assets once ─────────────────────── */
+
+const allImages = [photo1, photo2, photo3, photo4];
+if (typeof window !== "undefined") {
+  allImages.forEach((src) => {
+    const img = new Image();
+    img.src = src;
+  });
+}
+
 /* ── album cover: auto-flash on hover ─────────────────── */
 
 const AlbumCover = ({ album, onClick }: { album: Album; onClick: () => void }) => {
@@ -70,7 +80,11 @@ const AlbumCover = ({ album, onClick }: { album: Album; onClick: () => void }) =
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [hovering, album.photos.length]);
 
-  const displayImage = flashIdx >= 0 ? album.photos[flashIdx].image : album.cover;
+  // All unique images in this album (cover + photos)
+  const allSrcs = [album.cover, ...album.photos.map((p) => p.image)];
+  const uniqueSrcs = [...new Set(allSrcs)];
+
+  const activeImage = flashIdx >= 0 ? album.photos[flashIdx].image : album.cover;
 
   return (
     <div
@@ -79,20 +93,22 @@ const AlbumCover = ({ album, onClick }: { album: Album; onClick: () => void }) =
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
     >
-      <div className="aspect-[2/3] overflow-hidden">
-        <AnimatePresence mode="wait">
-          <motion.img
-            key={displayImage + flashIdx}
-            src={displayImage}
+      <div className="aspect-[2/3] overflow-hidden relative">
+        {/* Stack all images, toggle opacity — no loading delay */}
+        {uniqueSrcs.map((src) => (
+          <img
+            key={src}
+            src={src}
             alt={album.location}
-            className="w-full h-full object-cover"
-            style={{ filter: hovering ? "grayscale(0%)" : "grayscale(100%)" }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-150 ease-out"
+            style={{
+              opacity: src === activeImage ? 1 : 0,
+              filter: hovering ? "grayscale(0%)" : "grayscale(100%)",
+              transition: "opacity 150ms ease-out, filter 500ms ease-out",
+            }}
+            loading="eager"
           />
-        </AnimatePresence>
+        ))}
       </div>
       <div className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 35%)" }} />
       <div className="absolute bottom-0 left-0 right-0 p-4">

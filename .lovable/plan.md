@@ -1,51 +1,61 @@
 
 
-## Inspiration Board — First-Person Explorer
+## Photos Page — Location-Filtered Album Gallery
 
-### Concept
+### What this is
 
-A first-person walking experience inside a dark gallery/warehouse space rendered on a 2D canvas with pseudo-3D perspective (raycasting-style or simple perspective projection). The player moves forward/backward and turns left/right with arrow keys, exploring a room containing CRT TVs, corkboards, and objects displaying inspiration content. Black and white aesthetic with site accent color (#c8d7df) for highlights.
+A dedicated `/photos` route with a unique, editorially-crafted gallery. Albums grouped by location, with a location filter strip, stacked album cards, an expanded masonry view, and a keyboard-navigable lightbox. Every animation, spacing value, and typographic choice mirrors the existing site exactly.
 
-Think: Wolfenstein-era first-person renderer meets a lo-fi art gallery.
+### Design system alignment
 
-### How it works
+The site uses a tight, consistent vocabulary I will follow precisely:
 
-**Rendering**: Simple raycasting engine (like Wolfenstein 3D) drawn on a `<canvas>`. Walls rendered as vertical strips based on ray-wall intersection distances. Objects (TVs, corkboards) rendered as sprites at their world positions, scaled by distance.
+- **Easing:** `[0.16, 1, 0.3, 1]` for reveals, `[0.25, 0.1, 0.25, 1]` for text — never generic `ease-in-out`
+- **Spacing:** `px-6` page padding, `gap-[3px]` between image tiles, `py-12` section padding
+- **Typography:** `SectionHeading` component for headings (letter-by-letter blur reveal), `mono-text` class for labels (JetBrains Mono, 10px, tracking-widest, uppercase, 50% opacity)
+- **Images:** Always `grayscale(100%)` by default, `grayscale(0%)` on hover with `duration-700`
+- **Borders:** 0px radius everywhere (no rounding except pills)
+- **Gradients:** Bottom-up `rgba(0,0,0,0.85)` overlays on images for text legibility
+- **Edge fades:** `linear-gradient(to left, hsl(var(--background))...)` on scroll containers
+- **Chevrons:** Same `chevronVariants` pattern with custom directional enter/exit
+- **Parallax:** Wrap in `ParallaxSection` or use `useScroll`/`useTransform` scroll-linked motion
 
-**Controls**: Arrow Up/Down = move forward/backward. Arrow Left/Right = rotate view. When facing an object within interaction range, a prompt appears ("Press E"). Pressing E opens a styled overlay with the content.
+### Layout concept
 
-**World**: A small enclosed room (~12x12 grid). Walls are white lines on black. Floor has a subtle grid. Objects placed around the room:
-- 3 CRT TVs on walls showing images (with scanline effect)
-- 2 corkboards with pinned quotes
-- 1 desk with a notebook (personal note)
-- 2 magazine stands (links)
+**Filter strip** — Horizontal row of location pills at top. JetBrains Mono, uppercase, tracking-widest. "All" default. Active pill: `bg-foreground text-background`. Inactive: `border border-border text-foreground/50`. No rounded corners on pills (square, matching site's 0px radius). Animated underline on active using `layoutId` shared layout animation.
 
-**Visual style**: 
-- Black background, white wireframe walls (or filled with subtle gradient)
-- Scanlines over TVs, static noise when idle
-- Accent color (#c8d7df) for interaction prompts, TV glow, pushpin heads
-- Retro bitmap-style font for HUD text
+**Album grid (overview)** — 3-column grid (2-col tablet, 1-col mobile). Each album is a "stacked prints" card: a main cover image with 2 pseudo-layers behind it offset by 4px and 8px (using `::before`/`::after` or extra divs), creating depth. Cover is grayscale, full row is color on hover. Location name large, photo count in mono-text. Staggered reveal with the site's blur+y animation.
 
-**Content overlay**: When interacting with an object, a modal appears over the canvas showing the full content (image, quote, link) using existing site design tokens. Escape or click to close.
+**Expanded album** — Clicking an album transitions (AnimatePresence) to a masonry-style view of that location's photos. Back button top-left. Photos stagger in with `delay: index * 0.04`. Each photo is a `grid-item` with the existing grayscale hover + overlay pattern.
 
-**Mobile**: Touch controls — left side drag = turn, right side tap = move forward, double-tap = interact. Or a simple on-screen D-pad + action button.
+**Lightbox** — Full-screen overlay, `bg-black/90`. Photo centered. Prev/next chevrons (same `chevronVariants`). ESC and arrow key navigation. Photo counter in mono-text. Smooth scale-in animation on open.
 
-### Technical approach
+**"View All" link** — Added to the existing `PhotoSection` on the index page, styled as a `pill-button` linking to `/photos`.
 
-- Single file rewrite: `src/components/InspirationBoard.tsx`
-- Pure canvas raycasting — no libraries. ~300-400 lines
-- Map defined as a 2D array (0 = empty, 1 = wall)
-- Player state: x, y, angle, updated each frame
-- Rays cast from player angle across FOV (~60°), one per canvas column
-- Sprites sorted by distance, drawn after walls
-- Images preloaded via `new Image()`
-- `requestAnimationFrame` loop, cleanup on unmount
-- Canvas sized via ResizeObserver to fill container
-- Same sticky/scroll section wrapper and SectionHeading
+### Data
 
-### Files changed
+Reuse the 4 existing photo assets (`photo-1` through `photo-4`) distributed across 6 location albums (Chicago, Brooklyn, Detroit, Brussels, Tokyo, Berlin). Each album gets 3-5 photos with titles. All data is static, defined in the component.
+
+### Files
 
 | File | Change |
 |------|--------|
-| `src/components/InspirationBoard.tsx` | Full rewrite — first-person raycasting engine |
+| `src/pages/PhotosPage.tsx` | **New** — Full page: filter strip, album grid, expanded view, lightbox |
+| `src/App.tsx` | Add `/photos` route import and `<Route>` |
+| `src/components/PhotoSection.tsx` | Add "View All →" pill-button link to `/photos` |
+
+### Animation inventory (matching site exactly)
+
+- Filter pill selection: `layoutId` spring for active indicator
+- Album card reveal: `initial={{ opacity: 0, y: 20, filter: "blur(6px)" }}` → `whileInView` with staggered delay
+- Album hover: cover image `grayscale(0%)` + subtle `scale(1.02)` with `duration-700`
+- View transition (overview → expanded): `AnimatePresence` with `mode="wait"`, fade + slight y-shift
+- Photo grid stagger: `delay: index * 0.04, duration: 0.4`
+- Lightbox enter: `scale: 0.95 → 1`, `opacity: 0 → 1`, duration 0.3
+- Chevron arrows: identical `chevronVariants` from PhotoSection/NewsSection
+- Back button: fade-in with slight x-shift
+
+### Page structure
+
+The page includes its own header (Logo + back arrow) matching the site's fixed header pattern, plus the same footer component. No sidebar needed on the photos page — clean, full-bleed experience.
 

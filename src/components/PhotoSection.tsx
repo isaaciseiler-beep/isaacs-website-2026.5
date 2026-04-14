@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Link } from "react-router-dom";
 import SectionHeading from "@/components/SectionHeading";
 import photo1 from "@/assets/photo-1.jpg";
 import photo2 from "@/assets/photo-2.jpg";
@@ -86,8 +87,11 @@ const PhotoSection = () => {
 
   return (
     <section className="py-12">
-      <div className="px-6 mb-6">
+      <div className="px-6 mb-6 flex items-end justify-between">
         <SectionHeading className="mb-0">Photos</SectionHeading>
+        <Link to="/photos" className="pill-button text-[10px] mb-1">
+          View All
+        </Link>
       </div>
 
       <div className="relative">

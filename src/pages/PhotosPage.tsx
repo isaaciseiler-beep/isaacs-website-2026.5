@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
-import { ArrowLeft, X } from "lucide-react";
-import { Link } from "react-router-dom";
+import { ChevronRight, X } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import Logo from "@/components/Logo";
 import Footer from "@/components/Footer";
 import photo1 from "@/assets/photo-1.jpg";
@@ -85,16 +85,109 @@ const albums: Album[] = [
 
 const locations = ["All", ...albums.map((a) => a.location)];
 
-/* ── easing ────────────────────────────────────────────── */
-
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
+const EASE_TEXT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 
-/* ── component ────────────────────────────────────────── */
+/* ── album cover with hover-to-cycle ──────────────────── */
+
+const AlbumCover = ({
+  album,
+  onClick,
+}: {
+  album: Album;
+  onClick: () => void;
+}) => {
+  const [activeIdx, setActiveIdx] = useState(-1); // -1 = show cover
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width; // 0-1
+    const idx = Math.min(
+      Math.floor(x * album.photos.length),
+      album.photos.length - 1
+    );
+    setActiveIdx(idx);
+  };
+
+  const handleMouseLeave = () => setActiveIdx(-1);
+
+  const displayImage =
+    activeIdx >= 0 ? album.photos[activeIdx].image : album.cover;
+
+  return (
+    <div
+      ref={containerRef}
+      className="relative cursor-pointer overflow-hidden group"
+      onClick={onClick}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
+      <div className="aspect-[2/3] overflow-hidden">
+        <img
+          src={displayImage}
+          alt={album.location}
+          className="w-full h-full object-cover transition-[filter] duration-500 ease-out group-hover:grayscale-0"
+          style={{ filter: activeIdx >= 0 ? "grayscale(0%)" : "grayscale(100%)" }}
+        />
+      </div>
+
+      {/* bottom gradient */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 35%)",
+        }}
+      />
+
+      {/* location + count */}
+      <div className="absolute bottom-0 left-0 right-0 p-4">
+        <h3 className="text-sm font-medium tracking-tight text-white/90">
+          {album.location}
+        </h3>
+        <p className="font-mono text-[8px] tracking-[0.2em] uppercase text-white/30 mt-0.5">
+          {album.photos.length}
+        </p>
+      </div>
+
+      {/* hover progress dots */}
+      {activeIdx >= 0 && (
+        <div className="absolute top-3 left-3 right-3 flex gap-[2px]">
+          {album.photos.map((_, i) => (
+            <div
+              key={i}
+              className="h-[2px] flex-1 transition-colors duration-150"
+              style={{
+                background:
+                  i === activeIdx
+                    ? "rgba(255,255,255,0.7)"
+                    : "rgba(255,255,255,0.15)",
+              }}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* ── sidebar nav items ────────────────────────────────── */
+
+const sidebarItems = [
+  { id: "home", label: "Home", path: "/" },
+  { id: "photos", label: "Photos", path: "/photos" },
+];
+
+/* ── page ──────────────────────────────────────────────── */
 
 const PhotosPage = () => {
   const [filter, setFilter] = useState("All");
   const [openAlbum, setOpenAlbum] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const navigate = useNavigate();
 
   const filtered =
     filter === "All" ? albums : albums.filter((a) => a.location === filter);
@@ -103,7 +196,6 @@ const PhotosPage = () => {
     ? albums.find((a) => a.location === openAlbum)
     : null;
 
-  /* keyboard */
   const closePreview = useCallback(() => setPreview(null), []);
 
   useEffect(() => {
@@ -120,150 +212,203 @@ const PhotosPage = () => {
   }, [openAlbum]);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="relative min-h-screen bg-background text-foreground">
       {/* header */}
-      <header className="fixed top-0 left-0 right-0 z-50 flex items-center gap-3 px-6 py-4">
-        <Link
-          to="/"
-          className="text-foreground/40 hover:text-foreground transition-colors"
-          aria-label="Back"
-        >
-          <ArrowLeft className="w-4 h-4" />
+      <div className="fixed top-0 left-0 right-0 z-40 pointer-events-none" style={{ height: 64, background: "linear-gradient(to bottom, hsl(var(--background)) 0%, hsl(var(--background) / 0.6) 60%, transparent 100%)" }} />
+      <div className="fixed top-0 left-0 z-50 flex items-center gap-1 px-6 py-4">
+        <Link to="/" className="contents">
+          <Logo />
         </Link>
-        <Logo />
-      </header>
+        <motion.button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="w-5 h-5 flex items-center justify-center text-foreground hover:text-foreground/60 transition-colors duration-200"
+          aria-label="Toggle menu"
+          animate={{ rotate: sidebarOpen ? 180 : 0 }}
+          transition={{ duration: 0.3, ease: EASE_TEXT }}
+        >
+          <ChevronRight className="w-3.5 h-3.5" />
+        </motion.button>
+      </div>
 
-      <main className="pt-28 pb-0">
-        {/* filter */}
-        <div className="px-6 mb-16 flex gap-1 overflow-x-auto scrollbar-hide">
-          <LayoutGroup>
-            {locations.map((loc) => {
-              const active = filter === loc;
-              return (
-                <button
-                  key={loc}
+      {/* sidebar */}
+      <motion.nav
+        className="fixed left-0 top-0 h-screen w-[240px] bg-background z-[45] flex flex-col px-6 py-20 overflow-y-auto"
+        animate={{ x: sidebarOpen ? 0 : -240 }}
+        transition={{ duration: 0.4, ease: EASE_TEXT }}
+      >
+        <AnimatePresence>
+          {sidebarOpen && (
+            <div className="mt-4 flex flex-col gap-0.5">
+              {sidebarItems.map((item, i) => (
+                <motion.button
+                  key={item.id}
+                  initial={{ opacity: 0, x: -20, filter: "blur(6px)" }}
+                  animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+                  exit={{ opacity: 0, x: -14, filter: "blur(4px)" }}
+                  transition={{
+                    delay: 0.08 + i * 0.06,
+                    duration: 0.5,
+                    ease: EASE,
+                  }}
                   onClick={() => {
-                    setFilter(loc);
-                    setOpenAlbum(null);
+                    navigate(item.path);
+                    setSidebarOpen(false);
                   }}
-                  className="relative shrink-0 px-3 py-1 font-mono text-[9px] tracking-[0.2em] uppercase transition-colors duration-300"
-                  style={{
-                    color: active
-                      ? "hsl(var(--background))"
-                      : "hsl(var(--foreground) / 0.3)",
-                  }}
+                  className={`text-left py-1.5 text-sm font-medium transition-colors duration-200 ${
+                    item.path === "/photos"
+                      ? "text-foreground"
+                      : "text-foreground/40 hover:text-foreground/70"
+                  }`}
                 >
-                  {active && (
-                    <motion.div
-                      layoutId="filter-pill"
-                      className="absolute inset-0 bg-foreground"
-                      style={{ zIndex: -1 }}
-                      transition={{ type: "spring", stiffness: 500, damping: 35 }}
-                    />
-                  )}
-                  {loc}
-                </button>
-              );
-            })}
-          </LayoutGroup>
-        </div>
+                  {item.label}
+                </motion.button>
+              ))}
+            </div>
+          )}
+        </AnimatePresence>
+      </motion.nav>
 
-        {/* content */}
-        <AnimatePresence mode="wait">
-          {openAlbum && currentAlbum ? (
-            /* ── album interior: horizontal photos ──── */
-            <motion.div
-              key={`album-${openAlbum}`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3, ease: EASE }}
-            >
-              {/* back */}
-              <motion.button
-                onClick={() => setOpenAlbum(null)}
-                className="px-6 flex items-center gap-2 mb-10 text-foreground/30 hover:text-foreground transition-colors"
-                initial={{ opacity: 0, x: -8 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.1, duration: 0.3, ease: EASE }}
-              >
-                <ArrowLeft className="w-3 h-3" />
-                <span className="font-mono text-[9px] tracking-[0.2em] uppercase">
-                  {currentAlbum.location}
-                </span>
-              </motion.button>
+      {/* sidebar overlay */}
+      <AnimatePresence>
+        {sidebarOpen && (
+          <motion.div
+            className="fixed inset-0 z-20"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
-              {/* horizontal scroll strip */}
-              <div className="relative">
-                <div className="overflow-x-auto scrollbar-hide">
-                  <div className="flex gap-[3px] px-6 pb-6" style={{ width: "max-content" }}>
-                    {currentAlbum.photos.map((photo, i) => (
-                      <motion.div
-                        key={photo.id}
-                        className="relative shrink-0 cursor-pointer overflow-hidden"
-                        style={{ width: "60vw", maxWidth: 700 }}
-                        initial={{ opacity: 0, x: 40 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{
-                          delay: i * 0.06,
-                          duration: 0.5,
-                          ease: EASE,
-                        }}
-                        onClick={() => setPreview(photo.image)}
-                      >
-                        <div className="aspect-[3/2] overflow-hidden">
-                          <img
-                            src={photo.image}
-                            alt=""
-                            className="w-full h-full object-cover transition-all duration-700 ease-out"
-                            style={{ filter: "grayscale(100%)" }}
-                            onMouseEnter={(e) => {
-                              (e.target as HTMLImageElement).style.filter = "grayscale(0%)";
-                              (e.target as HTMLImageElement).style.transform = "scale(1.03)";
-                            }}
-                            onMouseLeave={(e) => {
-                              (e.target as HTMLImageElement).style.filter = "grayscale(100%)";
-                              (e.target as HTMLImageElement).style.transform = "scale(1)";
-                            }}
-                          />
-                        </div>
-                        {/* tiny location tag */}
-                        <span className="absolute bottom-3 right-3 font-mono text-[8px] tracking-[0.2em] uppercase text-white/40">
-                          {currentAlbum.location}
-                        </span>
-                      </motion.div>
-                    ))}
-                  </div>
-                </div>
-                {/* edge fade right */}
-                <div
-                  className="absolute top-0 right-0 bottom-0 w-24 pointer-events-none"
-                  style={{
-                    background:
-                      "linear-gradient(to left, hsl(var(--background)), transparent)",
-                  }}
-                />
-              </div>
-            </motion.div>
-          ) : (
-            /* ── album covers: staggered vertical layout ──── */
-            <motion.div
-              key={`overview-${filter}`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3, ease: EASE }}
-              className="px-6"
-            >
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-[3px]">
-                {filtered.map((album, i) => {
-                  // alternate tall/short for visual rhythm
-                  const tall = i % 3 === 0;
+      {/* content wrapper */}
+      <motion.div
+        animate={{ marginLeft: sidebarOpen ? 240 : 0 }}
+        transition={{ duration: 0.4, ease: EASE_TEXT }}
+      >
+        <main className="pt-28 pb-0">
+          {/* centered filter strip */}
+          <div className="flex justify-center mb-16">
+            <div className="flex gap-1 overflow-x-auto scrollbar-hide px-6">
+              <LayoutGroup>
+                {locations.map((loc) => {
+                  const active = filter === loc;
                   return (
+                    <button
+                      key={loc}
+                      onClick={() => {
+                        setFilter(loc);
+                        setOpenAlbum(null);
+                      }}
+                      className="relative shrink-0 px-3 py-1 font-mono text-[9px] tracking-[0.2em] uppercase transition-colors duration-300"
+                      style={{
+                        color: active
+                          ? "hsl(var(--background))"
+                          : "hsl(var(--foreground) / 0.3)",
+                      }}
+                    >
+                      {active && (
+                        <motion.div
+                          layoutId="filter-pill"
+                          className="absolute inset-0 bg-foreground"
+                          style={{ zIndex: -1 }}
+                          transition={{
+                            type: "spring",
+                            stiffness: 500,
+                            damping: 35,
+                          }}
+                        />
+                      )}
+                      {loc}
+                    </button>
+                  );
+                })}
+              </LayoutGroup>
+            </div>
+          </div>
+
+          {/* content */}
+          <AnimatePresence mode="wait">
+            {openAlbum && currentAlbum ? (
+              /* ── album interior: vertical scroll ──── */
+              <motion.div
+                key={`album-${openAlbum}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3, ease: EASE }}
+                className="px-6"
+              >
+                {/* back */}
+                <motion.button
+                  onClick={() => setOpenAlbum(null)}
+                  className="flex items-center gap-2 mb-10 text-foreground/30 hover:text-foreground transition-colors"
+                  initial={{ opacity: 0, x: -8 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1, duration: 0.3, ease: EASE }}
+                >
+                  <span className="font-mono text-[9px] tracking-[0.2em] uppercase">
+                    ← {currentAlbum.location}
+                  </span>
+                </motion.button>
+
+                {/* vertical photo list */}
+                <div className="flex flex-col gap-[3px] max-w-5xl mx-auto">
+                  {currentAlbum.photos.map((photo, i) => (
+                    <motion.div
+                      key={photo.id}
+                      className="relative cursor-pointer overflow-hidden"
+                      initial={{ opacity: 0, y: 30, filter: "blur(4px)" }}
+                      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                      transition={{
+                        delay: i * 0.05,
+                        duration: 0.5,
+                        ease: EASE,
+                      }}
+                      onClick={() => setPreview(photo.image)}
+                    >
+                      <div className="aspect-[16/9] overflow-hidden">
+                        <img
+                          src={photo.image}
+                          alt=""
+                          className="w-full h-full object-cover transition-all duration-700 ease-out"
+                          style={{ filter: "grayscale(100%)" }}
+                          onMouseEnter={(e) => {
+                            (e.target as HTMLImageElement).style.filter =
+                              "grayscale(0%)";
+                            (e.target as HTMLImageElement).style.transform =
+                              "scale(1.02)";
+                          }}
+                          onMouseLeave={(e) => {
+                            (e.target as HTMLImageElement).style.filter =
+                              "grayscale(100%)";
+                            (e.target as HTMLImageElement).style.transform =
+                              "scale(1)";
+                          }}
+                        />
+                      </div>
+                      {/* tiny location tag */}
+                      <span className="absolute bottom-3 right-4 font-mono text-[8px] tracking-[0.2em] uppercase text-white/30">
+                        {currentAlbum.location}
+                      </span>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            ) : (
+              /* ── album covers grid ──── */
+              <motion.div
+                key={`overview-${filter}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3, ease: EASE }}
+                className="px-6"
+              >
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-[3px]">
+                  {filtered.map((album, i) => (
                     <motion.div
                       key={album.location}
-                      className="relative cursor-pointer overflow-hidden group"
-                      style={{ gridRow: tall ? "span 2" : "span 1" }}
                       initial={{ opacity: 0, y: 30, filter: "blur(4px)" }}
                       animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                       transition={{
@@ -271,57 +416,23 @@ const PhotosPage = () => {
                         duration: 0.5,
                         ease: EASE,
                       }}
-                      onClick={() => setOpenAlbum(album.location)}
                     >
-                      <div
-                        className="w-full h-full overflow-hidden"
-                        style={{ aspectRatio: tall ? "2/3" : "3/2" }}
-                      >
-                        <img
-                          src={album.cover}
-                          alt={album.location}
-                          className="w-full h-full object-cover transition-all duration-700 ease-out"
-                          style={{ filter: "grayscale(100%)" }}
-                          onMouseEnter={(e) => {
-                            (e.target as HTMLImageElement).style.filter = "grayscale(0%)";
-                            (e.target as HTMLImageElement).style.transform = "scale(1.04)";
-                          }}
-                          onMouseLeave={(e) => {
-                            (e.target as HTMLImageElement).style.filter = "grayscale(100%)";
-                            (e.target as HTMLImageElement).style.transform = "scale(1)";
-                          }}
-                        />
-                      </div>
-                      {/* overlay: location + count */}
-                      <div className="absolute inset-0 flex flex-col justify-end p-4 pointer-events-none">
-                        <div
-                          className="absolute inset-0"
-                          style={{
-                            background:
-                              "linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 40%)",
-                          }}
-                        />
-                        <div className="relative z-10">
-                          <h3 className="text-sm font-medium tracking-tight text-white/90">
-                            {album.location}
-                          </h3>
-                          <p className="font-mono text-[8px] tracking-[0.2em] uppercase text-white/30 mt-0.5">
-                            {album.photos.length}
-                          </p>
-                        </div>
-                      </div>
+                      <AlbumCover
+                        album={album}
+                        onClick={() => setOpenAlbum(album.location)}
+                      />
                     </motion.div>
-                  );
-                })}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-        <div className="h-24" />
-      </main>
+          <div className="h-24" />
+        </main>
+      </motion.div>
 
-      {/* ── preview overlay (blurred backdrop) ─────────── */}
+      {/* ── preview overlay ────────────────────────────── */}
       <AnimatePresence>
         {preview && (
           <motion.div
@@ -332,7 +443,6 @@ const PhotosPage = () => {
             transition={{ duration: 0.2 }}
             onClick={closePreview}
           >
-            {/* blurred dark backdrop */}
             <div
               className="absolute inset-0"
               style={{
@@ -341,16 +451,12 @@ const PhotosPage = () => {
                 WebkitBackdropFilter: "blur(30px)",
               }}
             />
-
-            {/* close hint */}
             <button
               onClick={closePreview}
               className="absolute top-6 right-6 z-10 text-white/30 hover:text-white/60 transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
-
-            {/* photo */}
             <motion.img
               key={preview}
               src={preview}

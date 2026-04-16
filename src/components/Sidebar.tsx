@@ -47,21 +47,21 @@ const ThemeSwitch = () => {
 interface SitemapItem {
   id: string;
   label: string;
-  scrollTo?: string;   // scroll to section on index page
-  href?: string;       // navigate to route
+  scrollTo?: string;
+  href?: string;
   children?: { id: string; label: string; href: string }[];
 }
 
 const sitemapItems: SitemapItem[] = [
   { id: "hero", label: "Home", scrollTo: "hero" },
   { id: "featured", label: "Featured", scrollTo: "featured" },
+  { id: "about", label: "About", scrollTo: "about" },
   { id: "projects", label: "Projects", scrollTo: "projects" },
   { id: "news", label: "News", scrollTo: "news" },
   { id: "photos", label: "Photos", scrollTo: "photos", children: [
     { id: "portfolio", label: "Portfolio", href: "/photos" },
   ]},
   { id: "inspiration", label: "Inspiration", scrollTo: "inspiration" },
-  { id: "about", label: "About", scrollTo: "about" },
 ];
 
 const socialLinks = [
@@ -100,7 +100,6 @@ const socialLinks = [
 interface SidebarProps {
   open: boolean;
   onToggle: () => void;
-  /** Which section is active on the index page (from IntersectionObserver) */
   activeSection?: string;
 }
 
@@ -113,7 +112,6 @@ const Sidebar = ({ open, onToggle, activeSection }: SidebarProps) => {
     if (item.scrollTo) {
       if (location.pathname !== "/") {
         navigate("/");
-        // small delay to let page mount, then scroll
         setTimeout(() => {
           const el = document.getElementById(item.scrollTo!);
           if (el) el.scrollIntoView({ behavior: "smooth" });
@@ -126,12 +124,11 @@ const Sidebar = ({ open, onToggle, activeSection }: SidebarProps) => {
     if (item.href) {
       navigate(item.href);
     }
-    onToggle();
+    // Don't close sidebar on click
   };
 
   const handleChildClick = (child: { href: string }) => {
     navigate(child.href);
-    onToggle();
   };
 
   const handleSocialClick = (href: string) => {
@@ -140,7 +137,6 @@ const Sidebar = ({ open, onToggle, activeSection }: SidebarProps) => {
     } else {
       window.location.href = href;
     }
-    onToggle();
   };
 
   const isItemActive = (item: SitemapItem) => {
@@ -160,7 +156,7 @@ const Sidebar = ({ open, onToggle, activeSection }: SidebarProps) => {
       {/* toggle button */}
       <motion.button
         onClick={onToggle}
-        className="w-5 h-5 flex items-center justify-center text-foreground hover:text-foreground/60 transition-colors duration-200"
+        className="w-5 h-5 flex items-center justify-center text-foreground hover:text-foreground/60 transition-colors duration-200 relative z-[55]"
         aria-label="Toggle menu"
         animate={{ rotate: open ? 180 : 0 }}
         transition={{ duration: 0.3, ease: EASE_TEXT }}
@@ -221,7 +217,7 @@ const Sidebar = ({ open, onToggle, activeSection }: SidebarProps) => {
                               filter: { duration: 0.6, delay: 0.1 + childIdx * 0.06 },
                             }}
                             onClick={() => handleChildClick(child)}
-                            className={`text-left py-1 pl-4 text-xs font-medium transition-colors duration-200 origin-left block ${
+                            className={`text-left py-1.5 pl-4 text-sm font-medium transition-colors duration-200 origin-left block ${
                               childActive ? "text-foreground" : "text-foreground/30 hover:text-foreground/60"
                             }`}
                           >
@@ -250,7 +246,7 @@ const Sidebar = ({ open, onToggle, activeSection }: SidebarProps) => {
               <div className="grid grid-cols-4 gap-2">
                 <button
                   key="contact"
-                  onClick={() => { window.location.href = "/contact"; onToggle(); }}
+                  onClick={() => { window.location.href = "/contact"; }}
                   className="w-10 h-10 rounded-xl bg-foreground/10 hover:bg-foreground/15 text-foreground flex items-center justify-center transition-all duration-200"
                   aria-label="Contact"
                 >
@@ -274,19 +270,6 @@ const Sidebar = ({ open, onToggle, activeSection }: SidebarProps) => {
           )}
         </AnimatePresence>
       </motion.nav>
-
-      {/* overlay */}
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            className="fixed inset-0 z-20"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onToggle}
-          />
-        )}
-      </AnimatePresence>
     </>
   );
 };

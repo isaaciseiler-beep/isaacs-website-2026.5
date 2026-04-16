@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import Logo from "@/components/Logo";
 import HeroSection from "@/components/HeroSection";
 import FeaturedSection from "@/components/FeaturedSection";
@@ -49,8 +50,8 @@ const Index = () => {
       />
 
       {/* Fixed header */}
-      <div className="fixed top-0 left-0 z-50 flex items-center gap-1 px-6 md:px-6 py-4">
-        <Logo />
+      <div className="fixed top-0 left-0 z-[55] flex items-center gap-1 px-6 md:px-6 py-4">
+        <Link to="/" className="contents"><Logo /></Link>
         <Sidebar
           open={sidebarOpen}
           onToggle={() => setSidebarOpen(!sidebarOpen)}

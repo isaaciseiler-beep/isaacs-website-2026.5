@@ -43,7 +43,7 @@ const locations = ["All", ...albums.map((a) => a.location)];
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const EASE_TEXT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 
-/* ── preload all photo assets once ─────────────────────── */
+/* ── preload ─────────────────────────────────────────── */
 
 const allImages = [photo1, photo2, photo3, photo4];
 if (typeof window !== "undefined") {
@@ -53,7 +53,7 @@ if (typeof window !== "undefined") {
   });
 }
 
-/* ── album cover: auto-flash on hover ─────────────────── */
+/* ── album cover ─────────────────────────────────────── */
 
 const AlbumCover = ({ album, onClick }: { album: Album; onClick: () => void }) => {
   const [hovering, setHovering] = useState(false);
@@ -80,10 +80,8 @@ const AlbumCover = ({ album, onClick }: { album: Album; onClick: () => void }) =
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [hovering, album.photos.length]);
 
-  // All unique images in this album (cover + photos)
   const allSrcs = [album.cover, ...album.photos.map((p) => p.image)];
   const uniqueSrcs = [...new Set(allSrcs)];
-
   const activeImage = flashIdx >= 0 ? album.photos[flashIdx].image : album.cover;
 
   return (
@@ -94,13 +92,12 @@ const AlbumCover = ({ album, onClick }: { album: Album; onClick: () => void }) =
       onMouseLeave={() => setHovering(false)}
     >
       <div className="aspect-[2/3] overflow-hidden relative">
-        {/* Stack all images, toggle opacity — no loading delay */}
         {uniqueSrcs.map((src) => (
           <img
             key={src}
             src={src}
             alt={album.location}
-            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-150 ease-out"
+            className="absolute inset-0 w-full h-full object-cover"
             style={{
               opacity: src === activeImage ? 1 : 0,
               filter: hovering ? "grayscale(0%)" : "grayscale(100%)",
@@ -181,8 +178,8 @@ const PhotosPage = () => {
       <div className="fixed top-0 left-0 right-0 z-40 pointer-events-none" style={{ height: 64, background: "linear-gradient(to bottom, hsl(var(--background)) 0%, hsl(var(--background) / 0.6) 60%, transparent 100%)" }} />
 
       {/* header */}
-      <div className="fixed top-0 left-0 z-50 flex items-center gap-1 px-6 py-4">
-        <Link to="/" className="contents"><Logo /></Link>
+      <div className="fixed top-0 left-0 z-[55] flex items-center gap-1 px-6 py-4">
+        <Link to="/" className="contents relative z-[55]"><Logo /></Link>
         <Sidebar
           open={sidebarOpen}
           onToggle={() => setSidebarOpen(!sidebarOpen)}
@@ -195,34 +192,36 @@ const PhotosPage = () => {
         transition={{ duration: 0.4, ease: EASE_TEXT }}
       >
         <main className="pt-28 pb-0">
-          {/* centered filter */}
-          <div className="flex justify-center mb-16">
-            <div className="flex gap-1 px-6">
-              <LayoutGroup>
-                {locations.map((loc) => {
-                  const active = filter === loc;
-                  return (
-                    <button
-                      key={loc}
-                      onClick={() => { setFilter(loc); setOpenAlbum(null); }}
-                      className="relative shrink-0 px-3 py-1 font-mono text-[9px] tracking-[0.2em] uppercase transition-colors duration-300"
-                      style={{ color: active ? "hsl(var(--background))" : "hsl(var(--foreground) / 0.3)" }}
-                    >
-                      {active && (
-                        <motion.div
-                          layoutId="filter-pill"
-                          className="absolute inset-0 bg-foreground"
-                          style={{ zIndex: -1 }}
-                          transition={{ type: "spring", stiffness: 500, damping: 35 }}
-                        />
-                      )}
-                      {loc}
-                    </button>
-                  );
-                })}
-              </LayoutGroup>
+          {/* centered filter - hidden when inside an album */}
+          {!openAlbum && (
+            <div className="flex justify-center mb-16">
+              <div className="flex gap-1 px-6">
+                <LayoutGroup>
+                  {locations.map((loc) => {
+                    const active = filter === loc;
+                    return (
+                      <button
+                        key={loc}
+                        onClick={() => { setFilter(loc); setOpenAlbum(null); }}
+                        className="relative shrink-0 px-3 py-1 font-mono text-[9px] tracking-[0.2em] uppercase transition-colors duration-300"
+                        style={{ color: active ? "hsl(var(--background))" : "hsl(var(--foreground) / 0.3)" }}
+                      >
+                        {active && (
+                          <motion.div
+                            layoutId="filter-pill"
+                            className="absolute inset-0 bg-foreground"
+                            style={{ zIndex: -1 }}
+                            transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                          />
+                        )}
+                        {loc}
+                      </button>
+                    );
+                  })}
+                </LayoutGroup>
+              </div>
             </div>
-          </div>
+          )}
 
           <AnimatePresence mode="wait">
             {openAlbum && currentAlbum ? (
@@ -241,7 +240,7 @@ const PhotosPage = () => {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.1, duration: 0.3, ease: EASE }}
                 >
-                  <span className="font-mono text-[9px] tracking-[0.2em] uppercase">← {currentAlbum.location}</span>
+                  <span className="font-mono text-[9px] tracking-[0.2em] uppercase">← All Photos</span>
                 </motion.button>
 
                 <div className="flex flex-col gap-6">

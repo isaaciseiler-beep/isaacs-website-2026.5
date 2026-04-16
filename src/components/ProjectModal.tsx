@@ -1,0 +1,162 @@
+import { useCallback, useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowUpRight, ChevronLeft, ChevronRight, X } from "lucide-react";
+import type { ProjectItem } from "@/lib/siteContent";
+
+const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
+
+interface ProjectModalProps {
+  projects: ProjectItem[];
+  currentIndex: number | null;
+  onClose: () => void;
+  onNavigate: (index: number) => void;
+}
+
+const ProjectModal = ({ projects, currentIndex, onClose, onNavigate }: ProjectModalProps) => {
+  const project = currentIndex !== null ? projects[currentIndex] : null;
+
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (currentIndex === null) return;
+    if (e.key === "Escape") onClose();
+    if (e.key === "ArrowRight" && currentIndex < projects.length - 1) onNavigate(currentIndex + 1);
+    if (e.key === "ArrowLeft" && currentIndex > 0) onNavigate(currentIndex - 1);
+  }, [currentIndex, onClose, onNavigate, projects.length]);
+
+  useEffect(() => {
+    if (currentIndex === null) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [currentIndex, handleKeyDown]);
+
+  return (
+    <AnimatePresence>
+      {project && currentIndex !== null && (
+        <motion.div
+          className="fixed inset-0 z-[110] flex items-center justify-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.25, ease: EASE }}
+        >
+          <div
+            className="absolute inset-0"
+            onClick={onClose}
+            style={{
+              background: "rgba(10,10,8,0.9)",
+              backdropFilter: "blur(28px)",
+              WebkitBackdropFilter: "blur(28px)",
+            }}
+          />
+
+          <motion.div
+            key={project.id}
+            className="relative z-10 mx-4 flex max-h-[88vh] w-full max-w-5xl flex-col overflow-hidden border border-foreground/10 bg-background shadow-[0_30px_120px_rgba(0,0,0,0.45)]"
+            initial={{ opacity: 0, y: 24, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 16, scale: 0.98 }}
+            transition={{ duration: 0.35, ease: EASE }}
+          >
+            <button onClick={onClose} className="absolute right-4 top-4 z-20 text-foreground/35 transition-colors hover:text-foreground">
+              <X className="h-4 w-4" />
+            </button>
+
+            <div className="grid min-h-0 grid-cols-1 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+              <div className="relative min-h-[260px] overflow-hidden lg:min-h-[88vh]">
+                <img src={project.image} alt={project.title} className="h-full w-full object-cover grayscale" />
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background:
+                      "linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.35) 55%, rgba(10,10,8,0.8) 100%)",
+                  }}
+                />
+                <div className="absolute inset-x-0 bottom-0 p-6 lg:p-8">
+                  <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.28em] text-white/45">{project.source}</p>
+                  <h2 className="max-w-md text-3xl font-semibold tracking-tight text-white md:text-5xl">{project.title}</h2>
+                  <p className="mt-3 max-w-sm text-sm leading-relaxed text-white/68">{project.summary}</p>
+                </div>
+              </div>
+
+              <div className="min-h-0 overflow-y-auto">
+                <div className="px-6 pb-8 pt-16 md:px-8">
+                  <div className="mb-8 flex items-center gap-3">
+                    <span className="font-mono text-[10px] uppercase tracking-[0.26em] text-foreground/28">
+                      {String(currentIndex + 1).padStart(2, "0")}
+                    </span>
+                    <span className="h-px flex-1 bg-foreground/10" />
+                    <span className="font-mono text-[10px] uppercase tracking-[0.26em] text-foreground/28">{project.year}</span>
+                  </div>
+
+                  <div className="space-y-8">
+                    {project.sections.map((section) => (
+                      <section key={section.heading}>
+                        <h3 className="mb-3 text-xl font-semibold tracking-tight text-foreground">{section.heading}</h3>
+                        {section.paragraphs?.map((paragraph) => (
+                          <p key={paragraph} className="mb-3 text-[15px] leading-relaxed text-foreground/68 last:mb-0">
+                            {paragraph}
+                          </p>
+                        ))}
+                        {section.bullets && (
+                          <ul className="space-y-2">
+                            {section.bullets.map((bullet) => (
+                              <li key={bullet} className="flex gap-3 text-[15px] leading-relaxed text-foreground/68">
+                                <span className="mt-[0.55rem] h-[3px] w-[3px] shrink-0 rounded-full bg-foreground/30" />
+                                <span>{bullet}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                        {section.links && (
+                          <div className="space-y-3">
+                            {section.links.map((link) => (
+                              <a
+                                key={link.href}
+                                href={link.href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="group flex items-center justify-between border-b border-foreground/10 py-2 text-sm text-foreground/72 transition-colors hover:text-foreground"
+                              >
+                                <span>{link.label}</span>
+                                <ArrowUpRight className="h-4 w-4 text-foreground/32 transition-transform duration-200 group-hover:-translate-y-[1px] group-hover:translate-x-[1px] group-hover:text-foreground/75" />
+                              </a>
+                            ))}
+                          </div>
+                        )}
+                      </section>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {currentIndex > 0 && (
+              <button
+                onClick={() => onNavigate(currentIndex - 1)}
+                className="absolute left-4 top-1/2 z-20 -translate-y-1/2 text-white/20 transition-colors hover:text-white/60 lg:left-6"
+              >
+                <ChevronLeft className="h-5 w-5" strokeWidth={1.5} />
+              </button>
+            )}
+
+            {currentIndex < projects.length - 1 && (
+              <button
+                onClick={() => onNavigate(currentIndex + 1)}
+                className="absolute right-4 top-1/2 z-20 -translate-y-1/2 text-white/20 transition-colors hover:text-white/60 lg:right-6"
+              >
+                <ChevronRight className="h-5 w-5" strokeWidth={1.5} />
+              </button>
+            )}
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
+export default ProjectModal;

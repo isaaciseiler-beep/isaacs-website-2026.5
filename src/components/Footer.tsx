@@ -1,17 +1,18 @@
 import { Mail } from "lucide-react";
+import { CONTACT_MAILTO, GITHUB_URL, LINKEDIN_URL, SUBSTACK_URL } from "@/lib/site";
 
 const socialLinks = [
   {
     id: "contact",
     label: "Contact",
-    href: "/contact",
-    external: false,
+    href: CONTACT_MAILTO,
+    external: true,
     icon: <Mail className="w-4 h-4" />,
   },
   {
     id: "linkedin",
     label: "LinkedIn",
-    href: "https://www.linkedin.com",
+    href: LINKEDIN_URL,
     external: true,
     icon: (
       <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
@@ -22,7 +23,7 @@ const socialLinks = [
   {
     id: "github",
     label: "GitHub",
-    href: "https://github.com",
+    href: GITHUB_URL,
     external: true,
     icon: (
       <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
@@ -33,7 +34,7 @@ const socialLinks = [
   {
     id: "substack",
     label: "Substack",
-    href: "https://substack.com",
+    href: SUBSTACK_URL,
     external: true,
     icon: (
       <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
@@ -74,7 +75,7 @@ const Footer = () => {
 
         {/* Copyright centered */}
         <p className="font-mono text-[10px] tracking-widest uppercase text-foreground/40">
-          © 2026 Isaac Irvin Seiler
+          © 2026 Isaac Seiler
         </p>
       </div>
 

@@ -10,12 +10,12 @@ import photo3 from "@/assets/photo-3.jpg";
 import photo4 from "@/assets/photo-4.jpg";
 
 const photos = [
-  { id: 1, title: "Skyline", location: "Chicago", image: photo1 },
-  { id: 2, title: "Process", location: "Brooklyn", image: photo2 },
-  { id: 3, title: "Light & Ruin", location: "Detroit", image: photo3 },
-  { id: 4, title: "Vanishing Point", location: "Brussels", image: photo4 },
-  { id: 5, title: "Underpass", location: "Tokyo", image: photo1 },
-  { id: 6, title: "Grain", location: "Berlin", image: photo2 },
+  { id: 1, title: "Christchurch, New Zealand", location: "Christchurch, New Zealand", image: photo1 },
+  { id: 2, title: "Banli, Taiwan", location: "Banli, Taiwan", image: photo2 },
+  { id: 3, title: "Aoraki National Park", location: "Aoraki National Park", image: photo3 },
+  { id: 4, title: "Las Palmas de Gran Canaria, Spain", location: "Las Palmas de Gran Canaria, Spain", image: photo4 },
+  { id: 5, title: "Djupivogur, Iceland", location: "Djupivogur, Iceland", image: photo1 },
+  { id: 6, title: "Qiaozi Village, Taiwan", location: "Qiaozi Village, Taiwan", image: photo2 },
 ];
 
 photos.forEach((p) => { const img = new Image(); img.src = p.image; });
@@ -126,7 +126,10 @@ const PhotoSection = () => {
       <div className="px-6 mt-6">
         <Link to="/photos" className="block">
           <motion.div className="group relative w-full py-2.5 text-sm font-mono tracking-[0.2em] uppercase rounded-full bg-foreground overflow-hidden flex items-center justify-center cursor-pointer" whileTap={{ scale: 0.995 }}>
-            <span className="absolute inset-0 bg-[hsl(68,100%,81%)] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]" />
+            <span
+              className="absolute inset-0 bg-[hsl(68,100%,81%)] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500"
+              style={{ transitionTimingFunction: "cubic-bezier(0.16,1,0.3,1)" }}
+            />
             <span className="relative z-10 text-background flex items-center justify-center">
               View my Portfolio
               <span className="inline-flex overflow-hidden max-w-0 group-hover:max-w-[2rem] opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">

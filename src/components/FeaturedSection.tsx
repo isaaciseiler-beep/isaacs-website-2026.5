@@ -1,15 +1,12 @@
 import { useRef, useState } from "react";
 import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
-import project1 from "@/assets/project-1.jpg";
-import project2 from "@/assets/project-2.jpg";
-import project3 from "@/assets/project-3.jpg";
 import SectionHeading from "@/components/SectionHeading";
+import { featuredProjectIds, projectItems } from "@/lib/siteContent";
 
-const projectItems = [
-  { id: 1, title: "Urban Canvas", subtitle: "Redefining street identity through design", image: project1 },
-  { id: 2, title: "Concrete Dreams", subtitle: "Architectural storytelling in concrete", image: project2 },
-  { id: 3, title: "Neon Nights", subtitle: "A photographic exploration of city light", image: project3 },
-];
+const featuredProjects = featuredProjectIds
+  .slice(0, 3)
+  .map((id) => projectItems.find((project) => project.id === id))
+  .filter(Boolean);
 
 const BUFFER = 24;
 const GAP = 3;
@@ -100,8 +97,8 @@ const FeaturedSection = () => {
         >
           {/* Hero card */}
           <FeaturedTile
-            image={projectItems[0].image}
-            alt={projectItems[0].title}
+            image={featuredProjects[0]!.image}
+            alt={featuredProjects[0]!.title}
             filter={topFilter}
             canHover={isOutPhase}
             className="flex-1 min-h-0"
@@ -114,17 +111,17 @@ const FeaturedSection = () => {
               }}
             >
               <h3 className="text-2xl md:text-4xl font-semibold tracking-tighter text-foreground leading-tight">
-                {projectItems[0].title}
+                {featuredProjects[0]!.title}
               </h3>
-              <p className="text-sm text-foreground/60 mt-1 max-w-md">{projectItems[0].subtitle}</p>
+              <p className="text-sm text-foreground/60 mt-1 max-w-md">{featuredProjects[0]!.summary}</p>
             </div>
           </FeaturedTile>
 
           {/* Bottom thumbnails */}
           <div className="grid grid-cols-2 shrink-0" style={{ gap: GAP, height: "28vh" }}>
             <FeaturedTile
-              image={projectItems[1].image}
-              alt={projectItems[1].title}
+              image={featuredProjects[1]!.image}
+              alt={featuredProjects[1]!.title}
               filter={blFilter}
               canHover={isOutPhase}
             >
@@ -136,15 +133,15 @@ const FeaturedSection = () => {
                 }}
               >
                 <h3 className="text-base md:text-[1.625rem] font-semibold tracking-tighter text-foreground leading-tight">
-                  {projectItems[1].title}
+                  {featuredProjects[1]!.title}
                 </h3>
-                <p className="text-sm text-foreground/60 mt-1">{projectItems[1].subtitle}</p>
+                <p className="text-sm text-foreground/60 mt-1">{featuredProjects[1]!.summary}</p>
               </div>
             </FeaturedTile>
 
             <FeaturedTile
-              image={projectItems[2].image}
-              alt={projectItems[2].title}
+              image={featuredProjects[2]!.image}
+              alt={featuredProjects[2]!.title}
               filter={brFilter}
               canHover={isOutPhase}
             >
@@ -156,9 +153,9 @@ const FeaturedSection = () => {
                 }}
               >
                 <h3 className="text-base md:text-[1.625rem] font-semibold tracking-tighter text-foreground leading-tight">
-                  {projectItems[2].title}
+                  {featuredProjects[2]!.title}
                 </h3>
-                <p className="text-sm text-foreground/60 mt-1">{projectItems[2].subtitle}</p>
+                <p className="text-sm text-foreground/60 mt-1">{featuredProjects[2]!.summary}</p>
               </div>
             </FeaturedTile>
           </div>

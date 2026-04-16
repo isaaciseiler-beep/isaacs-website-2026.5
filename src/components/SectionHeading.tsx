@@ -7,7 +7,7 @@ interface SectionHeadingProps {
 
 const SectionHeading = ({ children, className = "" }: SectionHeadingProps) => {
   return (
-    <h2 className={`section-heading overflow-visible pl-[0.04em] -ml-[0.04em] ${className}`}>
+    <h2 className={`section-heading overflow-visible pl-10 md:pl-12 ${className}`}>
       {children.split("").map((char, i) => (
         <motion.span
           key={i}

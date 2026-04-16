@@ -14,25 +14,25 @@ interface Photo { id: string; image: string }
 interface Album { location: string; cover: string; photos: Photo[] }
 
 const albums: Album[] = [
-  { location: "Chicago", cover: photo1, photos: [
+  { location: "Christchurch, New Zealand", cover: photo1, photos: [
     { id: "chi-1", image: photo1 }, { id: "chi-2", image: photo3 },
     { id: "chi-3", image: photo2 }, { id: "chi-4", image: photo4 },
   ]},
-  { location: "Brooklyn", cover: photo2, photos: [
+  { location: "Banli, Taiwan", cover: photo2, photos: [
     { id: "bk-1", image: photo2 }, { id: "bk-2", image: photo1 }, { id: "bk-3", image: photo4 },
   ]},
-  { location: "Detroit", cover: photo3, photos: [
+  { location: "Aoraki National Park", cover: photo3, photos: [
     { id: "det-1", image: photo3 }, { id: "det-2", image: photo1 },
     { id: "det-3", image: photo4 }, { id: "det-4", image: photo2 }, { id: "det-5", image: photo3 },
   ]},
-  { location: "Brussels", cover: photo4, photos: [
+  { location: "Las Palmas de Gran Canaria, Spain", cover: photo4, photos: [
     { id: "bru-1", image: photo4 }, { id: "bru-2", image: photo2 }, { id: "bru-3", image: photo1 },
   ]},
-  { location: "Tokyo", cover: photo1, photos: [
+  { location: "Djupivogur, Iceland", cover: photo1, photos: [
     { id: "tok-1", image: photo1 }, { id: "tok-2", image: photo3 },
     { id: "tok-3", image: photo4 }, { id: "tok-4", image: photo2 },
   ]},
-  { location: "Berlin", cover: photo2, photos: [
+  { location: "Qiaozi Village, Taiwan", cover: photo2, photos: [
     { id: "ber-1", image: photo2 }, { id: "ber-2", image: photo3 }, { id: "ber-3", image: photo1 },
   ]},
 ];

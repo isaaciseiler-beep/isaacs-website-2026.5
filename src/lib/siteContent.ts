@@ -8,6 +8,8 @@ export interface NewsItem {
   source: string;
   title: string;
   href: string;
+  logoUrl: string;
+  logoAlt: string;
 }
 
 export interface ProjectLink {
@@ -46,66 +48,88 @@ export const newsItems: NewsItem[] = [
     source: "ChatGPT for Education",
     title: "Authored Substack Post on Education for OpenAI",
     href: "https://edunewsletter.openai.com/p/top-chats-from-the-fulbright-taiwan",
+    logoUrl: "https://pub-e466b845a9ef4344b05811b344fb11e1.r2.dev/openai-text.png",
+    logoAlt: "OpenAI",
   },
   {
     id: 2,
     source: "OpenAI",
     title: "Testimonial Featured in ChatGPT Pulse Launch",
     href: "https://openai.com/index/introducing-chatgpt-pulse/",
+    logoUrl: "https://pub-e466b845a9ef4344b05811b344fb11e1.r2.dev/openai-text.png",
+    logoAlt: "OpenAI",
   },
   {
     id: 3,
     source: "OpenAI",
     title: "Study Mode Spotlight on ChatGPT's Instagram",
     href: "https://www.instagram.com/chatgpt/reel/DNyG5VvXEZM/",
+    logoUrl: "https://pub-e466b845a9ef4344b05811b344fb11e1.r2.dev/openai-text.png",
+    logoAlt: "OpenAI",
   },
   {
     id: 4,
     source: "Washington University in St. Louis",
     title: "Won 2024 Truman Scholarship",
     href: "https://source.washu.edu/2024/04/junior-seiler-awarded-truman-scholarship/",
+    logoUrl: "https://pub-e466b845a9ef4344b05811b344fb11e1.r2.dev/WashU.png",
+    logoAlt: "WashU",
   },
   {
     id: 5,
     source: "OpenAI",
     title: "Co-Authored 100 Chats Project with the ChatGPT Lab",
     href: "https://chatgpt.com/100chats-project",
+    logoUrl: "https://pub-e466b845a9ef4344b05811b344fb11e1.r2.dev/openai-text.png",
+    logoAlt: "OpenAI",
   },
   {
     id: 6,
     source: "Washington University in St. Louis",
     title: "Named 2024 Rhodes Scholarship Finalist",
     href: "https://source.washu.edu/2024/11/seniors-darden-seiler-were-rhodes-scholars-finalists/",
+    logoUrl: "https://pub-e466b845a9ef4344b05811b344fb11e1.r2.dev/WashU.png",
+    logoAlt: "WashU",
   },
   {
     id: 7,
     source: "Washington University in St. Louis",
     title: "Won Fulbright Award to Taiwan",
     href: "https://source.wustl.edu/2025/06/several-alumni-earn-fulbright-awards/",
+    logoUrl: "https://pub-e466b845a9ef4344b05811b344fb11e1.r2.dev/Fulbright.png",
+    logoAlt: "Fulbright",
   },
   {
     id: 8,
     source: "Student Life",
     title: "Truman Scholarship Interview",
     href: "https://www.studlife.com/news/2024/04/24/isaac-seiler-named-truman-scholar",
+    logoUrl: "https://pub-e466b845a9ef4344b05811b344fb11e1.r2.dev/studlife.png",
+    logoAlt: "Student Life",
   },
   {
     id: 9,
     source: "Forbes",
     title: "60 Truman Scholars Announced (2024)",
     href: "https://www.forbes.com/sites/michaeltnietzel/2024/04/13/the-truman-scholars-for-2024-are-announced/",
+    logoUrl: "https://pub-e466b845a9ef4344b05811b344fb11e1.r2.dev/Forbes.png",
+    logoAlt: "Forbes",
   },
   {
     id: 10,
     source: "Missouri College Media Awards",
     title: "Won Award for Best College Newspaper Photography",
     href: "https://source.washu.edu/2025/05/student-life-wins-best-newspaper-honor-at-missouri-college-media-awards/",
+    logoUrl: "https://pub-e466b845a9ef4344b05811b344fb11e1.r2.dev/WashU.png",
+    logoAlt: "WashU",
   },
   {
     id: 11,
     source: "Washington University in St. Louis",
     title: "University Profile",
     href: "https://artsci.washu.edu/ampersand/isaac-seiler-setting-his-sights-high",
+    logoUrl: "https://pub-e466b845a9ef4344b05811b344fb11e1.r2.dev/WashU.png",
+    logoAlt: "WashU",
   },
 ];
 

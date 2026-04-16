@@ -56,7 +56,7 @@ const ProjectModal = ({ projects, currentIndex, onClose, onNavigate }: ProjectMo
 
           <motion.div
             key={project.id}
-            className="relative z-10 mx-4 flex max-h-[88vh] w-full max-w-5xl flex-col overflow-hidden border border-foreground/10 bg-background shadow-[0_30px_120px_rgba(0,0,0,0.45)]"
+            className="relative z-10 mx-4 flex max-h-[88vh] w-full max-w-3xl flex-col overflow-hidden border border-foreground/10 bg-background shadow-[0_30px_120px_rgba(0,0,0,0.45)]"
             initial={{ opacity: 0, y: 24, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.98 }}
@@ -66,8 +66,8 @@ const ProjectModal = ({ projects, currentIndex, onClose, onNavigate }: ProjectMo
               <X className="h-4 w-4" />
             </button>
 
-            <div className="grid min-h-0 grid-cols-1 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-              <div className="relative min-h-[260px] overflow-hidden lg:min-h-[88vh]">
+            <div className="min-h-0">
+              <div className="relative min-h-[220px] overflow-hidden">
                 <img src={project.image} alt={project.title} className="h-full w-full object-cover grayscale" />
                 <div
                   className="absolute inset-0"
@@ -76,15 +76,15 @@ const ProjectModal = ({ projects, currentIndex, onClose, onNavigate }: ProjectMo
                       "linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.35) 55%, rgba(10,10,8,0.8) 100%)",
                   }}
                 />
-                <div className="absolute inset-x-0 bottom-0 p-6 lg:p-8">
+                <div className="absolute inset-x-0 bottom-0 p-5 md:p-6">
                   <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.28em] text-white/45">{project.source}</p>
-                  <h2 className="max-w-md text-3xl font-semibold tracking-tight text-white md:text-5xl">{project.title}</h2>
-                  <p className="mt-3 max-w-sm text-sm leading-relaxed text-white/68">{project.summary}</p>
+                  <h2 className="max-w-2xl text-2xl font-semibold tracking-tight text-white md:text-4xl">{project.title}</h2>
+                  <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/68">{project.summary}</p>
                 </div>
               </div>
 
-              <div className="min-h-0 overflow-y-auto">
-                <div className="px-6 pb-8 pt-16 md:px-8">
+              <div className="min-h-0 overflow-y-auto max-h-[52vh]">
+                <div className="px-5 pb-6 pt-6 md:px-6">
                   <div className="mb-8 flex items-center gap-3">
                     <span className="font-mono text-[10px] uppercase tracking-[0.26em] text-foreground/28">
                       {String(currentIndex + 1).padStart(2, "0")}
@@ -96,7 +96,7 @@ const ProjectModal = ({ projects, currentIndex, onClose, onNavigate }: ProjectMo
                   <div className="space-y-8">
                     {project.sections.map((section) => (
                       <section key={section.heading}>
-                        <h3 className="mb-3 text-xl font-semibold tracking-tight text-foreground">{section.heading}</h3>
+                        <h3 className="mb-3 text-lg font-semibold tracking-tight text-foreground md:text-xl">{section.heading}</h3>
                         {section.paragraphs?.map((paragraph) => (
                           <p key={paragraph} className="mb-3 text-[15px] leading-relaxed text-foreground/68 last:mb-0">
                             {paragraph}
@@ -138,7 +138,7 @@ const ProjectModal = ({ projects, currentIndex, onClose, onNavigate }: ProjectMo
             {currentIndex > 0 && (
               <button
                 onClick={() => onNavigate(currentIndex - 1)}
-                className="absolute left-4 top-1/2 z-20 -translate-y-1/2 text-white/20 transition-colors hover:text-white/60 lg:left-6"
+                className="absolute left-3 top-[110px] z-20 text-white/25 transition-colors hover:text-white/70 md:left-4"
               >
                 <ChevronLeft className="h-5 w-5" strokeWidth={1.5} />
               </button>
@@ -147,7 +147,7 @@ const ProjectModal = ({ projects, currentIndex, onClose, onNavigate }: ProjectMo
             {currentIndex < projects.length - 1 && (
               <button
                 onClick={() => onNavigate(currentIndex + 1)}
-                className="absolute right-4 top-1/2 z-20 -translate-y-1/2 text-white/20 transition-colors hover:text-white/60 lg:right-6"
+                className="absolute right-3 top-[110px] z-20 text-white/25 transition-colors hover:text-white/70 md:right-4"
               >
                 <ChevronRight className="h-5 w-5" strokeWidth={1.5} />
               </button>

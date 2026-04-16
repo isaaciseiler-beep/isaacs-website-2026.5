@@ -1,24 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import AnimatedText from "@/components/AnimatedText";
 import SectionHeading from "@/components/SectionHeading";
 import headshot1 from "@/assets/headshot.jpg";
 import { bioLines } from "@/lib/siteContent";
 import { CONTACT_MAILTO } from "@/lib/site";
-
-const wordVariants = {
-  hidden: { opacity: 0, y: 18, filter: "blur(5px)" },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    filter: "blur(0px)",
-    transition: {
-      delay: i * 0.04,
-      duration: 0.4,
-      ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number],
-    },
-  }),
-};
 
 const popdownVariants = {
   closed: { height: 0, y: -18 },
@@ -49,6 +36,7 @@ const AboutSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const pillRef = useRef<HTMLDivElement>(null);
   const [hasDeployedPopdown, setHasDeployedPopdown] = useState(false);
+  const photoSize = "clamp(320px, 34vw, 520px)";
 
   useEffect(() => {
     if (hasDeployedPopdown) return;
@@ -89,28 +77,25 @@ const AboutSection = () => {
       <SectionHeading>About</SectionHeading>
 
       <div className="w-full max-w-[1600px]">
-        <div className="grid grid-cols-1 items-stretch gap-10 lg:grid-cols-[minmax(0,1fr)_clamp(320px,34vw,520px)] lg:gap-12">
-          <div className="min-w-0 self-stretch pr-4">
-            <div className="space-y-4">
+        <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-[minmax(0,1fr)_clamp(320px,34vw,520px)] lg:gap-12">
+          <div className="min-w-0 self-start pr-4 lg:flex lg:items-start">
+            <div className="space-y-4 lg:overflow-hidden" style={{ height: `calc(${photoSize} * 0.95)` }}>
               {bioLines.map((line, index) => (
-                <motion.p
+                <AnimatedText
                   key={line}
+                  text={line}
+                  as="p"
                   className="font-light tracking-tight text-foreground"
-                  style={{ fontSize: "clamp(1.65rem, 2.6vw, 2.9rem)", lineHeight: 1.02 }}
-                  variants={wordVariants}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, margin: "-60px" }}
-                  custom={index}
-                >
-                  {line}
-                </motion.p>
+                  delay={index * 0.08}
+                  margin="-60px"
+                />
               ))}
             </div>
           </div>
 
           <motion.div
             className="relative w-full overflow-hidden justify-self-end"
+            style={{ width: photoSize }}
             initial={{ opacity: 0, scale: 0.95, filter: "blur(8px)" }}
             whileInView={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
             viewport={{ once: true, margin: "-60px" }}
@@ -148,7 +133,7 @@ const AboutSection = () => {
                 ease: "easeInOut",
               }}
             />
-            <span className="text-base md:text-lg tracking-[0.02em] text-foreground">
+            <span className="text-base md:text-lg font-light tracking-[0.02em] text-foreground">
               Currently in the market for tech roles starting Summer 2026
             </span>
           </div>

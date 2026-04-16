@@ -1,19 +1,7 @@
 import { motion, useScroll, useTransform } from "framer-motion";
-import { bioLines } from "@/lib/siteContent";
+import AnimatedText from "@/components/AnimatedText";
 
-const lineVariants = {
-  hidden: { opacity: 0, y: 22, filter: "blur(8px)" },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    filter: "blur(0px)",
-    transition: {
-      delay: 0.25 + i * 0.12,
-      duration: 0.6,
-      ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number],
-    },
-  }),
-};
+const words = ["Crafting visual", "experiences that", "resonate."];
 
 const HeroSection = () => {
   const { scrollY } = useScroll();
@@ -24,21 +12,20 @@ const HeroSection = () => {
       <div className="absolute inset-0 bg-background" />
 
       <motion.div
-        className="relative z-10 px-6 pb-6 pl-16 md:pl-20"
+        className="relative z-10 px-6 pb-6"
         style={{ opacity: textOpacity }}
       >
         <div className="max-w-6xl space-y-3">
-          {bioLines.map((line, index) => (
-            <motion.p
+          {words.map((line, index) => (
+            <AnimatedText
               key={line}
-              className="text-2xl font-medium leading-[1.06] tracking-tight text-foreground md:text-4xl lg:text-5xl"
-              variants={lineVariants}
-              initial="hidden"
-              animate="visible"
-              custom={index}
-            >
-              {line}
-            </motion.p>
+              text={line}
+              as="p"
+              className="text-5xl font-semibold leading-[0.92] tracking-tighter text-foreground md:text-7xl lg:text-8xl"
+              delay={0.3 + index * 0.08}
+              once={false}
+              margin="-80px"
+            />
           ))}
         </div>
       </motion.div>

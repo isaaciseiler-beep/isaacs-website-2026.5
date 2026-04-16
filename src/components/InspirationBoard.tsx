@@ -37,13 +37,7 @@ const typeLabel: Record<string, string> = {
   video: "▶ VIDEO",
 };
 
-const typeColor: Record<string, string> = {
-  photo: "hsl(var(--foreground) / 0.5)",
-  website: "hsl(var(--foreground) / 0.5)",
-  place: "hsl(var(--foreground) / 0.5)",
-  quote: "hsl(var(--foreground) / 0.5)",
-  video: "hsl(var(--foreground) / 0.5)",
-};
+const OVERHANG = 0.3; // 30% max overhang
 
 const InspirationBoard = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -62,6 +56,21 @@ const InspirationBoard = () => {
   });
 
   const padding = useTransform(scrollYProgress, [0, 0.12, 0.25, 0.70, 0.82, 1], [24, 24, 0, 0, 24, 24]);
+
+  const clampPosition = useCallback((x: number, y: number, w: number, h: number) => {
+    if (!boardRef.current) return { x, y };
+    const board = boardRef.current;
+    const bw = board.clientWidth;
+    const bh = board.clientHeight;
+    const minX = -(w * OVERHANG);
+    const maxX = bw - w * (1 - OVERHANG);
+    const minY = -(h * OVERHANG);
+    const maxY = bh - h * (1 - OVERHANG);
+    return {
+      x: Math.max(minX, Math.min(maxX, x)),
+      y: Math.max(minY, Math.min(maxY, y)),
+    };
+  }, []);
 
   const handlePointerDown = useCallback((e: React.PointerEvent, id: number) => {
     e.preventDefault();
@@ -85,13 +94,15 @@ const InspirationBoard = () => {
   const handlePointerMove = useCallback((e: React.PointerEvent) => {
     if (dragging === null || !boardRef.current) return;
     const rect = boardRef.current.getBoundingClientRect();
-    const newX = e.clientX - rect.left - dragOffset.current.x;
-    const newY = e.clientY - rect.top - dragOffset.current.y;
+    const rawX = e.clientX - rect.left - dragOffset.current.x;
+    const rawY = e.clientY - rect.top - dragOffset.current.y;
     didDrag.current = true;
-    setItems(prev => prev.map(item =>
-      item.id === dragging ? { ...item, x: newX, y: newY } : item
-    ));
-  }, [dragging]);
+    setItems(prev => prev.map(item => {
+      if (item.id !== dragging) return item;
+      const clamped = clampPosition(rawX, rawY, item.w, item.h);
+      return { ...item, x: clamped.x, y: clamped.y };
+    }));
+  }, [dragging, clampPosition]);
 
   const handlePointerUp = useCallback((id: number) => {
     setDragging(null);
@@ -100,6 +111,69 @@ const InspirationBoard = () => {
       if (item) setActiveItem(item);
     }
   }, [items]);
+
+  const renderCard = (item: InspirationItem) => {
+    if (item.imageUrl) {
+      return (
+        <div className="relative w-full h-full overflow-hidden">
+          <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" draggable={false} />
+          <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-background/80 to-transparent">
+            <p className="mono-text text-foreground/40" style={{ fontSize: 8 }}>{typeLabel[item.type]}</p>
+            <p className="text-xs font-medium text-foreground tracking-tight">{item.title}</p>
+          </div>
+        </div>
+      );
+    }
+
+    if (item.type === "quote") {
+      return (
+        <div className="p-4 h-full flex flex-col justify-center" style={{ borderLeft: "2px solid hsl(var(--foreground) / 0.1)" }}>
+          <p className="text-xs text-foreground/50 leading-relaxed italic">{item.content}</p>
+          <p className="mono-text text-foreground/25 mt-2" style={{ fontSize: 8 }}>— {item.title}</p>
+        </div>
+      );
+    }
+
+    if (item.type === "place") {
+      return (
+        <div className="p-3 h-full flex flex-col justify-between" style={{ background: "linear-gradient(135deg, hsl(var(--foreground) / 0.03) 0%, transparent 100%)" }}>
+          <p className="mono-text text-foreground/25" style={{ fontSize: 8 }}>{typeLabel[item.type]}</p>
+          <div>
+            <p className="text-sm font-medium text-foreground/70 tracking-tight">{item.title}</p>
+            <p className="text-[10px] text-foreground/40 leading-relaxed mt-1">{item.content}</p>
+          </div>
+        </div>
+      );
+    }
+
+    if (item.type === "video") {
+      return (
+        <div className="p-3 h-full flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full border border-foreground/15 flex items-center justify-center shrink-0">
+            <span className="text-foreground/30 text-[10px]">▶</span>
+          </div>
+          <div>
+            <p className="text-xs font-medium text-foreground/60 tracking-tight">{item.title}</p>
+            <p className="text-[10px] text-foreground/30 mt-0.5">{item.content}</p>
+          </div>
+        </div>
+      );
+    }
+
+    // website / default
+    return (
+      <div className="p-3 h-full flex flex-col justify-between">
+        <div className="flex items-center gap-1.5">
+          <div className="w-2 h-2 rounded-full bg-foreground/10" />
+          <p className="mono-text text-foreground/25" style={{ fontSize: 8 }}>{typeLabel[item.type]}</p>
+        </div>
+        <div>
+          <p className="text-xs font-medium text-foreground/60 tracking-tight">{item.title}</p>
+          <p className="text-[10px] text-foreground/30 leading-relaxed mt-0.5">{item.content}</p>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <section ref={sectionRef} className="relative" style={{ minHeight: "110vh" }}>
@@ -115,20 +189,18 @@ const InspirationBoard = () => {
           <div
             ref={boardRef}
             className="relative flex-1 min-h-0 overflow-visible border border-border/20"
-            style={{
-              cursor: dragging !== null ? "grabbing" : "default",
-            }}
+            style={{ cursor: dragging !== null ? "grabbing" : "default" }}
             onPointerMove={handlePointerMove}
           >
-            {/* Dot grid background — fades in from bottom */}
+            {/* Dot grid — fades in from bottom */}
             <motion.div
               className="absolute inset-0 pointer-events-none"
               initial={{ opacity: 0, y: 40 }}
               animate={boardInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
               transition={{ duration: 0.8, ease: EASE }}
               style={{
-                backgroundImage: "radial-gradient(circle, hsl(var(--foreground) / 0.08) 1px, transparent 1px)",
-                backgroundSize: "24px 24px",
+                backgroundImage: "radial-gradient(circle, hsl(var(--foreground) / 0.1) 1px, transparent 1px)",
+                backgroundSize: "16px 16px",
               }}
             />
 
@@ -154,7 +226,6 @@ const InspirationBoard = () => {
                 onPointerDown={e => handlePointerDown(e, item.id)}
                 onPointerUp={() => handlePointerUp(item.id)}
               >
-                {/* Card */}
                 <div
                   className="border border-border/30 bg-background shadow-sm hover:shadow-md transition-shadow duration-300"
                   style={{
@@ -164,28 +235,7 @@ const InspirationBoard = () => {
                     height: item.h,
                   }}
                 >
-                  {item.imageUrl ? (
-                    <div className="relative w-full h-full overflow-hidden">
-                      <img
-                        src={item.imageUrl}
-                        alt={item.title}
-                        className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500"
-                        draggable={false}
-                      />
-                      <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-background/80 to-transparent">
-                        <p className="mono-text text-foreground/40" style={{ fontSize: 8 }}>{typeLabel[item.type]}</p>
-                        <p className="text-xs font-medium text-foreground tracking-tight">{item.title}</p>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="p-3 h-full flex flex-col justify-between">
-                      <p className="mono-text text-foreground/30" style={{ fontSize: 8 }}>{typeLabel[item.type]}</p>
-                      <div>
-                        <p className="text-xs text-foreground/60 leading-relaxed">{item.content}</p>
-                        <p className="mono-text text-foreground/30 mt-1" style={{ fontSize: 8 }}>— {item.title}</p>
-                      </div>
-                    </div>
-                  )}
+                  {renderCard(item)}
                 </div>
               </motion.div>
             ))}
@@ -214,34 +264,14 @@ const InspirationBoard = () => {
             >
               ✕
             </button>
-
-            <p className="mono-text mb-4" style={{ color: typeColor[activeItem.type], fontSize: 10 }}>
-              {typeLabel[activeItem.type]}
-            </p>
-
-            <h3 className="text-lg font-semibold tracking-tight text-foreground mb-3">
-              {activeItem.title}
-            </h3>
-
+            <p className="mono-text mb-4 text-foreground/50" style={{ fontSize: 10 }}>{typeLabel[activeItem.type]}</p>
+            <h3 className="text-lg font-semibold tracking-tight text-foreground mb-3">{activeItem.title}</h3>
             {activeItem.imageUrl && (
-              <img
-                src={activeItem.imageUrl}
-                alt={activeItem.title}
-                className="w-full aspect-video object-cover mb-4 grayscale hover:grayscale-0 transition-all duration-500"
-              />
+              <img src={activeItem.imageUrl} alt={activeItem.title} className="w-full aspect-video object-cover mb-4 grayscale hover:grayscale-0 transition-all duration-500" />
             )}
-
-            <p className="text-sm text-foreground/70 leading-relaxed mb-4">
-              {activeItem.content}
-            </p>
-
+            <p className="text-sm text-foreground/70 leading-relaxed mb-4">{activeItem.content}</p>
             {activeItem.url && (
-              <a
-                href={activeItem.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="pill-button inline-block"
-              >
+              <a href={activeItem.url} target="_blank" rel="noopener noreferrer" className="pill-button inline-block">
                 Visit →
               </a>
             )}

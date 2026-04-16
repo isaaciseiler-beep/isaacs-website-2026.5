@@ -40,7 +40,6 @@ const Index = () => {
 
   return (
     <div className="relative">
-      {/* Header gradient */}
       <div
         className="fixed top-0 left-0 right-0 z-40 pointer-events-none"
         style={{
@@ -49,8 +48,7 @@ const Index = () => {
         }}
       />
 
-      {/* Fixed header */}
-      <div className="fixed top-0 left-0 z-[55] flex items-center gap-1 px-6 md:px-6 py-4">
+      <div className="fixed top-0 left-0 z-[60] flex items-center gap-1 px-6 md:px-6 py-4">
         <Link to="/" className="contents"><Logo /></Link>
         <Sidebar
           open={sidebarOpen}
@@ -59,7 +57,6 @@ const Index = () => {
         />
       </div>
 
-      {/* Compress layout wrapper */}
       <motion.div
         animate={{ marginLeft: sidebarOpen ? 240 : 0, marginRight: 0 }}
         transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}

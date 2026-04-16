@@ -63,7 +63,7 @@ const AboutSection = () => {
     if (imgHeight <= 0) return;
 
     textEl.style.fontSize = "";
-    let lo = 12, hi = 42, best = lo;
+    let lo = 18, hi = 88, best = lo;
 
     for (let i = 0; i < 20; i++) {
       const mid = (lo + hi) / 2;
@@ -84,6 +84,18 @@ const AboutSection = () => {
     fitBioText();
     window.addEventListener("resize", fitBioText);
     return () => window.removeEventListener("resize", fitBioText);
+  }, [fitBioText]);
+
+  useEffect(() => {
+    const textEl = textRef.current;
+    const imgEl = imgRef.current;
+    if (!textEl || !imgEl || typeof ResizeObserver === "undefined") return;
+
+    const observer = new ResizeObserver(() => fitBioText());
+    observer.observe(textEl);
+    observer.observe(imgEl);
+
+    return () => observer.disconnect();
   }, [fitBioText]);
 
   useEffect(() => {
@@ -127,19 +139,20 @@ const AboutSection = () => {
     <section ref={sectionRef} className="py-12 px-6">
       <SectionHeading>About</SectionHeading>
 
-      <div className="max-w-5xl">
-        <div className="flex flex-col md:flex-row gap-10 md:gap-16 items-start">
-          <div ref={textRef} className="flex-1 min-w-0 overflow-hidden">
+      <div className="w-full max-w-[1600px]">
+        <div className="grid grid-cols-1 items-stretch gap-10 lg:grid-cols-[minmax(0,1fr)_clamp(320px,34vw,520px)] lg:gap-12">
+          <div className="min-w-0 self-stretch">
             <p
+              ref={textRef}
               className="leading-[1.38] font-light tracking-tight text-foreground"
-              style={bioFontSize ? { fontSize: `${bioFontSize}px` } : undefined}
+              style={bioFontSize ? { fontSize: `${bioFontSize}px`, lineHeight: 1.04 } : { fontSize: "clamp(1.9rem, 3.8vw, 4.5rem)", lineHeight: 1.04 }}
             >
               {words.map((word) => {
                 const ci = idx++;
                 return (
                   <motion.span
                     key={`w-${ci}`}
-                    className="inline-block mr-[0.28em]"
+                    className="inline-block mr-[0.28em] pl-[0.03em] -ml-[0.03em] will-change-transform"
                     variants={wordVariants}
                     initial="hidden"
                     whileInView="visible"
@@ -155,17 +168,17 @@ const AboutSection = () => {
 
           <motion.div
             ref={imgRef}
-            className="shrink-0"
+            className="relative w-full overflow-hidden justify-self-end"
             initial={{ opacity: 0, scale: 0.95, filter: "blur(8px)" }}
             whileInView={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           >
-            <motion.div className="overflow-hidden" style={{ y: imgY }}>
+            <motion.div className="aspect-square overflow-hidden" style={{ y: imgY }}>
               <img
                 src={headshot1}
                 alt="Portrait"
-                className="w-[180px] h-[180px] md:w-[240px] md:h-[240px] lg:w-[280px] lg:h-[280px] object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                className="h-full w-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
                 loading="lazy"
               />
             </motion.div>
@@ -233,4 +246,3 @@ const AboutSection = () => {
 };
 
 export default AboutSection;
-

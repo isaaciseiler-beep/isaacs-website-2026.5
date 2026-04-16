@@ -1,5 +1,5 @@
 import { useRef, useState, useCallback } from "react";
-import { motion, useScroll, useTransform, useInView } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import SectionHeading from "@/components/SectionHeading";
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
@@ -19,22 +19,22 @@ interface InspirationItem {
 }
 
 const ITEMS: InspirationItem[] = [
-  { id: 1, type: "photo", title: "Alpine Light", content: "Mountain photography — chasing light at altitude.", imageUrl: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop", url: "https://unsplash.com", x: 60, y: 40, w: 280, h: 200, rotate: -2 },
-  { id: 2, type: "quote", title: "Steve Jobs", content: "\"Design is not just what it looks like. Design is how it works.\"", x: 400, y: 60, w: 200, h: 120, rotate: 3 },
-  { id: 3, type: "website", title: "Are.na", content: "Visual research and bookmarking for the creative process.", url: "https://are.na", x: 650, y: 30, w: 220, h: 100, rotate: -1.5 },
-  { id: 4, type: "place", title: "Marfa, TX", content: "Desert minimalism. Judd foundations, Prada Marfa, endless sky.", x: 380, y: 240, w: 180, h: 140, rotate: -4 },
-  { id: 5, type: "video", title: "Dieter Rams", content: "Objectified — design philosophy in motion.", url: "https://vimeo.com", x: 80, y: 300, w: 240, h: 90, rotate: 1.5 },
-  { id: 6, type: "photo", title: "Street Type", content: "Found type in urban environments.", imageUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop", url: "https://unsplash.com", x: 600, y: 260, w: 200, h: 200, rotate: 2.5 },
-  { id: 7, type: "quote", title: "Da Vinci", content: "\"Simplicity is the ultimate sophistication.\"", x: 160, y: 480, w: 190, h: 100, rotate: -1 },
-  { id: 8, type: "website", title: "It's Nice That", content: "Why Brutalism is Making a Comeback", url: "https://itsnicethat.com", x: 440, y: 440, w: 220, h: 90, rotate: 3.5 },
+  { id: 1, type: "photo", title: "Alpine Light", content: "Mountain photography — chasing light at altitude.", imageUrl: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop", url: "https://unsplash.com", x: 5, y: 6, w: 31, h: 28, rotate: -2 },
+  { id: 2, type: "quote", title: "Steve Jobs", content: "\"Design is not just what it looks like. Design is how it works.\"", x: 41, y: 8, w: 22, h: 17, rotate: 3 },
+  { id: 3, type: "website", title: "Are.na", content: "Visual research and bookmarking for the creative process.", url: "https://are.na", x: 68, y: 5, w: 24, h: 14, rotate: -1.5 },
+  { id: 4, type: "place", title: "Marfa, TX", content: "Desert minimalism. Judd foundations, Prada Marfa, endless sky.", x: 39, y: 38, w: 20, h: 20, rotate: -4 },
+  { id: 5, type: "video", title: "Dieter Rams", content: "Objectified — design philosophy in motion.", url: "https://vimeo.com", x: 8, y: 49, w: 27, h: 13, rotate: 1.5 },
+  { id: 6, type: "photo", title: "Street Type", content: "Found type in urban environments.", imageUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop", url: "https://unsplash.com", x: 64, y: 42, w: 24, h: 28, rotate: 2.5 },
+  { id: 7, type: "quote", title: "Da Vinci", content: "\"Simplicity is the ultimate sophistication.\"", x: 15, y: 74, w: 21, h: 14, rotate: -1 },
+  { id: 8, type: "website", title: "It's Nice That", content: "Why Brutalism is Making a Comeback", url: "https://itsnicethat.com", x: 48, y: 72, w: 24, h: 13, rotate: 3.5 },
 ];
 
 const typeLabel: Record<string, string> = {
-  photo: "📷 PHOTO",
-  website: "🌐 WEBSITE",
-  place: "📍 PLACE",
-  quote: "💬 QUOTE",
-  video: "▶ VIDEO",
+  photo: "PHOTO",
+  website: "WEBSITE",
+  place: "PLACE",
+  quote: "QUOTE",
+  video: "VIDEO",
 };
 
 const OVERHANG = 0.3; // 30% max overhang
@@ -48,24 +48,29 @@ const InspirationBoard = () => {
   const dragOffset = useRef({ x: 0, y: 0 });
   const didDrag = useRef(false);
 
-  const boardInView = useInView(sectionRef, { once: true, margin: "-100px" });
-
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"],
   });
 
-  const padding = useTransform(scrollYProgress, [0, 0.12, 0.25, 0.70, 0.82, 1], [24, 24, 0, 0, 24, 24]);
+  const revealProgress = useSpring(useTransform(scrollYProgress, [0.08, 0.5], [0, 1]), {
+    stiffness: 140,
+    damping: 28,
+    mass: 0.8,
+  });
+  const boardY = useTransform(revealProgress, [0, 1], [88, 0]);
+  const boardOpacity = useTransform(revealProgress, [0, 1], [0, 1]);
+  const dotsOpacity = useTransform(revealProgress, [0, 0.55, 1], [0, 0.45, 1]);
+  const dotsY = useTransform(revealProgress, [0, 1], [52, 0]);
+  const cardOpacity = useTransform(revealProgress, [0.1, 1], [0, 1]);
+  const cardY = useTransform(revealProgress, [0, 1], [40, 0]);
 
   const clampPosition = useCallback((x: number, y: number, w: number, h: number) => {
     if (!boardRef.current) return { x, y };
-    const board = boardRef.current;
-    const bw = board.clientWidth;
-    const bh = board.clientHeight;
     const minX = -(w * OVERHANG);
-    const maxX = bw - w * (1 - OVERHANG);
+    const maxX = 100 - w * (1 - OVERHANG);
     const minY = -(h * OVERHANG);
-    const maxY = bh - h * (1 - OVERHANG);
+    const maxY = 100 - h * (1 - OVERHANG);
     return {
       x: Math.max(minX, Math.min(maxX, x)),
       y: Math.max(minY, Math.min(maxY, y)),
@@ -77,7 +82,10 @@ const InspirationBoard = () => {
     const item = items.find(i => i.id === id);
     if (!item || !boardRef.current) return;
     const rect = boardRef.current.getBoundingClientRect();
-    dragOffset.current = { x: e.clientX - rect.left - item.x, y: e.clientY - rect.top - item.y };
+    dragOffset.current = {
+      x: e.clientX - rect.left - (item.x / 100) * rect.width,
+      y: e.clientY - rect.top - (item.y / 100) * rect.height,
+    };
     didDrag.current = false;
     setDragging(id);
     setItems(prev => {
@@ -94,8 +102,8 @@ const InspirationBoard = () => {
   const handlePointerMove = useCallback((e: React.PointerEvent) => {
     if (dragging === null || !boardRef.current) return;
     const rect = boardRef.current.getBoundingClientRect();
-    const rawX = e.clientX - rect.left - dragOffset.current.x;
-    const rawY = e.clientY - rect.top - dragOffset.current.y;
+    const rawX = ((e.clientX - rect.left - dragOffset.current.x) / rect.width) * 100;
+    const rawY = ((e.clientY - rect.top - dragOffset.current.y) / rect.height) * 100;
     didDrag.current = true;
     setItems(prev => prev.map(item => {
       if (item.id !== dragging) return item;
@@ -117,9 +125,9 @@ const InspirationBoard = () => {
       return (
         <div className="relative w-full h-full overflow-hidden">
           <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" draggable={false} />
-          <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-background/80 to-transparent">
-            <p className="mono-text text-foreground/40" style={{ fontSize: 8 }}>{typeLabel[item.type]}</p>
-            <p className="text-xs font-medium text-foreground tracking-tight">{item.title}</p>
+          <div className="absolute bottom-0 left-0 right-0 p-[clamp(0.55rem,1vw,0.85rem)] bg-gradient-to-t from-background/90 to-transparent">
+            <p className="mono-text text-foreground/40" style={{ fontSize: "clamp(7px,0.6vw,9px)" }}>{typeLabel[item.type]}</p>
+            <p className="font-medium tracking-tight text-foreground" style={{ fontSize: "clamp(0.72rem,1vw,0.95rem)" }}>{item.title}</p>
           </div>
         </div>
       );
@@ -127,20 +135,20 @@ const InspirationBoard = () => {
 
     if (item.type === "quote") {
       return (
-        <div className="p-4 h-full flex flex-col justify-center" style={{ borderLeft: "2px solid hsl(var(--foreground) / 0.1)" }}>
-          <p className="text-xs text-foreground/50 leading-relaxed italic">{item.content}</p>
-          <p className="mono-text text-foreground/25 mt-2" style={{ fontSize: 8 }}>— {item.title}</p>
+        <div className="flex h-full flex-col justify-center p-[clamp(0.8rem,1.25vw,1.25rem)]" style={{ borderLeft: "2px solid hsl(var(--foreground) / 0.1)" }}>
+          <p className="italic text-foreground/55 leading-relaxed" style={{ fontSize: "clamp(0.72rem,0.95vw,0.95rem)" }}>{item.content}</p>
+          <p className="mono-text text-foreground/25 mt-2" style={{ fontSize: "clamp(7px,0.6vw,9px)" }}>- {item.title}</p>
         </div>
       );
     }
 
     if (item.type === "place") {
       return (
-        <div className="p-3 h-full flex flex-col justify-between" style={{ background: "linear-gradient(135deg, hsl(var(--foreground) / 0.03) 0%, transparent 100%)" }}>
-          <p className="mono-text text-foreground/25" style={{ fontSize: 8 }}>{typeLabel[item.type]}</p>
+        <div className="flex h-full flex-col justify-between p-[clamp(0.75rem,1vw,1rem)]" style={{ background: "linear-gradient(135deg, hsl(var(--foreground) / 0.03) 0%, transparent 100%)" }}>
+          <p className="mono-text text-foreground/25" style={{ fontSize: "clamp(7px,0.6vw,9px)" }}>{typeLabel[item.type]}</p>
           <div>
-            <p className="text-sm font-medium text-foreground/70 tracking-tight">{item.title}</p>
-            <p className="text-[10px] text-foreground/40 leading-relaxed mt-1">{item.content}</p>
+            <p className="font-medium text-foreground/72 tracking-tight" style={{ fontSize: "clamp(0.75rem,1vw,1rem)" }}>{item.title}</p>
+            <p className="mt-1 text-foreground/40 leading-relaxed" style={{ fontSize: "clamp(0.62rem,0.78vw,0.78rem)" }}>{item.content}</p>
           </div>
         </div>
       );
@@ -148,13 +156,13 @@ const InspirationBoard = () => {
 
     if (item.type === "video") {
       return (
-        <div className="p-3 h-full flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full border border-foreground/15 flex items-center justify-center shrink-0">
-            <span className="text-foreground/30 text-[10px]">▶</span>
+        <div className="flex h-full items-center gap-[clamp(0.55rem,0.9vw,0.85rem)] p-[clamp(0.75rem,1vw,1rem)]">
+          <div className="flex shrink-0 items-center justify-center rounded-full border border-foreground/15" style={{ width: "clamp(1.8rem,2.4vw,2.2rem)", height: "clamp(1.8rem,2.4vw,2.2rem)" }}>
+            <span className="text-foreground/30" style={{ fontSize: "clamp(0.55rem,0.7vw,0.7rem)" }}>▶</span>
           </div>
           <div>
-            <p className="text-xs font-medium text-foreground/60 tracking-tight">{item.title}</p>
-            <p className="text-[10px] text-foreground/30 mt-0.5">{item.content}</p>
+            <p className="font-medium text-foreground/60 tracking-tight" style={{ fontSize: "clamp(0.72rem,0.95vw,0.95rem)" }}>{item.title}</p>
+            <p className="mt-0.5 text-foreground/30" style={{ fontSize: "clamp(0.62rem,0.78vw,0.78rem)" }}>{item.content}</p>
           </div>
         </div>
       );
@@ -162,45 +170,42 @@ const InspirationBoard = () => {
 
     // website / default
     return (
-      <div className="p-3 h-full flex flex-col justify-between">
+      <div className="flex h-full flex-col justify-between p-[clamp(0.75rem,1vw,1rem)]">
         <div className="flex items-center gap-1.5">
           <div className="w-2 h-2 rounded-full bg-foreground/10" />
-          <p className="mono-text text-foreground/25" style={{ fontSize: 8 }}>{typeLabel[item.type]}</p>
+          <p className="mono-text text-foreground/25" style={{ fontSize: "clamp(7px,0.6vw,9px)" }}>{typeLabel[item.type]}</p>
         </div>
         <div>
-          <p className="text-xs font-medium text-foreground/60 tracking-tight">{item.title}</p>
-          <p className="text-[10px] text-foreground/30 leading-relaxed mt-0.5">{item.content}</p>
+          <p className="font-medium text-foreground/60 tracking-tight" style={{ fontSize: "clamp(0.72rem,0.95vw,0.95rem)" }}>{item.title}</p>
+          <p className="mt-0.5 text-foreground/30 leading-relaxed" style={{ fontSize: "clamp(0.62rem,0.78vw,0.78rem)" }}>{item.content}</p>
         </div>
       </div>
     );
   };
 
   return (
-    <section ref={sectionRef} className="relative" style={{ minHeight: "110vh" }}>
+    <section ref={sectionRef} className="relative" style={{ minHeight: "120vh" }}>
       <div className="sticky top-0 h-screen flex flex-col overflow-hidden">
         <div className="px-6 pt-[68px] pb-4">
           <SectionHeading className="mb-0">Inspiration</SectionHeading>
         </div>
 
-        <motion.div
-          className="flex-1 min-h-0 flex flex-col"
-          style={{ paddingLeft: padding, paddingRight: padding, paddingBottom: padding }}
-        >
-          <div
+        <div className="flex-1 min-h-0 px-6 pb-6">
+          <motion.div
             ref={boardRef}
-            className="relative flex-1 min-h-0 overflow-visible border border-border/20"
-            style={{ cursor: dragging !== null ? "grabbing" : "default" }}
+            className="relative h-full w-full overflow-hidden"
+            style={{ cursor: dragging !== null ? "grabbing" : "default", y: boardY, opacity: boardOpacity }}
             onPointerMove={handlePointerMove}
           >
             {/* Dot grid — fades in from bottom */}
             <motion.div
               className="absolute inset-0 pointer-events-none"
-              initial={{ opacity: 0, y: 40 }}
-              animate={boardInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
-              transition={{ duration: 0.8, ease: EASE }}
               style={{
+                opacity: dotsOpacity,
+                y: dotsY,
                 backgroundImage: "radial-gradient(circle, hsl(var(--foreground) / 0.1) 1px, transparent 1px)",
                 backgroundSize: "16px 16px",
+                maskImage: "linear-gradient(to top, rgba(0,0,0,1), rgba(0,0,0,0.82) 45%, rgba(0,0,0,0.1) 100%)",
               }}
             />
 
@@ -209,38 +214,38 @@ const InspirationBoard = () => {
                 key={item.id}
                 className="absolute select-none"
                 style={{
-                  left: item.x,
-                  top: item.y,
-                  width: item.w,
+                  left: `${item.x}%`,
+                  top: `${item.y}%`,
+                  width: `${item.w}%`,
+                  height: `${item.h}%`,
                   zIndex: dragging === item.id ? 50 : i,
-                  transform: `rotate(${item.rotate}deg)`,
+                  rotate: item.rotate,
                   cursor: dragging === item.id ? "grabbing" : "grab",
+                  opacity: cardOpacity,
+                  y: cardY,
                 }}
-                initial={{ opacity: 0, y: 30 }}
-                animate={boardInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
                 transition={{
-                  delay: 0.15 + i * 0.07,
-                  duration: 0.6,
+                  delay: 0.12 + i * 0.06,
+                  duration: 0.7,
                   ease: EASE,
                 }}
                 onPointerDown={e => handlePointerDown(e, item.id)}
                 onPointerUp={() => handlePointerUp(item.id)}
               >
                 <div
-                  className="border border-border/30 bg-background shadow-sm hover:shadow-md transition-shadow duration-300"
+                  className="h-full bg-background shadow-sm transition-shadow duration-300 hover:shadow-md"
                   style={{
                     boxShadow: dragging === item.id
                       ? "4px 6px 20px rgba(0,0,0,0.25)"
                       : "1px 2px 6px rgba(0,0,0,0.06)",
-                    height: item.h,
                   }}
                 >
                   {renderCard(item)}
                 </div>
               </motion.div>
             ))}
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
       </div>
 
       {/* Overlay */}

@@ -7,11 +7,11 @@ interface SectionHeadingProps {
 
 const SectionHeading = ({ children, className = "" }: SectionHeadingProps) => {
   return (
-    <h2 className={`section-heading ${className}`}>
+    <h2 className={`section-heading overflow-visible pl-[0.04em] -ml-[0.04em] ${className}`}>
       {children.split("").map((char, i) => (
         <motion.span
           key={i}
-          className="inline-block"
+          className="inline-block will-change-transform"
           style={{ whiteSpace: char === " " ? "pre" : undefined }}
           initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
           whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}

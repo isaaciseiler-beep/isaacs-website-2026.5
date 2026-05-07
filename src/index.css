@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&family=Rubik+Bubbles&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&family=Bungee+Shade&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -75,7 +75,7 @@
     --border: 50 10% 85%;
     --input: 50 10% 85%;
     --ring: 50 33% 7%;
-    --highlight: 68 100% 40%;
+    --highlight: 68 100% 81%;
 
     --sidebar-background: 50 20% 93%;
     --sidebar-foreground: 50 33% 7%;
@@ -93,10 +93,17 @@
     @apply border-border;
   }
 
+  html, body {
+    background: hsl(var(--background));
+    overscroll-behavior-y: none;
+  }
+
   body {
     @apply bg-background text-foreground;
     font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
     font-feature-settings: "ss01", "ss02";
+    user-select: none;
+    -webkit-user-select: none;
   }
 
   h1, h2, h3, h4, h5, h6 {

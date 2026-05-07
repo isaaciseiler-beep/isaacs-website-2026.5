@@ -15,13 +15,13 @@ const HeroSection = () => {
         className="relative z-10 px-6 pb-6"
         style={{ opacity: textOpacity }}
       >
-        <div className="max-w-6xl space-y-3">
+        <div className="max-w-6xl">
           {words.map((line, index) => (
             <AnimatedText
               key={line}
               text={line}
               as="p"
-              className="text-5xl font-semibold leading-[0.92] tracking-tighter text-foreground md:text-7xl lg:text-8xl"
+              className="text-5xl font-semibold leading-[0.85] tracking-tighter text-foreground md:text-7xl lg:text-8xl"
               delay={0.3 + index * 0.08}
               once={false}
               margin="-80px"

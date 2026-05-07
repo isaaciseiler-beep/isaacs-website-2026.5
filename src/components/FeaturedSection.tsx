@@ -113,7 +113,6 @@ const FeaturedSection = () => {
               <h3 className="text-2xl md:text-4xl font-semibold tracking-tighter text-foreground leading-tight">
                 {featuredProjects[0]!.title}
               </h3>
-              <p className="text-sm text-foreground/60 mt-1 max-w-md">{featuredProjects[0]!.summary}</p>
             </div>
           </FeaturedTile>
 
@@ -133,9 +132,8 @@ const FeaturedSection = () => {
                 }}
               >
                 <h3 className="text-base md:text-[1.625rem] font-semibold tracking-tighter text-foreground leading-tight">
-                  {featuredProjects[1]!.title}
+                  Projects archive
                 </h3>
-                <p className="text-sm text-foreground/60 mt-1">{featuredProjects[1]!.summary}</p>
               </div>
             </FeaturedTile>
 
@@ -153,9 +151,8 @@ const FeaturedSection = () => {
                 }}
               >
                 <h3 className="text-base md:text-[1.625rem] font-semibold tracking-tighter text-foreground leading-tight">
-                  {featuredProjects[2]!.title}
+                  Photo portfolio
                 </h3>
-                <p className="text-sm text-foreground/60 mt-1">{featuredProjects[2]!.summary}</p>
               </div>
             </FeaturedTile>
           </div>

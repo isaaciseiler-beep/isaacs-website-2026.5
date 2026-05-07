@@ -1,4 +1,3 @@
-import { useState, useRef, useEffect, useLayoutEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronRight, Mail, Sun, Laptop } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -90,33 +89,7 @@ const Sidebar = ({ open, onToggle, activeSection }: SidebarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const isOnPhotos = location.pathname === "/photos";
-  const isOnProjects = location.pathname === "/projects";
-
-  // Track positions for the blob glow
-  const itemRefs = useRef<Map<string, HTMLButtonElement | null>>(new Map());
-  const navRef = useRef<HTMLDivElement>(null);
-  const [blobStyle, setBlobStyle] = useState<{ top: number; height: number } | null>(null);
-
-  const getActiveId = () => {
-    if (isOnPhotos) return "portfolio";
-    if (isOnProjects) return "project-archive";
-    return activeSection || "hero";
-  };
-
-  const activeId = getActiveId();
-
-  useLayoutEffect(() => {
-    const el = itemRefs.current.get(activeId);
-    const nav = navRef.current;
-    if (el && nav) {
-      const navRect = nav.getBoundingClientRect();
-      const elRect = el.getBoundingClientRect();
-      setBlobStyle({
-        top: elRect.top - navRect.top,
-        height: elRect.height,
-      });
-    }
-  }, [activeId, open]);
+  const isOnProjects = location.pathname.startsWith("/projects");
 
   const handleItemClick = (item: SitemapItem) => {
     if (item.scrollTo) {
@@ -177,31 +150,14 @@ const Sidebar = ({ open, onToggle, activeSection }: SidebarProps) => {
       >
         <AnimatePresence>
           {open && (
-            <div className="mt-4" ref={navRef}>
+            <div className="mt-4">
               <div className="flex flex-col gap-0.5 relative">
-                {/* Animated glow blob behind active item */}
-                {blobStyle && (
-                  <motion.div
-                    className="absolute left-0 right-0 pointer-events-none"
-                    animate={{
-                      top: blobStyle.top,
-                      height: blobStyle.height,
-                    }}
-                    transition={{ type: "spring", stiffness: 350, damping: 30 }}
-                    style={{
-                      background: "radial-gradient(ellipse at center, hsl(var(--foreground) / 0.08) 0%, transparent 70%)",
-                      borderRadius: 8,
-                    }}
-                  />
-                )}
-
                 {sitemapItems.map((item) => {
                   const idx = flatIndex++;
                   const active = isItemActive(item);
                   return (
                     <div key={item.id}>
                       <motion.button
-                        ref={(el) => { itemRefs.current.set(item.id, el); }}
                         initial={{ opacity: 0, y: 12, filter: "blur(6px)" }}
                         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                         exit={{ opacity: 0, y: 8, filter: "blur(4px)" }}
@@ -220,7 +176,6 @@ const Sidebar = ({ open, onToggle, activeSection }: SidebarProps) => {
                         return (
                           <motion.button
                             key={child.id}
-                            ref={(el) => { itemRefs.current.set(child.id, el); }}
                             initial={{ opacity: 0, y: 12, filter: "blur(6px)" }}
                             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                             exit={{ opacity: 0, y: 8, filter: "blur(4px)" }}

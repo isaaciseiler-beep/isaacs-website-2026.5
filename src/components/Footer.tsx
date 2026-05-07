@@ -89,13 +89,14 @@ const Footer = () => {
         >
           <text
             x="0"
-            y="126"
+            y="118"
             textLength="1000"
             lengthAdjust="spacingAndGlyphs"
-            fill="hsl(var(--foreground) / 0.06)"
-            fontFamily="'Rubik Bubbles', cursive"
+            fill="hsl(var(--foreground) / 0.10)"
+            fontFamily="'Bungee Shade', cursive"
             fontWeight="400"
-            fontSize="130"
+            fontSize="120"
+            letterSpacing="2"
           >
             ISAAC SEILER
           </text>

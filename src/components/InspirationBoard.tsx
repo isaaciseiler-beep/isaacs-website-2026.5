@@ -19,14 +19,14 @@ interface InspirationItem {
 }
 
 const ITEMS: InspirationItem[] = [
-  { id: 1, type: "photo", title: "Alpine Light", content: "Mountain photography — chasing light at altitude.", imageUrl: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop", url: "https://unsplash.com", x: 5, y: 6, w: 31, h: 28, rotate: -2 },
-  { id: 2, type: "quote", title: "Steve Jobs", content: "\"Design is not just what it looks like. Design is how it works.\"", x: 41, y: 8, w: 22, h: 17, rotate: 3 },
-  { id: 3, type: "website", title: "Are.na", content: "Visual research and bookmarking for the creative process.", url: "https://are.na", x: 68, y: 5, w: 24, h: 14, rotate: -1.5 },
-  { id: 4, type: "place", title: "Marfa, TX", content: "Desert minimalism. Judd foundations, Prada Marfa, endless sky.", x: 39, y: 38, w: 20, h: 20, rotate: -4 },
-  { id: 5, type: "video", title: "Dieter Rams", content: "Objectified — design philosophy in motion.", url: "https://vimeo.com", x: 8, y: 49, w: 27, h: 13, rotate: 1.5 },
-  { id: 6, type: "photo", title: "Street Type", content: "Found type in urban environments.", imageUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop", url: "https://unsplash.com", x: 64, y: 42, w: 24, h: 28, rotate: 2.5 },
-  { id: 7, type: "quote", title: "Da Vinci", content: "\"Simplicity is the ultimate sophistication.\"", x: 15, y: 74, w: 21, h: 14, rotate: -1 },
-  { id: 8, type: "website", title: "It's Nice That", content: "Why Brutalism is Making a Comeback", url: "https://itsnicethat.com", x: 48, y: 72, w: 24, h: 13, rotate: 3.5 },
+  { id: 1, type: "photo", title: "Alpine Light", content: "Mountain photography — chasing light at altitude.", imageUrl: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop", url: "https://unsplash.com", x: 4, y: 5, w: 30, h: 32, rotate: -2 },
+  { id: 2, type: "quote", title: "Steve Jobs", content: "\"Design is not just what it looks like. Design is how it works.\"", x: 38, y: 7, w: 26, h: 20, rotate: 2.5 },
+  { id: 3, type: "website", title: "Are.na", content: "Visual research for the creative process.", url: "https://are.na", x: 69, y: 6, w: 27, h: 17, rotate: -1.5 },
+  { id: 4, type: "place", title: "Marfa, TX", content: "Desert minimalism. Judd, Prada, endless sky.", x: 40, y: 36, w: 23, h: 24, rotate: -3.5 },
+  { id: 5, type: "video", title: "Objectified", content: "Dieter Rams — design philosophy in motion.", url: "https://vimeo.com", x: 5, y: 56, w: 30, h: 17, rotate: 1.5 },
+  { id: 6, type: "photo", title: "Street Type", content: "Found type in urban environments.", imageUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=600&fit=crop", url: "https://unsplash.com", x: 67, y: 44, w: 28, h: 32, rotate: 2.5 },
+  { id: 7, type: "quote", title: "Da Vinci", content: "\"Simplicity is the ultimate sophistication.\"", x: 13, y: 78, w: 24, h: 17, rotate: -1 },
+  { id: 8, type: "website", title: "It's Nice That", content: "Why Brutalism is Making a Comeback", url: "https://itsnicethat.com", x: 42, y: 74, w: 24, h: 18, rotate: 3 },
 ];
 
 const typeLabel: Record<string, string> = {
@@ -125,9 +125,11 @@ const InspirationBoard = () => {
       return (
         <div className="relative w-full h-full overflow-hidden">
           <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" draggable={false} />
-          <div className="absolute bottom-0 left-0 right-0 p-[clamp(0.55rem,1vw,0.85rem)] bg-gradient-to-t from-background/90 to-transparent">
-            <p className="mono-text text-foreground/40" style={{ fontSize: "clamp(7px,0.6vw,9px)" }}>{typeLabel[item.type]}</p>
-            <p className="font-medium tracking-tight text-foreground" style={{ fontSize: "clamp(0.72rem,1vw,0.95rem)" }}>{item.title}</p>
+          <div className="absolute top-3 left-3">
+            <span className="mono-text bg-background/80 px-1.5 py-0.5 backdrop-blur-sm" style={{ fontSize: 9 }}>{typeLabel[item.type]}</span>
+          </div>
+          <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-background/95 via-background/60 to-transparent">
+            <p className="font-semibold tracking-tight text-foreground text-sm leading-tight">{item.title}</p>
           </div>
         </div>
       );
@@ -135,20 +137,24 @@ const InspirationBoard = () => {
 
     if (item.type === "quote") {
       return (
-        <div className="flex h-full flex-col justify-center p-[clamp(0.8rem,1.25vw,1.25rem)]" style={{ borderLeft: "2px solid hsl(var(--foreground) / 0.1)" }}>
-          <p className="italic text-foreground/55 leading-relaxed" style={{ fontSize: "clamp(0.72rem,0.95vw,0.95rem)" }}>{item.content}</p>
-          <p className="mono-text text-foreground/25 mt-2" style={{ fontSize: "clamp(7px,0.6vw,9px)" }}>- {item.title}</p>
+        <div className="flex h-full flex-col justify-between p-4" style={{ background: "hsl(var(--foreground) / 0.02)" }}>
+          <span className="text-foreground/15 leading-none" style={{ fontSize: 32, fontFamily: "Georgia, serif" }}>"</span>
+          <p className="italic text-foreground/75 leading-snug font-light text-[13px]">{item.content}</p>
+          <p className="mono-text text-foreground/40 mt-2" style={{ fontSize: 9 }}>— {item.title}</p>
         </div>
       );
     }
 
     if (item.type === "place") {
       return (
-        <div className="flex h-full flex-col justify-between p-[clamp(0.75rem,1vw,1rem)]" style={{ background: "linear-gradient(135deg, hsl(var(--foreground) / 0.03) 0%, transparent 100%)" }}>
-          <p className="mono-text text-foreground/25" style={{ fontSize: "clamp(7px,0.6vw,9px)" }}>{typeLabel[item.type]}</p>
+        <div className="flex h-full flex-col justify-between p-4" style={{ background: "linear-gradient(135deg, hsl(var(--foreground) / 0.04) 0%, transparent 100%)" }}>
+          <div className="flex items-center gap-1.5">
+            <span className="text-foreground/40" style={{ fontSize: 11 }}>◉</span>
+            <p className="mono-text text-foreground/40" style={{ fontSize: 9 }}>{typeLabel[item.type]}</p>
+          </div>
           <div>
-            <p className="font-medium text-foreground/72 tracking-tight" style={{ fontSize: "clamp(0.75rem,1vw,1rem)" }}>{item.title}</p>
-            <p className="mt-1 text-foreground/40 leading-relaxed" style={{ fontSize: "clamp(0.62rem,0.78vw,0.78rem)" }}>{item.content}</p>
+            <p className="font-semibold text-foreground tracking-tight text-base leading-tight">{item.title}</p>
+            <p className="mt-1.5 text-foreground/55 leading-snug text-[12px]">{item.content}</p>
           </div>
         </div>
       );
@@ -156,13 +162,16 @@ const InspirationBoard = () => {
 
     if (item.type === "video") {
       return (
-        <div className="flex h-full items-center gap-[clamp(0.55rem,0.9vw,0.85rem)] p-[clamp(0.75rem,1vw,1rem)]">
-          <div className="flex shrink-0 items-center justify-center rounded-full border border-foreground/15" style={{ width: "clamp(1.8rem,2.4vw,2.2rem)", height: "clamp(1.8rem,2.4vw,2.2rem)" }}>
-            <span className="text-foreground/30" style={{ fontSize: "clamp(0.55rem,0.7vw,0.7rem)" }}>▶</span>
-          </div>
-          <div>
-            <p className="font-medium text-foreground/60 tracking-tight" style={{ fontSize: "clamp(0.72rem,0.95vw,0.95rem)" }}>{item.title}</p>
-            <p className="mt-0.5 text-foreground/30" style={{ fontSize: "clamp(0.62rem,0.78vw,0.78rem)" }}>{item.content}</p>
+        <div className="flex h-full flex-col justify-between p-4" style={{ background: "hsl(var(--foreground) / 0.03)" }}>
+          <p className="mono-text text-foreground/40" style={{ fontSize: 9 }}>{typeLabel[item.type]}</p>
+          <div className="flex items-center gap-3">
+            <div className="flex shrink-0 items-center justify-center rounded-full bg-foreground/10 w-10 h-10">
+              <span className="text-foreground/70 ml-0.5" style={{ fontSize: 12 }}>▶</span>
+            </div>
+            <div className="min-w-0">
+              <p className="font-semibold text-foreground tracking-tight text-sm leading-tight truncate">{item.title}</p>
+              <p className="mt-0.5 text-foreground/50 text-[12px] leading-snug">{item.content}</p>
+            </div>
           </div>
         </div>
       );
@@ -170,14 +179,15 @@ const InspirationBoard = () => {
 
     // website / default
     return (
-      <div className="flex h-full flex-col justify-between p-[clamp(0.75rem,1vw,1rem)]">
+      <div className="flex h-full flex-col justify-between p-4 border border-foreground/10">
         <div className="flex items-center gap-1.5">
-          <div className="w-2 h-2 rounded-full bg-foreground/10" />
-          <p className="mono-text text-foreground/25" style={{ fontSize: "clamp(7px,0.6vw,9px)" }}>{typeLabel[item.type]}</p>
+          <div className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--highlight))]" />
+          <p className="mono-text text-foreground/40" style={{ fontSize: 9 }}>{typeLabel[item.type]}</p>
+          <span className="ml-auto text-foreground/30" style={{ fontSize: 11 }}>↗</span>
         </div>
         <div>
-          <p className="font-medium text-foreground/60 tracking-tight" style={{ fontSize: "clamp(0.72rem,0.95vw,0.95rem)" }}>{item.title}</p>
-          <p className="mt-0.5 text-foreground/30 leading-relaxed" style={{ fontSize: "clamp(0.62rem,0.78vw,0.78rem)" }}>{item.content}</p>
+          <p className="font-semibold text-foreground tracking-tight text-sm leading-tight">{item.title}</p>
+          <p className="mt-1 text-foreground/50 leading-snug text-[12px]">{item.content}</p>
         </div>
       </div>
     );
@@ -203,8 +213,8 @@ const InspirationBoard = () => {
               style={{
                 opacity: dotsOpacity,
                 y: dotsY,
-                backgroundImage: "radial-gradient(circle, hsl(var(--foreground) / 0.1) 1px, transparent 1px)",
-                backgroundSize: "16px 16px",
+                backgroundImage: "radial-gradient(circle, hsl(var(--foreground) / 0.13) 1px, transparent 1px)",
+                backgroundSize: "14px 14px",
                 maskImage: "linear-gradient(to top, rgba(0,0,0,1), rgba(0,0,0,0.82) 45%, rgba(0,0,0,0.1) 100%)",
               }}
             />

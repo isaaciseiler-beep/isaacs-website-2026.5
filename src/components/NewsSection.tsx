@@ -70,7 +70,7 @@ const NewsSection = () => {
               href={item.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="group relative block flex-shrink-0 border border-border p-6 transition-colors duration-300 overflow-hidden bg-card/40 hover:bg-card/70"
+              className="news-card group relative block flex-shrink-0 border border-border p-6 transition-colors duration-300 overflow-hidden"
               style={{ width: "calc(40% - 2px)", scrollSnapAlign: "start", minWidth: 280 }}
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}

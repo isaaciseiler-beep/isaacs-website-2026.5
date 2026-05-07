@@ -148,7 +148,7 @@ const PhotosPage = () => {
   const previewImages = currentAlbum ? currentAlbum.photos.map(p => p.image) : [];
 
   return (
-    <div className="relative min-h-screen bg-background text-foreground">
+    <div className="relative min-h-screen bg-background text-foreground overflow-x-hidden">
       <div className="fixed top-0 left-0 right-0 z-40 pointer-events-none" style={{ height: 64, background: "linear-gradient(to bottom, hsl(var(--background)) 0%, hsl(var(--background) / 0.6) 60%, transparent 100%)" }} />
 
       <div className="fixed top-0 left-0 z-[60] flex items-center gap-1 px-6 py-4">
@@ -168,7 +168,7 @@ const PhotosPage = () => {
         >
           {!openAlbum && (
             <div className="flex justify-center mb-16">
-              <div className="flex gap-1 px-6">
+              <div className="flex flex-wrap justify-center gap-1 px-6 max-w-full">
                 <LayoutGroup>
                   {locations.map((loc) => {
                     const active = filter === loc;
@@ -176,7 +176,7 @@ const PhotosPage = () => {
                       <button
                         key={loc}
                         onClick={() => { setFilter(loc); setOpenAlbum(null); }}
-                        className="relative shrink-0 px-3 py-1 font-mono text-[9px] tracking-[0.2em] uppercase transition-colors duration-300"
+                        className="relative px-3 py-1 font-mono text-[9px] tracking-[0.2em] uppercase transition-colors duration-300"
                         style={{ color: active ? "hsl(var(--background))" : "hsl(var(--foreground) / 0.3)" }}
                       >
                         {active && (

@@ -189,6 +189,9 @@
   .news-card {
     background-color: hsl(var(--card) / 0.4);
   }
+  .news-card:hover .news-card-title {
+    color: hsl(var(--highlight));
+  }
   .light .news-card {
     background-color: hsl(var(--background)); /* dark olive/green from dark mode */
     background-color: hsl(50 33% 7%);
@@ -198,10 +201,29 @@
   .light .news-card h3 {
     color: hsl(var(--primary-foreground));
   }
+  .light .news-card:hover .news-card-title {
+    color: hsl(var(--highlight));
+  }
   .light .news-card .mono-text {
     color: hsl(var(--primary-foreground) / 0.6);
   }
   .light .news-card:hover {
     background-color: hsl(50 33% 12%);
+  }
+
+  /* Light mode: pill button hover text turns dark green */
+  .light .pill-button:hover {
+    color: hsl(50 33% 7%);
+  }
+
+  /* Light mode: kill the hairline borders on the bg-foreground pills (Explore / Portfolio / Get in touch) */
+  .light .group .bg-foreground,
+  .light .group\/pill .bg-foreground {
+    border: none;
+  }
+  /* Light mode: when hovering the Explore/Portfolio/Get-in-touch pills, the label flips to dark green */
+  .light .group:hover .text-background,
+  .light .group\/pill:hover .text-background {
+    color: hsl(50 33% 7%);
   }
 }

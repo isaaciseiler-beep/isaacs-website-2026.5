@@ -97,8 +97,8 @@ const ChatOrb = () => {
     }, 1200);
   };
 
-  const orbColor = "hsl(200 20% 85%)";
-  const bgShadow = "hsl(var(--background))";
+  const orbShadow = "hsl(50 33% 7% / 0.55)";
+  const softShadow = `0 8px 32px -4px ${orbShadow}, 0 2px 12px -2px ${orbShadow}`;
 
   if (!isVisible && !isOpen) return null;
 
@@ -115,20 +115,19 @@ const ChatOrb = () => {
               width: DOT_SIZE,
               height: DOT_SIZE,
               background: "hsl(var(--foreground))",
-              boxShadow: `0 2px 20px -2px ${bgShadow}`,
+              boxShadow: softShadow,
             }}
             onClick={() => setIsOpen(true)}
             initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
+            animate={{ scale: [1, 1.12, 1], opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
-            transition={fastSlowTransition}
+            transition={{
+              opacity: { duration: 0.3 },
+              scale: { duration: 2.2, repeat: Infinity, ease: "easeInOut" },
+            }}
+            whileHover={{ scale: 1.18 }}
             aria-label="Open chat"
-          >
-            <div
-              className="rounded-full"
-              style={{ width: 8, height: 8, background: orbColor }}
-            />
-          </motion.button>
+          />
         )}
       </AnimatePresence>
 
@@ -150,6 +149,7 @@ const ChatOrb = () => {
                 bottom: bottomOffset,
                 right: DOT_RIGHT,
                 transformOrigin: "bottom right",
+                filter: `drop-shadow(0 12px 40px ${orbShadow}) drop-shadow(0 4px 16px ${orbShadow})`,
               }}
               initial={{
                 width: DOT_SIZE,
@@ -158,7 +158,7 @@ const ChatOrb = () => {
                 opacity: 0.8,
               }}
               animate={{
-                width: "min(50vw, 560px)",
+                width: "min(80vw, 896px)",
                 height: "auto",
                 borderRadius: 0,
                 opacity: 1,
@@ -181,7 +181,7 @@ const ChatOrb = () => {
                       background: "hsl(var(--background) / 0.35)",
                       backdropFilter: "blur(40px)",
                       WebkitBackdropFilter: "blur(40px)",
-                      boxShadow: `0 4px 24px -4px ${bgShadow}`,
+                      boxShadow: "none",
                     }}
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
@@ -228,7 +228,7 @@ const ChatOrb = () => {
               {/* Input pill */}
               <div
                 className="w-full flex items-center gap-2 px-4"
-                style={{ borderRadius: 100, background: "hsl(var(--foreground))", boxShadow: `0 4px 24px -4px ${bgShadow}`, height: DOT_SIZE }}
+                style={{ borderRadius: 100, background: "hsl(var(--foreground))", boxShadow: "none", height: DOT_SIZE }}
               >
                 <input
                   ref={inputRef}
@@ -256,7 +256,7 @@ const ChatOrb = () => {
 
               {/* Mode buttons */}
               <div className="w-full flex items-center justify-between mt-2.5 px-1">
-                <div className="flex items-center gap-3" style={{ filter: `drop-shadow(0 4px 12px ${bgShadow})` }}>
+                <div className="flex items-center gap-3">
                   <button
                     onClick={() => setMode("search")}
                     className={`pill-button !px-4 !py-1.5 !text-[10px] ${

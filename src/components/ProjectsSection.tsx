@@ -57,15 +57,25 @@ const ProjectsSection = () => {
 
               {/* Collapsed: vertical label */}
               <motion.div
-                className="absolute inset-0 flex flex-col items-center justify-end pb-5"
+                className="absolute inset-0 flex flex-col items-center justify-end pb-5 overflow-hidden"
                 animate={{ opacity: isActive ? 0 : 1 }}
                 transition={{ duration: 0.2 }}
               >
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background:
+                      "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 50%, transparent 80%)",
+                  }}
+                />
                 <span
-                  className="text-[11px] font-mono tracking-[0.25em] text-foreground/70 uppercase whitespace-nowrap drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]"
+                  className="relative text-[10px] font-mono tracking-[0.25em] text-white uppercase whitespace-nowrap"
                   style={{
                     writingMode: "vertical-lr",
                     transform: "rotate(180deg)",
+                    maxHeight: "70%",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
                   }}
                 >
                   {project.title}
@@ -110,7 +120,7 @@ const ProjectsSection = () => {
                       </motion.div>
 
                       <motion.h3
-                        className="text-2xl md:text-4xl font-semibold tracking-tighter text-foreground leading-[0.92] mb-2"
+                        className="text-xl md:text-3xl font-semibold tracking-tighter text-white leading-[0.95] mb-2"
                         initial={{ opacity: 0, y: 12 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, ease, delay: 0.15 }}
@@ -119,7 +129,7 @@ const ProjectsSection = () => {
                       </motion.h3>
 
                       <motion.p
-                        className="text-[13px] text-foreground/45 leading-relaxed max-w-sm"
+                        className="text-[13px] text-white/65 leading-relaxed max-w-sm"
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, ease, delay: 0.22 }}

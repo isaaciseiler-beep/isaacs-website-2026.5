@@ -7,48 +7,48 @@
 @layer base {
   :root {
     --background: 50 33% 7%;
-    --foreground: 200 20% 85%;
+    --foreground: 225 100% 98%;
 
     --card: 50 20% 9%;
-    --card-foreground: 200 20% 85%;
+    --card-foreground: 225 100% 98%;
 
     --popover: 50 20% 9%;
-    --popover-foreground: 200 20% 85%;
+    --popover-foreground: 225 100% 98%;
 
-    --primary: 200 20% 85%;
+    --primary: 225 100% 98%;
     --primary-foreground: 50 33% 7%;
 
     --secondary: 50 10% 12%;
-    --secondary-foreground: 200 20% 85%;
+    --secondary-foreground: 225 100% 98%;
 
     --muted: 50 10% 11%;
-    --muted-foreground: 200 20% 85%;
+    --muted-foreground: 225 100% 98%;
 
-    --accent: 200 20% 85%;
+    --accent: 225 100% 98%;
     --accent-foreground: 50 33% 7%;
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 200 20% 85%;
+    --destructive-foreground: 225 100% 98%;
 
     --border: 50 10% 14%;
     --input: 50 10% 14%;
-    --ring: 200 20% 85%;
+    --ring: 225 100% 98%;
     --highlight: 68 100% 81%;
 
     --radius: 0px;
 
     --sidebar-background: 50 33% 5%;
-    --sidebar-foreground: 200 20% 85%;
-    --sidebar-primary: 200 20% 85%;
+    --sidebar-foreground: 225 100% 98%;
+    --sidebar-primary: 225 100% 98%;
     --sidebar-primary-foreground: 50 33% 7%;
     --sidebar-accent: 50 10% 10%;
-    --sidebar-accent-foreground: 200 20% 85%;
+    --sidebar-accent-foreground: 225 100% 98%;
     --sidebar-border: 50 10% 12%;
-    --sidebar-ring: 200 20% 85%;
+    --sidebar-ring: 225 100% 98%;
   }
 
   .light {
-    --background: 200 20% 85%;
+    --background: 225 100% 98%;
     --foreground: 50 33% 7%;
 
     --card: 200 18% 82%;
@@ -58,7 +58,7 @@
     --popover-foreground: 50 33% 7%;
 
     --primary: 50 33% 7%;
-    --primary-foreground: 200 20% 85%;
+    --primary-foreground: 225 100% 98%;
 
     --secondary: 200 15% 78%;
     --secondary-foreground: 50 33% 7%;
@@ -67,7 +67,7 @@
     --muted-foreground: 50 33% 7%;
 
     --accent: 50 33% 7%;
-    --accent-foreground: 200 20% 85%;
+    --accent-foreground: 225 100% 98%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 50 33% 7%;
@@ -80,7 +80,7 @@
     --sidebar-background: 200 18% 88%;
     --sidebar-foreground: 50 33% 7%;
     --sidebar-primary: 50 33% 7%;
-    --sidebar-primary-foreground: 200 20% 85%;
+    --sidebar-primary-foreground: 225 100% 98%;
     --sidebar-accent: 200 18% 82%;
     --sidebar-accent-foreground: 50 33% 7%;
     --sidebar-border: 200 15% 82%;

@@ -213,8 +213,8 @@ const InspirationBoard = () => {
               style={{
                 opacity: dotsOpacity,
                 y: dotsY,
-                backgroundImage: "radial-gradient(circle, hsl(var(--foreground) / 0.1) 1px, transparent 1px)",
-                backgroundSize: "16px 16px",
+                backgroundImage: "radial-gradient(circle, hsl(var(--foreground) / 0.13) 1px, transparent 1px)",
+                backgroundSize: "14px 14px",
                 maskImage: "linear-gradient(to top, rgba(0,0,0,1), rgba(0,0,0,0.82) 45%, rgba(0,0,0,0.1) 100%)",
               }}
             />

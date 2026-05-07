@@ -117,12 +117,12 @@ const AboutSection = () => {
       <SectionHeading>About</SectionHeading>
 
       <div className="w-full max-w-[1600px]">
-        <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-[minmax(0,1fr)_clamp(320px,34vw,520px)] lg:gap-12">
-          <div className="min-w-0 self-start pr-4 lg:flex lg:items-stretch">
+        <div className="flex flex-col-reverse items-center gap-10 lg:grid lg:grid-cols-[minmax(0,1fr)_clamp(320px,34vw,520px)] lg:items-center lg:gap-12">
+          <div className="min-w-0 w-full self-center pr-0 lg:pr-4 lg:flex lg:items-center">
             <div
               ref={bioBoxRef}
               className="relative w-full overflow-hidden"
-              style={{ height: photoSize }}
+              style={{ height: `calc(${photoSize} * 0.9)` }}
             >
               {/* Hidden measuring layer — same content, off-screen, used to compute the fitting font-size */}
               <div
@@ -169,7 +169,7 @@ const AboutSection = () => {
           </div>
 
           <motion.div
-            className="relative w-full overflow-hidden justify-self-end"
+            className="relative w-full overflow-hidden justify-self-end self-center"
             style={{ width: photoSize }}
             initial={{ opacity: 0, scale: 0.95, filter: "blur(8px)" }}
             whileInView={{ opacity: 1, scale: 1, filter: "blur(0px)" }}

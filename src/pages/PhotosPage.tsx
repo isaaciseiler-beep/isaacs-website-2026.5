@@ -10,34 +10,45 @@ import photo2 from "@/assets/photo-2.jpg";
 import photo3 from "@/assets/photo-3.jpg";
 import photo4 from "@/assets/photo-4.jpg";
 
+type Continent = "North America" | "Asia" | "Europe" | "Oceania";
+
 interface Photo { id: string; image: string }
-interface Album { location: string; cover: string; photos: Photo[] }
+interface Album { location: string; continent: Continent; cover: string; photos: Photo[] }
 
 const albums: Album[] = [
-  { location: "Christchurch, New Zealand", cover: photo1, photos: [
+  { location: "Christchurch, New Zealand", continent: "Oceania", cover: photo1, photos: [
     { id: "chi-1", image: photo1 }, { id: "chi-2", image: photo3 },
     { id: "chi-3", image: photo2 }, { id: "chi-4", image: photo4 },
   ]},
-  { location: "Banli, Taiwan", cover: photo2, photos: [
+  { location: "Banli, Taiwan", continent: "Asia", cover: photo2, photos: [
     { id: "bk-1", image: photo2 }, { id: "bk-2", image: photo1 }, { id: "bk-3", image: photo4 },
   ]},
-  { location: "Aoraki National Park", cover: photo3, photos: [
+  { location: "Aoraki National Park", continent: "Oceania", cover: photo3, photos: [
     { id: "det-1", image: photo3 }, { id: "det-2", image: photo1 },
     { id: "det-3", image: photo4 }, { id: "det-4", image: photo2 }, { id: "det-5", image: photo3 },
   ]},
-  { location: "Las Palmas de Gran Canaria, Spain", cover: photo4, photos: [
+  { location: "Las Palmas de Gran Canaria, Spain", continent: "Europe", cover: photo4, photos: [
     { id: "bru-1", image: photo4 }, { id: "bru-2", image: photo2 }, { id: "bru-3", image: photo1 },
   ]},
-  { location: "Djupivogur, Iceland", cover: photo1, photos: [
+  { location: "Djupivogur, Iceland", continent: "Europe", cover: photo1, photos: [
     { id: "tok-1", image: photo1 }, { id: "tok-2", image: photo3 },
     { id: "tok-3", image: photo4 }, { id: "tok-4", image: photo2 },
   ]},
-  { location: "Qiaozi Village, Taiwan", cover: photo2, photos: [
+  { location: "Qiaozi Village, Taiwan", continent: "Asia", cover: photo2, photos: [
     { id: "ber-1", image: photo2 }, { id: "ber-2", image: photo3 }, { id: "ber-3", image: photo1 },
   ]},
 ];
 
-const locations = ["All", ...albums.map((a) => a.location)];
+const continents: ("All" | Continent)[] = ["All", "North America", "Asia", "Europe", "Oceania"];
+
+// Featured photos for the editorial layout above the grid
+const featuredPhotos = {
+  hero: photo3,
+  pairLeft: photo1,
+  pairRight: photo2,
+  overlap: photo4,
+  bottom: photo1,
+};
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const EASE_TEXT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 
@@ -121,7 +132,7 @@ const PhotosPage = () => {
   const [previewIdx, setPreviewIdx] = useState<number | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const filtered = filter === "All" ? albums : albums.filter((a) => a.location === filter);
+  const filtered = filter === "All" ? albums : albums.filter((a) => a.continent === filter);
   const currentAlbum = openAlbum ? albums.find((a) => a.location === openAlbum) : null;
 
   useEffect(() => {
@@ -167,10 +178,14 @@ const PhotosPage = () => {
           transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1], delay: 0.1 }}
         >
           {!openAlbum && (
+            <FeaturedHero />
+          )}
+
+          {!openAlbum && (
             <div className="flex justify-center mb-16">
               <div className="flex flex-wrap justify-center gap-1 px-6 max-w-full">
                 <LayoutGroup>
-                  {locations.map((loc) => {
+                  {continents.map((loc) => {
                     const active = filter === loc;
                     return (
                       <button

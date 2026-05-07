@@ -55,32 +55,7 @@ const ProjectsSection = () => {
                 transition={{ duration: 0.85, ease }}
               />
 
-              {/* Collapsed: vertical label */}
-              <motion.div
-                className="absolute inset-0 flex flex-col items-center justify-end pb-5 overflow-hidden"
-                animate={{ opacity: isActive ? 0 : 1 }}
-                transition={{ duration: 0.2 }}
-              >
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    background:
-                      "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 50%, transparent 80%)",
-                  }}
-                />
-                <span
-                  className="relative text-[10px] font-mono tracking-[0.25em] text-white uppercase whitespace-nowrap"
-                  style={{
-                    writingMode: "vertical-lr",
-                    transform: "rotate(180deg)",
-                    maxHeight: "70%",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
-                >
-                  {project.title}
-                </span>
-              </motion.div>
+              {/* Collapsed: no label, just the photo */}
 
               {/* Expanded overlay */}
               <AnimatePresence>

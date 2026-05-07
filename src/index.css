@@ -190,10 +190,18 @@
     background-color: hsl(var(--card) / 0.4);
   }
   .light .news-card {
-    background-color: hsl(var(--highlight) / 0.55);
-    border-color: hsl(var(--highlight) / 0.7);
+    background-color: hsl(var(--background)); /* dark olive/green from dark mode */
+    background-color: hsl(50 33% 7%);
+    border-color: hsl(50 33% 7%);
+    color: hsl(var(--primary-foreground));
+  }
+  .light .news-card h3 {
+    color: hsl(var(--primary-foreground));
+  }
+  .light .news-card .mono-text {
+    color: hsl(var(--primary-foreground) / 0.6);
   }
   .light .news-card:hover {
-    background-color: hsl(var(--highlight) / 0.75);
+    background-color: hsl(50 33% 12%);
   }
 }

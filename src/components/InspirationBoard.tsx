@@ -53,7 +53,7 @@ const InspirationBoard = () => {
     offset: ["start end", "end start"],
   });
 
-  const revealProgress = useSpring(useTransform(scrollYProgress, [0.08, 0.5], [0, 1]), {
+  const revealProgress = useSpring(useTransform(scrollYProgress, [0.0, 0.28], [0, 1]), {
     stiffness: 140,
     damping: 28,
     mass: 0.8,

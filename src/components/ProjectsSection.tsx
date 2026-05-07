@@ -82,14 +82,14 @@ const ProjectsSection = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, ease, delay: 0.1 }}
                       >
-                        <span className="text-[10px] font-mono tracking-[0.3em] text-[hsl(200,20%,85%)]/50">
+                        <span className="text-[10px] font-mono tracking-[0.3em] text-[#f3f6ff]/50">
                           {String(i + 1).padStart(2, "0")}
                         </span>
-                        <span className="w-4 h-px bg-[hsl(200,20%,85%)]/30" />
-                        <span className="text-[10px] font-mono tracking-[0.2em] text-[hsl(200,20%,85%)]/60 uppercase">
+                        <span className="w-4 h-px bg-[#f3f6ff]/30" />
+                        <span className="text-[10px] font-mono tracking-[0.2em] text-[#f3f6ff]/60 uppercase">
                           {project.source}
                         </span>
-                        <span className="text-[10px] font-mono tracking-[0.2em] text-[hsl(200,20%,85%)]/40 uppercase ml-auto">
+                        <span className="text-[10px] font-mono tracking-[0.2em] text-[#f3f6ff]/40 uppercase ml-auto">
                           {project.year}
                         </span>
                       </motion.div>

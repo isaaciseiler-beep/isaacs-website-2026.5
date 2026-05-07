@@ -47,16 +47,6 @@ const socialLinks = [
 const Footer = () => {
   return (
     <footer id="footer" className="relative overflow-hidden bg-background">
-      {/* Smooth static gradient — no animation, no hard edges */}
-      <div
-        aria-hidden
-        className="absolute inset-0 z-0"
-        style={{
-          background:
-            "linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--background)) 5%, hsl(200 28% 88% / 0.02) 20%, hsl(200 28% 88% / 0.05) 30%, hsl(200 28% 88% / 0.09) 38%, hsl(200 28% 88% / 0.14) 46%, hsl(200 28% 88% / 0.2) 54%, hsl(200 28% 88% / 0.27) 62%, hsl(200 28% 88% / 0.34) 70%, hsl(200 28% 88% / 0.4) 80%, hsl(200 28% 88% / 0.46) 90%, hsl(200 28% 88% / 0.5) 100%)",
-        }}
-      />
-
       <div className="relative z-10 px-6 pt-20 pb-6 flex flex-col items-center">
         {/* Social icons centered */}
         <div className="flex items-center justify-center gap-5 mb-4">
@@ -92,11 +82,11 @@ const Footer = () => {
             y="118"
             textLength="1000"
             lengthAdjust="spacingAndGlyphs"
-            fill="hsl(var(--foreground) / 0.10)"
-            fontFamily="'Bungee Shade', cursive"
-            fontWeight="400"
+            fill="hsl(var(--foreground) / 0.12)"
+            fontFamily="'Space Grotesk', -apple-system, sans-serif"
+            fontWeight="700"
             fontSize="120"
-            letterSpacing="2"
+            letterSpacing="-4"
           >
             ISAAC SEILER
           </text>

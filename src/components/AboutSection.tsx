@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import AnimatedText from "@/components/AnimatedText";
 import SectionHeading from "@/components/SectionHeading";
 import headshot1 from "@/assets/headshot.jpg";
 import { bioLines } from "@/lib/siteContent";
@@ -37,6 +36,47 @@ const AboutSection = () => {
   const pillRef = useRef<HTMLDivElement>(null);
   const [hasDeployedPopdown, setHasDeployedPopdown] = useState(false);
   const photoSize = "clamp(320px, 34vw, 520px)";
+
+  // Auto-fit the bio text inside a fixed-height box matching the headshot.
+  const bioBoxRef = useRef<HTMLDivElement>(null);
+  const bioMeasureRef = useRef<HTMLDivElement>(null);
+  const [bioFontPx, setBioFontPx] = useState<number>(28);
+
+  useLayoutEffect(() => {
+    const fit = () => {
+      const box = bioBoxRef.current;
+      const measure = bioMeasureRef.current;
+      if (!box || !measure) return;
+      const targetH = box.clientHeight;
+      const targetW = box.clientWidth;
+      if (targetH <= 0 || targetW <= 0) return;
+      // Binary search for the largest font-size that fits both height and width.
+      let lo = 12;
+      let hi = 96;
+      let best = lo;
+      for (let i = 0; i < 18; i++) {
+        const mid = (lo + hi) / 2;
+        measure.style.fontSize = `${mid}px`;
+        const fits = measure.scrollHeight <= targetH && measure.scrollWidth <= targetW;
+        if (fits) {
+          best = mid;
+          lo = mid;
+        } else {
+          hi = mid;
+        }
+        if (hi - lo < 0.5) break;
+      }
+      setBioFontPx(best);
+    };
+    fit();
+    const ro = new ResizeObserver(fit);
+    if (bioBoxRef.current) ro.observe(bioBoxRef.current);
+    window.addEventListener("resize", fit);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", fit);
+    };
+  }, []);
 
   useEffect(() => {
     if (hasDeployedPopdown) return;
@@ -80,24 +120,51 @@ const AboutSection = () => {
         <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-[minmax(0,1fr)_clamp(320px,34vw,520px)] lg:gap-12">
           <div className="min-w-0 self-start pr-4 lg:flex lg:items-stretch">
             <div
-              className="flex flex-col justify-between gap-4 w-full"
-              style={{ minHeight: photoSize }}
+              ref={bioBoxRef}
+              className="relative w-full overflow-hidden"
+              style={{ height: photoSize }}
             >
-              {bioLines.map((line, index) => (
-                <AnimatedText
-                  key={line}
-                  text={line}
-                  as="p"
-                  className="font-light tracking-tight leading-[1.15] text-foreground break-words"
-                  style={{
-                    fontSize: `clamp(1rem, ${2.2 - index * 0.2}vw, ${1.65 - index * 0.15}rem)`,
-                    wordBreak: "normal",
-                    overflowWrap: "break-word",
-                  }}
-                  delay={index * 0.08}
-                  margin="-60px"
-                />
-              ))}
+              {/* Hidden measuring layer — same content, off-screen, used to compute the fitting font-size */}
+              <div
+                ref={bioMeasureRef}
+                aria-hidden
+                className="font-light tracking-tight leading-[1.18] text-foreground"
+                style={{
+                  position: "absolute",
+                  visibility: "hidden",
+                  pointerEvents: "none",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  whiteSpace: "normal",
+                  wordBreak: "normal",
+                  overflowWrap: "break-word",
+                }}
+              >
+                {bioLines.map((line, i) => (
+                  <p key={i} style={{ marginBottom: i === bioLines.length - 1 ? 0 : "0.7em" }}>
+                    {line}
+                  </p>
+                ))}
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 12, filter: "blur(6px)" }}
+                whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.45, ease: [0.25, 0.1, 0.25, 1] }}
+                className="font-light tracking-tight leading-[1.18] text-foreground"
+                style={{ fontSize: `${bioFontPx}px` }}
+              >
+                {bioLines.map((line, i) => (
+                  <p
+                    key={i}
+                    style={{ marginBottom: i === bioLines.length - 1 ? 0 : "0.7em" }}
+                  >
+                    {line}
+                  </p>
+                ))}
+              </motion.div>
             </div>
           </div>
 

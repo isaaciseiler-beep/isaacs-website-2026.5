@@ -8,6 +8,11 @@ interface Message {
   content: string;
 }
 
+interface ChatApiResponse {
+  message?: string;
+  error?: string;
+}
+
 const DOT_SIZE = 36;
 const DOT_BOTTOM = 20;
 const DOT_RIGHT = 20;
@@ -76,25 +81,54 @@ const ChatOrb = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!input.trim()) return;
     const userMsg: Message = { id: Date.now().toString(), role: "user", content: input.trim() };
-    setMessages((prev) => [...prev, userMsg]);
+    const nextMessages = [...messages, userMsg];
+    setMessages(nextMessages);
     setInput("");
     setIsLoading(true);
-    setTimeout(() => {
+
+    try {
+      const endpoint = mode === "ai" ? "/api/chat" : "/api/search";
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: nextMessages.map(({ role, content }) => ({ role, content })),
+          query: userMsg.content,
+        }),
+      });
+
+      const data = (await response.json()) as ChatApiResponse;
       setMessages((prev) => [
         ...prev,
         {
           id: (Date.now() + 1).toString(),
           role: "assistant",
-          content: mode === "ai"
-            ? "This is a placeholder AI response. Connect an LLM to bring me to life."
-            : "No results found. Search indexing is not yet connected.",
+          content:
+            data.message ||
+            data.error ||
+            (mode === "ai"
+              ? "I could not reach the AI assistant yet."
+              : "No results found. Search indexing is not yet connected."),
         },
       ]);
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: (Date.now() + 1).toString(),
+          role: "assistant",
+          content:
+            mode === "ai"
+              ? "I could not reach the AI assistant yet. On local dev, run this through Vercel so /api/chat is available."
+              : "Search is not connected yet.",
+        },
+      ]);
+    } finally {
       setIsLoading(false);
-    }, 1200);
+    }
   };
 
   const orbColor = "hsl(200 20% 85%)";

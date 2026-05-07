@@ -180,4 +180,15 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+
+  .news-card {
+    background-color: hsl(var(--card) / 0.4);
+  }
+  .light .news-card {
+    background-color: hsl(var(--highlight) / 0.55);
+    border-color: hsl(var(--highlight) / 0.7);
+  }
+  .light .news-card:hover {
+    background-color: hsl(var(--highlight) / 0.75);
+  }
 }

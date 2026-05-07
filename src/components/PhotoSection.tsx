@@ -93,8 +93,7 @@ const PhotoSection = () => {
               >
                 <img src={photo.image} alt={photo.title} className="w-full h-full object-cover" />
                 <div className="grid-item-overlay">
-                  <p className="mono-text mb-0.5">{photo.location}</p>
-                  <h3 className="text-xs font-medium text-foreground">{photo.title}</h3>
+                  <p className="mono-text">{photo.location}</p>
                 </div>
               </motion.div>
             ))}

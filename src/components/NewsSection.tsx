@@ -78,17 +78,17 @@ const NewsSection = () => {
               transition={{ delay: index * 0.05, duration: 0.4 }}
             >
               <div className="flex items-start justify-between mb-5">
-                <div className="flex h-[46px] items-center">
+                <div className="flex h-[37px] items-center">
                   <img
                     src={item.logoUrl}
                     alt={item.logoAlt}
-                    className="h-full w-auto max-w-[160px] object-contain opacity-80 transition-opacity duration-200 group-hover:opacity-100"
+                    className="h-full w-auto max-w-[128px] object-contain opacity-80 transition-opacity duration-200 group-hover:opacity-100"
                     loading="lazy"
                   />
                 </div>
               </div>
 
-              <h3 className="text-lg font-semibold tracking-tight text-foreground mb-2 group-hover:text-foreground/80 transition-colors duration-200">
+              <h3 className="news-card-title text-lg font-semibold tracking-tight text-foreground mb-2 transition-colors duration-200">
                 {item.title}
               </h3>
               <div className="flex items-center justify-end mt-8">

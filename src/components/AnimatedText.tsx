@@ -1,9 +1,11 @@
+import type { CSSProperties } from "react";
 import { motion } from "framer-motion";
 
 interface AnimatedTextProps {
   text: string;
   as?: "span" | "p";
   className?: string;
+  style?: CSSProperties;
   delay?: number;
   once?: boolean;
   margin?: string;
@@ -13,6 +15,7 @@ const AnimatedText = ({
   text,
   as = "span",
   className = "",
+  style,
   delay = 0,
   once = true,
   margin = "-50px",
@@ -20,7 +23,7 @@ const AnimatedText = ({
   const MotionTag = as === "p" ? motion.p : motion.span;
 
   return (
-    <MotionTag className={className}>
+    <MotionTag className={className} style={style}>
       {text.split("").map((char, index) => (
         <motion.span
           key={`${text}-${index}`}

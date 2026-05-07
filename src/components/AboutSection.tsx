@@ -78,14 +78,20 @@ const AboutSection = () => {
 
       <div className="w-full max-w-[1600px]">
         <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-[minmax(0,1fr)_clamp(320px,34vw,520px)] lg:gap-12">
-          <div className="min-w-0 self-start pr-4 lg:flex lg:items-start">
-            <div className="space-y-4 lg:overflow-hidden" style={{ height: `calc(${photoSize} * 0.95)` }}>
+          <div className="min-w-0 self-start pr-4 lg:flex lg:items-stretch">
+            <div
+              className="flex flex-col justify-between lg:overflow-hidden w-full"
+              style={{ height: photoSize }}
+            >
               {bioLines.map((line, index) => (
                 <AnimatedText
                   key={line}
                   text={line}
                   as="p"
-                  className="font-light tracking-tight text-foreground"
+                  className="font-semibold tracking-tighter leading-[0.95] text-foreground"
+                  style={{
+                    fontSize: `clamp(1.5rem, ${4.4 - index * 0.4}vw, ${3.4 - index * 0.3}rem)`,
+                  }}
                   delay={index * 0.08}
                   margin="-60px"
                 />

@@ -110,7 +110,7 @@ const FeaturedSection = () => {
                   "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 60%, transparent 100%)",
               }}
             >
-              <h3 className="text-2xl md:text-4xl font-semibold tracking-tighter text-foreground leading-tight">
+              <h3 className="text-[2rem] md:text-[3.25rem] font-semibold tracking-tighter text-[hsl(200,20%,85%)] leading-tight">
                 {featuredProjects[0]!.title}
               </h3>
             </div>
@@ -131,7 +131,7 @@ const FeaturedSection = () => {
                     "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 70%, transparent 100%)",
                 }}
               >
-                <h3 className="text-base md:text-[1.625rem] font-semibold tracking-tighter text-foreground leading-tight">
+                <h3 className="text-base md:text-[1.625rem] font-semibold tracking-tighter text-[hsl(200,20%,85%)] leading-tight">
                   Projects archive
                 </h3>
               </div>
@@ -150,7 +150,7 @@ const FeaturedSection = () => {
                     "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 70%, transparent 100%)",
                 }}
               >
-                <h3 className="text-base md:text-[1.625rem] font-semibold tracking-tighter text-foreground leading-tight">
+                <h3 className="text-base md:text-[1.625rem] font-semibold tracking-tighter text-[hsl(200,20%,85%)] leading-tight">
                   Photo portfolio
                 </h3>
               </div>

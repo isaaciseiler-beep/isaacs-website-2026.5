@@ -202,10 +202,10 @@ const Sidebar = ({ open, onToggle, activeSection }: SidebarProps) => {
                     <div key={item.id}>
                       <motion.button
                         ref={(el) => { itemRefs.current.set(item.id, el); }}
-                        initial={{ opacity: 0, x: -20, scale: 0.92, filter: "blur(6px)", rotateY: -15 }}
-                        animate={{ opacity: 1, x: 0, scale: 1, filter: "blur(0px)", rotateY: 0 }}
-                        exit={{ opacity: 0, x: -14, scale: 0.95, filter: "blur(4px)", rotateY: -10 }}
-                        transition={{ delay: 0.08 + idx * 0.06, duration: 0.5, ease: EASE, opacity: { duration: 0.4 }, filter: { duration: 0.6, delay: 0.1 + idx * 0.06 } }}
+                        initial={{ opacity: 0, y: 12, filter: "blur(6px)" }}
+                        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                        exit={{ opacity: 0, y: 8, filter: "blur(4px)" }}
+                        transition={{ delay: 0.08 + idx * 0.05, duration: 0.5, ease: EASE }}
                         onClick={() => handleItemClick(item)}
                         className={`text-left py-1.5 text-sm font-medium transition-colors duration-300 origin-left ${
                           active ? "text-foreground" : "text-foreground/30 hover:text-foreground/60"
@@ -221,10 +221,10 @@ const Sidebar = ({ open, onToggle, activeSection }: SidebarProps) => {
                           <motion.button
                             key={child.id}
                             ref={(el) => { itemRefs.current.set(child.id, el); }}
-                            initial={{ opacity: 0, x: -20, scale: 0.92, filter: "blur(6px)", rotateY: -15 }}
-                            animate={{ opacity: 1, x: 0, scale: 1, filter: "blur(0px)", rotateY: 0 }}
-                            exit={{ opacity: 0, x: -14, scale: 0.95, filter: "blur(4px)", rotateY: -10 }}
-                            transition={{ delay: 0.08 + childIdx * 0.06, duration: 0.5, ease: EASE, opacity: { duration: 0.4 }, filter: { duration: 0.6, delay: 0.1 + childIdx * 0.06 } }}
+                            initial={{ opacity: 0, y: 12, filter: "blur(6px)" }}
+                            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                            exit={{ opacity: 0, y: 8, filter: "blur(4px)" }}
+                            transition={{ delay: 0.08 + childIdx * 0.05, duration: 0.5, ease: EASE }}
                             onClick={() => handleChildClick(child)}
                             className={`text-left py-1.5 pl-4 text-sm font-medium transition-colors duration-300 origin-left block ${
                               childActive ? "text-foreground" : "text-foreground/30 hover:text-foreground/60"

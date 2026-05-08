@@ -323,7 +323,7 @@ const InspirationBoard = () => {
                   left: `${item.x}%`,
                   top: `${item.y}%`,
                   width: `${item.w}%`,
-                  height: `${item.h}%`,
+                  aspectRatio: item.aspect,
                   zIndex: dragging === item.id ? 50 : i,
                   rotate: item.rotate,
                   cursor: dragging === item.id ? "grabbing" : "grab",

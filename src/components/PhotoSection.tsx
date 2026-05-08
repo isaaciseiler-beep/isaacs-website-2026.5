@@ -4,25 +4,13 @@ import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import SectionHeading from "@/components/SectionHeading";
 import PhotoPreview from "@/components/PhotoPreview";
-import photo1 from "@/assets/photo-1.jpg";
-import photo2 from "@/assets/photo-2.jpg";
-import photo3 from "@/assets/photo-3.jpg";
-import photo4 from "@/assets/photo-4.jpg";
+import { albums, coverFor } from "@/lib/photoAlbums";
 
-const photos = [
-  { id: 1, title: "Christchurch, New Zealand", image: photo1 },
-  { id: 2, title: "Banli, Taiwan", image: photo2 },
-  { id: 3, title: "Aoraki National Park", image: photo3 },
-  { id: 4, title: "Las Palmas de Gran Canaria, Spain", image: photo4 },
-  { id: 5, title: "Djupivogur, Iceland", image: photo1 },
-  { id: 6, title: "Qiaozi Village, Taiwan", image: photo2 },
-  { id: 7, title: "Christchurch II", image: photo3 },
-  { id: 8, title: "Banli II", image: photo4 },
-  { id: 9, title: "Aoraki II", image: photo1 },
-  { id: 10, title: "Las Palmas II", image: photo2 },
-  { id: 11, title: "Djupivogur II", image: photo3 },
-  { id: 12, title: "Qiaozi II", image: photo4 },
-];
+const photos = albums.map((a, i) => ({
+  id: i + 1,
+  title: a.location,
+  image: coverFor(a),
+}));
 
 photos.forEach((p) => { const img = new Image(); img.src = p.image; });
 

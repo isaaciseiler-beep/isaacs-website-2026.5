@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import SectionHeading from "@/components/SectionHeading";
 import PhotoPreview from "@/components/PhotoPreview";
@@ -76,19 +76,15 @@ const PhotoSection = () => {
       </div>
 
       <div className="px-6 mt-6">
-        <Link to="/photos" className="block">
-          <motion.div className="group relative w-full py-2.5 text-sm font-mono tracking-[0.2em] uppercase rounded-full bg-foreground overflow-hidden flex items-center justify-center cursor-pointer" whileTap={{ scale: 0.995 }}>
-            <span
-              className="absolute inset-0 bg-[hsl(var(--highlight))] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500"
-              style={{ transitionTimingFunction: "cubic-bezier(0.16,1,0.3,1)" }}
-            />
-            <span className="relative z-10 text-background flex items-center justify-center">
-              View my Portfolio
+        <Link to="/photos" className="block w-full md:w-1/2">
+          <div className="group relative w-full py-3 text-sm font-mono tracking-[0.2em] uppercase border border-foreground/30 hover:border-[hsl(var(--highlight))] transition-colors duration-300 flex items-center justify-center cursor-pointer">
+            <span className="text-foreground group-hover:text-[hsl(var(--highlight))] transition-colors duration-300 flex items-center justify-center">
+              Full Portfolio
               <span className="inline-flex overflow-hidden max-w-0 group-hover:max-w-[2rem] opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">
-                <ArrowRight className="w-4 h-4 ml-2 shrink-0" strokeWidth={1.5} />
+                <ArrowUpRight className="w-4 h-4 ml-2 shrink-0" strokeWidth={1.5} />
               </span>
             </span>
-          </motion.div>
+          </div>
         </Link>
       </div>
 

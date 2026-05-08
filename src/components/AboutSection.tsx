@@ -220,18 +220,14 @@ const AboutSection = () => {
     className="overflow-hidden"
             >
               <button
-                className="relative pointer-events-auto h-[68px] w-full bg-foreground overflow-hidden cursor-pointer"
+                className="relative pointer-events-auto h-[68px] w-full bg-[hsl(50_33%_7%)] overflow-hidden cursor-pointer"
                 onClick={() => window.location.href = CONTACT_MAILTO}
               >
-                <span
-                  className="absolute inset-0 bg-[hsl(var(--highlight))] origin-left scale-x-0 group-hover/pill:scale-x-100 transition-transform duration-500"
-                  style={{ transitionTimingFunction: "cubic-bezier(0.16,1,0.3,1)" }}
-                />
                 <motion.span
                   variants={popdownTextVariants}
                   initial="closed"
                   animate={hasDeployedPopdown ? "open" : "closed"}
-                  className="relative z-10 flex h-full items-center justify-center px-6 pt-[26px] text-sm font-mono tracking-[0.2em] uppercase text-background"
+                  className="relative z-10 flex h-full items-center justify-center px-6 pt-[26px] text-sm font-mono tracking-[0.2em] uppercase text-[hsl(200_25%_83%)] group-hover/pill:text-[hsl(var(--highlight))] transition-colors duration-300"
                 >
                   Get in touch
                   <span className="inline-flex overflow-hidden max-w-0 opacity-0 transition-all duration-300 ease-out group-hover/pill:max-w-[2rem] group-hover/pill:opacity-100">

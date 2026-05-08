@@ -70,31 +70,48 @@ const NewsSection = () => {
               href={item.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="news-card group relative block flex-shrink-0 border border-border p-6 transition-colors duration-300 overflow-hidden"
+              className="news-card group relative block flex-shrink-0 border border-border transition-colors duration-300 overflow-hidden flex flex-col"
               style={{ width: "calc(40% - 2px)", scrollSnapAlign: "start", minWidth: 280 }}
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true, margin: "-20px" }}
               transition={{ delay: index * 0.05, duration: 0.4 }}
             >
-              <div className="flex items-start justify-between mb-5">
-                <div className="flex h-[37px] items-center">
+              {item.imageUrl && (
+                <div className="relative w-full overflow-hidden" style={{ aspectRatio: "16/9" }}>
                   <img
-                    src={item.logoUrl}
-                    alt={item.logoAlt}
-                    className="h-full w-auto max-w-[128px] object-contain opacity-80 transition-opacity duration-200 group-hover:opacity-100"
+                    src={item.imageUrl}
+                    alt={item.title}
+                    className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 ease-out"
                     loading="lazy"
                   />
+                  <div
+                    className="absolute inset-x-0 bottom-0 h-20 pointer-events-none"
+                    style={{ background: "linear-gradient(to bottom, transparent 0%, hsl(var(--card) / 0.4) 100%)" }}
+                  />
                 </div>
-              </div>
+              )}
 
-              <h3 className="news-card-title text-lg font-semibold tracking-tight text-foreground mb-2 transition-colors duration-200">
-                {item.title}
-              </h3>
-              <div className="absolute bottom-5 right-5">
-                <span className="text-foreground text-sm opacity-0 group-hover:opacity-100 group-hover:text-[hsl(var(--highlight))] translate-x-[-4px] group-hover:translate-x-0 transition-all duration-300">
-                  <ArrowUpRight className="w-4 h-4" />
-                </span>
+              <div className="p-6 flex-1 flex flex-col">
+                <div className="flex items-start justify-between mb-5">
+                  <div className="flex h-[37px] items-center">
+                    <img
+                      src={item.logoUrl}
+                      alt={item.logoAlt}
+                      className="h-full w-auto max-w-[128px] object-contain opacity-80 transition-opacity duration-200 group-hover:opacity-100"
+                      loading="lazy"
+                    />
+                  </div>
+                </div>
+
+                <h3 className="news-card-title text-lg font-semibold tracking-tight text-foreground mb-2 transition-colors duration-200">
+                  {item.title}
+                </h3>
+                <div className="absolute bottom-5 right-5">
+                  <span className="text-foreground text-sm opacity-0 group-hover:opacity-100 group-hover:text-[hsl(var(--highlight))] translate-x-[-4px] group-hover:translate-x-0 transition-all duration-300">
+                    <ArrowUpRight className="w-4 h-4" />
+                  </span>
+                </div>
               </div>
 
               <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-foreground scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />

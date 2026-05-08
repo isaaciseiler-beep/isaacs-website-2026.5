@@ -10,12 +10,18 @@ import photo3 from "@/assets/photo-3.jpg";
 import photo4 from "@/assets/photo-4.jpg";
 
 const photos = [
-  { id: 1, title: "Christchurch, New Zealand", location: "Christchurch, New Zealand", image: photo1 },
-  { id: 2, title: "Banli, Taiwan", location: "Banli, Taiwan", image: photo2 },
-  { id: 3, title: "Aoraki National Park", location: "Aoraki National Park", image: photo3 },
-  { id: 4, title: "Las Palmas de Gran Canaria, Spain", location: "Las Palmas de Gran Canaria, Spain", image: photo4 },
-  { id: 5, title: "Djupivogur, Iceland", location: "Djupivogur, Iceland", image: photo1 },
-  { id: 6, title: "Qiaozi Village, Taiwan", location: "Qiaozi Village, Taiwan", image: photo2 },
+  { id: 1, title: "Christchurch, New Zealand", image: photo1 },
+  { id: 2, title: "Banli, Taiwan", image: photo2 },
+  { id: 3, title: "Aoraki National Park", image: photo3 },
+  { id: 4, title: "Las Palmas de Gran Canaria, Spain", image: photo4 },
+  { id: 5, title: "Djupivogur, Iceland", image: photo1 },
+  { id: 6, title: "Qiaozi Village, Taiwan", image: photo2 },
+  { id: 7, title: "Christchurch II", image: photo3 },
+  { id: 8, title: "Banli II", image: photo4 },
+  { id: 9, title: "Aoraki II", image: photo1 },
+  { id: 10, title: "Las Palmas II", image: photo2 },
+  { id: 11, title: "Djupivogur II", image: photo3 },
+  { id: 12, title: "Qiaozi II", image: photo4 },
 ];
 
 photos.forEach((p) => { const img = new Image(); img.src = p.image; });
@@ -24,23 +30,30 @@ const PhotoSection = () => {
   const [previewIdx, setPreviewIdx] = useState<number | null>(null);
   const [hovering, setHovering] = useState(false);
   const [activeIdx, setActiveIdx] = useState(0);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    if (hovering) {
-      let i = activeIdx;
-      intervalRef.current = setInterval(() => {
+    if (!hovering) {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      return;
+    }
+    let tick = 0;
+    let i = activeIdx;
+    const schedule = () => {
+      // staggered cadence: slow start, accelerate, then ease out
+      const cadence = [520, 380, 260, 200, 170, 160, 170, 200, 260, 340, 420, 500];
+      const delay = cadence[tick % cadence.length];
+      timeoutRef.current = setTimeout(() => {
         i = (i + 1) % photos.length;
         setActiveIdx(i);
-      }, 220);
-    } else if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+        tick++;
+        schedule();
+      }, delay);
+    };
+    schedule();
+    return () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hovering]);
-
-  const activePhoto = photos[activeIdx];
 
   return (
     <section className="py-12">
@@ -51,7 +64,7 @@ const PhotoSection = () => {
       <div className="px-6">
         <div
           className="relative w-full overflow-hidden cursor-pointer group"
-          style={{ aspectRatio: "3/1.05" }}
+          style={{ aspectRatio: "3/1.365" }}
           onMouseEnter={() => setHovering(true)}
           onMouseLeave={() => setHovering(false)}
           onClick={() => setPreviewIdx(activeIdx)}
@@ -71,31 +84,6 @@ const PhotoSection = () => {
               loading="eager"
             />
           ))}
-
-          {/* Bottom gradient + caption */}
-          <div
-            className="absolute inset-x-0 bottom-0 h-1/3 pointer-events-none"
-            style={{ background: "linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 100%)" }}
-          />
-          <div className="absolute bottom-4 left-5 right-5 flex items-end justify-between gap-4 pointer-events-none">
-            <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-white/80">
-              {activePhoto.location}
-            </p>
-            <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-white/40 tabular-nums">
-              {String(activeIdx + 1).padStart(2, "0")} / {String(photos.length).padStart(2, "0")}
-            </p>
-          </div>
-
-          {/* Progress ticks */}
-          <div className="absolute top-4 left-5 right-5 flex gap-1 pointer-events-none">
-            {photos.map((_, idx) => (
-              <div
-                key={idx}
-                className="flex-1 h-[2px] transition-colors duration-200"
-                style={{ background: idx === activeIdx ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.18)" }}
-              />
-            ))}
-          </div>
         </div>
       </div>
 

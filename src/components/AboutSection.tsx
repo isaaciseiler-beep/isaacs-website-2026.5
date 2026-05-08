@@ -191,7 +191,7 @@ const AboutSection = () => {
         <div className="mt-8 md:mt-10 relative group/pill">
           <div
             ref={pillRef}
-            className="relative flex items-center gap-3 px-6 py-3.5 bg-background group-hover/pill:bg-[hsl(50_33%_12%)] border-2 border-foreground transition-colors duration-300 w-full z-10"
+            className="relative flex items-center gap-3 px-6 py-3.5 bg-background border-2 border-foreground group-hover/pill:border-[hsl(50_33%_12%)] transition-colors duration-300 w-full z-10"
           >
             <motion.span
               className="rounded-full w-2.5 h-2.5 bg-foreground transition-colors duration-300 shrink-0"

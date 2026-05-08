@@ -129,8 +129,8 @@ const ProjectsSection = () => {
       {/* Explore button */}
       <div className="px-6 mt-6">
         <Link to="/projects" className="block w-full md:w-1/2">
-          <div className="group relative w-full py-3 text-sm font-mono tracking-[0.2em] uppercase bg-[hsl(50_33%_7%)] transition-colors duration-300 flex items-center justify-center cursor-pointer">
-            <span className="text-[hsl(var(--background))] dark:text-foreground group-hover:!text-[hsl(var(--highlight))] transition-colors duration-300 flex items-center justify-center" style={{ color: "hsl(var(--accent-text, 200 25% 83%))" }}>
+          <div className="group relative w-full py-3 text-sm font-mono tracking-[0.2em] uppercase bg-[hsl(50_33%_7%)] flex items-center justify-center cursor-pointer">
+            <span className="text-[hsl(200_25%_83%)] group-hover:text-[hsl(var(--highlight))] transition-colors duration-300 flex items-center justify-center">
               My Work
               <span className="inline-flex overflow-hidden max-w-0 group-hover:max-w-[2rem] opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">
                 <ArrowUpRight className="w-4 h-4 ml-2 shrink-0" strokeWidth={1.5} />

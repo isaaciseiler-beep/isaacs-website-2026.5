@@ -3,8 +3,7 @@ import AnimatedText from "@/components/AnimatedText";
 
 const words = [
   "Building at the",
-  "intersection of AI,",
-  "emerging technology,",
+  "intersection of AI",
   "and society.",
 ];
 

@@ -83,9 +83,14 @@ const NewsSection = () => {
                     src={item.imageUrl}
                     alt={item.title}
                     className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 ease-out"
+                    style={{
+                      WebkitMaskImage:
+                        "linear-gradient(to bottom, black 0%, black 55%, rgba(0,0,0,0.7) 80%, rgba(0,0,0,0) 100%)",
+                      maskImage:
+                        "linear-gradient(to bottom, black 0%, black 55%, rgba(0,0,0,0.7) 80%, rgba(0,0,0,0) 100%)",
+                    }}
                     loading="lazy"
                   />
-                  <div className="news-gradient absolute inset-x-0 bottom-0 h-32 pointer-events-none" />
                 </div>
               )}
 

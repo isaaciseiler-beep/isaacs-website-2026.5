@@ -5,10 +5,7 @@ import Logo from "@/components/Logo";
 import Footer from "@/components/Footer";
 import Sidebar from "@/components/Sidebar";
 import PhotoPreview from "@/components/PhotoPreview";
-import { useRef } from "react";
 import { albums, albumPhotos, coverFor, type Album, type Continent } from "@/lib/photoAlbums";
-
-interface Photo { id: string; image: string }
 
 const continents: ("All" | Continent)[] = ["All", "Asia", "Europe", "Oceania"];
 
@@ -59,9 +56,10 @@ const AlbumCover = ({ album, onClick }: { album: Album; onClick: () => void }) =
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [hovering, album.photos.length]);
 
-  const allSrcs = [album.cover, ...album.photos.map((p) => p.image)];
+  const cover = coverFor(album);
+  const allSrcs = [cover, ...albumPhotos(album)];
   const uniqueSrcs = [...new Set(allSrcs)];
-  const activeImage = flashIdx >= 0 ? album.photos[flashIdx].image : album.cover;
+  const activeImage = flashIdx >= 0 ? albumPhotos(album)[flashIdx] : cover;
 
   return (
     <div
@@ -177,9 +175,9 @@ const PhotosPage = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [openAlbum]);
 
-  const buildRows = (photos: Photo[], albumIdx: number) => {
+  const buildRows = (photos: string[], albumIdx: number) => {
     const pattern = layoutPatterns[albumIdx % layoutPatterns.length];
-    const rows: { layout: RowLayout; photos: Photo[]; startIdx: number }[] = [];
+    const rows: { layout: RowLayout; photos: string[]; startIdx: number }[] = [];
     let photoIdx = 0;
     for (let r = 0; photoIdx < photos.length; r++) {
       const layout = pattern[r % pattern.length];
@@ -270,13 +268,13 @@ const PhotosPage = () => {
                 </motion.button>
 
                 <div className="flex flex-col gap-6">
-                  {buildRows(currentAlbum.photos, albums.indexOf(currentAlbum)).map((row, rowIdx) => {
+                  {buildRows(albumPhotos(currentAlbum), albums.indexOf(currentAlbum)).map((row, rowIdx) => {
                     if (row.layout === "pair") {
                       return (
                         <div key={rowIdx} className="grid grid-cols-2 gap-[3px]">
                           {row.photos.map((photo, pi) => (
                             <motion.div
-                              key={photo.id}
+                              key={photo}
                               className="cursor-pointer overflow-hidden"
                               initial={{ opacity: 0, y: 20 }}
                               animate={{ opacity: 1, y: 0 }}
@@ -284,7 +282,7 @@ const PhotosPage = () => {
                               onClick={() => setPreviewIdx(row.startIdx + pi)}
                             >
                               <div className="aspect-[4/3] overflow-hidden">
-                                <img src={photo.image} alt="" className="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-700 ease-out" />
+                                <img src={photo} alt="" loading="lazy" className="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-700 ease-out" />
                               </div>
                             </motion.div>
                           ))}
@@ -295,7 +293,7 @@ const PhotosPage = () => {
                     const isOffset = row.layout === "offset-right" || row.layout === "offset-left";
                     return (
                       <motion.div
-                        key={photo.id}
+                        key={photo}
                         className={`cursor-pointer overflow-hidden ${isOffset ? (row.layout === "offset-right" ? "ml-auto w-[75%]" : "mr-auto w-[75%]") : "w-full"}`}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -303,7 +301,7 @@ const PhotosPage = () => {
                         onClick={() => setPreviewIdx(row.startIdx)}
                       >
                         <div className="aspect-[4/3] overflow-hidden">
-                          <img src={photo.image} alt="" className="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-700 ease-out" />
+                          <img src={photo} alt="" loading="lazy" className="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-700 ease-out" />
                         </div>
                       </motion.div>
                     );

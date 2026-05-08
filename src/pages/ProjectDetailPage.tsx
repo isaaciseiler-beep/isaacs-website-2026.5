@@ -46,15 +46,22 @@ const ProjectDetailPage = () => {
         >
           <button
             onClick={() => navigate("/projects")}
-            className="mb-8 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.28em] text-foreground/40 hover:text-foreground transition-colors"
+            className="group relative mb-8 inline-flex items-center justify-center overflow-hidden rounded-full bg-foreground px-6 py-2.5 font-mono text-sm uppercase tracking-[0.2em] cursor-pointer"
           >
-            <ArrowLeft className="w-3 h-3" /> All Projects
+            <span
+              className="absolute inset-0 bg-[hsl(var(--highlight))] origin-right scale-x-0 group-hover:scale-x-100 transition-transform duration-500"
+              style={{ transitionTimingFunction: "cubic-bezier(0.16,1,0.3,1)" }}
+            />
+            <span className="relative z-10 flex items-center text-background">
+              <span className="inline-flex overflow-hidden max-w-[2rem] opacity-100 transition-all duration-300 ease-out">
+                <ArrowLeft className="w-4 h-4 mr-2 shrink-0" strokeWidth={1.5} />
+              </span>
+              All Projects
+            </span>
           </button>
 
-          <div className="mb-3 flex items-center gap-3">
-            <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-foreground/50">{project.source}</span>
-            <span className="h-px flex-1 bg-foreground/10" />
-            <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-foreground/40">{project.year}</span>
+          <div className="mb-3 flex items-center">
+            <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-foreground/50">{project.year}</span>
           </div>
 
           <h1 className="text-3xl md:text-5xl font-semibold tracking-tight text-foreground mb-4">{project.title}</h1>

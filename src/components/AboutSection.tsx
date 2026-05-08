@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import SectionHeading from "@/components/SectionHeading";
 const headshotUrl = "https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev/8B142F31-3FF0-440E-8771-33A465C8C9FE_1_201_a.jpeg";
 import { bioLines } from "@/lib/siteContent";
@@ -192,12 +192,11 @@ const AboutSection = () => {
           <div
             ref={pillRef}
             className="relative flex items-center gap-3 px-6 py-3.5 bg-background border-2 border-foreground w-full z-10"
-            style={{ borderRadius: "9999px" }}
           >
             {/* Highlight border overlay — clip-path reveal left-to-right on hover */}
             <span
               className="absolute inset-[-2px] border-2 border-[hsl(var(--highlight))] pointer-events-none transition-[clip-path] duration-500 [clip-path:inset(0_100%_0_0)] group-hover/pill:[clip-path:inset(0_0%_0_0)]"
-              style={{ borderRadius: "9999px", transitionTimingFunction: "cubic-bezier(0.16,1,0.3,1)" }}
+              style={{ transitionTimingFunction: "cubic-bezier(0.16,1,0.3,1)" }}
             />
             <motion.span
               className="rounded-full w-2.5 h-2.5 bg-foreground shrink-0"
@@ -218,10 +217,10 @@ const AboutSection = () => {
               initial="closed"
               animate={hasDeployedPopdown ? "open" : "closed"}
               variants={popdownVariants}
-              className="overflow-hidden rounded-b-[26px]"
+    className="overflow-hidden"
             >
               <button
-                className="relative pointer-events-auto h-[68px] w-full rounded-b-[26px] bg-foreground overflow-hidden cursor-pointer"
+                className="relative pointer-events-auto h-[68px] w-full bg-foreground overflow-hidden cursor-pointer"
                 onClick={() => window.location.href = CONTACT_MAILTO}
               >
                 <span
@@ -236,7 +235,7 @@ const AboutSection = () => {
                 >
                   Get in touch
                   <span className="inline-flex overflow-hidden max-w-0 opacity-0 transition-all duration-300 ease-out group-hover/pill:max-w-[2rem] group-hover/pill:opacity-100">
-                    <ArrowRight className="w-4 h-4 ml-2 shrink-0" strokeWidth={1.5} />
+                    <ArrowUpRight className="w-4 h-4 ml-2 shrink-0" strokeWidth={1.5} />
                   </span>
                 </motion.span>
               </button>

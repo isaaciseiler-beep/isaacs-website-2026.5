@@ -12,7 +12,7 @@ const HeroSection = () => {
   const textOpacity = useTransform(scrollY, [0, 400], [1, 0]);
 
   return (
-    <section className="relative h-screen flex items-end overflow-hidden mb-16 md:mb-24">
+    <section className="relative h-screen flex items-end overflow-hidden">
       <div className="absolute inset-0 bg-background" />
 
       <motion.div

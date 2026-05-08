@@ -191,10 +191,10 @@ const AboutSection = () => {
         <div className="mt-8 md:mt-10 relative group/pill">
           <div
             ref={pillRef}
-            className="relative flex items-center gap-3 px-6 py-3.5 bg-background border-2 border-foreground group-hover/pill:border-[hsl(var(--highlight))] transition-colors duration-300 w-full z-10"
+            className="relative flex items-center gap-3 px-6 py-3.5 bg-background group-hover/pill:bg-[hsl(50_33%_12%)] border-2 border-foreground transition-colors duration-300 w-full z-10"
           >
             <motion.span
-              className="rounded-full w-2.5 h-2.5 bg-foreground group-hover/pill:bg-[hsl(var(--highlight))] transition-colors duration-300 shrink-0"
+              className="rounded-full w-2.5 h-2.5 bg-foreground transition-colors duration-300 shrink-0"
               animate={{ scale: [1, 1.4, 1] }}
               transition={{
                 duration: 2.2,
@@ -202,7 +202,7 @@ const AboutSection = () => {
                 ease: "easeInOut",
               }}
             />
-            <span className="text-base md:text-lg font-light tracking-[0.02em] text-foreground group-hover/pill:text-[hsl(var(--highlight))] transition-colors duration-300">
+            <span className="text-base md:text-lg font-light tracking-[0.02em] text-foreground transition-colors duration-300">
               Currently in the market for tech roles starting Summer 2026
             </span>
           </div>
@@ -215,14 +215,14 @@ const AboutSection = () => {
     className="overflow-hidden"
             >
               <button
-                className="relative pointer-events-auto h-[68px] w-full bg-[hsl(50_33%_7%)] overflow-hidden cursor-pointer"
+                className="relative pointer-events-auto h-[68px] w-full bg-[hsl(50_33%_7%)] group-hover/pill:bg-[hsl(50_33%_12%)] transition-colors duration-300 overflow-hidden cursor-pointer"
                 onClick={() => window.location.href = CONTACT_MAILTO}
               >
                 <motion.span
                   variants={popdownTextVariants}
                   initial="closed"
                   animate={hasDeployedPopdown ? "open" : "closed"}
-                  className="relative z-10 flex h-full items-center justify-center px-6 pt-[26px] text-sm font-mono tracking-[0.2em] uppercase text-[hsl(200_25%_83%)] group-hover/pill:text-[hsl(var(--highlight))] transition-colors duration-300"
+                  className="relative z-10 flex h-full items-center justify-center px-6 pt-[26px] text-sm font-mono tracking-[0.2em] uppercase text-[hsl(200_25%_83%)] transition-colors duration-300"
                 >
                   Get in touch
                   <span className="inline-flex overflow-hidden max-w-0 opacity-0 transition-all duration-300 ease-out group-hover/pill:max-w-[2rem] group-hover/pill:opacity-100">

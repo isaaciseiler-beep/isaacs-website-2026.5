@@ -77,8 +77,10 @@ const InspirationBoard = () => {
   const cardOpacity = useTransform(revealProgress, [0.1, 1], [0, 1]);
   const cardY = useTransform(revealProgress, [0, 1], [40, 0]);
 
-  const clampPosition = useCallback((x: number, y: number, w: number, h: number) => {
+  const clampPosition = useCallback((x: number, y: number, w: number, aspect: number) => {
     if (!boardRef.current) return { x, y };
+    const rect = boardRef.current.getBoundingClientRect();
+    const h = (((w / 100) * rect.width) / aspect / rect.height) * 100;
     const minX = -(w * OVERHANG);
     const maxX = 100 - w * (1 - OVERHANG);
     const minY = -(h * OVERHANG);
@@ -119,7 +121,7 @@ const InspirationBoard = () => {
     didDrag.current = true;
     setItems(prev => prev.map(item => {
       if (item.id !== dragging) return item;
-      const clamped = clampPosition(rawX, rawY, item.w, item.h);
+        const clamped = clampPosition(rawX, rawY, item.w, item.aspect);
       return { ...item, x: clamped.x, y: clamped.y };
     }));
   }, [dragging, clampPosition]);
@@ -136,7 +138,7 @@ const InspirationBoard = () => {
     if (item.imageUrl) {
       return (
         <div className="group relative w-full h-full overflow-hidden flex items-center justify-center">
-          <img src={item.imageUrl} alt={item.title} className="w-full h-full object-contain grayscale group-hover:grayscale-0 transition-all duration-500" draggable={false} />
+          <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" draggable={false} />
           <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-background/95 via-background/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <p className="font-semibold tracking-tight text-foreground text-sm leading-tight">{item.title}</p>
             <p className="mt-1 text-foreground/70 leading-snug text-[11px]">{item.content}</p>

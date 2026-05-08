@@ -85,10 +85,7 @@ const NewsSection = () => {
                     className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 ease-out"
                     loading="lazy"
                   />
-                  <div
-                    className="absolute inset-x-0 bottom-0 h-20 pointer-events-none"
-                    style={{ background: "linear-gradient(to bottom, transparent 0%, hsl(var(--card) / 0.4) 100%)" }}
-                  />
+                  <div className="news-gradient absolute inset-x-0 bottom-0 h-20 pointer-events-none" />
                 </div>
               )}
 

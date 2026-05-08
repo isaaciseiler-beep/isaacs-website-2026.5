@@ -124,7 +124,7 @@ const ProjectsSection = () => {
       <div className="px-6 mt-6">
         <Link to="/projects" className="block">
           <motion.div
-            className="group relative w-full py-2.5 text-sm font-mono tracking-[0.2em] uppercase rounded-full bg-background overflow-hidden flex items-center justify-center"
+            className="group relative w-full py-2.5 text-sm font-mono tracking-[0.2em] uppercase rounded-full bg-background border-2 border-foreground overflow-hidden flex items-center justify-center"
             whileTap={{ scale: 0.995 }}
           >
             <span

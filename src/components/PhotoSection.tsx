@@ -124,7 +124,7 @@ const PhotoSection = () => {
 
       <div className="px-6 mt-6">
         <Link to="/photos" className="block">
-          <motion.div className="group relative w-full py-2.5 text-sm font-mono tracking-[0.2em] uppercase rounded-full bg-background overflow-hidden flex items-center justify-center cursor-pointer" whileTap={{ scale: 0.995 }}>
+          <motion.div className="group relative w-full py-2.5 text-sm font-mono tracking-[0.2em] uppercase rounded-full bg-background border-2 border-foreground overflow-hidden flex items-center justify-center cursor-pointer" whileTap={{ scale: 0.995 }}>
             <span
               className="absolute inset-0 rounded-full border-2 border-[hsl(var(--highlight))] pointer-events-none transition-[clip-path] duration-500 [clip-path:inset(0_100%_0_0)] group-hover:[clip-path:inset(0_0%_0_0)]"
               style={{ transitionTimingFunction: "cubic-bezier(0.16,1,0.3,1)" }}

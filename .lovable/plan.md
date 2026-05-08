@@ -1,61 +1,51 @@
+## Goal
 
+Wire the 13 Cloudflare R2 albums into the Photos portfolio and the home page rotating preview, replacing the current placeholder data.
 
-## Photos Page — Location-Filtered Album Gallery
+## Source
 
-### What this is
+Base: `https://pub-9c24f6ce599b4e09bac5241fc8f8beb0.r2.dev`
 
-A dedicated `/photos` route with a unique, editorially-crafted gallery. Albums grouped by location, with a location filter strip, stacked album cards, an expanded masonry view, and a keyboard-navigable lightbox. Every animation, spacing value, and typographic choice mirrors the existing site exactly.
+Albums (folder → display name → continent):
+- `Australia` → Australia → Oceania
+- `GranCanaria` → Canary Islands → Europe
+- `HongKong` → Hong Kong → Asia
+- `Iceland` → Iceland → Europe
+- `Indonesia` → Indonesia → Asia
+- `Japan` → Japan → Asia
+- `Korea` → Korea → Asia
+- `NewZealand` → New Zealand → Oceania
+- `Portugal` → Portugal → Europe
+- `Taiwan` → Taiwan → Asia
+- `TaiwanStrait` → Matsu → Asia
+- `Thailand` → Thailand → Asia
+- `Vietnam` → Vietnam → Asia
 
-### Design system alignment
+## Changes
 
-The site uses a tight, consistent vocabulary I will follow precisely:
+1. **New file `src/lib/photoAlbums.ts`** — single source of truth.
+   - Export `R2_BASE` constant.
+   - Export `albums: Album[]` with `{ folder, location, continent, photos: string[] }`, where each photo is just the filename. A helper builds full URLs via `` `${R2_BASE}/${folder}/${file}` ``.
+   - Export `allPhotos` flat list and `coverFor(album)` (first photo).
 
-- **Easing:** `[0.16, 1, 0.3, 1]` for reveals, `[0.25, 0.1, 0.25, 1]` for text — never generic `ease-in-out`
-- **Spacing:** `px-6` page padding, `gap-[3px]` between image tiles, `py-12` section padding
-- **Typography:** `SectionHeading` component for headings (letter-by-letter blur reveal), `mono-text` class for labels (JetBrains Mono, 10px, tracking-widest, uppercase, 50% opacity)
-- **Images:** Always `grayscale(100%)` by default, `grayscale(0%)` on hover with `duration-700`
-- **Borders:** 0px radius everywhere (no rounding except pills)
-- **Gradients:** Bottom-up `rgba(0,0,0,0.85)` overlays on images for text legibility
-- **Edge fades:** `linear-gradient(to left, hsl(var(--background))...)` on scroll containers
-- **Chevrons:** Same `chevronVariants` pattern with custom directional enter/exit
-- **Parallax:** Wrap in `ParallaxSection` or use `useScroll`/`useTransform` scroll-linked motion
+2. **`src/pages/PhotosPage.tsx`**
+   - Import albums from the new file; remove the local `photo1..4` placeholder imports and the hardcoded `albums` array.
+   - Continent filter list becomes `["All", "Asia", "Europe", "Oceania"]` (drop "North America" since no albums there).
+   - `AlbumCover` and the album detail grid keep current layout/animations; just consume the new data.
+   - `FeaturedHero` (top of page) sources its 5 images from a curated picks array (e.g., one striking shot from Iceland, NZ, Japan, Taiwan, Australia).
+   - Eager preload list switches to the curated hero picks + each album's cover only (avoid preloading 130+ images).
 
-### Layout concept
+3. **`src/components/PhotoSection.tsx`** (home preview)
+   - Replace the 12-photo placeholder array with ~12 curated picks pulled from `albums` (one or two per album), preserving the staggered hover cycle.
 
-**Filter strip** — Horizontal row of location pills at top. JetBrains Mono, uppercase, tracking-widest. "All" default. Active pill: `bg-foreground text-background`. Inactive: `border border-border text-foreground/50`. No rounded corners on pills (square, matching site's 0px radius). Animated underline on active using `layoutId` shared layout animation.
+4. **`src/components/FeaturedSection.tsx`** (3-tile featured block on home)
+   - The two thumbnails currently labeled "Projects archive" and "Photo portfolio" use `featuredProjects[1]/[2]`. The Photo portfolio tile's image should switch to a strong picture from the new R2 set so it visually represents photos.
 
-**Album grid (overview)** — 3-column grid (2-col tablet, 1-col mobile). Each album is a "stacked prints" card: a main cover image with 2 pseudo-layers behind it offset by 4px and 8px (using `::before`/`::after` or extra divs), creating depth. Cover is grayscale, full row is color on hover. Location name large, photo count in mono-text. Staggered reveal with the site's blur+y animation.
+5. **Cleanup**
+   - Leave `src/assets/photo-1..4.jpg` in place (they're still used elsewhere — InspirationBoard images aren't, but other components may reference them; will only remove imports that become unused to keep the diff tight).
 
-**Expanded album** — Clicking an album transitions (AnimatePresence) to a masonry-style view of that location's photos. Back button top-left. Photos stagger in with `delay: index * 0.04`. Each photo is a `grid-item` with the existing grayscale hover + overlay pattern.
+## Notes
 
-**Lightbox** — Full-screen overlay, `bg-black/90`. Photo centered. Prev/next chevrons (same `chevronVariants`). ESC and arrow key navigation. Photo counter in mono-text. Smooth scale-in animation on open.
-
-**"View All" link** — Added to the existing `PhotoSection` on the index page, styled as a `pill-button` linking to `/photos`.
-
-### Data
-
-Reuse the 4 existing photo assets (`photo-1` through `photo-4`) distributed across 6 location albums (Chicago, Brooklyn, Detroit, Brussels, Tokyo, Berlin). Each album gets 3-5 photos with titles. All data is static, defined in the component.
-
-### Files
-
-| File | Change |
-|------|--------|
-| `src/pages/PhotosPage.tsx` | **New** — Full page: filter strip, album grid, expanded view, lightbox |
-| `src/App.tsx` | Add `/photos` route import and `<Route>` |
-| `src/components/PhotoSection.tsx` | Add "View All →" pill-button link to `/photos` |
-
-### Animation inventory (matching site exactly)
-
-- Filter pill selection: `layoutId` spring for active indicator
-- Album card reveal: `initial={{ opacity: 0, y: 20, filter: "blur(6px)" }}` → `whileInView` with staggered delay
-- Album hover: cover image `grayscale(0%)` + subtle `scale(1.02)` with `duration-700`
-- View transition (overview → expanded): `AnimatePresence` with `mode="wait"`, fade + slight y-shift
-- Photo grid stagger: `delay: index * 0.04, duration: 0.4`
-- Lightbox enter: `scale: 0.95 → 1`, `opacity: 0 → 1`, duration 0.3
-- Chevron arrows: identical `chevronVariants` from PhotoSection/NewsSection
-- Back button: fade-in with slight x-shift
-
-### Page structure
-
-The page includes its own header (Logo + back arrow) matching the site's fixed header pattern, plus the same footer component. No sidebar needed on the photos page — clean, full-bleed experience.
-
+- Filenames stay URL-safe as-is (uppercase hex + underscores, no spaces) so no encoding needed.
+- All images render through existing grayscale → color hover treatment; no styling changes.
+- If you later want a different cover per album or a custom display order, we can add `cover` and `order` fields to `photoAlbums.ts` without touching components.

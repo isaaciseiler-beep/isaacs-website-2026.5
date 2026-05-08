@@ -70,7 +70,7 @@ const NewsSection = () => {
               href={item.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="news-card group relative block flex-shrink-0 border border-border transition-colors duration-300 overflow-hidden flex flex-col"
+              className="news-card group relative block flex-shrink-0 transition-colors duration-300 overflow-hidden flex flex-col"
               style={{ width: "calc(40% - 2px)", scrollSnapAlign: "start", minWidth: 280 }}
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
@@ -85,7 +85,7 @@ const NewsSection = () => {
                     className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 ease-out"
                     loading="lazy"
                   />
-                  <div className="news-gradient absolute inset-x-0 bottom-0 h-20 pointer-events-none" />
+                  <div className="news-gradient absolute inset-x-0 bottom-0 h-32 pointer-events-none" />
                 </div>
               )}
 

@@ -5,57 +5,30 @@ import Logo from "@/components/Logo";
 import Footer from "@/components/Footer";
 import Sidebar from "@/components/Sidebar";
 import PhotoPreview from "@/components/PhotoPreview";
-import photo1 from "@/assets/photo-1.jpg";
-import photo2 from "@/assets/photo-2.jpg";
-import photo3 from "@/assets/photo-3.jpg";
-import photo4 from "@/assets/photo-4.jpg";
+import { albums, albumPhotos, coverFor, type Album, type Continent } from "@/lib/photoAlbums";
 
-type Continent = "North America" | "Asia" | "Europe" | "Oceania";
+const continents: ("All" | Continent)[] = ["All", "Asia", "Europe", "Oceania"];
 
-interface Photo { id: string; image: string }
-interface Album { location: string; continent: Continent; cover: string; photos: Photo[] }
-
-const albums: Album[] = [
-  { location: "Christchurch, New Zealand", continent: "Oceania", cover: photo1, photos: [
-    { id: "chi-1", image: photo1 }, { id: "chi-2", image: photo3 },
-    { id: "chi-3", image: photo2 }, { id: "chi-4", image: photo4 },
-  ]},
-  { location: "Banli, Taiwan", continent: "Asia", cover: photo2, photos: [
-    { id: "bk-1", image: photo2 }, { id: "bk-2", image: photo1 }, { id: "bk-3", image: photo4 },
-  ]},
-  { location: "Aoraki National Park", continent: "Oceania", cover: photo3, photos: [
-    { id: "det-1", image: photo3 }, { id: "det-2", image: photo1 },
-    { id: "det-3", image: photo4 }, { id: "det-4", image: photo2 }, { id: "det-5", image: photo3 },
-  ]},
-  { location: "Las Palmas de Gran Canaria, Spain", continent: "Europe", cover: photo4, photos: [
-    { id: "bru-1", image: photo4 }, { id: "bru-2", image: photo2 }, { id: "bru-3", image: photo1 },
-  ]},
-  { location: "Djupivogur, Iceland", continent: "Europe", cover: photo1, photos: [
-    { id: "tok-1", image: photo1 }, { id: "tok-2", image: photo3 },
-    { id: "tok-3", image: photo4 }, { id: "tok-4", image: photo2 },
-  ]},
-  { location: "Qiaozi Village, Taiwan", continent: "Asia", cover: photo2, photos: [
-    { id: "ber-1", image: photo2 }, { id: "ber-2", image: photo3 }, { id: "ber-3", image: photo1 },
-  ]},
-];
-
-const continents: ("All" | Continent)[] = ["All", "North America", "Asia", "Europe", "Oceania"];
-
-// Featured photos for the editorial layout above the grid
+// Featured photos for the editorial layout above the grid — pulled from R2 albums
+const findAlbum = (folder: string) => albums.find((a) => a.folder === folder)!;
 const featuredPhotos = {
-  hero: photo3,
-  pairLeft: photo1,
-  pairRight: photo2,
-  overlap: photo4,
-  bottom: photo1,
+  hero: `${import.meta.env.BASE_URL ? "" : ""}${coverFor(findAlbum("Iceland"))}`,
+  pairLeft: coverFor(findAlbum("NewZealand")),
+  pairRight: coverFor(findAlbum("Japan")),
+  overlap: coverFor(findAlbum("Taiwan")),
+  bottom: coverFor(findAlbum("Australia")),
 };
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const EASE_TEXT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 
-// Eager preload
-const allImages = [photo1, photo2, photo3, photo4];
+// Eager preload covers + hero picks only (avoid 100+ image flood)
 if (typeof window !== "undefined") {
-  allImages.forEach((src) => { const img = new Image(); img.src = src; });
+  const preload = [
+    ...albums.map(coverFor),
+    featuredPhotos.hero, featuredPhotos.pairLeft, featuredPhotos.pairRight,
+    featuredPhotos.overlap, featuredPhotos.bottom,
+  ];
+  preload.forEach((src) => { const img = new Image(); img.src = src; });
 }
 
 const AlbumCover = ({ album, onClick }: { album: Album; onClick: () => void }) => {
@@ -83,9 +56,10 @@ const AlbumCover = ({ album, onClick }: { album: Album; onClick: () => void }) =
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [hovering, album.photos.length]);
 
-  const allSrcs = [album.cover, ...album.photos.map((p) => p.image)];
+  const cover = coverFor(album);
+  const allSrcs = [cover, ...albumPhotos(album)];
   const uniqueSrcs = [...new Set(allSrcs)];
-  const activeImage = flashIdx >= 0 ? album.photos[flashIdx].image : album.cover;
+  const activeImage = flashIdx >= 0 ? albumPhotos(album)[flashIdx] : cover;
 
   return (
     <div
@@ -201,9 +175,9 @@ const PhotosPage = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [openAlbum]);
 
-  const buildRows = (photos: Photo[], albumIdx: number) => {
+  const buildRows = (photos: string[], albumIdx: number) => {
     const pattern = layoutPatterns[albumIdx % layoutPatterns.length];
-    const rows: { layout: RowLayout; photos: Photo[]; startIdx: number }[] = [];
+    const rows: { layout: RowLayout; photos: string[]; startIdx: number }[] = [];
     let photoIdx = 0;
     for (let r = 0; photoIdx < photos.length; r++) {
       const layout = pattern[r % pattern.length];
@@ -218,7 +192,7 @@ const PhotosPage = () => {
     return rows;
   };
 
-  const previewImages = currentAlbum ? currentAlbum.photos.map(p => p.image) : [];
+  const previewImages = currentAlbum ? albumPhotos(currentAlbum) : [];
 
   return (
     <div className="relative min-h-screen bg-background text-foreground overflow-x-hidden">
@@ -294,13 +268,13 @@ const PhotosPage = () => {
                 </motion.button>
 
                 <div className="flex flex-col gap-6">
-                  {buildRows(currentAlbum.photos, albums.indexOf(currentAlbum)).map((row, rowIdx) => {
+                  {buildRows(albumPhotos(currentAlbum), albums.indexOf(currentAlbum)).map((row, rowIdx) => {
                     if (row.layout === "pair") {
                       return (
                         <div key={rowIdx} className="grid grid-cols-2 gap-[3px]">
                           {row.photos.map((photo, pi) => (
                             <motion.div
-                              key={photo.id}
+                              key={photo}
                               className="cursor-pointer overflow-hidden"
                               initial={{ opacity: 0, y: 20 }}
                               animate={{ opacity: 1, y: 0 }}
@@ -308,7 +282,7 @@ const PhotosPage = () => {
                               onClick={() => setPreviewIdx(row.startIdx + pi)}
                             >
                               <div className="aspect-[4/3] overflow-hidden">
-                                <img src={photo.image} alt="" className="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-700 ease-out" />
+                                <img src={photo} alt="" loading="lazy" className="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-700 ease-out" />
                               </div>
                             </motion.div>
                           ))}
@@ -319,7 +293,7 @@ const PhotosPage = () => {
                     const isOffset = row.layout === "offset-right" || row.layout === "offset-left";
                     return (
                       <motion.div
-                        key={photo.id}
+                        key={photo}
                         className={`cursor-pointer overflow-hidden ${isOffset ? (row.layout === "offset-right" ? "ml-auto w-[75%]" : "mr-auto w-[75%]") : "w-full"}`}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -327,7 +301,7 @@ const PhotosPage = () => {
                         onClick={() => setPreviewIdx(row.startIdx)}
                       >
                         <div className="aspect-[4/3] overflow-hidden">
-                          <img src={photo.image} alt="" className="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-700 ease-out" />
+                          <img src={photo} alt="" loading="lazy" className="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-700 ease-out" />
                         </div>
                       </motion.div>
                     );

@@ -52,11 +52,10 @@ interface SitemapItem {
 
 export const sitemapItems: SitemapItem[] = [
   { id: "hero", label: "Home", scrollTo: "hero" },
-  { id: "featured", label: "Featured", scrollTo: "featured" },
-  { id: "about", label: "About", scrollTo: "about" },
   { id: "projects", label: "Projects", scrollTo: "projects", children: [
     { id: "project-archive", label: "Archive", href: "/projects" },
   ]},
+  { id: "about", label: "About", scrollTo: "about" },
   { id: "news", label: "News", scrollTo: "news" },
   { id: "photos", label: "Photos", scrollTo: "photos", children: [
     { id: "portfolio", label: "Portfolio", href: "/photos" },

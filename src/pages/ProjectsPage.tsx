@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { motion, LayoutGroup } from "framer-motion";
+import { useState } from "react";
+import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import Footer from "@/components/Footer";
 import Logo from "@/components/Logo";
@@ -9,21 +9,11 @@ import { projectItems } from "@/lib/siteContent";
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const EASE_TEXT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 
-const categories = ["All", "RESEARCH", "WORK", "REPORTING", "PROJECT"];
-
 const ProjectsPage = () => {
-  const [filter, setFilter] = useState("All");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
-  const filteredProjects = useMemo(
-    () => (filter === "All" ? projectItems : projectItems.filter((project) => project.source === filter)),
-    [filter]
-  );
-
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [filter]);
+  const filteredProjects = projectItems;
 
   return (
     <div className="relative min-h-screen bg-background text-foreground">
@@ -48,34 +38,6 @@ const ProjectsPage = () => {
             </h1>
           </div>
 
-          <div className="mb-12 flex justify-center">
-            <div className="flex gap-1 px-6">
-              <LayoutGroup>
-                {categories.map((category) => {
-                  const active = filter === category;
-                  return (
-                    <button
-                      key={category}
-                      onClick={() => setFilter(category)}
-                      className="relative shrink-0 px-3 py-1 font-mono text-[9px] tracking-[0.2em] uppercase transition-colors duration-300"
-                      style={{ color: active ? "hsl(var(--background))" : "hsl(var(--foreground) / 0.3)" }}
-                    >
-                      {active && (
-                        <motion.div
-                          layoutId="projects-filter-pill"
-                          className="absolute inset-0 bg-foreground"
-                          style={{ zIndex: -1 }}
-                          transition={{ type: "spring", stiffness: 500, damping: 35 }}
-                        />
-                      )}
-                      {category}
-                    </button>
-                  );
-                })}
-              </LayoutGroup>
-            </div>
-          </div>
-
           <div className="px-6">
             <div className="grid grid-cols-1 gap-[3px] md:grid-cols-2">
               {filteredProjects.map((project, index) => (
@@ -95,10 +57,8 @@ const ProjectsPage = () => {
                     />
                   </div>
                   <div className="bg-background p-5 md:p-6">
-                    <div className="mb-3 flex items-center gap-2">
-                      <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-foreground/45">{project.source}</span>
-                      <span className="h-px w-5 bg-foreground/15" />
-                      <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-foreground/30">{project.year}</span>
+                    <div className="mb-3 flex items-center">
+                      <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-foreground/45">{project.year}</span>
                     </div>
                     <h2 className="max-w-xl text-2xl font-semibold tracking-tight text-foreground md:text-3xl">{project.title}</h2>
                     <p className="mt-2 max-w-xl text-[13px] leading-relaxed text-foreground/65 md:text-sm">{project.summary}</p>

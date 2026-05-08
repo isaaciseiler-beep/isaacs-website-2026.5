@@ -191,7 +191,7 @@ const AboutSection = () => {
         <div className="mt-8 md:mt-10 relative group/pill">
           <div
             ref={pillRef}
-            className="relative flex items-center gap-3 px-6 py-3.5 bg-background w-full z-10"
+            className="relative flex items-center gap-3 px-6 py-3.5 bg-background border-2 border-foreground w-full z-10"
             style={{ borderRadius: "9999px" }}
           >
             {/* Highlight border overlay — clip-path reveal left-to-right on hover */}

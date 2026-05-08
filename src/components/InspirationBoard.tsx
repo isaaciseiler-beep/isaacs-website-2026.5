@@ -189,6 +189,67 @@ const InspirationBoard = () => {
       );
     }
 
+    if (item.type === "book") {
+      return (
+        <div className="flex h-full p-0" style={{ background: "hsl(var(--foreground) / 0.03)" }}>
+          <div className="w-[28%] shrink-0 relative" style={{ background: "linear-gradient(135deg, hsl(var(--foreground) / 0.18), hsl(var(--foreground) / 0.06))", borderRight: "1px solid hsl(var(--foreground) / 0.15)" }}>
+            <div className="absolute inset-0 flex items-end justify-center pb-2">
+              <span className="mono-text text-foreground/35" style={{ fontSize: 8 }}>BOOK</span>
+            </div>
+            <div className="absolute left-1.5 top-2 bottom-6 w-px bg-foreground/15" />
+          </div>
+          <div className="flex-1 flex flex-col justify-between p-3 min-w-0">
+            <p className="mono-text text-foreground/40" style={{ fontSize: 9 }}>READING</p>
+            <div>
+              <p className="font-semibold text-foreground tracking-tight text-[13px] leading-tight italic">{item.title}</p>
+              <p className="mt-1 text-foreground/55 leading-snug text-[11px]">{item.content}</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (item.type === "music") {
+      return (
+        <div className="flex h-full flex-col justify-between p-4" style={{ background: "linear-gradient(160deg, hsl(var(--foreground) / 0.06), transparent)" }}>
+          <div className="flex items-center justify-between">
+            <p className="mono-text text-foreground/40" style={{ fontSize: 9 }}>{typeLabel[item.type]}</p>
+            <div className="flex items-end gap-[2px] h-3">
+              <span className="w-[2px] bg-[hsl(var(--highlight))]" style={{ height: "40%" }} />
+              <span className="w-[2px] bg-[hsl(var(--highlight))]" style={{ height: "100%" }} />
+              <span className="w-[2px] bg-[hsl(var(--highlight))]" style={{ height: "65%" }} />
+              <span className="w-[2px] bg-[hsl(var(--highlight))]" style={{ height: "85%" }} />
+              <span className="w-[2px] bg-[hsl(var(--highlight))]" style={{ height: "30%" }} />
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex shrink-0 items-center justify-center rounded-full border border-foreground/30 w-10 h-10">
+              <span className="text-foreground/60" style={{ fontSize: 14 }}>♪</span>
+            </div>
+            <div className="min-w-0">
+              <p className="font-semibold text-foreground tracking-tight text-sm leading-tight truncate">{item.title}</p>
+              <p className="mt-0.5 text-foreground/50 text-[11px] leading-snug">{item.content}</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (item.type === "podcast") {
+      return (
+        <div className="flex h-full flex-col justify-between p-4" style={{ background: "hsl(var(--foreground) / 0.03)" }}>
+          <div className="flex items-center gap-1.5">
+            <span className="text-[hsl(var(--highlight))]" style={{ fontSize: 10 }}>●</span>
+            <p className="mono-text text-foreground/40" style={{ fontSize: 9 }}>{typeLabel[item.type]}</p>
+          </div>
+          <div>
+            <p className="font-semibold text-foreground tracking-tight text-sm leading-tight">{item.title}</p>
+            <p className="mt-1 text-foreground/55 leading-snug text-[12px]">{item.content}</p>
+          </div>
+        </div>
+      );
+    }
+
     // website / default
     return (
       <div className="flex h-full flex-col justify-between p-4 border border-foreground/10">

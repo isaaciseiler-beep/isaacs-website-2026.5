@@ -23,8 +23,8 @@ const ProjectsSection = () => {
       </div>
 
       <div
-        className="flex px-6"
-        style={{ gap: GAP, height: "55vh", minHeight: 340 }}
+        className="flex flex-col md:flex-row px-6 h-auto md:h-[55vh] md:min-h-[340px]"
+        style={{ gap: GAP }}
         onMouseLeave={() => setActiveIndex(null)}
       >
         {projects.map((project, i) => {
@@ -34,10 +34,12 @@ const ProjectsSection = () => {
           return (
             <motion.div
               key={project.id}
-              className="relative overflow-hidden cursor-pointer"
+              className="relative overflow-hidden cursor-pointer aspect-[4/3] md:aspect-auto md:flex-[1_1_0%]"
               style={{ minWidth: 0 }}
               animate={{
-                flex: isActive ? 6 : hasActive ? 0.8 : 1,
+                flex: typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches
+                  ? (isActive ? 6 : hasActive ? 0.8 : 1)
+                  : undefined,
               }}
               transition={{ duration: 0.85, ease }}
               onMouseEnter={() => setActiveIndex(i)}

@@ -6,7 +6,7 @@ const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
 interface InspirationItem {
   id: number;
-  type: "photo" | "website" | "place" | "quote" | "video";
+  type: "photo" | "website" | "place" | "quote" | "video" | "book" | "music" | "podcast";
   title: string;
   content: string;
   url?: string;
@@ -19,14 +19,14 @@ interface InspirationItem {
 }
 
 const ITEMS: InspirationItem[] = [
-  { id: 1, type: "photo", title: "Alpine Light", content: "Mountain photography — chasing light at altitude.", imageUrl: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop", url: "https://unsplash.com", x: 4, y: 5, w: 30, h: 32, rotate: -2 },
-  { id: 2, type: "quote", title: "Steve Jobs", content: "\"Design is not just what it looks like. Design is how it works.\"", x: 38, y: 7, w: 26, h: 20, rotate: 2.5 },
-  { id: 3, type: "website", title: "Are.na", content: "Visual research for the creative process.", url: "https://are.na", x: 69, y: 6, w: 27, h: 17, rotate: -1.5 },
-  { id: 4, type: "place", title: "Marfa, TX", content: "Desert minimalism. Judd, Prada, endless sky.", x: 40, y: 36, w: 23, h: 24, rotate: -3.5 },
-  { id: 5, type: "video", title: "Objectified", content: "Dieter Rams — design philosophy in motion.", url: "https://vimeo.com", x: 5, y: 56, w: 30, h: 17, rotate: 1.5 },
-  { id: 6, type: "photo", title: "Street Type", content: "Found type in urban environments.", imageUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=600&fit=crop", url: "https://unsplash.com", x: 67, y: 44, w: 28, h: 32, rotate: 2.5 },
-  { id: 7, type: "quote", title: "Da Vinci", content: "\"Simplicity is the ultimate sophistication.\"", x: 13, y: 78, w: 24, h: 17, rotate: -1 },
-  { id: 8, type: "website", title: "It's Nice That", content: "Why Brutalism is Making a Comeback", url: "https://itsnicethat.com", x: 42, y: 74, w: 24, h: 18, rotate: 3 },
+  { id: 1, type: "website", title: "John Provencher", content: "Brooklyn-based artist & designer — interfaces as sculpture.", url: "https://johnprovencher.com/", x: 4, y: 5, w: 30, h: 24, rotate: -2 },
+  { id: 2, type: "music", title: "Isaiah Huron", content: "Atmospheric R&B — late-night drives, neon reflections.", url: "https://open.spotify.com/artist/1hJx89kEIcAmlZzUWat9w6", x: 38, y: 7, w: 26, h: 20, rotate: 2.5 },
+  { id: 3, type: "place", title: "Hong Kong", content: "Density as poetry. Neon, mist, signage stacked to the sky.", imageUrl: "https://images.unsplash.com/photo-1536599018102-9f803c140fc1?w=800&h=600&fit=crop", x: 69, y: 6, w: 27, h: 28, rotate: -1.5 },
+  { id: 4, type: "podcast", title: "Search Engine", content: "PJ Vogt asks the questions you'd Google but never finish.", url: "https://www.searchengine.show/", x: 40, y: 36, w: 23, h: 22, rotate: -3.5 },
+  { id: 5, type: "photo", title: "Greg Girard", content: "Kowloon Walled City, Tokyo nights — the vanished Asian metropolis.", imageUrl: "https://images.unsplash.com/photo-1493514789931-586cb221d7a7?w=800&h=600&fit=crop", url: "https://www.youtube.com/watch?v=Ss1L7SaMnAU&t=937s", x: 4, y: 53, w: 30, h: 30, rotate: 1.5 },
+  { id: 6, type: "book", title: "I Deliver Parcels in Beijing", content: "Hu Anyan — a courier's view of the city, one doorbell at a time.", x: 67, y: 38, w: 28, h: 22, rotate: 2.5 },
+  { id: 7, type: "book", title: "My Year of Rest and Relaxation", content: "Ottessa Moshfegh — pharmaceutical hibernation in pre-9/11 Manhattan.", x: 38, y: 62, w: 26, h: 22, rotate: -1 },
+  { id: 8, type: "book", title: "What We Can Know", content: "Ian McEwan — a future scholar reconstructs a lost world from fragments.", x: 67, y: 66, w: 28, h: 22, rotate: 3 },
 ];
 
 const typeLabel: Record<string, string> = {
@@ -35,6 +35,9 @@ const typeLabel: Record<string, string> = {
   place: "PLACE",
   quote: "QUOTE",
   video: "VIDEO",
+  book: "BOOK",
+  music: "MUSIC",
+  podcast: "PODCAST",
 };
 
 const OVERHANG = 0.3; // 30% max overhang
@@ -181,6 +184,67 @@ const InspirationBoard = () => {
               <p className="font-semibold text-foreground tracking-tight text-sm leading-tight truncate">{item.title}</p>
               <p className="mt-0.5 text-foreground/50 text-[12px] leading-snug">{item.content}</p>
             </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (item.type === "book") {
+      return (
+        <div className="flex h-full p-0" style={{ background: "hsl(var(--foreground) / 0.03)" }}>
+          <div className="w-[28%] shrink-0 relative" style={{ background: "linear-gradient(135deg, hsl(var(--foreground) / 0.18), hsl(var(--foreground) / 0.06))", borderRight: "1px solid hsl(var(--foreground) / 0.15)" }}>
+            <div className="absolute inset-0 flex items-end justify-center pb-2">
+              <span className="mono-text text-foreground/35" style={{ fontSize: 8 }}>BOOK</span>
+            </div>
+            <div className="absolute left-1.5 top-2 bottom-6 w-px bg-foreground/15" />
+          </div>
+          <div className="flex-1 flex flex-col justify-between p-3 min-w-0">
+            <p className="mono-text text-foreground/40" style={{ fontSize: 9 }}>READING</p>
+            <div>
+              <p className="font-semibold text-foreground tracking-tight text-[13px] leading-tight italic">{item.title}</p>
+              <p className="mt-1 text-foreground/55 leading-snug text-[11px]">{item.content}</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (item.type === "music") {
+      return (
+        <div className="flex h-full flex-col justify-between p-4" style={{ background: "linear-gradient(160deg, hsl(var(--foreground) / 0.06), transparent)" }}>
+          <div className="flex items-center justify-between">
+            <p className="mono-text text-foreground/40" style={{ fontSize: 9 }}>{typeLabel[item.type]}</p>
+            <div className="flex items-end gap-[2px] h-3">
+              <span className="w-[2px] bg-[hsl(var(--highlight))]" style={{ height: "40%" }} />
+              <span className="w-[2px] bg-[hsl(var(--highlight))]" style={{ height: "100%" }} />
+              <span className="w-[2px] bg-[hsl(var(--highlight))]" style={{ height: "65%" }} />
+              <span className="w-[2px] bg-[hsl(var(--highlight))]" style={{ height: "85%" }} />
+              <span className="w-[2px] bg-[hsl(var(--highlight))]" style={{ height: "30%" }} />
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex shrink-0 items-center justify-center rounded-full border border-foreground/30 w-10 h-10">
+              <span className="text-foreground/60" style={{ fontSize: 14 }}>♪</span>
+            </div>
+            <div className="min-w-0">
+              <p className="font-semibold text-foreground tracking-tight text-sm leading-tight truncate">{item.title}</p>
+              <p className="mt-0.5 text-foreground/50 text-[11px] leading-snug">{item.content}</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (item.type === "podcast") {
+      return (
+        <div className="flex h-full flex-col justify-between p-4" style={{ background: "hsl(var(--foreground) / 0.03)" }}>
+          <div className="flex items-center gap-1.5">
+            <span className="text-[hsl(var(--highlight))]" style={{ fontSize: 10 }}>●</span>
+            <p className="mono-text text-foreground/40" style={{ fontSize: 9 }}>{typeLabel[item.type]}</p>
+          </div>
+          <div>
+            <p className="font-semibold text-foreground tracking-tight text-sm leading-tight">{item.title}</p>
+            <p className="mt-1 text-foreground/55 leading-snug text-[12px]">{item.content}</p>
           </div>
         </div>
       );

@@ -129,7 +129,7 @@ const ProjectsSection = () => {
       {/* Explore button */}
       <div className="px-6 mt-6">
         <Link to="/projects" className="block w-full md:w-1/2">
-          <div className="group relative w-full py-3 text-sm font-mono tracking-[0.2em] uppercase bg-[hsl(50_33%_7%)] text-[hsl(200_25%_83%)] hover:text-[hsl(var(--highlight))] transition-colors duration-300 flex items-center justify-center cursor-pointer">
+          <div className="group relative w-full py-3 text-sm font-mono tracking-[0.2em] uppercase bg-[hsl(50_33%_7%)] hover:bg-[hsl(50_33%_12%)] text-[hsl(200_25%_83%)] transition-colors duration-300 flex items-center justify-center cursor-pointer">
             <span className="flex items-center justify-center">
               My Work
               <span className="inline-flex overflow-hidden max-w-0 group-hover:max-w-[2rem] opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">

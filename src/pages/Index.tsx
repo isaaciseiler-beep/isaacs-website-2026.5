@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import Logo from "@/components/Logo";
 import HeroSection from "@/components/HeroSection";
-import FeaturedSection from "@/components/FeaturedSection";
 import ProjectsSection from "@/components/ProjectsSection";
 import NewsSection from "@/components/NewsSection";
 import PhotoSection from "@/components/PhotoSection";
@@ -63,9 +62,8 @@ const Index = () => {
       >
         <main>
           <div id="hero"><HeroSection /></div>
-          <ParallaxSection id="featured" offset={50} clip={false}><FeaturedSection /></ParallaxSection>
-          <ParallaxSection id="about" offset={60}><AboutSection /></ParallaxSection>
           <ParallaxSection id="projects" offset={70}><ProjectsSection /></ParallaxSection>
+          <ParallaxSection id="about" offset={60}><AboutSection /></ParallaxSection>
           <ParallaxSection id="news" offset={55}><NewsSection /></ParallaxSection>
           <ParallaxSection id="photos" offset={80}><PhotoSection /></ParallaxSection>
           <ParallaxSection id="inspiration" offset={55}><InspirationBoard /></ParallaxSection>

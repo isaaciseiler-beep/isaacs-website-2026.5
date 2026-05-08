@@ -192,12 +192,11 @@ const AboutSection = () => {
           <div
             ref={pillRef}
             className="relative flex items-center gap-3 px-6 py-3.5 bg-background border-2 border-foreground w-full z-10"
-            style={{ borderRadius: "9999px" }}
           >
             {/* Highlight border overlay — clip-path reveal left-to-right on hover */}
             <span
               className="absolute inset-[-2px] border-2 border-[hsl(var(--highlight))] pointer-events-none transition-[clip-path] duration-500 [clip-path:inset(0_100%_0_0)] group-hover/pill:[clip-path:inset(0_0%_0_0)]"
-              style={{ borderRadius: "9999px", transitionTimingFunction: "cubic-bezier(0.16,1,0.3,1)" }}
+              style={{ transitionTimingFunction: "cubic-bezier(0.16,1,0.3,1)" }}
             />
             <motion.span
               className="rounded-full w-2.5 h-2.5 bg-foreground shrink-0"

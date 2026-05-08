@@ -191,15 +191,10 @@ const AboutSection = () => {
         <div className="mt-8 md:mt-10 relative group/pill">
           <div
             ref={pillRef}
-            className="relative flex items-center gap-3 px-6 py-3.5 bg-background border-2 border-foreground w-full z-10"
+            className="relative flex items-center gap-3 px-6 py-3.5 bg-background border-2 border-foreground group-hover/pill:border-[hsl(var(--highlight))] transition-colors duration-300 w-full z-10"
           >
-            {/* Highlight border overlay — clip-path reveal left-to-right on hover */}
-            <span
-              className="absolute inset-[-2px] border-2 border-[hsl(var(--highlight))] pointer-events-none transition-[clip-path] duration-500 [clip-path:inset(0_100%_0_0)] group-hover/pill:[clip-path:inset(0_0%_0_0)]"
-              style={{ transitionTimingFunction: "cubic-bezier(0.16,1,0.3,1)" }}
-            />
             <motion.span
-              className="rounded-full w-2.5 h-2.5 bg-foreground shrink-0"
+              className="rounded-full w-2.5 h-2.5 bg-foreground group-hover/pill:bg-[hsl(var(--highlight))] transition-colors duration-300 shrink-0"
               animate={{ scale: [1, 1.4, 1] }}
               transition={{
                 duration: 2.2,
@@ -207,7 +202,7 @@ const AboutSection = () => {
                 ease: "easeInOut",
               }}
             />
-            <span className="text-base md:text-lg font-light tracking-[0.02em] text-foreground">
+            <span className="text-base md:text-lg font-light tracking-[0.02em] text-foreground group-hover/pill:text-[hsl(var(--highlight))] transition-colors duration-300">
               Currently in the market for tech roles starting Summer 2026
             </span>
           </div>

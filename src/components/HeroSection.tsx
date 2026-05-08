@@ -1,7 +1,12 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import AnimatedText from "@/components/AnimatedText";
 
-const words = ["Crafting visual", "experiences that", "resonate."];
+const words = [
+  "Building at the",
+  "intersection of AI,",
+  "emerging technology,",
+  "and society.",
+];
 
 const HeroSection = () => {
   const { scrollY } = useScroll();

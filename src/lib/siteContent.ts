@@ -10,6 +10,7 @@ export interface NewsItem {
   href: string;
   logoUrl: string;
   logoAlt: string;
+  imageUrl?: string;
 }
 
 export interface ProjectLink {
@@ -50,6 +51,7 @@ export const newsItems: NewsItem[] = [
     href: "https://edunewsletter.openai.com/p/top-chats-from-the-fulbright-taiwan",
     logoUrl: "https://pub-e466b845a9ef4344b05811b344fb11e1.r2.dev/openai-text.png",
     logoAlt: "OpenAI",
+    imageUrl: "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=800&h=500&fit=crop",
   },
   {
     id: 2,
@@ -58,6 +60,7 @@ export const newsItems: NewsItem[] = [
     href: "https://openai.com/index/introducing-chatgpt-pulse/",
     logoUrl: "https://pub-e466b845a9ef4344b05811b344fb11e1.r2.dev/openai-text.png",
     logoAlt: "OpenAI",
+    imageUrl: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=500&fit=crop",
   },
   {
     id: 3,
@@ -66,6 +69,7 @@ export const newsItems: NewsItem[] = [
     href: "https://www.instagram.com/chatgpt/reel/DNyG5VvXEZM/",
     logoUrl: "https://pub-e466b845a9ef4344b05811b344fb11e1.r2.dev/openai-text.png",
     logoAlt: "OpenAI",
+    imageUrl: "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=800&h=500&fit=crop",
   },
   {
     id: 4,
@@ -74,6 +78,7 @@ export const newsItems: NewsItem[] = [
     href: "https://source.washu.edu/2024/04/junior-seiler-awarded-truman-scholarship/",
     logoUrl: "https://pub-e466b845a9ef4344b05811b344fb11e1.r2.dev/WashU.png",
     logoAlt: "WashU",
+    imageUrl: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&h=500&fit=crop",
   },
   {
     id: 5,
@@ -82,6 +87,7 @@ export const newsItems: NewsItem[] = [
     href: "https://chatgpt.com/100chats-project",
     logoUrl: "https://pub-e466b845a9ef4344b05811b344fb11e1.r2.dev/openai-text.png",
     logoAlt: "OpenAI",
+    imageUrl: "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=800&h=500&fit=crop",
   },
   {
     id: 6,
@@ -90,6 +96,7 @@ export const newsItems: NewsItem[] = [
     href: "https://source.washu.edu/2024/11/seniors-darden-seiler-were-rhodes-scholars-finalists/",
     logoUrl: "https://pub-e466b845a9ef4344b05811b344fb11e1.r2.dev/WashU.png",
     logoAlt: "WashU",
+    imageUrl: "https://images.unsplash.com/photo-1607013251379-e6eecfffe234?w=800&h=500&fit=crop",
   },
   {
     id: 7,
@@ -98,6 +105,7 @@ export const newsItems: NewsItem[] = [
     href: "https://source.wustl.edu/2025/06/several-alumni-earn-fulbright-awards/",
     logoUrl: "https://pub-e466b845a9ef4344b05811b344fb11e1.r2.dev/Fulbright.png",
     logoAlt: "Fulbright",
+    imageUrl: "https://images.unsplash.com/photo-1470004914212-05527e49370b?w=800&h=500&fit=crop",
   },
   {
     id: 8,
@@ -106,6 +114,7 @@ export const newsItems: NewsItem[] = [
     href: "https://www.studlife.com/news/2024/04/24/isaac-seiler-named-truman-scholar",
     logoUrl: "https://pub-e466b845a9ef4344b05811b344fb11e1.r2.dev/studlife.png",
     logoAlt: "Student Life",
+    imageUrl: "https://images.unsplash.com/photo-1495020689067-958852a7765e?w=800&h=500&fit=crop",
   },
   {
     id: 9,
@@ -114,6 +123,7 @@ export const newsItems: NewsItem[] = [
     href: "https://www.forbes.com/sites/michaeltnietzel/2024/04/13/the-truman-scholars-for-2024-are-announced/",
     logoUrl: "https://pub-e466b845a9ef4344b05811b344fb11e1.r2.dev/Forbes.png",
     logoAlt: "Forbes",
+    imageUrl: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&h=500&fit=crop",
   },
   {
     id: 10,
@@ -122,6 +132,7 @@ export const newsItems: NewsItem[] = [
     href: "https://source.washu.edu/2025/05/student-life-wins-best-newspaper-honor-at-missouri-college-media-awards/",
     logoUrl: "https://pub-e466b845a9ef4344b05811b344fb11e1.r2.dev/WashU.png",
     logoAlt: "WashU",
+    imageUrl: "https://images.unsplash.com/photo-1452780212940-6f5c0d14d848?w=800&h=500&fit=crop",
   },
   {
     id: 11,
@@ -130,6 +141,7 @@ export const newsItems: NewsItem[] = [
     href: "https://artsci.washu.edu/ampersand/isaac-seiler-setting-his-sights-high",
     logoUrl: "https://pub-e466b845a9ef4344b05811b344fb11e1.r2.dev/WashU.png",
     logoAlt: "WashU",
+    imageUrl: "https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&h=500&fit=crop",
   },
 ];
 

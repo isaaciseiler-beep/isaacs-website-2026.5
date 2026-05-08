@@ -79,20 +79,12 @@ const ProjectModal = ({ projects, currentIndex, onClose, onNavigate }: ProjectMo
                 <div className="absolute inset-x-0 bottom-0 p-5 md:p-6">
                   <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.28em] text-white/45">{project.source}</p>
                   <h2 className="max-w-2xl text-2xl font-semibold tracking-tight text-white md:text-4xl">{project.title}</h2>
-                  <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/68">{project.summary}</p>
+                  <p className="mt-2 text-sm leading-relaxed text-white/68">{project.summary}</p>
                 </div>
               </div>
 
               <div className="min-h-0 overflow-y-auto max-h-[52vh]">
                 <div className="px-5 pb-6 pt-6 md:px-6">
-                  <div className="mb-8 flex items-center gap-3">
-                    <span className="font-mono text-[10px] uppercase tracking-[0.26em] text-foreground/28">
-                      {String(currentIndex + 1).padStart(2, "0")}
-                    </span>
-                    <span className="h-px flex-1 bg-foreground/10" />
-                    <span className="font-mono text-[10px] uppercase tracking-[0.26em] text-foreground/28">{project.year}</span>
-                  </div>
-
                   <div className="space-y-8">
                     {project.sections.map((section) => (
                       <section key={section.heading}>

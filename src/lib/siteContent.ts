@@ -1,7 +1,17 @@
-import project1 from "@/assets/project-1.jpg";
-import project2 from "@/assets/project-2.jpg";
-import project3 from "@/assets/project-3.jpg";
-import project4 from "@/assets/project-4.jpg";
+const PROJECT_IMG_BASE = "https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev";
+const projectImg = {
+  aiIndex: `${PROJECT_IMG_BASE}/aiindex.png`,
+  aiNews: `${PROJECT_IMG_BASE}/ainews.png`,
+  biCares: `${PROJECT_IMG_BASE}/bicares.png`,
+  boehStrategy: `${PROJECT_IMG_BASE}/boehstrategy.png`,
+  capHill: `${PROJECT_IMG_BASE}/caphill.png`,
+  charging: `${PROJECT_IMG_BASE}/charging.png`,
+  chatLab: `${PROJECT_IMG_BASE}/chatlab.jpeg`,
+  congressInterview: `${PROJECT_IMG_BASE}/congressinterview.png`,
+  nonprofitNews: `${PROJECT_IMG_BASE}/nonprofitnews.png`,
+  politicalConsult: `${PROJECT_IMG_BASE}/politicalconsult.png`,
+  reporting: `${PROJECT_IMG_BASE}/reporting.png`,
+};
 
 export interface NewsItem {
   id: number;

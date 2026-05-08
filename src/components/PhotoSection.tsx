@@ -124,12 +124,12 @@ const PhotoSection = () => {
 
       <div className="px-6 mt-6">
         <Link to="/photos" className="block">
-          <motion.div className="group relative w-full py-2.5 text-sm font-mono tracking-[0.2em] uppercase rounded-full bg-background border-2 border-foreground overflow-hidden flex items-center justify-center cursor-pointer" whileTap={{ scale: 0.995 }}>
+          <motion.div className="group relative w-full py-2.5 text-sm font-mono tracking-[0.2em] uppercase rounded-full bg-foreground overflow-hidden flex items-center justify-center cursor-pointer" whileTap={{ scale: 0.995 }}>
             <span
-              className="absolute inset-0 rounded-full border-2 border-[hsl(var(--highlight))] pointer-events-none transition-[clip-path] duration-500 [clip-path:inset(0_100%_0_0)] group-hover:[clip-path:inset(0_0%_0_0)]"
+              className="absolute inset-0 bg-[hsl(var(--highlight))] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500"
               style={{ transitionTimingFunction: "cubic-bezier(0.16,1,0.3,1)" }}
             />
-            <span className="relative z-10 text-foreground flex items-center justify-center">
+            <span className="relative z-10 text-background flex items-center justify-center">
               View my Portfolio
               <span className="inline-flex overflow-hidden max-w-0 group-hover:max-w-[2rem] opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">
                 <ArrowRight className="w-4 h-4 ml-2 shrink-0" strokeWidth={1.5} />

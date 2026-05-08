@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import SectionHeading from "@/components/SectionHeading";
 import PhotoPreview from "@/components/PhotoPreview";
@@ -20,52 +20,27 @@ const photos = [
 
 photos.forEach((p) => { const img = new Image(); img.src = p.image; });
 
-const chevronVariants = {
-  initial: (dir: "left" | "right") => ({ opacity: 0, x: dir === "left" ? -20 : 20 }),
-  animate: { opacity: 1, x: 0, transition: { duration: 0.35, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] } },
-  exit: (dir: "left" | "right") => ({ opacity: 0, x: dir === "left" ? -20 : 20, transition: { duration: 0.25, ease: [0.4, 0, 1, 1] as [number, number, number, number] } }),
-};
-
-const VISIBLE_COLS = 1.5;
-
 const PhotoSection = () => {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
-  const [containerHeight, setContainerHeight] = useState<number | undefined>(undefined);
   const [previewIdx, setPreviewIdx] = useState<number | null>(null);
-
-  const checkScroll = () => {
-    const el = scrollRef.current;
-    if (!el) return;
-    setCanScrollLeft(el.scrollLeft > 2);
-    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 2);
-  };
+  const [hovering, setHovering] = useState(false);
+  const [activeIdx, setActiveIdx] = useState(0);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    checkScroll();
-    el.addEventListener("scroll", checkScroll, { passive: true });
-    const updateHeight = () => {
-      const itemW = (window.innerWidth - 48) / VISIBLE_COLS;
-      setContainerHeight(itemW / 1.5);
-    };
-    updateHeight();
-    window.addEventListener("resize", updateHeight);
-    window.addEventListener("resize", checkScroll);
-    return () => {
-      el.removeEventListener("scroll", checkScroll);
-      window.removeEventListener("resize", checkScroll);
-      window.removeEventListener("resize", updateHeight);
-    };
-  }, []);
+    if (hovering) {
+      let i = activeIdx;
+      intervalRef.current = setInterval(() => {
+        i = (i + 1) % photos.length;
+        setActiveIdx(i);
+      }, 220);
+    } else if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hovering]);
 
-  const scroll = (dir: "left" | "right") => {
-    const el = scrollRef.current;
-    if (!el) return;
-    el.scrollBy({ left: dir === "left" ? -el.clientWidth * 0.6 : el.clientWidth * 0.6, behavior: "smooth" });
-  };
+  const activePhoto = photos[activeIdx];
 
   return (
     <section className="py-12">
@@ -73,53 +48,55 @@ const PhotoSection = () => {
         <SectionHeading className="mb-0">Photos</SectionHeading>
       </div>
 
-      <div className="relative">
+      <div className="px-6">
         <div
-          ref={scrollRef}
-          className="overflow-x-auto overflow-y-hidden scrollbar-hide"
-          style={{ scrollSnapType: "x mandatory", scrollPaddingLeft: 24, maxHeight: containerHeight }}
+          className="relative w-full overflow-hidden cursor-pointer group"
+          style={{ aspectRatio: "3/1.05" }}
+          onMouseEnter={() => setHovering(true)}
+          onMouseLeave={() => setHovering(false)}
+          onClick={() => setPreviewIdx(activeIdx)}
         >
-          <div className="flex gap-[3px] px-6" style={{ width: "max-content" }}>
-            {photos.map((photo, index) => (
-              <motion.div
-                key={photo.id}
-                className="grid-item shrink-0 cursor-pointer"
-                style={{ width: `calc((100vw - 48px) / ${VISIBLE_COLS})`, aspectRatio: "3/2", scrollSnapAlign: "start" }}
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true, margin: "-20px" }}
-                transition={{ delay: index * 0.05, duration: 0.4 }}
-                onClick={() => setPreviewIdx(index)}
-              >
-                <img src={photo.image} alt={photo.title} className="w-full h-full object-cover" />
-                <div className="grid-item-overlay">
-                  <p className="mono-text">{photo.location}</p>
-                </div>
-              </motion.div>
+          {photos.map((photo, idx) => (
+            <img
+              key={photo.id}
+              src={photo.image}
+              alt={photo.title}
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{
+                opacity: idx === activeIdx ? 1 : 0,
+                filter: hovering ? "grayscale(0%)" : "grayscale(100%)",
+                transform: hovering ? "scale(1.02)" : "scale(1)",
+                transition: "opacity 140ms ease-out, filter 600ms ease-out, transform 900ms cubic-bezier(0.16,1,0.3,1)",
+              }}
+              loading="eager"
+            />
+          ))}
+
+          {/* Bottom gradient + caption */}
+          <div
+            className="absolute inset-x-0 bottom-0 h-1/3 pointer-events-none"
+            style={{ background: "linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 100%)" }}
+          />
+          <div className="absolute bottom-4 left-5 right-5 flex items-end justify-between gap-4 pointer-events-none">
+            <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-white/80">
+              {activePhoto.location}
+            </p>
+            <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-white/40 tabular-nums">
+              {String(activeIdx + 1).padStart(2, "0")} / {String(photos.length).padStart(2, "0")}
+            </p>
+          </div>
+
+          {/* Progress ticks */}
+          <div className="absolute top-4 left-5 right-5 flex gap-1 pointer-events-none">
+            {photos.map((_, idx) => (
+              <div
+                key={idx}
+                className="flex-1 h-[2px] transition-colors duration-200"
+                style={{ background: idx === activeIdx ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.18)" }}
+              />
             ))}
           </div>
         </div>
-
-        <div className="absolute top-0 right-0 bottom-0 w-14 pointer-events-none z-10" style={{ background: "linear-gradient(to left, hsl(var(--background)) 0%, hsl(var(--background) / 0.6) 40%, transparent 100%)" }} />
-        <div
-          className="absolute top-0 left-0 bottom-0 w-14 pointer-events-none z-10 transition-opacity duration-500 ease-out"
-          style={{ background: "linear-gradient(to right, hsl(var(--background)) 0%, hsl(var(--background) / 0.6) 40%, transparent 100%)", opacity: canScrollLeft ? 1 : 0 }}
-        />
-
-        <AnimatePresence>
-          {canScrollLeft && (
-            <motion.button key="scroll-left" custom="left" variants={chevronVariants} initial="initial" animate="animate" exit="exit" onClick={() => scroll("left")} className="absolute left-8 top-1/2 -translate-y-1/2 z-20 text-foreground hover:text-foreground transition-colors drop-shadow-[0_0_8px_hsl(var(--background))]" whileHover={{ x: -3 }} whileTap={{ scale: 0.85 }}>
-              <ChevronLeft className="w-6 h-6" strokeWidth={1.5} />
-            </motion.button>
-          )}
-        </AnimatePresence>
-        <AnimatePresence>
-          {canScrollRight && (
-            <motion.button key="scroll-right" custom="right" variants={chevronVariants} initial="initial" animate="animate" exit="exit" onClick={() => scroll("right")} className="absolute right-8 top-1/2 -translate-y-1/2 z-20 text-foreground hover:text-foreground transition-colors drop-shadow-[0_0_8px_hsl(var(--background))]" whileHover={{ x: 3 }} whileTap={{ scale: 0.85 }}>
-              <ChevronRight className="w-6 h-6" strokeWidth={1.5} />
-            </motion.button>
-          )}
-        </AnimatePresence>
       </div>
 
       <div className="px-6 mt-6">

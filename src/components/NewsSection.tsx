@@ -91,8 +91,8 @@ const NewsSection = () => {
               <h3 className="news-card-title text-lg font-semibold tracking-tight text-foreground mb-2 transition-colors duration-200">
                 {item.title}
               </h3>
-              <div className="flex items-center justify-end mt-8">
-                <span className="text-foreground text-sm opacity-0 group-hover:opacity-100 translate-x-[-4px] group-hover:translate-x-0 transition-all duration-300">
+              <div className="absolute bottom-5 right-5">
+                <span className="text-foreground text-sm opacity-0 group-hover:opacity-100 group-hover:text-[hsl(var(--highlight))] translate-x-[-4px] group-hover:translate-x-0 transition-all duration-300">
                   <ArrowUpRight className="w-4 h-4" />
                 </span>
               </div>

@@ -189,6 +189,13 @@
   .news-card {
     background-color: hsl(var(--card) / 0.4);
   }
+  .news-card .news-gradient {
+    background: linear-gradient(to bottom,
+      hsl(var(--card) / 0) 0%,
+      hsl(var(--card) / 0.18) 45%,
+      hsl(var(--card) / 0.34) 75%,
+      hsl(var(--card) / 0.4) 100%);
+  }
   .news-card:hover .news-card-title {
     color: hsl(var(--highlight));
   }
@@ -210,15 +217,17 @@
   .light .news-card:hover {
     background-color: hsl(50 33% 12%);
   }
-  .news-card .news-gradient {
-    background: linear-gradient(to bottom, transparent 0%, hsl(var(--card) / 0.4) 100%);
-    transition: background 300ms ease;
-  }
   .light .news-card .news-gradient {
-    background: linear-gradient(to bottom, transparent 0%, hsl(50 33% 7%) 100%);
+    background: linear-gradient(to bottom,
+      hsl(50 33% 7% / 0) 0%,
+      hsl(50 33% 7% / 0.55) 50%,
+      hsl(50 33% 7%) 100%);
   }
   .light .news-card:hover .news-gradient {
-    background: linear-gradient(to bottom, transparent 0%, hsl(50 33% 12%) 100%);
+    background: linear-gradient(to bottom,
+      hsl(50 33% 12% / 0) 0%,
+      hsl(50 33% 12% / 0.55) 50%,
+      hsl(50 33% 12%) 100%);
   }
 
   /* Light mode: pill button hover text turns dark green */

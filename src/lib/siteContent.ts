@@ -1,7 +1,17 @@
-import project1 from "@/assets/project-1.jpg";
-import project2 from "@/assets/project-2.jpg";
-import project3 from "@/assets/project-3.jpg";
-import project4 from "@/assets/project-4.jpg";
+const PROJECT_IMG_BASE = "https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev";
+const projectImg = {
+  aiIndex: `${PROJECT_IMG_BASE}/aiindex.png`,
+  aiNews: `${PROJECT_IMG_BASE}/ainews.png`,
+  biCares: `${PROJECT_IMG_BASE}/bicares.png`,
+  boehStrategy: `${PROJECT_IMG_BASE}/boehstrategy.png`,
+  capHill: `${PROJECT_IMG_BASE}/caphill.png`,
+  charging: `${PROJECT_IMG_BASE}/charging.png`,
+  chatLab: `${PROJECT_IMG_BASE}/chatlab.jpeg`,
+  congressInterview: `${PROJECT_IMG_BASE}/congressinterview.png`,
+  nonprofitNews: `${PROJECT_IMG_BASE}/nonprofitnews.png`,
+  politicalConsult: `${PROJECT_IMG_BASE}/politicalconsult.png`,
+  reporting: `${PROJECT_IMG_BASE}/reporting.png`,
+};
 
 export interface NewsItem {
   id: number;
@@ -153,7 +163,7 @@ export const projectItems: ProjectItem[] = [
     year: "2025",
     summary:
       "A public-information benchmark measuring how state and territory governments are actually responding to generative AI.",
-    image: project1,
+    image: projectImg.aiIndex,
     sections: [
       {
         heading: "Overview",
@@ -190,7 +200,7 @@ export const projectItems: ProjectItem[] = [
     year: "2025",
     summary:
       "A report capturing the systems, staffing, and benchmarks used to stand up a brand-new congressional office from zero.",
-    image: project2,
+    image: projectImg.capHill,
     sections: [
       {
         heading: "Overview",
@@ -224,7 +234,7 @@ export const projectItems: ProjectItem[] = [
     year: "2025",
     summary:
       "A qualitative honors thesis on the structural decline of local journalism in Australia and its implications for democracy, labor, and media policy.",
-    image: project3,
+    image: projectImg.aiNews,
     sections: [
       {
         heading: "Overview",
@@ -258,7 +268,7 @@ export const projectItems: ProjectItem[] = [
     year: "2024",
     summary:
       "A GIS and quantitative analysis project examining EV infrastructure access and where structural charger gaps remain.",
-    image: project4,
+    image: projectImg.charging,
     sections: [
       {
         heading: "Overview",
@@ -292,7 +302,7 @@ export const projectItems: ProjectItem[] = [
     year: "2024",
     summary:
       "An independent consultancy effort supporting local candidates through campaign websites, digital strategy, and rapid-response communications.",
-    image: project1,
+    image: projectImg.politicalConsult,
     sections: [
       {
         heading: "Overview",
@@ -326,7 +336,7 @@ export const projectItems: ProjectItem[] = [
     year: "2025",
     summary:
       "A six-session educator lab, sponsored by OpenAI, focused on practical and responsible uses of ChatGPT in education.",
-    image: project2,
+    image: projectImg.chatLab,
     sections: [
       {
         heading: "Overview",
@@ -361,7 +371,7 @@ export const projectItems: ProjectItem[] = [
     year: "2024",
     summary:
       "Student political reporting at WashU focused on protest, campus governance, elections, and institutional accountability.",
-    image: project3,
+    image: projectImg.reporting,
     sections: [
       {
         heading: "Overview",
@@ -390,7 +400,7 @@ export const projectItems: ProjectItem[] = [
     year: "2025",
     summary:
       "A full rebrand and strategic redirect for Boehringer Cares, spanning narrative, UX, visual identity, and internal communications.",
-    image: project4,
+    image: projectImg.biCares,
     sections: [
       {
         heading: "Overview",
@@ -423,7 +433,7 @@ export const projectItems: ProjectItem[] = [
     year: "2022",
     summary:
       "A large-scale nonprofit news research project involving data collection, survey synthesis, and direct stakeholder outreach.",
-    image: project1,
+    image: projectImg.nonprofitNews,
     sections: [
       {
         heading: "Overview",
@@ -454,7 +464,7 @@ export const projectItems: ProjectItem[] = [
     year: "2021",
     summary:
       "Early access-driven political reporting on then-Congressman Peter Meijer during a volatile post-impeachment period.",
-    image: project2,
+    image: projectImg.congressInterview,
     sections: [
       {
         heading: "Overview",
@@ -479,7 +489,7 @@ export const projectItems: ProjectItem[] = [
     year: "2024",
     summary:
       "Strategy and communications work around health access policy at Boehringer Ingelheim, including an internal report and SDX partnership support.",
-    image: project3,
+    image: projectImg.boehStrategy,
     sections: [
       {
         heading: "Overview",

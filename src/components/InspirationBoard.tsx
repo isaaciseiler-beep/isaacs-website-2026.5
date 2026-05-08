@@ -14,20 +14,19 @@ interface InspirationItem {
   x: number;
   y: number;
   w: number;
-  h: number;
+  aspect: number;
   rotate: number;
 }
 
 const ITEMS: InspirationItem[] = [
-  // h is computed from natural aspect ratio of each asset (relative to ~1118x450 board): h% ≈ (imgH/imgW) * w% * 2.48
-  { id: 1, type: "website", title: "John Provencher", content: "Brooklyn-based artist & designer — interfaces as sculpture.", url: "https://johnprovencher.com/", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/john_provencherpicture-34-copy.webp", x: 2, y: 4, w: 14, h: 36, rotate: -2 },
-  { id: 2, type: "music", title: "Mr. Lovebomb", content: "Isaiah Huron — atmospheric R&B, late-night drives, neon reflections.", url: "https://open.spotify.com/artist/1hJx89kEIcAmlZzUWat9w6", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/lovebomb.jpg", x: 18, y: 6, w: 13, h: 32, rotate: 2.5 },
-  { id: 3, type: "place", title: "Hong Kong", content: "Density as poetry. Neon, mist, signage stacked to the sky.", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/hk.JPG", x: 33, y: 5, w: 22, h: 36, rotate: -1.5 },
-  { id: 4, type: "podcast", title: "Search Engine", content: "PJ Vogt asks the questions you'd Google but never finish.", url: "https://www.searchengine.show/", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/1200x1200bf-60.jpg", x: 58, y: 4, w: 13, h: 32, rotate: -3.5 },
-  { id: 5, type: "video", title: "Greg Girard", content: "Interview with the photographer of Kowloon Walled City and the vanished Asian metropolis.", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/ggirard.jpg", url: "https://www.youtube.com/watch?v=Ss1L7SaMnAU&t=937s", x: 73, y: 5, w: 14, h: 35, rotate: 1.5 },
-  { id: 6, type: "book", title: "I Deliver Parcels in Beijing", content: "Hu Anyan — a courier's view of the city, one doorbell at a time.", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/parcels.jpg", x: 6, y: 56, w: 10, h: 37, rotate: 2.5 },
-  { id: 7, type: "book", title: "My Year of Rest and Relaxation", content: "Ottessa Moshfegh — pharmaceutical hibernation in pre-9/11 Manhattan.", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/myyearofrest.jpg", x: 22, y: 55, w: 10, h: 38, rotate: -1 },
-  { id: 8, type: "book", title: "What We Can Know", content: "Ian McEwan — a future scholar reconstructs a lost world from fragments.", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/What_We_Can_Know.jpg", x: 38, y: 55, w: 10, h: 39, rotate: 3 },
+  { id: 1, type: "website", title: "John Provencher", content: "Brooklyn-based artist & designer — interfaces as sculpture.", url: "https://johnprovencher.com/", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/john_provencherpicture-34-copy.webp", x: 2, y: 4, w: 14, aspect: 1912 / 1982, rotate: -2 },
+  { id: 2, type: "music", title: "Mr. Lovebomb", content: "Isaiah Huron — atmospheric R&B, late-night drives, neon reflections.", url: "https://open.spotify.com/artist/1hJx89kEIcAmlZzUWat9w6", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/lovebomb.jpg", x: 18, y: 6, w: 13, aspect: 1, rotate: 2.5 },
+  { id: 3, type: "place", title: "Hong Kong", content: "Density as poetry. Neon, mist, signage stacked to the sky.", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/hk.JPG", x: 33, y: 5, w: 22, aspect: 1.5, rotate: -1.5 },
+  { id: 4, type: "podcast", title: "Search Engine", content: "PJ Vogt asks the questions you'd Google but never finish.", url: "https://www.searchengine.show/", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/1200x1200bf-60.jpg", x: 58, y: 4, w: 13, aspect: 1, rotate: -3.5 },
+  { id: 5, type: "video", title: "Greg Girard", content: "Interview with the photographer of Kowloon Walled City and the vanished Asian metropolis.", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/ggirard.jpg", url: "https://www.youtube.com/watch?v=Ss1L7SaMnAU&t=937s", x: 73, y: 5, w: 14, aspect: 1, rotate: 1.5 },
+  { id: 6, type: "book", title: "I Deliver Parcels in Beijing", content: "Hu Anyan — a courier's view of the city, one doorbell at a time.", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/parcels.jpg", x: 6, y: 56, w: 10, aspect: 2 / 3, rotate: 2.5 },
+  { id: 7, type: "book", title: "My Year of Rest and Relaxation", content: "Ottessa Moshfegh — pharmaceutical hibernation in pre-9/11 Manhattan.", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/myyearofrest.jpg", x: 22, y: 55, w: 10, aspect: 294 / 450, rotate: -1 },
+  { id: 8, type: "book", title: "What We Can Know", content: "Ian McEwan — a future scholar reconstructs a lost world from fragments.", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/What_We_Can_Know.jpg", x: 38, y: 55, w: 10, aspect: 250 / 396, rotate: 3 },
 ];
 
 const typeLabel: Record<string, string> = {
@@ -78,8 +77,10 @@ const InspirationBoard = () => {
   const cardOpacity = useTransform(revealProgress, [0.1, 1], [0, 1]);
   const cardY = useTransform(revealProgress, [0, 1], [40, 0]);
 
-  const clampPosition = useCallback((x: number, y: number, w: number, h: number) => {
+  const clampPosition = useCallback((x: number, y: number, w: number, aspect: number) => {
     if (!boardRef.current) return { x, y };
+    const rect = boardRef.current.getBoundingClientRect();
+    const h = (((w / 100) * rect.width) / aspect / rect.height) * 100;
     const minX = -(w * OVERHANG);
     const maxX = 100 - w * (1 - OVERHANG);
     const minY = -(h * OVERHANG);
@@ -120,7 +121,7 @@ const InspirationBoard = () => {
     didDrag.current = true;
     setItems(prev => prev.map(item => {
       if (item.id !== dragging) return item;
-      const clamped = clampPosition(rawX, rawY, item.w, item.h);
+        const clamped = clampPosition(rawX, rawY, item.w, item.aspect);
       return { ...item, x: clamped.x, y: clamped.y };
     }));
   }, [dragging, clampPosition]);
@@ -137,7 +138,7 @@ const InspirationBoard = () => {
     if (item.imageUrl) {
       return (
         <div className="group relative w-full h-full overflow-hidden flex items-center justify-center">
-          <img src={item.imageUrl} alt={item.title} className="w-full h-full object-contain grayscale group-hover:grayscale-0 transition-all duration-500" draggable={false} />
+          <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" draggable={false} />
           <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-background/95 via-background/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <p className="font-semibold tracking-tight text-foreground text-sm leading-tight">{item.title}</p>
             <p className="mt-1 text-foreground/70 leading-snug text-[11px]">{item.content}</p>
@@ -322,7 +323,7 @@ const InspirationBoard = () => {
                   left: `${item.x}%`,
                   top: `${item.y}%`,
                   width: `${item.w}%`,
-                  height: `${item.h}%`,
+                  aspectRatio: item.aspect,
                   zIndex: dragging === item.id ? 50 : i,
                   rotate: item.rotate,
                   cursor: dragging === item.id ? "grabbing" : "grab",

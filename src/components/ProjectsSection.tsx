@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -12,6 +12,14 @@ const ease = [0.16, 1, 0.3, 1] as [number, number, number, number];
 const ProjectsSection = () => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [openProjectIndex, setOpenProjectIndex] = useState<number | null>(null);
+  const [isDesktop, setIsDesktop] = useState(true);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    const update = () => setIsDesktop(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
   const projects: ProjectItem[] = featuredProjectIds
     .map((id) => projectItems.find((project) => project.id === id))
     .filter((project): project is ProjectItem => Boolean(project));
@@ -23,24 +31,22 @@ const ProjectsSection = () => {
       </div>
 
       <div
-        className="flex px-6"
-        style={{ gap: GAP, height: "55vh", minHeight: 340 }}
+        className="flex flex-col md:flex-row px-6 h-auto md:h-[55vh] md:min-h-[340px]"
+        style={{ gap: GAP }}
         onMouseLeave={() => setActiveIndex(null)}
       >
         {projects.map((project, i) => {
-          const isActive = activeIndex === i;
+          const isActive = !isDesktop || activeIndex === i;
           const hasActive = activeIndex !== null;
 
           return (
             <motion.div
               key={project.id}
-              className="relative overflow-hidden cursor-pointer"
+              className="relative overflow-hidden cursor-pointer aspect-[4/3] md:aspect-auto md:flex-[1_1_0%]"
               style={{ minWidth: 0 }}
-              animate={{
-                flex: isActive ? 6 : hasActive ? 0.8 : 1,
-              }}
+              animate={isDesktop ? { flex: isActive ? 6 : hasActive ? 0.8 : 1 } : {}}
               transition={{ duration: 0.85, ease }}
-              onMouseEnter={() => setActiveIndex(i)}
+              onMouseEnter={() => isDesktop && setActiveIndex(i)}
               onClick={() => setOpenProjectIndex(i)}
             >
               {/* Image */}

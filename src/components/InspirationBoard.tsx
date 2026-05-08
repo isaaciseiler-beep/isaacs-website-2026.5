@@ -6,7 +6,7 @@ const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
 interface InspirationItem {
   id: number;
-  type: "photo" | "website" | "place" | "quote" | "video";
+  type: "photo" | "website" | "place" | "quote" | "video" | "book" | "music" | "podcast";
   title: string;
   content: string;
   url?: string;
@@ -19,14 +19,14 @@ interface InspirationItem {
 }
 
 const ITEMS: InspirationItem[] = [
-  { id: 1, type: "photo", title: "Alpine Light", content: "Mountain photography — chasing light at altitude.", imageUrl: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop", url: "https://unsplash.com", x: 4, y: 5, w: 30, h: 32, rotate: -2 },
-  { id: 2, type: "quote", title: "Steve Jobs", content: "\"Design is not just what it looks like. Design is how it works.\"", x: 38, y: 7, w: 26, h: 20, rotate: 2.5 },
-  { id: 3, type: "website", title: "Are.na", content: "Visual research for the creative process.", url: "https://are.na", x: 69, y: 6, w: 27, h: 17, rotate: -1.5 },
-  { id: 4, type: "place", title: "Marfa, TX", content: "Desert minimalism. Judd, Prada, endless sky.", x: 40, y: 36, w: 23, h: 24, rotate: -3.5 },
-  { id: 5, type: "video", title: "Objectified", content: "Dieter Rams — design philosophy in motion.", url: "https://vimeo.com", x: 5, y: 56, w: 30, h: 17, rotate: 1.5 },
-  { id: 6, type: "photo", title: "Street Type", content: "Found type in urban environments.", imageUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=600&fit=crop", url: "https://unsplash.com", x: 67, y: 44, w: 28, h: 32, rotate: 2.5 },
-  { id: 7, type: "quote", title: "Da Vinci", content: "\"Simplicity is the ultimate sophistication.\"", x: 13, y: 78, w: 24, h: 17, rotate: -1 },
-  { id: 8, type: "website", title: "It's Nice That", content: "Why Brutalism is Making a Comeback", url: "https://itsnicethat.com", x: 42, y: 74, w: 24, h: 18, rotate: 3 },
+  { id: 1, type: "website", title: "John Provencher", content: "Brooklyn-based artist & designer — interfaces as sculpture.", url: "https://johnprovencher.com/", x: 4, y: 5, w: 30, h: 24, rotate: -2 },
+  { id: 2, type: "music", title: "Isaiah Huron", content: "Atmospheric R&B — late-night drives, neon reflections.", url: "https://open.spotify.com/artist/1hJx89kEIcAmlZzUWat9w6", x: 38, y: 7, w: 26, h: 20, rotate: 2.5 },
+  { id: 3, type: "place", title: "Hong Kong", content: "Density as poetry. Neon, mist, signage stacked to the sky.", imageUrl: "https://images.unsplash.com/photo-1536599018102-9f803c140fc1?w=800&h=600&fit=crop", x: 69, y: 6, w: 27, h: 28, rotate: -1.5 },
+  { id: 4, type: "podcast", title: "Search Engine", content: "PJ Vogt asks the questions you'd Google but never finish.", url: "https://www.searchengine.show/", x: 40, y: 36, w: 23, h: 22, rotate: -3.5 },
+  { id: 5, type: "photo", title: "Greg Girard", content: "Kowloon Walled City, Tokyo nights — the vanished Asian metropolis.", imageUrl: "https://images.unsplash.com/photo-1493514789931-586cb221d7a7?w=800&h=600&fit=crop", url: "https://www.youtube.com/watch?v=Ss1L7SaMnAU&t=937s", x: 4, y: 53, w: 30, h: 30, rotate: 1.5 },
+  { id: 6, type: "book", title: "I Deliver Parcels in Beijing", content: "Hu Anyan — a courier's view of the city, one doorbell at a time.", x: 67, y: 38, w: 28, h: 22, rotate: 2.5 },
+  { id: 7, type: "book", title: "My Year of Rest and Relaxation", content: "Ottessa Moshfegh — pharmaceutical hibernation in pre-9/11 Manhattan.", x: 38, y: 62, w: 26, h: 22, rotate: -1 },
+  { id: 8, type: "book", title: "What We Can Know", content: "Ian McEwan — a future scholar reconstructs a lost world from fragments.", x: 67, y: 66, w: 28, h: 22, rotate: 3 },
 ];
 
 const typeLabel: Record<string, string> = {
@@ -35,6 +35,9 @@ const typeLabel: Record<string, string> = {
   place: "PLACE",
   quote: "QUOTE",
   video: "VIDEO",
+  book: "BOOK",
+  music: "MUSIC",
+  podcast: "PODCAST",
 };
 
 const OVERHANG = 0.3; // 30% max overhang

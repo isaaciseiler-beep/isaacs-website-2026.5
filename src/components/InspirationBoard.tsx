@@ -135,13 +135,11 @@ const InspirationBoard = () => {
   const renderCard = (item: InspirationItem) => {
     if (item.imageUrl) {
       return (
-        <div className="relative w-full h-full overflow-hidden">
-          <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" draggable={false} />
-          <div className="absolute top-3 left-3">
-            <span className="mono-text bg-background/80 px-1.5 py-0.5 backdrop-blur-sm" style={{ fontSize: 9 }}>{typeLabel[item.type]}</span>
-          </div>
-          <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-background/95 via-background/60 to-transparent">
+        <div className="group relative w-full h-full overflow-hidden flex items-center justify-center">
+          <img src={item.imageUrl} alt={item.title} className="w-full h-full object-contain grayscale group-hover:grayscale-0 transition-all duration-500" draggable={false} />
+          <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-background/95 via-background/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <p className="font-semibold tracking-tight text-foreground text-sm leading-tight">{item.title}</p>
+            <p className="mt-1 text-foreground/70 leading-snug text-[11px]">{item.content}</p>
           </div>
         </div>
       );

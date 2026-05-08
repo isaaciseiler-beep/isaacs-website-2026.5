@@ -83,9 +83,14 @@ const NewsSection = () => {
                     src={item.imageUrl}
                     alt={item.title}
                     className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 ease-out"
+                    style={{
+                      WebkitMaskImage:
+                        "linear-gradient(to bottom, black 0%, black 55%, rgba(0,0,0,0.7) 80%, rgba(0,0,0,0) 100%)",
+                      maskImage:
+                        "linear-gradient(to bottom, black 0%, black 55%, rgba(0,0,0,0.7) 80%, rgba(0,0,0,0) 100%)",
+                    }}
                     loading="lazy"
                   />
-                  <div className="news-gradient absolute inset-x-0 bottom-0 h-32 pointer-events-none" />
                 </div>
               )}
 
@@ -118,24 +123,6 @@ const NewsSection = () => {
           <div className="flex-shrink-0 w-3" aria-hidden />
         </div>
 
-        {/* Right edge gradient — always visible */}
-        <div
-          className="absolute top-0 right-0 bottom-0 w-9 pointer-events-none z-10"
-          style={{
-            background:
-              "linear-gradient(to left, hsl(var(--background)) 0%, hsl(var(--background)) 35%, hsl(var(--background) / 0.85) 65%, transparent 100%)",
-          }}
-        />
-
-        {/* Left edge gradient — only when scrolled */}
-        <div
-          className="absolute top-0 left-0 bottom-0 w-9 pointer-events-none z-10 transition-opacity duration-500 ease-out"
-          style={{
-            background:
-              "linear-gradient(to right, hsl(var(--background)) 0%, hsl(var(--background)) 35%, hsl(var(--background) / 0.85) 65%, transparent 100%)",
-            opacity: canScrollLeft ? 1 : 0,
-          }}
-        />
 
         <AnimatePresence>
           {canScrollLeft && (

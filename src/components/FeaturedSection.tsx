@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
 import SectionHeading from "@/components/SectionHeading";
 import { featuredProjectIds, projectItems } from "@/lib/siteContent";
@@ -54,6 +54,14 @@ const FeaturedTile = ({
 const FeaturedSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [isOutPhase, setIsOutPhase] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -78,6 +86,31 @@ const FeaturedSection = () => {
   const topFilter = useTransform(topGrayscale, (v) => `grayscale(${v * 100}%)`);
   const blFilter = useTransform(blGrayscale, (v) => `grayscale(${v * 100}%)`);
   const brFilter = useTransform(brGrayscale, (v) => `grayscale(${v * 100}%)`);
+
+  if (isMobile) {
+    return (
+      <section className="relative">
+        <div className="px-6 pt-12 pb-4">
+          <SectionHeading className="mb-0">Featured</SectionHeading>
+        </div>
+        <div className="flex flex-col gap-[3px] px-6 pb-12">
+          {featuredProjects.map((p, i) => (
+            <div key={p!.id} className="relative aspect-[4/3] overflow-hidden">
+              <img src={p!.image} alt={p!.title} className="w-full h-full object-cover" loading="lazy" />
+              <div
+                className="absolute bottom-0 left-0 right-0 p-4"
+                style={{ background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 60%, transparent 100%)" }}
+              >
+                <h3 className="text-2xl font-semibold tracking-tighter text-[#f3f6ff] leading-tight">
+                  {i === 0 ? p!.title : i === 1 ? "Projects archive" : "Photo portfolio"}
+                </h3>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section ref={sectionRef} className="relative" style={{ height: "200vh" }}>

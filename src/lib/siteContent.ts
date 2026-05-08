@@ -10,6 +10,7 @@ export interface NewsItem {
   href: string;
   logoUrl: string;
   logoAlt: string;
+  imageUrl?: string;
 }
 
 export interface ProjectLink {

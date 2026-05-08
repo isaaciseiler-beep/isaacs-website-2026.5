@@ -19,14 +19,14 @@ interface InspirationItem {
 }
 
 const ITEMS: InspirationItem[] = [
-  { id: 1, type: "website", title: "John Provencher", content: "Brooklyn-based artist & designer — interfaces as sculpture.", url: "https://johnprovencher.com/", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/john_provencherpicture-34-copy.webp", x: 2, y: 4, w: 14, aspect: 1912 / 1982, rotate: -2 },
-  { id: 2, type: "music", title: "Mr. Lovebomb", content: "Isaiah Huron — atmospheric R&B, late-night drives, neon reflections.", url: "https://open.spotify.com/artist/1hJx89kEIcAmlZzUWat9w6", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/lovebomb.jpg", x: 18, y: 6, w: 13, aspect: 1, rotate: 2.5 },
-  { id: 3, type: "place", title: "Hong Kong", content: "Density as poetry. Neon, mist, signage stacked to the sky.", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/hk.JPG", x: 33, y: 5, w: 22, aspect: 1.5, rotate: -1.5 },
-  { id: 4, type: "podcast", title: "Search Engine", content: "PJ Vogt asks the questions you'd Google but never finish.", url: "https://www.searchengine.show/", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/1200x1200bf-60.jpg", x: 58, y: 4, w: 13, aspect: 1, rotate: -3.5 },
-  { id: 5, type: "video", title: "Greg Girard", content: "Interview with the photographer of Kowloon Walled City and the vanished Asian metropolis.", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/ggirard.jpg", url: "https://www.youtube.com/watch?v=Ss1L7SaMnAU&t=937s", x: 73, y: 5, w: 14, aspect: 1, rotate: 1.5 },
-  { id: 6, type: "book", title: "I Deliver Parcels in Beijing", content: "Hu Anyan — a courier's view of the city, one doorbell at a time.", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/parcels.jpg", x: 6, y: 56, w: 10, aspect: 2 / 3, rotate: 2.5 },
-  { id: 7, type: "book", title: "My Year of Rest and Relaxation", content: "Ottessa Moshfegh — pharmaceutical hibernation in pre-9/11 Manhattan.", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/myyearofrest.jpg", x: 22, y: 55, w: 10, aspect: 294 / 450, rotate: -1 },
-  { id: 8, type: "book", title: "What We Can Know", content: "Ian McEwan — a future scholar reconstructs a lost world from fragments.", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/What_We_Can_Know.jpg", x: 38, y: 55, w: 10, aspect: 250 / 396, rotate: 3 },
+  { id: 1, type: "website", title: "John Provencher", content: "Brooklyn-based artist & designer — interfaces as sculpture.", url: "https://johnprovencher.com/", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/john_provencherpicture-34-copy.webp", x: 1, y: 2, w: 17.5, aspect: 1912 / 1982, rotate: -2 },
+  { id: 2, type: "music", title: "Mr. Lovebomb", content: "Isaiah Huron — atmospheric R&B, late-night drives, neon reflections.", url: "https://open.spotify.com/artist/1hJx89kEIcAmlZzUWat9w6", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/lovebomb.jpg", x: 21, y: 4, w: 16.25, aspect: 1, rotate: 2.5 },
+  { id: 3, type: "place", title: "Hong Kong", content: "Density as poetry. Neon, mist, signage stacked to the sky.", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/hk.JPG", x: 38, y: 3, w: 27.5, aspect: 1.5, rotate: -1.5 },
+  { id: 4, type: "podcast", title: "Search Engine", content: "PJ Vogt asks the questions you'd Google but never finish.", url: "https://www.searchengine.show/", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/1200x1200bf-60.jpg", x: 67, y: 2, w: 16.25, aspect: 1, rotate: -3.5 },
+  { id: 5, type: "video", title: "Greg Girard", content: "Interview with the photographer of Kowloon Walled City and the vanished Asian metropolis.", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/ggirard.jpg", url: "https://www.youtube.com/watch?v=Ss1L7SaMnAU&t=937s", x: 84, y: 4, w: 17.5, aspect: 1, rotate: 1.5 },
+  { id: 6, type: "book", title: "I Deliver Parcels in Beijing", content: "Hu Anyan — a courier's view of the city, one doorbell at a time.", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/parcels.jpg", x: 4, y: 50, w: 12.5, aspect: 2 / 3, rotate: 2.5 },
+  { id: 7, type: "book", title: "My Year of Rest and Relaxation", content: "Ottessa Moshfegh — pharmaceutical hibernation in pre-9/11 Manhattan.", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/myyearofrest.jpg", x: 22, y: 49, w: 12.5, aspect: 294 / 450, rotate: -1 },
+  { id: 8, type: "book", title: "What We Can Know", content: "Ian McEwan — a future scholar reconstructs a lost world from fragments.", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/What_We_Can_Know.jpg", x: 41, y: 49, w: 12.5, aspect: 250 / 396, rotate: 3 },
 ];
 
 const typeLabel: Record<string, string> = {
@@ -40,7 +40,7 @@ const typeLabel: Record<string, string> = {
   podcast: "PODCAST",
 };
 
-const OVERHANG = 0.3; // 30% max overhang
+const OVERHANG = 0.12; // 12% max overhang
 
 const InspirationBoard = () => {
   const sectionRef = useRef<HTMLDivElement>(null);

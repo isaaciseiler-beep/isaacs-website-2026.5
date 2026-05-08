@@ -43,7 +43,7 @@ const ProjectsPage = () => {
               {filteredProjects.map((project, index) => (
                 <motion.button
                   key={project.id}
-                  className="group relative text-left bg-card overflow-hidden"
+                  className="group relative flex flex-col text-left bg-background overflow-hidden h-full"
                   initial={{ opacity: 0, y: 24, filter: "blur(4px)" }}
                   animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                   transition={{ delay: index * 0.04, duration: 0.45, ease: EASE }}
@@ -56,7 +56,7 @@ const ProjectsPage = () => {
                       className="h-full w-full object-cover grayscale transition-all duration-700 ease-out group-hover:scale-[1.02] group-hover:grayscale-0"
                     />
                   </div>
-                  <div className="bg-background p-5 md:p-6">
+                  <div className="bg-background p-5 md:p-6 flex-1">
                     <div className="mb-3 flex items-center">
                       <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-foreground/45">{project.year}</span>
                     </div>

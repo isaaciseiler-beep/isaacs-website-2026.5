@@ -69,29 +69,6 @@ const Footer = () => {
         </p>
       </div>
 
-      {/* Full-width graffiti wordmark */}
-      <div className="relative z-10 w-full overflow-hidden leading-none -mb-[2px]">
-        <svg
-          viewBox="0 0 1000 130"
-          preserveAspectRatio="none"
-          className="block h-[clamp(176px,21vw,264px)] w-full"
-          aria-hidden
-        >
-          <text
-            x="0"
-            y="118"
-            textLength="1000"
-            lengthAdjust="spacingAndGlyphs"
-            fill="hsl(var(--foreground) / 0.12)"
-            fontFamily="'Space Grotesk', -apple-system, sans-serif"
-            fontWeight="700"
-            fontSize="120"
-            letterSpacing="-4"
-          >
-            ISAAC SEILER
-          </text>
-        </svg>
-      </div>
     </footer>
   );
 };

@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import SectionHeading from "@/components/SectionHeading";
 
@@ -47,6 +47,15 @@ const InspirationBoard = () => {
   const [dragging, setDragging] = useState<number | null>(null);
   const dragOffset = useRef({ x: 0, y: 0 });
   const didDrag = useRef(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -194,7 +203,30 @@ const InspirationBoard = () => {
   };
 
   return (
-    <section ref={sectionRef} className="relative" style={{ minHeight: "120vh" }}>
+    <section ref={sectionRef} className="relative" style={isMobile ? undefined : { minHeight: "120vh" }}>
+      {isMobile ? (
+        <div className="flex flex-col">
+          <div className="px-6 pt-12 pb-4">
+            <SectionHeading className="mb-0">Inspiration</SectionHeading>
+          </div>
+          <div className="grid grid-cols-1 gap-3 px-6 pb-12">
+            {ITEMS.map((item, i) => (
+              <motion.div
+                key={item.id}
+                initial={{ opacity: 0, y: 24, filter: "blur(6px)" }}
+                whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ delay: i * 0.05, duration: 0.55, ease: EASE }}
+                className="relative h-44 bg-background cursor-pointer"
+                style={{ boxShadow: "1px 2px 6px rgba(0,0,0,0.08)" }}
+                onClick={() => setActiveItem(item)}
+              >
+                {renderCard(item)}
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      ) : (
       <div className="sticky top-0 h-screen flex flex-col overflow-hidden">
         <div className="px-6 pt-[68px] pb-4">
           <SectionHeading className="mb-0">Inspiration</SectionHeading>
@@ -257,6 +289,7 @@ const InspirationBoard = () => {
           </motion.div>
         </div>
       </div>
+      )}
 
       {/* Overlay */}
       {activeItem && (

@@ -36,7 +36,7 @@ const ProjectsSection = () => {
         onMouseLeave={() => setActiveIndex(null)}
       >
         {projects.map((project, i) => {
-          const isActive = activeIndex === i;
+          const isActive = !isDesktop || activeIndex === i;
           const hasActive = activeIndex !== null;
 
           return (

@@ -178,7 +178,7 @@ const AboutSection = () => {
           >
             <motion.div className="aspect-square overflow-hidden" style={{ y: imgY }}>
               <img
-                src={headshot1}
+                src={headshotUrl}
                 alt="Portrait"
                 className="h-full w-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
                 loading="lazy"

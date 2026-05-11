@@ -144,8 +144,8 @@
 
   .site-logo-xray,
   .site-nav-toggle-xray {
-    color: #fff;
-    mix-blend-mode: difference;
+    color: inherit;
+    mix-blend-mode: normal;
     opacity: 1;
     filter: none;
     text-shadow: none;

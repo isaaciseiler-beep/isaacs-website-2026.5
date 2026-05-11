@@ -392,8 +392,8 @@ interface BoardCardProps {
 }
 
 const BoardCard = ({ item, index, dragging, zIndex, cardOpacity, cardY, onPointerDown, onPointerUp, onRotate, renderCard }: BoardCardProps) => {
-  const rotX = useSpring(useMotionValue(0), { stiffness: 90, damping: 22, mass: 0.8 });
-  const rotY = useSpring(useMotionValue(0), { stiffness: 90, damping: 22, mass: 0.8 });
+  const rotX = useSpring(useMotionValue(0), { stiffness: 120, damping: 18, mass: 0.6 });
+  const rotY = useSpring(useMotionValue(0), { stiffness: 120, damping: 18, mass: 0.6 });
   const [cornerHover, setCornerHover] = useState(false);
   const [rotating, setRotating] = useState(false);
   const rotateState = useRef<{ startAngle: number; baseRot: number; cx: number; cy: number } | null>(null);
@@ -434,8 +434,8 @@ const BoardCard = ({ item, index, dragging, zIndex, cardOpacity, cardY, onPointe
     const nx = ((e.clientX - r.left) / r.width - 0.5) * 2;
     const ny = ((e.clientY - r.top) / r.height - 0.5) * 2;
     // tilt: corners lift while center stays planar
-    rotY.set(nx * 5);
-    rotX.set(-ny * 5);
+    rotY.set(nx * 9);
+    rotX.set(-ny * 9);
   };
 
   const handleUp = () => {

@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, Mail, Sun, Laptop } from "lucide-react";
+import { ChevronRight, Mail, Sun } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { useTheme } from "@/components/ThemeProvider";
@@ -17,7 +17,6 @@ const SlimMoon = ({ className }: { className?: string }) => (
 const themeOptions = [
   { value: "dark" as const, label: "Dark", icon: SlimMoon },
   { value: "light" as const, label: "Light", icon: Sun },
-  { value: "system" as const, label: "System", icon: Laptop },
 ];
 
 const ThemeSwitch = () => {

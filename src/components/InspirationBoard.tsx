@@ -69,11 +69,13 @@ function buildLayout(items: InspirationItem[]): InspirationItem[] {
     const c = i % cols;
     const cx = c * slotW + slotW / 2 + (rand() - 0.5) * slotW * 0.35;
     const cy = r * slotH + slotH / 2 + (rand() - 0.5) * slotH * 0.3;
-    const hPercent = (it.w / it.aspect) / BOARD_RATIO;
+    const hPercent = (it.w / it.aspect) * BOARD_RATIO;
+    const x = cx - it.w / 2;
+    const y = cy - hPercent / 2;
     return {
       ...it,
-      x: cx - it.w / 2,
-      y: cy - hPercent / 2,
+      x: Math.max(0, Math.min(100 - it.w, x)),
+      y: Math.max(0, Math.min(100 - hPercent, y)),
       rotate: (rand() - 0.5) * 10,
     };
   });
@@ -90,7 +92,7 @@ const typeLabel: Record<string, string> = {
   podcast: "PODCAST",
 };
 
-const OVERHANG = 0.08; // max overhang past board edge (drag can go further? no, also clamps)
+const OVERHANG = 0; // keep every card fully on the board from load through drag
 
 const ROTATE_CURSOR_SVG = encodeURIComponent(
   `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"><path d="M17 8.5a5.5 5.5 0 1 0 1.5 4.5" fill="none" stroke="black" stroke-width="2.4" stroke-linecap="round"/><polyline points="18 5 18 9 14 9" fill="none" stroke="black" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`
@@ -174,6 +176,30 @@ const InspirationBoard = () => {
       y: Math.max(minY, Math.min(maxY, y)),
     };
   }, []);
+
+  useEffect(() => {
+    if (isMobile || !boardRef.current) return;
+    const board = boardRef.current;
+    const clampAll = () => {
+      setItems(prev => {
+        let changed = false;
+        const next = prev.map(item => {
+          const clamped = clampPosition(item.x, item.y, item.w, item.aspect);
+          if (clamped.x !== item.x || clamped.y !== item.y) changed = true;
+          return changed ? { ...item, x: clamped.x, y: clamped.y } : item;
+        });
+        return changed ? next : prev;
+      });
+    };
+    clampAll();
+    const resizeObserver = new ResizeObserver(clampAll);
+    resizeObserver.observe(board);
+    window.addEventListener("resize", clampAll);
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", clampAll);
+    };
+  }, [isMobile, clampPosition]);
 
   const handlePointerDown = useCallback((e: React.PointerEvent, id: number) => {
     e.preventDefault();

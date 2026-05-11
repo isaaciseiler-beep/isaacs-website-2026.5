@@ -234,4 +234,15 @@
   .back-projects-button:hover .back-projects-button-label {
     color: hsl(var(--highlight));
   }
+
+  .homepage-cta,
+  .homepage-cta * {
+    color: hsl(200 25% 83%);
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, transform, max-width;
+  }
+
+  .homepage-cta:hover,
+  .homepage-cta:hover * {
+    color: hsl(var(--highlight));
+  }
 }

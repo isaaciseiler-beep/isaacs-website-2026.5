@@ -9,6 +9,7 @@ interface AnimatedTextProps {
   delay?: number;
   once?: boolean;
   margin?: string;
+  controlledVisible?: boolean;
 }
 
 const AnimatedText = ({
@@ -19,6 +20,7 @@ const AnimatedText = ({
   delay = 0,
   once = true,
   margin = "-50px",
+  controlledVisible,
 }: AnimatedTextProps) => {
   const MotionTag = as === "p" ? motion.p : motion.span;
 
@@ -55,8 +57,9 @@ const AnimatedText = ({
       style={style}
       variants={container}
       initial="hidden"
-      whileInView="visible"
-      viewport={{ once, margin }}
+      animate={controlledVisible === undefined ? undefined : controlledVisible ? "visible" : "hidden"}
+      whileInView={controlledVisible === undefined ? "visible" : undefined}
+      viewport={controlledVisible === undefined ? { once, margin } : undefined}
     >
       {words.map((word, wIdx) => {
         const isLast = wIdx === words.length - 1;

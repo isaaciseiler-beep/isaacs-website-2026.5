@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import Sidebar from "@/components/Sidebar";
 import PhotoPreview from "@/components/PhotoPreview";
 import { albums, albumPhotos, coverFor, type Album, type Continent } from "@/lib/photoAlbums";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const continents: ("All" | Continent)[] = ["All", "Asia", "Europe", "Oceania"];
 
@@ -167,6 +168,7 @@ const PhotosPage = () => {
   const [openAlbum, setOpenAlbum] = useState<string | null>(null);
   const [previewIdx, setPreviewIdx] = useState<number | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   const filtered = filter === "All" ? albums : albums.filter((a) => a.continent === filter);
   const currentAlbum = openAlbum ? albums.find((a) => a.location === openAlbum) : null;
@@ -200,11 +202,11 @@ const PhotosPage = () => {
 
       <div className="fixed top-0 left-0 z-[60] flex items-center gap-1 px-6 py-4">
         <Link to="/" className="contents"><Logo /></Link>
-        <Sidebar open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
+        <Sidebar open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} onClose={() => setSidebarOpen(false)} />
       </div>
 
       <motion.div
-        animate={{ marginLeft: sidebarOpen ? 240 : 0 }}
+        animate={{ marginLeft: sidebarOpen && !isMobile ? 240 : 0 }}
         transition={{ duration: 0.4, ease: EASE_TEXT }}
       >
         <motion.main

@@ -1,10 +1,11 @@
 import { useRef, useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import SectionHeading from "@/components/SectionHeading";
 import PhotoPreview from "@/components/PhotoPreview";
 import { albums, coverFor } from "@/lib/photoAlbums";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const photos = albums.map((a, i) => ({
   id: i + 1,
@@ -18,10 +19,14 @@ const PhotoSection = () => {
   const [previewIdx, setPreviewIdx] = useState<number | null>(null);
   const [hovering, setHovering] = useState(false);
   const [activeIdx, setActiveIdx] = useState(0);
+  const previewRef = useRef<HTMLDivElement | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isMobile = useIsMobile();
+  const isPreviewInView = useInView(previewRef, { amount: 0.55 });
+  const shouldFlipPhotos = isMobile ? isPreviewInView : hovering;
 
   useEffect(() => {
-    if (!hovering) {
+    if (!shouldFlipPhotos) {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       return;
     }
@@ -41,7 +46,7 @@ const PhotoSection = () => {
     schedule();
     return () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hovering]);
+  }, [shouldFlipPhotos]);
 
   return (
     <section className="py-12">
@@ -51,8 +56,8 @@ const PhotoSection = () => {
 
       <div className="px-6">
         <div
-          className="relative w-full overflow-hidden cursor-pointer group"
-          style={{ aspectRatio: "3/1.365" }}
+          ref={previewRef}
+          className="relative aspect-square w-full overflow-hidden cursor-pointer group md:aspect-[3/1.365]"
           onMouseEnter={() => setHovering(true)}
           onMouseLeave={() => setHovering(false)}
           onClick={() => setPreviewIdx(activeIdx)}
@@ -65,8 +70,8 @@ const PhotoSection = () => {
               className="absolute inset-0 w-full h-full object-cover"
               style={{
                 opacity: idx === activeIdx ? 1 : 0,
-                filter: hovering ? "grayscale(0%)" : "grayscale(100%)",
-                transform: hovering ? "scale(1.02)" : "scale(1)",
+                filter: shouldFlipPhotos ? "grayscale(0%)" : "grayscale(100%)",
+                transform: shouldFlipPhotos ? "scale(1.02)" : "scale(1)",
                 transition: "opacity 140ms ease-out, filter 600ms ease-out, transform 900ms cubic-bezier(0.16,1,0.3,1)",
               }}
               loading="eager"

@@ -78,17 +78,11 @@ const NewsSection = () => {
               transition={{ delay: index * 0.1, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             >
               {item.imageUrl && (
-                <div className="relative w-full overflow-hidden" style={{ aspectRatio: "16/9" }}>
+                <div className="relative w-full overflow-hidden border-b border-foreground/20" style={{ aspectRatio: "16/9" }}>
                   <img
                     src={item.imageUrl}
                     alt={item.title}
                     className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 ease-out"
-                    style={{
-                      WebkitMaskImage:
-                        "linear-gradient(to bottom, black 0%, black 55%, rgba(0,0,0,0.7) 80%, rgba(0,0,0,0) 100%)",
-                      maskImage:
-                        "linear-gradient(to bottom, black 0%, black 55%, rgba(0,0,0,0.7) 80%, rgba(0,0,0,0) 100%)",
-                    }}
                     loading="lazy"
                   />
                 </div>

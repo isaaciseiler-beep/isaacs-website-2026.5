@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { useTheme } from "@/components/ThemeProvider";
 import { CONTACT_MAILTO, GITHUB_URL, LINKEDIN_URL, SUBSTACK_URL } from "@/lib/site";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const EASE_TEXT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
@@ -87,12 +88,14 @@ const socialLinks = [
 interface SidebarProps {
   open: boolean;
   onToggle: () => void;
+  onClose?: () => void;
   activeSection?: string;
 }
 
-const Sidebar = ({ open, onToggle, activeSection }: SidebarProps) => {
+const Sidebar = ({ open, onToggle, onClose, activeSection }: SidebarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const isMobile = useIsMobile();
   const isOnPhotos = location.pathname === "/photos";
   const isOnProjects = location.pathname.startsWith("/projects");
 
@@ -110,10 +113,12 @@ const Sidebar = ({ open, onToggle, activeSection }: SidebarProps) => {
       }
     }
     if (item.href) navigate(item.href);
+    if (item.scrollTo) onClose?.();
   };
 
   const handleChildClick = (child: { href: string }) => {
     navigate(child.href);
+    onClose?.();
   };
 
   const handleSocialClick = (href: string) => {
@@ -149,14 +154,14 @@ const Sidebar = ({ open, onToggle, activeSection }: SidebarProps) => {
       </motion.button>
 
       <motion.nav
-        className="fixed left-0 top-0 h-screen w-[240px] bg-background z-[45] flex flex-col justify-between px-6 py-20 overflow-y-auto"
-        animate={{ x: open ? 0 : -240 }}
+        className="fixed left-0 top-0 z-[45] flex h-[100svh] w-screen flex-col overflow-y-auto bg-background px-6 pb-[calc(env(safe-area-inset-bottom)+2rem)] pt-20 md:h-screen md:w-[240px] md:justify-between md:py-20"
+        animate={{ x: open ? 0 : isMobile ? "-100%" : -240 }}
         transition={{ duration: 0.4, ease: EASE_TEXT }}
       >
         <AnimatePresence>
           {open && (
-            <div className="mt-4">
-              <div className="flex flex-col gap-0.5 relative">
+            <div className="flex flex-1 items-center md:mt-4 md:block md:flex-none">
+              <div className="flex flex-col gap-1.5 relative md:gap-0.5">
                 {sitemapItems.map((item) => {
                   const idx = flatIndex++;
                   const active = isItemActive(item);
@@ -168,7 +173,7 @@ const Sidebar = ({ open, onToggle, activeSection }: SidebarProps) => {
                         exit={{ opacity: 0, y: 8, filter: "blur(4px)" }}
                         transition={{ delay: 0.08 + idx * 0.05, duration: 0.5, ease: EASE }}
                         onClick={() => handleItemClick(item)}
-                        className={`text-left py-1.5 text-sm font-medium transition-colors duration-300 origin-left ${
+                        className={`text-left py-1.5 text-[28px] font-medium leading-none transition-colors duration-300 origin-left md:text-sm md:leading-normal ${
                           active ? "text-foreground" : "text-foreground/30 hover:text-foreground/60"
                         }`}
                       >
@@ -186,7 +191,7 @@ const Sidebar = ({ open, onToggle, activeSection }: SidebarProps) => {
                             exit={{ opacity: 0, y: 8, filter: "blur(4px)" }}
                             transition={{ delay: 0.08 + childIdx * 0.05, duration: 0.5, ease: EASE }}
                             onClick={() => handleChildClick(child)}
-                            className={`text-left py-1.5 pl-4 text-sm font-medium transition-colors duration-300 origin-left block ${
+                            className={`text-left py-1.5 pl-6 text-[28px] font-medium leading-none transition-colors duration-300 origin-left block md:pl-4 md:text-sm md:leading-normal ${
                               childActive ? "text-foreground" : "text-foreground/30 hover:text-foreground/60"
                             }`}
                           >
@@ -205,33 +210,38 @@ const Sidebar = ({ open, onToggle, activeSection }: SidebarProps) => {
         <AnimatePresence>
           {open && (
             <motion.div
+              className="flex items-start justify-between gap-8 md:block"
               initial={{ opacity: 0, y: 16, scale: 0.94, filter: "blur(6px)" }}
               animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
               exit={{ opacity: 0, y: 12, scale: 0.96, filter: "blur(4px)" }}
               transition={{ delay: 0.25, duration: 0.5, ease: EASE, filter: { duration: 0.6, delay: 0.3 } }}
             >
-              <p className="mono-text mb-3">Get in Touch</p>
-              <div className="grid grid-cols-4 gap-2">
-                <button
-                  onClick={() => { window.location.href = CONTACT_MAILTO; }}
-                  className="w-10 h-10 bg-foreground/10 hover:bg-foreground/20 text-foreground flex items-center justify-center transition-colors duration-300"
-                  aria-label="Contact"
-                >
-                  <Mail className="w-4 h-4" />
-                </button>
-                {socialLinks.map((link) => (
+              <div>
+                <p className="mono-text mb-3">Get in Touch</p>
+                <div className="flex w-fit gap-2">
                   <button
-                    key={link.id}
-                    onClick={() => handleSocialClick(link.href)}
+                    onClick={() => { window.location.href = CONTACT_MAILTO; }}
                     className="w-10 h-10 bg-foreground/10 hover:bg-foreground/20 text-foreground flex items-center justify-center transition-colors duration-300"
-                    aria-label={link.label}
+                    aria-label="Contact"
                   >
-                    {link.icon}
+                    <Mail className="w-4 h-4" />
                   </button>
-                ))}
+                  {socialLinks.map((link) => (
+                    <button
+                      key={link.id}
+                      onClick={() => handleSocialClick(link.href)}
+                      className="w-10 h-10 bg-foreground/10 hover:bg-foreground/20 text-foreground flex items-center justify-center transition-colors duration-300"
+                      aria-label={link.label}
+                    >
+                      {link.icon}
+                    </button>
+                  ))}
+                </div>
               </div>
-              <p className="mono-text mb-3 mt-6">Appearance</p>
-              <ThemeSwitch />
+              <div className="shrink-0 md:mt-6">
+                <p className="mono-text mb-3">Appearance</p>
+                <ThemeSwitch />
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

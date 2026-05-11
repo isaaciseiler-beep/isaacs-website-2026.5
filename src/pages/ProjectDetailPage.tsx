@@ -5,7 +5,9 @@ import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import Footer from "@/components/Footer";
 import Logo from "@/components/Logo";
 import Sidebar from "@/components/Sidebar";
+import ChatOrb from "@/components/ChatOrb";
 import { projectItems } from "@/lib/siteContent";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const EASE_TEXT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
@@ -14,6 +16,7 @@ const ProjectDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   const project = projectItems.find((p) => p.id === id);
 
@@ -34,10 +37,10 @@ const ProjectDetailPage = () => {
       <div className="fixed top-0 left-0 right-0 z-40 pointer-events-none" style={{ height: 58, background: "linear-gradient(to bottom, hsl(var(--background)) 0%, hsl(var(--background) / 0.85) 35%, hsl(var(--background) / 0.4) 70%, transparent 100%)" }} />
       <div className="fixed top-0 left-0 z-[60] flex items-center gap-1 px-6 py-4">
         <Link to="/" className="contents"><Logo /></Link>
-        <Sidebar open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
+        <Sidebar open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} onClose={() => setSidebarOpen(false)} />
       </div>
 
-      <motion.div animate={{ marginLeft: sidebarOpen ? 240 : 0 }} transition={{ duration: 0.4, ease: EASE_TEXT }}>
+      <motion.div animate={{ marginLeft: sidebarOpen && !isMobile ? 240 : 0 }} transition={{ duration: 0.4, ease: EASE_TEXT }}>
         <motion.main
           className="pt-28 pb-20 px-6 max-w-4xl mx-auto"
           initial={{ opacity: 0, y: 20, filter: "blur(6px)" }}
@@ -111,6 +114,7 @@ const ProjectDetailPage = () => {
 
         <Footer />
       </motion.div>
+      {!sidebarOpen && <ChatOrb />}
     </div>
   );
 };

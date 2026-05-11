@@ -1,5 +1,7 @@
-import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
+import { motion, useInView, useScroll, useTransform } from "framer-motion";
 import AnimatedText from "@/components/AnimatedText";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const words = [
   "Building at the",
@@ -10,16 +12,19 @@ const words = [
 const HeroSection = () => {
   const { scrollY } = useScroll();
   const textOpacity = useTransform(scrollY, [0, 400], [1, 0]);
+  const isMobile = useIsMobile();
+  const textRef = useRef<HTMLDivElement | null>(null);
+  const mobileTextInView = useInView(textRef, { amount: 0.85 });
 
   return (
-    <section className="relative h-screen flex items-end overflow-hidden">
+    <section className="relative flex h-[100svh] min-h-[100svh] items-end overflow-hidden">
       <div className="absolute inset-0 bg-background" />
 
       <motion.div
-        className="relative z-10 px-6 pb-6"
+        className="relative z-10 px-6 pb-[calc(env(safe-area-inset-bottom)+3.5rem)] md:pb-6"
         style={{ opacity: textOpacity }}
       >
-        <div className="max-w-6xl">
+        <div ref={textRef} className="max-w-6xl">
           {words.map((line, index) => (
             <AnimatedText
               key={line}
@@ -29,6 +34,7 @@ const HeroSection = () => {
               delay={0.3 + index * 0.08}
               once={false}
               margin="-80px"
+              controlledVisible={isMobile ? mobileTextInView : undefined}
             />
           ))}
         </div>

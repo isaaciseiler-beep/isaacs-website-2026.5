@@ -12,10 +12,12 @@ import Footer from "@/components/Footer";
 import ChatOrb from "@/components/ChatOrb";
 import ParallaxSection from "@/components/ParallaxSection";
 import Sidebar, { sitemapItems } from "@/components/Sidebar";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Index = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("hero");
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -52,12 +54,13 @@ const Index = () => {
         <Sidebar
           open={sidebarOpen}
           onToggle={() => setSidebarOpen(!sidebarOpen)}
+          onClose={() => setSidebarOpen(false)}
           activeSection={activeSection}
         />
       </div>
 
       <motion.div
-        animate={{ marginLeft: sidebarOpen ? 240 : 0, marginRight: 0 }}
+        animate={{ marginLeft: sidebarOpen && !isMobile ? 240 : 0, marginRight: 0 }}
         transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
       >
         <main>
@@ -71,7 +74,7 @@ const Index = () => {
         </main>
       </motion.div>
 
-      <ChatOrb />
+      {!sidebarOpen && <ChatOrb />}
     </div>
   );
 };

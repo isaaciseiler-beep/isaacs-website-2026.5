@@ -6,18 +6,6 @@ const headshotUrl = "https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev/8B142F3
 import { bioLines } from "@/lib/siteContent";
 import { CONTACT_MAILTO } from "@/lib/site";
 
-const popdownVariants = {
-  closed: { height: 0, y: -18 },
-  open: {
-    height: 68,
-    y: 0,
-    transition: {
-      duration: 0.58,
-      ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
-    },
-  },
-};
-
 const popdownTextVariants = {
   closed: { opacity: 0, y: -4 },
   open: {
@@ -36,6 +24,17 @@ const AboutSection = () => {
   const pillRef = useRef<HTMLDivElement>(null);
   const [hasDeployedPopdown, setHasDeployedPopdown] = useState(false);
   const photoSize = "clamp(320px, 34vw, 520px)";
+  const popdownVariants = {
+    closed: { height: 0, y: -18 },
+    open: {
+      height: 44,
+      y: 0,
+      transition: {
+        duration: 0.58,
+        ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
+      },
+    },
+  };
 
   // Auto-fit the bio text inside a fixed-height box matching the headshot.
   const bioBoxRef = useRef<HTMLDivElement>(null);
@@ -207,22 +206,22 @@ const AboutSection = () => {
             </span>
           </div>
 
-          <div className="absolute left-0 right-0 z-0 pointer-events-none" style={{ top: "50%" }}>
+          <div className="absolute left-0 right-0 z-0 pointer-events-none" style={{ top: "100%" }}>
             <motion.div
               initial="closed"
               animate={hasDeployedPopdown ? "open" : "closed"}
               variants={popdownVariants}
-    className="overflow-hidden"
+              className="overflow-hidden"
             >
               <button
-                className="homepage-cta relative pointer-events-auto h-[68px] w-full bg-[hsl(50_33%_7%)] group-hover/pill:bg-[hsl(50_33%_12%)] transition-colors duration-300 overflow-hidden cursor-pointer"
+                className="homepage-cta relative pointer-events-auto h-full w-full bg-[hsl(50_33%_7%)] group-hover/pill:bg-[hsl(50_33%_12%)] transition-colors duration-300 overflow-hidden cursor-pointer"
                 onClick={() => window.location.href = CONTACT_MAILTO}
               >
                 <motion.span
                   variants={popdownTextVariants}
                   initial="closed"
                   animate={hasDeployedPopdown ? "open" : "closed"}
-                  className="relative z-10 flex h-full items-center justify-center px-6 pt-[26px] text-sm font-mono tracking-[0.2em] uppercase transition-colors duration-300"
+                  className="relative z-10 flex h-full items-center justify-center px-6 text-sm font-mono tracking-[0.2em] uppercase transition-colors duration-300"
                 >
                   Get in touch
                   <span className="inline-flex overflow-hidden max-w-0 opacity-0 transition-all duration-300 ease-out group-hover/pill:max-w-[2rem] group-hover/pill:opacity-100">

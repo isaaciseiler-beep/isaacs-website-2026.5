@@ -212,7 +212,7 @@ const InspirationBoard = () => {
     if (item.imageUrl) {
       return (
         <div className="group relative w-full h-full overflow-hidden flex items-center justify-center">
-          <img src={item.imageUrl} alt={item.title} className="w-full h-full object-contain grayscale group-hover:grayscale-0 transition-all duration-500" draggable={false} />
+          <img src={item.imageUrl} alt={item.title} className={`w-full h-full ${item.transparent ? "object-contain" : "object-cover"} grayscale group-hover:grayscale-0 transition-all duration-500`} draggable={false} />
         </div>
       );
     }

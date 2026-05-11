@@ -26,7 +26,7 @@ const ITEMS: InspirationItem[] = [
   { id: 2, type: "music", title: "Mr. Lovebomb", content: "", url: "https://open.spotify.com/artist/1hJx89kEIcAmlZzUWat9w6", imageUrl: `${R2}/lovebomb.jpg`, x: 0, y: 0, w: 17.9, aspect: 1, rotate: 0 },
   { id: 3, type: "place", title: "Hong Kong", content: "", imageUrl: `${R2}/hk.JPG`, x: 0, y: 0, w: 30.25, aspect: 1.5, rotate: 0 },
   { id: 4, type: "podcast", title: "Search Engine", content: "", url: "https://www.searchengine.show/", imageUrl: `${R2}/1200x1200bf-60.jpg`, x: 0, y: 0, w: 17.9, aspect: 1, rotate: 0 },
-  { id: 5, type: "video", title: "Greg Girard", content: "Interview with the photographer of Kowloon Walled City.", imageUrl: `${R2}/ggirard.jpg`, url: "https://www.youtube.com/watch?v=Ss1L7SaMnAU&t=937s", x: 0, y: 0, w: 19.25, aspect: 1, rotate: 0 },
+  { id: 5, type: "video", title: "Greg Girard", content: "Interview with the photographer of Kowloon Walled City.", imageUrl: `${R2}/newgirard.webp`, url: "https://www.youtube.com/watch?v=Ss1L7SaMnAU", x: 0, y: 0, w: 19.25, aspect: 1, rotate: 0 },
   { id: 6, type: "book", title: "I Deliver Parcels in Beijing", content: "", imageUrl: `${R2}/parcels.jpg`, x: 0, y: 0, w: 16.5, aspect: 2 / 3, rotate: 0 },
   { id: 7, type: "book", title: "My Year of Rest and Relaxation", content: "", imageUrl: `${R2}/myyearofrest.jpg`, x: 0, y: 0, w: 13.75, aspect: 294 / 450, rotate: 0 },
   { id: 9, type: "website", title: "OpenAI Supply Co.", content: "", url: "https://supplyco.openai.com/", imageUrl: `${R2}/oaisupply.png`, x: 0, y: 0, w: 16.9, aspect: 819 / 1350, rotate: 0, transparent: true },
@@ -332,21 +332,21 @@ const InspirationBoard = () => {
           </div>
         </div>
       ) : (
-      <div className="sticky top-0 h-screen flex flex-col overflow-hidden">
+      <div className="sticky top-0 h-screen flex flex-col overflow-visible z-30">
         <div className="px-6 pt-[68px] pb-4">
           <SectionHeading className="mb-0">Inspiration</SectionHeading>
         </div>
 
-        <div className="flex-1 min-h-0 px-6 pb-6">
+        <div className="flex-1 min-h-0 px-6 pb-6 relative z-30">
           <motion.div
             ref={boardRef}
-            className="relative h-full w-full overflow-hidden"
+            className="relative h-full w-full"
             style={{ cursor: dragging !== null ? "grabbing" : "default", y: boardY, opacity: boardOpacity }}
             onPointerMove={handlePointerMove}
           >
             {/* Dot grid — fades in from bottom */}
             <motion.div
-              className="absolute inset-0 pointer-events-none"
+              className="absolute inset-0 pointer-events-none overflow-hidden"
               style={{
                 opacity: dotsOpacity,
                 y: dotsY,
@@ -394,8 +394,8 @@ interface BoardCardProps {
 }
 
 const BoardCard = ({ item, index, dragging, zIndex, cardOpacity, cardY, onPointerDown, onPointerUp, onRotate, renderCard }: BoardCardProps) => {
-  const rotX = useSpring(useMotionValue(0), { stiffness: 220, damping: 18 });
-  const rotY = useSpring(useMotionValue(0), { stiffness: 220, damping: 18 });
+  const rotX = useSpring(useMotionValue(0), { stiffness: 90, damping: 22, mass: 0.8 });
+  const rotY = useSpring(useMotionValue(0), { stiffness: 90, damping: 22, mass: 0.8 });
   const [cornerHover, setCornerHover] = useState(false);
   const [rotating, setRotating] = useState(false);
   const rotateState = useRef<{ startAngle: number; baseRot: number; cx: number; cy: number } | null>(null);
@@ -436,8 +436,8 @@ const BoardCard = ({ item, index, dragging, zIndex, cardOpacity, cardY, onPointe
     const nx = ((e.clientX - r.left) / r.width - 0.5) * 2;
     const ny = ((e.clientY - r.top) / r.height - 0.5) * 2;
     // tilt: corners lift while center stays planar
-    rotY.set(nx * 12);
-    rotX.set(-ny * 12);
+    rotY.set(nx * 5);
+    rotX.set(-ny * 5);
   };
 
   const handleUp = () => {

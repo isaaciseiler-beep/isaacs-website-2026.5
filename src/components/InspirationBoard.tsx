@@ -20,6 +20,7 @@ interface InspirationItem {
 }
 
 const R2 = "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev";
+const R2B = "https://pub-0f2ac8ec0d4e41b885a39ae5fd004706.r2.dev";
 
 const ITEMS: InspirationItem[] = [
   { id: 1, type: "website", title: "John Provencher", content: "", url: "https://johnprovencher.com/", imageUrl: `${R2}/john_provencherpicture-34-copy.webp`, x: 0, y: 0, w: 19.25, aspect: 1912 / 1982, rotate: 0 },
@@ -34,6 +35,9 @@ const ITEMS: InspirationItem[] = [
   { id: 11, type: "video", title: "Tales from the Road", content: "Jack Fitz", url: "https://vimeo.com/1125286551", imageUrl: `${R2}/jackfitz.jpg`, x: 0, y: 0, w: 22, aspect: 16 / 9, rotate: 0 },
   { id: 12, type: "photo", title: "1989 Volvo 240 Wagon", content: "The best car ever made.", imageUrl: `${R2}/volvo_240_brochure_single_picture.webp`, x: 0, y: 0, w: 24, aspect: 1024 / 511, rotate: 0 },
   { id: 14, type: "website", title: "Ricoh GRIIIx", content: "", url: "https://www.ricoh-imaging.co.jp/english/products/gr-3/", imageUrl: `${R2}/grIIIx-hdf4.png`, x: 0, y: 0, w: 36, aspect: 1026 / 721, rotate: 0, transparent: true },
+  { id: 15, type: "website", title: "M22 Microadventures", content: "", url: "https://m22.com/pages/m22microadventures?srsltid=AfmBOopJcmgdSW-z_Vit11JFCYE6ZpGThs1n__vtKa3h7zf6_zzcO1Nl", imageUrl: `${R2B}/m22.png`, x: 0, y: 0, w: 17.9, aspect: 1, rotate: 0, transparent: true },
+  { id: 16, type: "photo", title: "MI", content: "", imageUrl: `${R2B}/mi.png`, x: 0, y: 0, w: 17.9, aspect: 1, rotate: 0, transparent: true },
+  { id: 17, type: "photo", title: "NZ", content: "", imageUrl: `${R2B}/nz.png`, x: 0, y: 0, w: 17.9, aspect: 1433 / 1643, rotate: 0, transparent: true },
 ];
 
 // Approximate board width/height ratio (viewport-dependent; fine for initial layout)

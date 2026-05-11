@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, Mail, Sun } from "lucide-react";
+import { Mail, Sun } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { useTheme } from "@/components/ThemeProvider";
@@ -66,6 +66,7 @@ export const sitemapItems: SitemapItem[] = [
   { id: "news", label: "News", scrollTo: "news" },
   { id: "photos", label: "Photos", scrollTo: "photos", children: [
     { id: "portfolio", label: "Portfolio", href: "/photos" },
+    { id: "photo-map", label: "Photo Map", href: "/photos/map" },
   ]},
   { id: "inspiration", label: "Inspiration", scrollTo: "inspiration" },
 ];
@@ -90,13 +91,14 @@ interface SidebarProps {
   onToggle: () => void;
   onClose?: () => void;
   activeSection?: string;
+  showToggle?: boolean;
 }
 
-const Sidebar = ({ open, onToggle, onClose, activeSection }: SidebarProps) => {
+const Sidebar = ({ open, onToggle, onClose, activeSection, showToggle = true }: SidebarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useIsMobile();
-  const isOnPhotos = location.pathname === "/photos";
+  const isOnPhotos = location.pathname.startsWith("/photos");
   const isOnProjects = location.pathname.startsWith("/projects");
 
   const handleItemClick = (item: SitemapItem) => {
@@ -134,7 +136,8 @@ const Sidebar = ({ open, onToggle, onClose, activeSection }: SidebarProps) => {
   };
 
   const isChildActive = (child: { id: string; href: string }) => {
-    if (isOnPhotos && child.id === "portfolio") return true;
+    if (location.pathname === "/photos/map" && child.id === "photo-map") return true;
+    if (location.pathname === "/photos" && child.id === "portfolio") return true;
     if (isOnProjects && child.id === "project-archive") return true;
     return location.pathname === child.href;
   };
@@ -143,18 +146,22 @@ const Sidebar = ({ open, onToggle, onClose, activeSection }: SidebarProps) => {
 
   return (
     <>
-      <motion.button
-        onClick={onToggle}
-        className="site-nav-toggle-xray w-5 h-5 flex items-center justify-center transition-opacity duration-200 relative z-[60] hover:opacity-70"
-        aria-label="Toggle menu"
-        animate={{ rotate: open ? 180 : 0 }}
-        transition={{ duration: 0.3, ease: EASE_TEXT }}
-      >
-        <ChevronRight className="w-3.5 h-3.5" />
-      </motion.button>
+      {showToggle ? (
+        <motion.button
+          onClick={onToggle}
+          className="h-5 w-5 flex items-center justify-center text-foreground hover:text-foreground/60 transition-colors duration-200 relative z-[60]"
+          aria-label="Toggle menu"
+          animate={{ rotate: open ? 180 : 0 }}
+          transition={{ duration: 0.3, ease: EASE_TEXT }}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5">
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        </motion.button>
+      ) : null}
 
       <motion.nav
-        className="fixed left-0 top-0 z-[45] flex h-[100svh] w-screen flex-col overflow-y-auto bg-background px-6 pb-[calc(env(safe-area-inset-bottom)+2rem)] pt-20 md:h-screen md:w-[240px] md:justify-between md:py-20"
+        className="site-sidebar-panel fixed left-0 top-0 z-[45] isolate flex h-[100svh] w-screen flex-col overflow-y-auto px-6 pb-[calc(env(safe-area-inset-bottom)+2rem)] pt-20 md:h-screen md:w-[240px] md:justify-between md:py-20"
         animate={{ x: open ? 0 : isMobile ? "-100%" : -240 }}
         transition={{ duration: 0.4, ease: EASE_TEXT }}
       >

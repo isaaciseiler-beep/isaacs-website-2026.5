@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { ArrowUp } from "lucide-react";
 import Footer from "@/components/Footer";
-import Logo from "@/components/Logo";
 import Sidebar from "@/components/Sidebar";
+import SiteHeader from "@/components/SiteHeader";
 import ChatOrb from "@/components/ChatOrb";
 import { projectItems, type ProjectItem } from "@/lib/siteContent";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -140,12 +140,15 @@ const ProjectsPage = () => {
 
   return (
     <div className="relative min-h-screen bg-background text-foreground">
-      <div className="site-header-xray fixed top-0 left-0 z-[60] flex items-center gap-1 px-6 py-4">
-        <Link to="/" className="contents"><Logo /></Link>
-        <Sidebar open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} onClose={() => setSidebarOpen(false)} />
-      </div>
+      <Sidebar open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} onClose={() => setSidebarOpen(false)} showToggle={false} />
 
-      <motion.div animate={{ marginLeft: sidebarOpen && !isMobile ? 240 : 0 }} transition={{ duration: 0.4, ease: EASE_TEXT }}>
+      <motion.div
+        animate={{
+          marginLeft: sidebarOpen && !isMobile ? 240 : 0,
+          width: sidebarOpen && !isMobile ? "calc(100% - 240px)" : "100%",
+        }}
+        transition={{ duration: 0.4, ease: EASE_TEXT }}
+      >
         <motion.main
           className="pt-28 pb-20"
           initial={{ opacity: 0, y: 20, filter: "blur(6px)" }}
@@ -204,6 +207,8 @@ const ProjectsPage = () => {
       </AnimatePresence>
 
       {!sidebarOpen && <ChatOrb />}
+
+      <SiteHeader open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
     </div>
   );
 };

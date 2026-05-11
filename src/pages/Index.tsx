@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
-import Logo from "@/components/Logo";
 import HeroSection from "@/components/HeroSection";
 import ProjectsSection from "@/components/ProjectsSection";
 import NewsSection from "@/components/NewsSection";
@@ -12,6 +10,7 @@ import Footer from "@/components/Footer";
 import ChatOrb from "@/components/ChatOrb";
 import ParallaxSection from "@/components/ParallaxSection";
 import Sidebar, { sitemapItems } from "@/components/Sidebar";
+import SiteHeader from "@/components/SiteHeader";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const Index = () => {
@@ -41,18 +40,19 @@ const Index = () => {
 
   return (
     <div className="relative">
-      <div className="site-header-xray fixed top-0 left-0 z-[60] flex items-center gap-1 px-6 md:px-6 py-4">
-        <Link to="/" className="contents"><Logo /></Link>
-        <Sidebar
-          open={sidebarOpen}
-          onToggle={() => setSidebarOpen(!sidebarOpen)}
-          onClose={() => setSidebarOpen(false)}
-          activeSection={activeSection}
-        />
-      </div>
+      <Sidebar
+        open={sidebarOpen}
+        onToggle={() => setSidebarOpen(!sidebarOpen)}
+        onClose={() => setSidebarOpen(false)}
+        activeSection={activeSection}
+        showToggle={false}
+      />
 
       <motion.div
-        animate={{ marginLeft: sidebarOpen && !isMobile ? 240 : 0, marginRight: 0 }}
+        animate={{
+          marginLeft: sidebarOpen && !isMobile ? 240 : 0,
+          width: sidebarOpen && !isMobile ? "calc(100% - 240px)" : "100%",
+        }}
         transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
       >
         <main>
@@ -67,6 +67,8 @@ const Index = () => {
       </motion.div>
 
       {!sidebarOpen && <ChatOrb />}
+
+      <SiteHeader open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
     </div>
   );
 };

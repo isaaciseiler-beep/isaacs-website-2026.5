@@ -8,6 +8,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 
 const Index = lazy(() => import("./pages/Index.tsx"));
 const PhotosPage = lazy(() => import("./pages/PhotosPage.tsx"));
+const PhotoMapPage = lazy(() => import("./pages/PhotoMapPage.tsx"));
 const ProjectsPage = lazy(() => import("./pages/ProjectsPage.tsx"));
 const ProjectDetailPage = lazy(() => import("./pages/ProjectDetailPage.tsx"));
 const FulbrightMapPage = lazy(() => import("./pages/FulbrightMapPage.tsx"));
@@ -26,6 +27,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/photos" element={<PhotosPage />} />
+              <Route path="/photos/map" element={<PhotoMapPage />} />
               <Route path="/projects" element={<ProjectsPage />} />
               <Route path="/projects/:id" element={<ProjectDetailPage />} />
               <Route path="/fulbrightmap" element={<FulbrightMapPage />} />

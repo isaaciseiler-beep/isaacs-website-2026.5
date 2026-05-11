@@ -12,6 +12,10 @@
   ],
   "rewrites": [
     {
+      "source": "/photos/map",
+      "destination": "/index.html"
+    },
+    {
       "source": "/fulbrightmap",
       "destination": "/index.html"
     }

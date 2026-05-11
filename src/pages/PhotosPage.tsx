@@ -1,9 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
-import { Link } from "react-router-dom";
-import Logo from "@/components/Logo";
 import Footer from "@/components/Footer";
 import Sidebar from "@/components/Sidebar";
+import SiteHeader from "@/components/SiteHeader";
 import PhotoPreview from "@/components/PhotoPreview";
 import { albums, albumPhotos, coverFor, type Album, type Continent } from "@/lib/photoAlbums";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -198,13 +197,13 @@ const PhotosPage = () => {
 
   return (
     <div className="relative min-h-screen bg-background text-foreground overflow-x-hidden">
-      <div className="site-header-xray fixed top-0 left-0 z-[60] flex items-center gap-1 px-6 py-4">
-        <Link to="/" className="contents"><Logo /></Link>
-        <Sidebar open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} onClose={() => setSidebarOpen(false)} />
-      </div>
+      <Sidebar open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} onClose={() => setSidebarOpen(false)} showToggle={false} />
 
       <motion.div
-        animate={{ marginLeft: sidebarOpen && !isMobile ? 240 : 0 }}
+        animate={{
+          marginLeft: sidebarOpen && !isMobile ? 240 : 0,
+          width: sidebarOpen && !isMobile ? "calc(100% - 240px)" : "100%",
+        }}
         transition={{ duration: 0.4, ease: EASE_TEXT }}
       >
         <motion.main
@@ -347,6 +346,8 @@ const PhotosPage = () => {
         onClose={() => setPreviewIdx(null)}
         onNavigate={setPreviewIdx}
       />
+
+      <SiteHeader open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
     </div>
   );
 };

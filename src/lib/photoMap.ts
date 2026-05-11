@@ -12,7 +12,6 @@ export interface PhotoMapEntry {
   images: string[];
   albumFolder?: Album["folder"];
   photoIds?: string[];
-  href?: string;
 }
 
 const albumCoordinates: Record<Album["folder"], [number, number]> = {
@@ -40,7 +39,6 @@ const standalonePhotoEntries: PhotoMapEntry[] = [
     coordinates: [-83.3773, 33.9519],
     coverImage: `${R2_BASE}/ATHENS.JPG`,
     images: [`${R2_BASE}/ATHENS.JPG`],
-    href: `${R2_BASE}/ATHENS.JPG`,
   },
   {
     id: "photo-dc",
@@ -50,7 +48,6 @@ const standalonePhotoEntries: PhotoMapEntry[] = [
     coordinates: [-77.0369, 38.9072],
     coverImage: `${R2_BASE}/DC.JPG`,
     images: [`${R2_BASE}/DC.JPG`],
-    href: `${R2_BASE}/DC.JPG`,
   },
   {
     id: "photo-glenhaven",
@@ -60,7 +57,6 @@ const standalonePhotoEntries: PhotoMapEntry[] = [
     coordinates: [-85.9854, 44.9056],
     coverImage: `${R2_BASE}/GLENHAVEN.JPG`,
     images: [`${R2_BASE}/GLENHAVEN.JPG`],
-    href: `${R2_BASE}/GLENHAVEN.JPG`,
   },
   {
     id: "photo-oakridge",
@@ -70,7 +66,6 @@ const standalonePhotoEntries: PhotoMapEntry[] = [
     coordinates: [-84.2696, 36.0104],
     coverImage: `${R2_BASE}/OAKRIDGE.JPG`,
     images: [`${R2_BASE}/OAKRIDGE.JPG`],
-    href: `${R2_BASE}/OAKRIDGE.JPG`,
   },
   {
     id: "photo-stl",
@@ -80,7 +75,6 @@ const standalonePhotoEntries: PhotoMapEntry[] = [
     coordinates: [-90.1994, 38.627],
     coverImage: `${R2_BASE}/STL.JPG`,
     images: [`${R2_BASE}/STL.JPG`],
-    href: `${R2_BASE}/STL.JPG`,
   },
 ];
 

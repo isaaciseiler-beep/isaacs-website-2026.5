@@ -162,14 +162,10 @@ const PhotoMapPage = () => {
   const albumHref = (entry: PhotoMapEntry) =>
     entry.albumFolder ? `/photos?album=${encodeURIComponent(entry.albumFolder)}` : "/photos";
 
-  const entryHref = (entry: PhotoMapEntry) => entry.href ?? albumHref(entry);
-  const entryActionLabel = (entry: PhotoMapEntry) => entry.href ? "Open Photo" : "Open Album";
+  const hasAlbum = (entry: PhotoMapEntry) => Boolean(entry.albumFolder);
 
   const openEntry = (entry: PhotoMapEntry) => {
-    if (entry.href) {
-      window.open(entry.href, "_blank", "noopener");
-      return;
-    }
+    if (!hasAlbum(entry)) return;
 
     navigate(albumHref(entry));
   };
@@ -241,34 +237,26 @@ const PhotoMapPage = () => {
                       type="button"
                       className="mb-6 text-left"
                       onClick={() => openEntry(activeEntry)}
-                      aria-label={`${entryActionLabel(activeEntry)} for ${activeEntry.location}`}
+                      aria-label={hasAlbum(activeEntry) ? `Open ${activeEntry.location} album` : `${activeEntry.location} album not available`}
                     >
                       <h1 className="text-5xl font-semibold leading-[0.9] tracking-tight">{activeEntry.title}</h1>
                     </button>
 
                     <div className="grid grid-cols-[1fr_auto] gap-2">
-                      {activeEntry.href ? (
-                        <a
-                          href={entryHref(activeEntry)}
-                          target="_blank"
-                          rel="noreferrer"
+                      {hasAlbum(activeEntry) ? (
+                        <Link
+                          to={albumHref(activeEntry)}
                           className="photo-map-panel-button group"
                         >
                           <span className="relative z-10 flex items-center justify-between">
-                            {entryActionLabel(activeEntry)}
+                            Open Album
                             <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                           </span>
-                        </a>
-                      ) : (
-                        <Link
-                          to={entryHref(activeEntry)}
-                          className="photo-map-panel-button group"
-                        >
-                        <span className="relative z-10 flex items-center justify-between">
-                          {entryActionLabel(activeEntry)}
-                          <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                        </span>
                         </Link>
+                      ) : (
+                        <div className="photo-map-panel-button photo-map-panel-button-disabled">
+                          <span className="relative z-10">Album not available</span>
+                        </div>
                       )}
                       <button
                         type="button"

@@ -215,14 +215,14 @@ const AboutSection = () => {
     className="overflow-hidden"
             >
               <button
-                className="relative pointer-events-auto h-[68px] w-full bg-[hsl(50_33%_7%)] group-hover/pill:bg-[hsl(50_33%_12%)] transition-colors duration-300 overflow-hidden cursor-pointer"
+                className="homepage-cta relative pointer-events-auto h-[68px] w-full bg-[hsl(50_33%_7%)] group-hover/pill:bg-[hsl(50_33%_12%)] transition-colors duration-300 overflow-hidden cursor-pointer"
                 onClick={() => window.location.href = CONTACT_MAILTO}
               >
                 <motion.span
                   variants={popdownTextVariants}
                   initial="closed"
                   animate={hasDeployedPopdown ? "open" : "closed"}
-                  className="relative z-10 flex h-full items-center justify-center px-6 pt-[26px] text-sm font-mono tracking-[0.2em] uppercase text-[hsl(200_25%_83%)] group-hover/pill:text-highlight transition-colors duration-300"
+                  className="relative z-10 flex h-full items-center justify-center px-6 pt-[26px] text-sm font-mono tracking-[0.2em] uppercase transition-colors duration-300"
                 >
                   Get in touch
                   <span className="inline-flex overflow-hidden max-w-0 opacity-0 transition-all duration-300 ease-out group-hover/pill:max-w-[2rem] group-hover/pill:opacity-100">

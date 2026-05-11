@@ -130,7 +130,7 @@
 
   .site-header-xray {
     color: #fff;
-    mix-blend-mode: difference;
+    mix-blend-mode: normal;
     isolation: auto;
     pointer-events: auto;
     background: transparent;
@@ -144,8 +144,8 @@
 
   .site-logo-xray,
   .site-nav-toggle-xray {
-    color: inherit;
-    mix-blend-mode: normal;
+    color: #fff;
+    mix-blend-mode: difference;
     opacity: 1;
     filter: none;
     text-shadow: none;

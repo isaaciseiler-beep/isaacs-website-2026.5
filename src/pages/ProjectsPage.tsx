@@ -32,7 +32,7 @@ const ProjectsPage = () => {
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1], delay: 0.1 }}
         >
-          <div className="mb-12 px-6">
+          <div className="mb-12 px-6 pt-[40vh]">
             <AnimatedText
               as="p"
               text="Research, reporting, strategy, and communications work."

@@ -49,11 +49,11 @@ const ProjectDetailPage = () => {
             className="group relative mb-8 inline-flex items-center justify-center overflow-hidden rounded-full bg-foreground px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.2em] cursor-pointer"
           >
             <span
-              className="absolute inset-0 bg-[hsl(var(--highlight))] origin-right scale-x-0 group-hover:scale-x-100 transition-transform duration-500"
-              style={{ transitionTimingFunction: "cubic-bezier(0.16,1,0.3,1)" }}
+              className="absolute inset-0 bg-[hsl(50_33%_12%)] origin-right scale-x-0 group-hover:scale-x-100 transition-transform duration-700"
+              style={{ transitionTimingFunction: "cubic-bezier(0.22,1,0.36,1)" }}
             />
-            <span className="relative z-10 flex items-center text-background">
-              <span className="inline-flex overflow-hidden max-w-0 opacity-0 group-hover:max-w-[1.5rem] group-hover:opacity-100 transition-all duration-300 ease-out">
+            <span className="relative z-10 flex items-center text-background group-hover:text-[hsl(200_25%_83%)] transition-colors duration-500">
+              <span className="inline-flex overflow-hidden max-w-0 opacity-0 group-hover:max-w-[1.5rem] group-hover:opacity-100 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]">
                 <ArrowLeft className="w-3 h-3 mr-1.5 shrink-0" strokeWidth={1.5} />
               </span>
               All Projects

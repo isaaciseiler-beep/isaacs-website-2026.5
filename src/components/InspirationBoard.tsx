@@ -44,23 +44,37 @@ const ITEMS: InspirationItem[] = [
 // Approximate board width/height ratio (viewport-dependent; fine for initial layout)
 const BOARD_RATIO = 1.7;
 
-function randomizeLayout(items: InspirationItem[]): InspirationItem[] {
+// Mulberry32 deterministic PRNG so layout is stable across loads.
+function mulberry32(seed: number) {
+  return function () {
+    let t = (seed += 0x6d2b79f5);
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function buildLayout(items: InspirationItem[]): InspirationItem[] {
+  const rand = mulberry32(20240511);
   const cols = 4;
-  const shuffled = [...items].sort(() => Math.random() - 0.5);
+  const shuffled = [...items]
+    .map((it) => ({ it, k: rand() }))
+    .sort((a, b) => a.k - b.k)
+    .map((x) => x.it);
   const rows = Math.ceil(shuffled.length / cols);
   const slotW = 100 / cols;
   const slotH = 100 / rows;
   return shuffled.map((it, i) => {
     const r = Math.floor(i / cols);
     const c = i % cols;
-    const cx = c * slotW + slotW / 2 + (Math.random() - 0.5) * slotW * 0.35;
-    const cy = r * slotH + slotH / 2 + (Math.random() - 0.5) * slotH * 0.3;
+    const cx = c * slotW + slotW / 2 + (rand() - 0.5) * slotW * 0.35;
+    const cy = r * slotH + slotH / 2 + (rand() - 0.5) * slotH * 0.3;
     const hPercent = (it.w / it.aspect) / BOARD_RATIO;
     return {
       ...it,
       x: cx - it.w / 2,
       y: cy - hPercent / 2,
-      rotate: (Math.random() - 0.5) * 10,
+      rotate: (rand() - 0.5) * 10,
     };
   });
 }
@@ -86,7 +100,7 @@ const ROTATE_CURSOR = `url("data:image/svg+xml;utf8,${ROTATE_CURSOR_SVG}") 7 7, 
 const InspirationBoard = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const boardRef = useRef<HTMLDivElement>(null);
-  const [items, setItems] = useState(() => randomizeLayout(ITEMS));
+  const [items, setItems] = useState(() => buildLayout(ITEMS));
   const [dragging, setDragging] = useState<number | null>(null);
   const dragOffset = useRef({ x: 0, y: 0 });
   const didDrag = useRef(false);
@@ -367,7 +381,7 @@ const InspirationBoard = () => {
                     <img
                       src={item.imageUrl}
                       alt={item.title}
-                      className="w-full h-full object-contain"
+                      className="w-full h-full object-contain grayscale hover:grayscale-0 transition-all duration-500"
                       draggable={false}
                     />
                   ) : (

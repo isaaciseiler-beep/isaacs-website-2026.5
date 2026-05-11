@@ -117,8 +117,8 @@ const AboutSection = () => {
       <SectionHeading>About</SectionHeading>
 
       <div className="w-full max-w-[1600px]">
-        <div className="flex flex-col-reverse items-center gap-10 lg:grid lg:grid-cols-[minmax(0,1fr)_clamp(320px,34vw,520px)] lg:items-center lg:gap-12">
-          <div className="min-w-0 w-full self-center pr-0 lg:pr-4 lg:flex lg:items-center">
+        <div className="flex flex-col-reverse items-center gap-10 md:grid md:grid-cols-[minmax(0,1fr)_clamp(320px,34vw,520px)] md:items-center md:gap-12">
+          <div className="min-w-0 w-full self-center pr-0 md:pr-4 md:flex md:items-center">
             <div
               ref={bioBoxRef}
               className="relative w-full overflow-hidden"
@@ -191,7 +191,7 @@ const AboutSection = () => {
         <div className="mt-8 md:mt-10 relative group/pill">
           <div
             ref={pillRef}
-            className="relative flex items-center gap-3 px-6 py-3.5 bg-background border-2 border-foreground group-hover/pill:border-[hsl(50_33%_12%)] transition-colors duration-300 w-full z-10"
+            className={`relative flex items-center gap-3 px-6 py-3.5 bg-background border-2 border-foreground group-hover/pill:border-[hsl(50_33%_12%)] transition-colors duration-300 w-full z-10 ${hasDeployedPopdown ? "border-b-0" : ""}`}
           >
             <motion.span
               className="rounded-full w-2.5 h-2.5 bg-foreground transition-colors duration-300 shrink-0"

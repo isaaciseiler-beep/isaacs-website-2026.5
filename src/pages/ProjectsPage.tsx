@@ -72,6 +72,9 @@ const ProjectCard = ({ project, index, isMobile, revealImmediately, onOpen }: Pr
         <motion.img
           src={project.image}
           alt={project.title}
+          loading={index < 4 ? "eager" : "lazy"}
+          decoding="async"
+          fetchPriority={index < 2 ? "high" : "auto"}
           className="h-full w-full object-cover grayscale transition-all duration-500 md:group-hover:grayscale-0"
           animate={isMobile ? { filter: isColor ? "grayscale(0%)" : "grayscale(100%)" } : undefined}
           transition={{ duration: 0.6, ease: EASE }}
@@ -97,6 +100,14 @@ const ProjectsPage = () => {
   const isMobile = useIsMobile();
 
   const filteredProjects = projectItems;
+
+  useEffect(() => {
+    filteredProjects.forEach((project) => {
+      const image = new Image();
+      image.decoding = "async";
+      image.src = project.image;
+    });
+  }, [filteredProjects]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -129,8 +140,6 @@ const ProjectsPage = () => {
 
   return (
     <div className="relative min-h-screen bg-background text-foreground">
-      <div className="fixed top-0 left-0 right-0 z-40 pointer-events-none" style={{ height: 58, background: "linear-gradient(to bottom, hsl(var(--background)) 0%, hsl(var(--background) / 0.85) 35%, hsl(var(--background) / 0.4) 70%, transparent 100%)" }} />
-
       <div className="fixed top-0 left-0 z-[60] flex items-center gap-1 px-6 py-4">
         <Link to="/" className="contents"><Logo /></Link>
         <Sidebar open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} onClose={() => setSidebarOpen(false)} />

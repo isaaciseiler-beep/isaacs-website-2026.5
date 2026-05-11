@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -82,6 +82,9 @@ const FeaturedProjectCard = ({
       <motion.img
         src={project.image}
         alt={project.title}
+        loading="eager"
+        decoding="async"
+        fetchPriority={index === 0 ? "high" : "auto"}
         className="absolute inset-0 w-full h-full object-cover"
         animate={{
           filter: isImageActive ? "grayscale(0%) brightness(1)" : "grayscale(100%) brightness(0.7)",
@@ -174,9 +177,21 @@ const ProjectsSection = () => {
     mq.addEventListener("change", update);
     return () => mq.removeEventListener("change", update);
   }, []);
-  const projects: ProjectItem[] = featuredProjectIds
-    .map((id) => projectItems.find((project) => project.id === id))
-    .filter((project): project is ProjectItem => Boolean(project));
+  const projects: ProjectItem[] = useMemo(
+    () =>
+      featuredProjectIds
+        .map((id) => projectItems.find((project) => project.id === id))
+        .filter((project): project is ProjectItem => Boolean(project)),
+    [],
+  );
+
+  useEffect(() => {
+    projects.forEach((project) => {
+      const image = new Image();
+      image.decoding = "async";
+      image.src = project.image;
+    });
+  }, [projects]);
 
   return (
     <section className="py-12">

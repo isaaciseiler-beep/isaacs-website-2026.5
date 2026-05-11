@@ -13,8 +13,8 @@ const Logo = () => {
   const middleOpacity = useTransform(progress, [0.4, 0.8], [0, 1]);
 
   return (
-    <div className="flex items-center select-none mr-2 relative z-[60]">
-      <span className="font-mono text-[13px] font-normal tracking-[0.05em] uppercase text-foreground flex overflow-visible whitespace-nowrap leading-none">
+    <div className="site-logo-xray flex items-center select-none mr-2 relative z-[60]">
+      <span className="font-mono text-[13px] font-normal tracking-[0.05em] uppercase flex overflow-visible whitespace-nowrap leading-none">
         <span>I</span>
         <motion.span className="inline-block overflow-hidden will-change-[width,opacity]" style={{ width: saacWidth, opacity: saacOpacity }}>SAAC</motion.span>
         <motion.span className="inline-block will-change-[width]" style={{ width: nameSpace }} />

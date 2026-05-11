@@ -39,6 +39,8 @@ const FeaturedTile = ({
         <motion.img
           src={image}
           alt={alt}
+          loading="eager"
+          decoding="async"
           className="w-full h-full object-cover"
           style={{
             filter: showColor ? "grayscale(0%)" : filter,
@@ -96,7 +98,14 @@ const FeaturedSection = () => {
         <div className="flex flex-col gap-[3px] px-6 pb-12">
           {featuredProjects.map((p, i) => (
             <div key={p!.id} className="relative aspect-[4/3] overflow-hidden">
-              <img src={p!.image} alt={p!.title} className="w-full h-full object-cover" loading="lazy" />
+              <img
+                src={p!.image}
+                alt={p!.title}
+                className="w-full h-full object-cover"
+                loading={i === 0 ? "eager" : "lazy"}
+                decoding="async"
+                fetchPriority={i === 0 ? "high" : "auto"}
+              />
               <div
                 className="absolute bottom-0 left-0 right-0 p-4"
                 style={{ background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 60%, transparent 100%)" }}

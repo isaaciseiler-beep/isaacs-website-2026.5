@@ -145,7 +145,7 @@ const Sidebar = ({ open, onToggle, onClose, activeSection }: SidebarProps) => {
     <>
       <motion.button
         onClick={onToggle}
-        className="w-5 h-5 flex items-center justify-center text-foreground hover:text-foreground/60 transition-colors duration-200 relative z-[60]"
+        className="site-nav-toggle-xray w-5 h-5 flex items-center justify-center transition-opacity duration-200 relative z-[60] hover:opacity-70"
         aria-label="Toggle menu"
         animate={{ rotate: open ? 180 : 0 }}
         transition={{ duration: 0.3, ease: EASE_TEXT }}

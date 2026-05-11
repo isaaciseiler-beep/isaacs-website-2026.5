@@ -1,5 +1,6 @@
 import { useRef, useState, useCallback, useEffect } from "react";
-import { motion, useScroll, useTransform, useSpring, useMotionValue } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring, useMotionValue, AnimatePresence } from "framer-motion";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import SectionHeading from "@/components/SectionHeading";
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
@@ -90,6 +91,36 @@ const InspirationBoard = () => {
   const dragOffset = useRef({ x: 0, y: 0 });
   const didDrag = useRef(false);
   const [isMobile, setIsMobile] = useState(false);
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const checkCarouselScroll = useCallback(() => {
+    const el = carouselRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 2);
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 2);
+  }, []);
+
+  useEffect(() => {
+    if (!isMobile) return;
+    const el = carouselRef.current;
+    if (!el) return;
+    checkCarouselScroll();
+    el.addEventListener("scroll", checkCarouselScroll, { passive: true });
+    window.addEventListener("resize", checkCarouselScroll);
+    return () => {
+      el.removeEventListener("scroll", checkCarouselScroll);
+      window.removeEventListener("resize", checkCarouselScroll);
+    };
+  }, [isMobile, checkCarouselScroll]);
+
+  const scrollCarousel = (dir: "left" | "right") => {
+    const el = carouselRef.current;
+    if (!el) return;
+    const amount = el.clientWidth * 0.6;
+    el.scrollBy({ left: dir === "left" ? -amount : amount, behavior: "smooth" });
+  };
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 767px)");
@@ -181,7 +212,7 @@ const InspirationBoard = () => {
     if (item.imageUrl) {
       return (
         <div className="group relative w-full h-full overflow-hidden flex items-center justify-center">
-          <img src={item.imageUrl} alt={item.title} className="w-full h-full object-contain grayscale group-hover:grayscale-0 transition-all duration-500" draggable={false} />
+          <img src={item.imageUrl} alt={item.title} className={`w-full h-full ${item.transparent ? "object-contain" : "object-cover"} grayscale group-hover:grayscale-0 transition-all duration-500`} draggable={false} />
         </div>
       );
     }
@@ -312,11 +343,13 @@ const InspirationBoard = () => {
           <div className="px-6 pt-12 pb-4">
             <SectionHeading className="mb-0">Inspiration</SectionHeading>
           </div>
-          <div
-            className="flex gap-6 overflow-x-auto scrollbar-hide px-6 pb-12 items-center"
-            style={{ scrollSnapType: "x mandatory", scrollPaddingLeft: 24 }}
-          >
-            {ITEMS.map((item, i) => {
+          <div className="relative">
+            <div
+              ref={carouselRef}
+              className="flex gap-6 overflow-x-auto scrollbar-hide px-6 pb-12 items-center"
+              style={{ scrollSnapType: "x mandatory", scrollPaddingLeft: 24 }}
+            >
+              {ITEMS.map((item, i) => {
               const baseW = 240;
               const h = baseW / item.aspect;
               return (
@@ -342,8 +375,47 @@ const InspirationBoard = () => {
                   )}
                 </motion.div>
               );
-            })}
-            <div className="flex-shrink-0 w-3" aria-hidden />
+              })}
+              <div className="flex-shrink-0 w-3" aria-hidden />
+            </div>
+            <AnimatePresence>
+              {canScrollLeft && (
+                <motion.button
+                  key="ins-left"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.3, ease: EASE }}
+                  onClick={() => scrollCarousel("left")}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 z-20"
+                  style={{ color: "hsl(50 33% 7%)" }}
+                  whileHover={{ x: -3 }}
+                  whileTap={{ scale: 0.85 }}
+                  aria-label="Scroll left"
+                >
+                  <ChevronLeft className="w-6 h-6" strokeWidth={1.5} />
+                </motion.button>
+              )}
+            </AnimatePresence>
+            <AnimatePresence>
+              {canScrollRight && (
+                <motion.button
+                  key="ins-right"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.3, ease: EASE }}
+                  onClick={() => scrollCarousel("right")}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 z-20"
+                  style={{ color: "hsl(50 33% 7%)" }}
+                  whileHover={{ x: 3 }}
+                  whileTap={{ scale: 0.85 }}
+                  aria-label="Scroll right"
+                >
+                  <ChevronRight className="w-6 h-6" strokeWidth={1.5} />
+                </motion.button>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       ) : (

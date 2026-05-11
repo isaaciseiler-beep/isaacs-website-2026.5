@@ -147,20 +147,18 @@
     color: inherit;
     mix-blend-mode: normal;
     opacity: 1;
-    filter: grayscale(1) contrast(2.4) brightness(1.18);
-    text-shadow:
-      0 0 1px rgba(255, 255, 255, 0.88),
-      0 0 10px rgba(255, 255, 255, 0.18);
+    filter: none;
+    text-shadow: none;
   }
 
   .site-logo-xray {
-    -webkit-text-stroke: 0.18px rgba(255, 255, 255, 0.68);
+    -webkit-text-stroke: 0;
     text-rendering: geometricPrecision;
   }
 
   .site-nav-toggle-xray svg {
     stroke-width: 1.65;
-    filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.76));
+    filter: none;
   }
 
   .site-sidebar-panel {

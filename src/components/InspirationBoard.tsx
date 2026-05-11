@@ -69,7 +69,7 @@ function buildLayout(items: InspirationItem[]): InspirationItem[] {
     const c = i % cols;
     const cx = c * slotW + slotW / 2 + (rand() - 0.5) * slotW * 0.35;
     const cy = r * slotH + slotH / 2 + (rand() - 0.5) * slotH * 0.3;
-    const hPercent = (it.w / it.aspect) / BOARD_RATIO;
+    const hPercent = (it.w / it.aspect) * BOARD_RATIO;
     const x = cx - it.w / 2;
     const y = cy - hPercent / 2;
     return {

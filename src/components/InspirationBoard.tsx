@@ -182,12 +182,6 @@ const InspirationBoard = () => {
       return (
         <div className="group relative w-full h-full overflow-hidden flex items-center justify-center">
           <img src={item.imageUrl} alt={item.title} className="w-full h-full object-contain grayscale group-hover:grayscale-0 transition-all duration-500" draggable={false} />
-          {item.content && (
-            <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-background/95 via-background/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <p className="font-semibold tracking-tight text-foreground text-sm leading-tight">{item.title}</p>
-              <p className="mt-1 text-foreground/70 leading-snug text-[11px]">{item.content}</p>
-            </div>
-          )}
         </div>
       );
     }

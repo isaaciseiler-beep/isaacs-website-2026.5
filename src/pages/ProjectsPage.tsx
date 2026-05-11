@@ -42,11 +42,11 @@ const ProjectsPage = () => {
           </div>
 
           <div className="px-6">
-            <div className="grid grid-cols-1 gap-[3px] md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-7">
               {filteredProjects.map((project, index) => (
                 <motion.button
                   key={project.id}
-                  className="relative flex flex-col text-left bg-background overflow-hidden h-full"
+                  className="group relative flex flex-col text-left bg-background overflow-hidden h-full border border-foreground/10 hover:border-foreground/30 transition-colors duration-300"
                   initial={{ opacity: 0, y: 40, filter: "blur(8px)" }}
                   whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                   viewport={{ once: true, margin: "-80px" }}
@@ -57,10 +57,10 @@ const ProjectsPage = () => {
                     <img
                       src={project.image}
                       alt={project.title}
-                      className="h-full w-full object-cover grayscale"
+                      className="h-full w-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
                     />
                   </div>
-                  <div className="bg-background p-5 md:p-6 flex-1">
+                  <div className="bg-background p-5 md:p-6 flex-1 border-t border-foreground/10">
                     <div className="mb-3 flex items-center">
                       <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-foreground/45">{project.year}</span>
                     </div>

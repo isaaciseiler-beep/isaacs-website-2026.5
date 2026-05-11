@@ -44,8 +44,15 @@ const ProjectsSection = () => {
               key={project.id}
               className="relative overflow-hidden cursor-pointer aspect-[4/3] md:aspect-auto md:flex-[1_1_0%]"
               style={{ minWidth: 0 }}
+              initial={{ opacity: 0, x: -40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
               animate={isDesktop ? { flex: isActive ? 6 : hasActive ? 0.8 : 1 } : {}}
-              transition={{ duration: 0.85, ease }}
+              transition={{
+                opacity: { duration: 0.55, ease, delay: i * 0.12 },
+                x: { duration: 0.65, ease, delay: i * 0.12 },
+                flex: { duration: 0.85, ease },
+              }}
               onMouseEnter={() => isDesktop && setActiveIndex(i)}
               onClick={() => setOpenProjectIndex(i)}
             >
@@ -82,24 +89,6 @@ const ProjectsSection = () => {
                     />
 
                     <div className="relative z-10 p-5 md:p-7">
-                      <motion.div
-                        className="flex items-center gap-2 mb-3"
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, ease, delay: 0.1 }}
-                      >
-                        <span className="text-[10px] font-mono tracking-[0.3em] text-[#f3f6ff]/50">
-                          {String(i + 1).padStart(2, "0")}
-                        </span>
-                        <span className="w-4 h-px bg-[#f3f6ff]/30" />
-                        <span className="text-[10px] font-mono tracking-[0.2em] text-[#f3f6ff]/60 uppercase">
-                          {project.source}
-                        </span>
-                        <span className="text-[10px] font-mono tracking-[0.2em] text-[#f3f6ff]/40 uppercase ml-auto">
-                          {project.year}
-                        </span>
-                      </motion.div>
-
                       <motion.h3
                         className="text-xl md:text-3xl font-semibold tracking-tighter text-white leading-[0.95] mb-2"
                         initial={{ opacity: 0, y: 12 }}

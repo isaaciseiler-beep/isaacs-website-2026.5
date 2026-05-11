@@ -140,7 +140,7 @@ const ProjectsPage = () => {
 
   return (
     <div className="relative min-h-screen bg-background text-foreground">
-      <div className="fixed top-0 left-0 z-[60] flex items-center gap-1 px-6 py-4">
+      <div className="site-header-xray fixed top-0 left-0 z-[60] flex items-center gap-1 px-6 py-4">
         <Link to="/" className="contents"><Logo /></Link>
         <Sidebar open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} onClose={() => setSidebarOpen(false)} />
       </div>

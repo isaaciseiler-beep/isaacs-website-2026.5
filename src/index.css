@@ -128,10 +128,21 @@
     font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
   }
 
+  .site-header-xray {
+    color: #fff;
+    mix-blend-mode: difference;
+    isolation: auto;
+  }
+
+  .site-header-xray,
+  .site-header-xray * {
+    color: inherit;
+  }
+
   .site-logo-xray,
   .site-nav-toggle-xray {
-    color: white;
-    mix-blend-mode: difference;
+    color: inherit;
+    mix-blend-mode: normal;
     opacity: 0.94;
     filter: contrast(1.35) saturate(0);
     text-shadow:

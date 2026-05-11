@@ -41,7 +41,7 @@ const Index = () => {
 
   return (
     <div className="relative">
-      <div className="fixed top-0 left-0 z-[60] flex items-center gap-1 px-6 md:px-6 py-4">
+      <div className="site-header-xray fixed top-0 left-0 z-[60] flex items-center gap-1 px-6 md:px-6 py-4">
         <Link to="/" className="contents"><Logo /></Link>
         <Sidebar
           open={sidebarOpen}

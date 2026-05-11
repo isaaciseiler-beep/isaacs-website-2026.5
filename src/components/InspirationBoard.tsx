@@ -177,6 +177,30 @@ const InspirationBoard = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (isMobile || !boardRef.current) return;
+    const board = boardRef.current;
+    const clampAll = () => {
+      setItems(prev => {
+        let changed = false;
+        const next = prev.map(item => {
+          const clamped = clampPosition(item.x, item.y, item.w, item.aspect);
+          if (clamped.x !== item.x || clamped.y !== item.y) changed = true;
+          return changed ? { ...item, x: clamped.x, y: clamped.y } : item;
+        });
+        return changed ? next : prev;
+      });
+    };
+    clampAll();
+    const resizeObserver = new ResizeObserver(clampAll);
+    resizeObserver.observe(board);
+    window.addEventListener("resize", clampAll);
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", clampAll);
+    };
+  }, [isMobile, clampPosition]);
+
   const handlePointerDown = useCallback((e: React.PointerEvent, id: number) => {
     e.preventDefault();
     const item = items.find(i => i.id === id);

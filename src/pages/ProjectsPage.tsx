@@ -188,7 +188,7 @@ const ProjectsPage = () => {
       <AnimatePresence>
         {showBackToTop && !sidebarOpen && (
           <motion.button
-            className={`fixed left-1/2 z-50 flex h-8 w-8 -translate-x-1/2 items-center justify-center rounded-full backdrop-blur-xl transition-colors duration-300 ${
+            className={`fixed left-[calc(env(safe-area-inset-left)+1.5rem)] z-50 flex h-8 w-8 items-center justify-center rounded-full backdrop-blur-xl transition-colors duration-300 ${
               isLightTheme
                 ? "bg-foreground/12 text-foreground hover:bg-foreground/18"
                 : "bg-white/16 text-[hsl(var(--background))] hover:bg-white/24"

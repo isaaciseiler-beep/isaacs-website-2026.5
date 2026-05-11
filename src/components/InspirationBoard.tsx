@@ -1,5 +1,5 @@
 import { useRef, useState, useCallback, useEffect } from "react";
-import { motion, useScroll, useTransform, useSpring, useMotionValue, MotionValue } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring, useMotionValue } from "framer-motion";
 import SectionHeading from "@/components/SectionHeading";
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
@@ -295,7 +295,7 @@ const InspirationBoard = () => {
                 transition={{ delay: i * 0.05, duration: 0.55, ease: EASE }}
                 className="relative h-44 bg-background cursor-pointer"
                 style={{ boxShadow: "1px 2px 6px rgba(0,0,0,0.08)" }}
-                onClick={() => setActiveItem(item)}
+                onClick={() => item.url && window.open(item.url, "_blank", "noopener,noreferrer")}
               >
                 {renderCard(item)}
               </motion.div>
@@ -323,87 +323,105 @@ const InspirationBoard = () => {
                 y: dotsY,
                 backgroundImage: "radial-gradient(circle, hsl(var(--foreground) / 0.13) 1px, transparent 1px)",
                 backgroundSize: "14px 14px",
-                maskImage: "linear-gradient(to top, rgba(0,0,0,1), rgba(0,0,0,0.82) 45%, rgba(0,0,0,0.1) 100%)",
               }}
             />
 
             {items.map((item, i) => (
-              <motion.div
+              <BoardCard
                 key={item.id}
-                className="absolute select-none"
-                style={{
-                  left: `${item.x}%`,
-                  top: `${item.y}%`,
-                  width: `${item.w}%`,
-                  aspectRatio: item.aspect,
-                  zIndex: dragging === item.id ? 50 : i,
-                  rotate: item.rotate,
-                  cursor: dragging === item.id ? "grabbing" : "grab",
-                  opacity: cardOpacity,
-                  y: cardY,
-                }}
-                transition={{
-                  delay: 0.12 + i * 0.06,
-                  duration: 0.7,
-                  ease: EASE,
-                }}
+                item={item}
+                index={i}
+                dragging={dragging === item.id}
+                zIndex={dragging === item.id ? 50 : i}
+                cardOpacity={cardOpacity}
+                cardY={cardY}
                 onPointerDown={e => handlePointerDown(e, item.id)}
                 onPointerUp={() => handlePointerUp(item.id)}
-              >
-                <div
-                  className="h-full bg-background shadow-sm transition-shadow duration-300 hover:shadow-md"
-                  style={{
-                    boxShadow: dragging === item.id
-                      ? "4px 6px 20px rgba(0,0,0,0.25)"
-                      : "1px 2px 6px rgba(0,0,0,0.06)",
-                  }}
-                >
-                  {renderCard(item)}
-                </div>
-              </motion.div>
+                renderCard={renderCard}
+              />
             ))}
           </motion.div>
         </div>
       </div>
-      )}
-
-      {/* Overlay */}
-      {activeItem && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center"
-          style={{ backgroundColor: "rgba(23,23,12,0.85)", backdropFilter: "blur(8px)" }}
-          onClick={() => setActiveItem(null)}
-        >
-          <motion.div
-            className="max-w-md w-full mx-4 border border-border/40 bg-background p-8 relative"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.2 }}
-            onClick={e => e.stopPropagation()}
-          >
-            <button
-              onClick={() => setActiveItem(null)}
-              className="absolute top-4 right-4 mono-text text-foreground/40 hover:text-foreground transition-colors cursor-pointer"
-              style={{ fontSize: 10 }}
-            >
-              ✕
-            </button>
-            <p className="mono-text mb-4 text-foreground/50" style={{ fontSize: 10 }}>{typeLabel[activeItem.type]}</p>
-            <h3 className="text-lg font-semibold tracking-tight text-foreground mb-3">{activeItem.title}</h3>
-            {activeItem.imageUrl && (
-              <img src={activeItem.imageUrl} alt={activeItem.title} className="w-full aspect-video object-cover mb-4 grayscale hover:grayscale-0 transition-all duration-500" />
-            )}
-            <p className="text-sm text-foreground/70 leading-relaxed mb-4">{activeItem.content}</p>
-            {activeItem.url && (
-              <a href={activeItem.url} target="_blank" rel="noopener noreferrer" className="pill-button inline-block">
-                Visit →
-              </a>
-            )}
-          </motion.div>
-        </div>
       )}
     </section>
   );
 };
 
 export default InspirationBoard;
+
+interface BoardCardProps {
+  item: InspirationItem;
+  index: number;
+  dragging: boolean;
+  zIndex: number;
+  cardOpacity: any;
+  cardY: any;
+  onPointerDown: (e: React.PointerEvent) => void;
+  onPointerUp: () => void;
+  renderCard: (item: InspirationItem) => React.ReactNode;
+}
+
+const BoardCard = ({ item, index, dragging, zIndex, cardOpacity, cardY, onPointerDown, onPointerUp, renderCard }: BoardCardProps) => {
+  const offsetX = useSpring(useMotionValue(0), { stiffness: 200, damping: 18 });
+  const offsetY = useSpring(useMotionValue(0), { stiffness: 200, damping: 18 });
+
+  const handleMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (dragging) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    // normalized -1..1 from center
+    const nx = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+    const ny = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+    // corner intensity: stronger near corners
+    const intensity = Math.min(1, Math.max(Math.abs(nx), Math.abs(ny)));
+    const factor = 8 * intensity; // px
+    offsetX.set(nx * factor);
+    offsetY.set(ny * factor);
+  };
+
+  const handleLeave = () => {
+    offsetX.set(0);
+    offsetY.set(0);
+  };
+
+  return (
+    <motion.div
+      className="absolute select-none"
+      style={{
+        left: `${item.x}%`,
+        top: `${item.y}%`,
+        width: `${item.w}%`,
+        aspectRatio: item.aspect,
+        zIndex,
+        rotate: item.rotate,
+        cursor: dragging ? "grabbing" : "grab",
+        opacity: cardOpacity,
+        y: cardY,
+      }}
+      transition={{
+        delay: 0.12 + index * 0.06,
+        duration: 0.7,
+        ease: EASE,
+      }}
+      onPointerDown={onPointerDown}
+      onPointerUp={onPointerUp}
+      onPointerMove={handleMove}
+      onPointerLeave={handleLeave}
+    >
+      <motion.div
+        className={`h-full transition-shadow duration-300 ${item.transparent ? "" : "bg-background shadow-sm hover:shadow-md"}`}
+        style={{
+          x: offsetX,
+          y: offsetY,
+          boxShadow: item.transparent
+            ? undefined
+            : dragging
+              ? "4px 6px 20px rgba(0,0,0,0.25)"
+              : "1px 2px 6px rgba(0,0,0,0.06)",
+        }}
+      >
+        {renderCard(item)}
+      </motion.div>
+    </motion.div>
+  );
+};

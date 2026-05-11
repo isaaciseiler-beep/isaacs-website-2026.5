@@ -1,5 +1,5 @@
 import { useRef, useState, useCallback, useEffect } from "react";
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring, useMotionValue } from "framer-motion";
 import SectionHeading from "@/components/SectionHeading";
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
@@ -16,17 +16,28 @@ interface InspirationItem {
   w: number;
   aspect: number;
   rotate: number;
+  transparent?: boolean;
 }
 
+const R2 = "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev";
+
 const ITEMS: InspirationItem[] = [
-  { id: 1, type: "website", title: "John Provencher", content: "Brooklyn-based artist & designer — interfaces as sculpture.", url: "https://johnprovencher.com/", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/john_provencherpicture-34-copy.webp", x: 1, y: 2, w: 17.5, aspect: 1912 / 1982, rotate: -2 },
-  { id: 2, type: "music", title: "Mr. Lovebomb", content: "Isaiah Huron — atmospheric R&B, late-night drives, neon reflections.", url: "https://open.spotify.com/artist/1hJx89kEIcAmlZzUWat9w6", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/lovebomb.jpg", x: 21, y: 4, w: 16.25, aspect: 1, rotate: 2.5 },
-  { id: 3, type: "place", title: "Hong Kong", content: "Density as poetry. Neon, mist, signage stacked to the sky.", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/hk.JPG", x: 38, y: 3, w: 27.5, aspect: 1.5, rotate: -1.5 },
-  { id: 4, type: "podcast", title: "Search Engine", content: "PJ Vogt asks the questions you'd Google but never finish.", url: "https://www.searchengine.show/", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/1200x1200bf-60.jpg", x: 67, y: 2, w: 16.25, aspect: 1, rotate: -3.5 },
-  { id: 5, type: "video", title: "Greg Girard", content: "Interview with the photographer of Kowloon Walled City and the vanished Asian metropolis.", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/ggirard.jpg", url: "https://www.youtube.com/watch?v=Ss1L7SaMnAU&t=937s", x: 84, y: 4, w: 17.5, aspect: 1, rotate: 1.5 },
-  { id: 6, type: "book", title: "I Deliver Parcels in Beijing", content: "Hu Anyan — a courier's view of the city, one doorbell at a time.", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/parcels.jpg", x: 4, y: 50, w: 12.5, aspect: 2 / 3, rotate: 2.5 },
-  { id: 7, type: "book", title: "My Year of Rest and Relaxation", content: "Ottessa Moshfegh — pharmaceutical hibernation in pre-9/11 Manhattan.", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/myyearofrest.jpg", x: 22, y: 49, w: 12.5, aspect: 294 / 450, rotate: -1 },
-  { id: 8, type: "book", title: "What We Can Know", content: "Ian McEwan — a future scholar reconstructs a lost world from fragments.", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/What_We_Can_Know.jpg", x: 41, y: 49, w: 12.5, aspect: 250 / 396, rotate: 3 },
+  // Row 1
+  { id: 1, type: "website", title: "John Provencher", content: "", url: "https://johnprovencher.com/", imageUrl: `${R2}/john_provencherpicture-34-copy.webp`, x: 0, y: 2, w: 19.25, aspect: 1912 / 1982, rotate: -2 },
+  { id: 2, type: "music", title: "Mr. Lovebomb", content: "", url: "https://open.spotify.com/artist/1hJx89kEIcAmlZzUWat9w6", imageUrl: `${R2}/lovebomb.jpg`, x: 21, y: 4, w: 17.9, aspect: 1, rotate: 2.5 },
+  { id: 3, type: "place", title: "Hong Kong", content: "", imageUrl: `${R2}/hk.JPG`, x: 40, y: 3, w: 30.25, aspect: 1.5, rotate: -1.5 },
+  { id: 4, type: "podcast", title: "Search Engine", content: "", url: "https://www.searchengine.show/", imageUrl: `${R2}/1200x1200bf-60.jpg`, x: 72, y: 2, w: 17.9, aspect: 1, rotate: -3.5 },
+  { id: 5, type: "video", title: "Greg Girard", content: "Interview with the photographer of Kowloon Walled City.", imageUrl: `${R2}/ggirard.jpg`, url: "https://www.youtube.com/watch?v=Ss1L7SaMnAU&t=937s", x: 90, y: 24, w: 19.25, aspect: 1, rotate: 1.5 },
+  // Row 2
+  { id: 6, type: "book", title: "I Deliver Parcels in Beijing", content: "", imageUrl: `${R2}/parcels.jpg`, x: 2, y: 36, w: 13.75, aspect: 2 / 3, rotate: 2.5 },
+  { id: 7, type: "book", title: "My Year of Rest and Relaxation", content: "", imageUrl: `${R2}/myyearofrest.jpg`, x: 18, y: 35, w: 13.75, aspect: 294 / 450, rotate: -1 },
+  { id: 9, type: "website", title: "OpenAI Supply Co.", content: "", url: "https://supplyco.openai.com/", imageUrl: `${R2}/oaisupply.png`, x: 35, y: 36, w: 13, aspect: 819 / 1350, rotate: 2, transparent: true },
+  { id: 10, type: "music", title: "I'll Finish the Lyrics Later", content: "", url: "https://genius.com/albums/Isaia-huron/Ill-finish-the-lyrics-later", imageUrl: `${R2}/lyricsarentfinished.jpg`, x: 50, y: 38, w: 16, aspect: 1, rotate: -2 },
+  { id: 11, type: "video", title: "Tales from the Road", content: "Jack Fitz", url: "https://vimeo.com/1125286551", imageUrl: `${R2}/jackfitz.jpg`, x: 70, y: 50, w: 22, aspect: 16 / 9, rotate: 1.5 },
+  // Row 3
+  { id: 12, type: "photo", title: "1989 Volvo 240 Wagon", content: "The best car ever made.", imageUrl: `${R2}/volvo_240_brochure_single_picture.webp`, x: 6, y: 70, w: 24, aspect: 1024 / 511, rotate: -2 },
+  { id: 13, type: "video", title: "Of An Age", content: "", url: "https://letterboxd.com/film/of-an-age/", imageUrl: `${R2}/ofanage.jpg`, x: 36, y: 72, w: 22, aspect: 16 / 9, rotate: 1.5 },
+  { id: 14, type: "website", title: "Ricoh GRIIIx", content: "", url: "https://www.ricoh-imaging.co.jp/english/products/gr-3/", imageUrl: `${R2}/grIIIx-hdf4.png`, x: 62, y: 73, w: 18, aspect: 1026 / 721, rotate: -1.5, transparent: true },
 ];
 
 const typeLabel: Record<string, string> = {
@@ -46,7 +57,6 @@ const InspirationBoard = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const boardRef = useRef<HTMLDivElement>(null);
   const [items, setItems] = useState(ITEMS);
-  const [activeItem, setActiveItem] = useState<InspirationItem | null>(null);
   const [dragging, setDragging] = useState<number | null>(null);
   const dragOffset = useRef({ x: 0, y: 0 });
   const didDrag = useRef(false);
@@ -130,7 +140,7 @@ const InspirationBoard = () => {
     setDragging(null);
     if (!didDrag.current) {
       const item = items.find(i => i.id === id);
-      if (item) setActiveItem(item);
+      if (item?.url) window.open(item.url, "_blank", "noopener,noreferrer");
     }
   }, [items]);
 
@@ -138,11 +148,13 @@ const InspirationBoard = () => {
     if (item.imageUrl) {
       return (
         <div className="group relative w-full h-full overflow-hidden flex items-center justify-center">
-          <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" draggable={false} />
-          <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-background/95 via-background/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <p className="font-semibold tracking-tight text-foreground text-sm leading-tight">{item.title}</p>
-            <p className="mt-1 text-foreground/70 leading-snug text-[11px]">{item.content}</p>
-          </div>
+          <img src={item.imageUrl} alt={item.title} className="w-full h-full object-contain grayscale group-hover:grayscale-0 transition-all duration-500" draggable={false} />
+          {item.content && (
+            <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-background/95 via-background/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <p className="font-semibold tracking-tight text-foreground text-sm leading-tight">{item.title}</p>
+              <p className="mt-1 text-foreground/70 leading-snug text-[11px]">{item.content}</p>
+            </div>
+          )}
         </div>
       );
     }
@@ -283,7 +295,7 @@ const InspirationBoard = () => {
                 transition={{ delay: i * 0.05, duration: 0.55, ease: EASE }}
                 className="relative h-44 bg-background cursor-pointer"
                 style={{ boxShadow: "1px 2px 6px rgba(0,0,0,0.08)" }}
-                onClick={() => setActiveItem(item)}
+                onClick={() => item.url && window.open(item.url, "_blank", "noopener,noreferrer")}
               >
                 {renderCard(item)}
               </motion.div>
@@ -311,87 +323,105 @@ const InspirationBoard = () => {
                 y: dotsY,
                 backgroundImage: "radial-gradient(circle, hsl(var(--foreground) / 0.13) 1px, transparent 1px)",
                 backgroundSize: "14px 14px",
-                maskImage: "linear-gradient(to top, rgba(0,0,0,1), rgba(0,0,0,0.82) 45%, rgba(0,0,0,0.1) 100%)",
               }}
             />
 
             {items.map((item, i) => (
-              <motion.div
+              <BoardCard
                 key={item.id}
-                className="absolute select-none"
-                style={{
-                  left: `${item.x}%`,
-                  top: `${item.y}%`,
-                  width: `${item.w}%`,
-                  aspectRatio: item.aspect,
-                  zIndex: dragging === item.id ? 50 : i,
-                  rotate: item.rotate,
-                  cursor: dragging === item.id ? "grabbing" : "grab",
-                  opacity: cardOpacity,
-                  y: cardY,
-                }}
-                transition={{
-                  delay: 0.12 + i * 0.06,
-                  duration: 0.7,
-                  ease: EASE,
-                }}
+                item={item}
+                index={i}
+                dragging={dragging === item.id}
+                zIndex={dragging === item.id ? 50 : i}
+                cardOpacity={cardOpacity}
+                cardY={cardY}
                 onPointerDown={e => handlePointerDown(e, item.id)}
                 onPointerUp={() => handlePointerUp(item.id)}
-              >
-                <div
-                  className="h-full bg-background shadow-sm transition-shadow duration-300 hover:shadow-md"
-                  style={{
-                    boxShadow: dragging === item.id
-                      ? "4px 6px 20px rgba(0,0,0,0.25)"
-                      : "1px 2px 6px rgba(0,0,0,0.06)",
-                  }}
-                >
-                  {renderCard(item)}
-                </div>
-              </motion.div>
+                renderCard={renderCard}
+              />
             ))}
           </motion.div>
         </div>
       </div>
-      )}
-
-      {/* Overlay */}
-      {activeItem && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center"
-          style={{ backgroundColor: "rgba(23,23,12,0.85)", backdropFilter: "blur(8px)" }}
-          onClick={() => setActiveItem(null)}
-        >
-          <motion.div
-            className="max-w-md w-full mx-4 border border-border/40 bg-background p-8 relative"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.2 }}
-            onClick={e => e.stopPropagation()}
-          >
-            <button
-              onClick={() => setActiveItem(null)}
-              className="absolute top-4 right-4 mono-text text-foreground/40 hover:text-foreground transition-colors cursor-pointer"
-              style={{ fontSize: 10 }}
-            >
-              ✕
-            </button>
-            <p className="mono-text mb-4 text-foreground/50" style={{ fontSize: 10 }}>{typeLabel[activeItem.type]}</p>
-            <h3 className="text-lg font-semibold tracking-tight text-foreground mb-3">{activeItem.title}</h3>
-            {activeItem.imageUrl && (
-              <img src={activeItem.imageUrl} alt={activeItem.title} className="w-full aspect-video object-cover mb-4 grayscale hover:grayscale-0 transition-all duration-500" />
-            )}
-            <p className="text-sm text-foreground/70 leading-relaxed mb-4">{activeItem.content}</p>
-            {activeItem.url && (
-              <a href={activeItem.url} target="_blank" rel="noopener noreferrer" className="pill-button inline-block">
-                Visit →
-              </a>
-            )}
-          </motion.div>
-        </div>
       )}
     </section>
   );
 };
 
 export default InspirationBoard;
+
+interface BoardCardProps {
+  item: InspirationItem;
+  index: number;
+  dragging: boolean;
+  zIndex: number;
+  cardOpacity: any;
+  cardY: any;
+  onPointerDown: (e: React.PointerEvent) => void;
+  onPointerUp: () => void;
+  renderCard: (item: InspirationItem) => React.ReactNode;
+}
+
+const BoardCard = ({ item, index, dragging, zIndex, cardOpacity, cardY, onPointerDown, onPointerUp, renderCard }: BoardCardProps) => {
+  const offsetX = useSpring(useMotionValue(0), { stiffness: 200, damping: 18 });
+  const offsetY = useSpring(useMotionValue(0), { stiffness: 200, damping: 18 });
+
+  const handleMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (dragging) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    // normalized -1..1 from center
+    const nx = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+    const ny = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+    // corner intensity: stronger near corners
+    const intensity = Math.min(1, Math.max(Math.abs(nx), Math.abs(ny)));
+    const factor = 8 * intensity; // px
+    offsetX.set(nx * factor);
+    offsetY.set(ny * factor);
+  };
+
+  const handleLeave = () => {
+    offsetX.set(0);
+    offsetY.set(0);
+  };
+
+  return (
+    <motion.div
+      className="absolute select-none"
+      style={{
+        left: `${item.x}%`,
+        top: `${item.y}%`,
+        width: `${item.w}%`,
+        aspectRatio: item.aspect,
+        zIndex,
+        rotate: item.rotate,
+        cursor: dragging ? "grabbing" : "grab",
+        opacity: cardOpacity,
+        y: cardY,
+      }}
+      transition={{
+        delay: 0.12 + index * 0.06,
+        duration: 0.7,
+        ease: EASE,
+      }}
+      onPointerDown={onPointerDown}
+      onPointerUp={onPointerUp}
+      onPointerMove={handleMove}
+      onPointerLeave={handleLeave}
+    >
+      <motion.div
+        className={`h-full transition-shadow duration-300 ${item.transparent ? "" : "bg-background shadow-sm hover:shadow-md"}`}
+        style={{
+          x: offsetX,
+          y: offsetY,
+          boxShadow: item.transparent
+            ? undefined
+            : dragging
+              ? "4px 6px 20px rgba(0,0,0,0.25)"
+              : "1px 2px 6px rgba(0,0,0,0.06)",
+        }}
+      >
+        {renderCard(item)}
+      </motion.div>
+    </motion.div>
+  );
+};

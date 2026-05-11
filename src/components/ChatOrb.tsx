@@ -98,8 +98,7 @@ const ChatOrb = () => {
     }, 1200);
   };
 
-  const orbShadow = "hsl(50 33% 7% / 0.25)";
-  const softShadow = `0 4px 14px -6px ${orbShadow}, 0 1px 4px -2px ${orbShadow}`;
+  const softShadow = "none";
 
   if (!isVisible && !isOpen) return null;
 
@@ -150,7 +149,7 @@ const ChatOrb = () => {
                 bottom: bottomOffset,
                 right: DOT_RIGHT,
                 transformOrigin: "bottom right",
-                filter: `drop-shadow(0 6px 18px ${orbShadow}) drop-shadow(0 2px 6px ${orbShadow})`,
+              filter: "none",
               }}
               initial={{
                 width: DOT_SIZE,

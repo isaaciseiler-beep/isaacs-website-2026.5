@@ -154,12 +154,12 @@ const InspirationBoard = () => {
     damping: 28,
     mass: 0.8,
   });
-  const boardY = useTransform(revealProgress, [0, 1], [88, 0]);
+  const boardY = useTransform(revealProgress, [0, 1], [0, 0]);
   const boardOpacity = useTransform(revealProgress, [0, 1], [0, 1]);
   const dotsOpacity = useTransform(revealProgress, [0, 0.55, 1], [0, 0.45, 1]);
-  const dotsY = useTransform(revealProgress, [0, 1], [52, 0]);
+  const dotsY = useTransform(revealProgress, [0, 1], [0, 0]);
   const cardOpacity = useTransform(revealProgress, [0.1, 1], [0, 1]);
-  const cardY = useTransform(revealProgress, [0, 1], [40, 0]);
+  const cardY = useTransform(revealProgress, [0, 1], [0, 0]);
 
   const clampPosition = useCallback((x: number, y: number, w: number, aspect: number) => {
     if (!boardRef.current) return { x, y };

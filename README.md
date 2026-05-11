@@ -19,7 +19,7 @@ VITE_MAPBOX_ACCESS_TOKEN=pk_your_token_here
 
 `VITE_MAPBOX_TOKEN` is also accepted as a fallback.
 
-### Optional Supabase persistence
+### Required Supabase persistence for shared pins
 
 Without Supabase values, the map runs in local browser mode and stores pins in
 `localStorage`. For the collaborative live map, add both values:
@@ -28,6 +28,10 @@ Without Supabase values, the map runs in local browser mode and stores pins in
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your_anon_key
 ```
+
+These are Vite build-time variables. On Vercel, add them to the project
+environment variables and redeploy; a deployment built without them will always
+show "Local browser mode" and pins will not sync between users.
 
 The database and storage setup has been migrated to
 `supabase/fulbrightmap-schema.sql`.

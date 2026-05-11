@@ -15,10 +15,26 @@ import {
   deletePin,
   getPins,
   getStorageMode,
+  subscribeToPinChanges,
   uploadImage,
 } from "@/lib/fulbrightmap/storage";
 import type { PendingLocation, Pin } from "@/lib/fulbrightmap/types";
 import { getAnonymousUserId } from "@/lib/fulbrightmap/user";
+
+function sortPinsNewestFirst(pins: Pin[]) {
+  return [...pins].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  );
+}
+
+function mergePin(pins: Pin[], pin: Pin) {
+  const existingIndex = pins.findIndex((candidate) => candidate.id === pin.id);
+  if (existingIndex === -1) return sortPinsNewestFirst([pin, ...pins]);
+
+  const nextPins = [...pins];
+  nextPins[existingIndex] = pin;
+  return sortPinsNewestFirst(nextPins);
+}
 
 export default function FulbrightMapPage() {
   const mapboxToken =
@@ -80,6 +96,36 @@ export default function FulbrightMapPage() {
 
     void loadPins(true);
 
+    const unsubscribeFromPinChanges =
+      storageMode === "supabase"
+        ? subscribeToPinChanges({
+            onInsert: (pin) => {
+              if (!active) return;
+              setPins((current) => mergePin(current, pin));
+            },
+            onDelete: (pinId) => {
+              if (!active) return;
+              setPins((current) =>
+                current.filter((candidate) => candidate.id !== pinId),
+              );
+              setPopupRequest((current) =>
+                current?.pinId === pinId ? null : current,
+              );
+              setHighlightedPinId((current) =>
+                current === pinId ? null : current,
+              );
+            },
+            onError: (message) => {
+              if (!active) return;
+              showToast({
+                tone: "warning",
+                title: "Live updates paused",
+                detail: message,
+              });
+            },
+          })
+        : null;
+
     const refreshInterval =
       storageMode === "supabase"
         ? window.setInterval(() => {
@@ -89,6 +135,7 @@ export default function FulbrightMapPage() {
 
     return () => {
       active = false;
+      unsubscribeFromPinChanges?.();
       if (refreshInterval) window.clearInterval(refreshInterval);
     };
   }, [showToast, storageMode]);
@@ -116,7 +163,7 @@ export default function FulbrightMapPage() {
         anonymousUserId,
       });
 
-      setPins((current) => [pin, ...current]);
+      setPins((current) => mergePin(current, pin));
       setPendingLocation(null);
       popupRequestNonceRef.current += 1;
       setPopupRequest({

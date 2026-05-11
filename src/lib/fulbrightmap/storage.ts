@@ -1,4 +1,8 @@
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import {
+  createClient,
+  type RealtimeChannel,
+  type SupabaseClient,
+} from "@supabase/supabase-js";
 
 import { compressImage, compressImageToDataUrl } from "./image";
 import type { Pin, PinInput, StorageMode } from "./types";
@@ -52,6 +56,8 @@ function fromDatabase(row: {
     createdAt: row.created_at,
   };
 }
+
+type PinDatabaseRow = Parameters<typeof fromDatabase>[0];
 
 function toDatabase(input: PinInput) {
   return {
@@ -130,6 +136,51 @@ function writeLocalPins(pins: Pin[]) {
 
 export function getStorageMode(): StorageMode {
   return hasSupabaseConfig() ? "supabase" : "local";
+}
+
+export function subscribeToPinChanges({
+  onInsert,
+  onDelete,
+  onError,
+}: {
+  onInsert: (pin: Pin) => void;
+  onDelete: (pinId: string) => void;
+  onError?: (message: string) => void;
+}) {
+  const supabase = getSupabaseClient();
+  if (!supabase) return () => {};
+
+  let channel: RealtimeChannel | null = supabase
+    .channel("fulbrightmap:pins")
+    .on(
+      "postgres_changes",
+      { event: "INSERT", schema: "public", table: "pins" },
+      (payload) => {
+        onInsert(fromDatabase(payload.new as PinDatabaseRow));
+      },
+    )
+    .on(
+      "postgres_changes",
+      { event: "DELETE", schema: "public", table: "pins" },
+      (payload) => {
+        const deletedPinId = (payload.old as { id?: string }).id;
+        if (deletedPinId) onDelete(deletedPinId);
+      },
+    )
+    .subscribe((status, error) => {
+      if (status === "CHANNEL_ERROR") {
+        onError?.(
+          error?.message ??
+            "Live map updates are unavailable. The map will keep refreshing in the background.",
+        );
+      }
+    });
+
+  return () => {
+    if (!channel) return;
+    void supabase.removeChannel(channel);
+    channel = null;
+  };
 }
 
 export function canDeletePin(pin: Pin, anonymousUserId: string) {

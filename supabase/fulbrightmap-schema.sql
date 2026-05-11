@@ -20,6 +20,22 @@ create table if not exists public.pins (
 create index if not exists pins_created_at_idx on public.pins (created_at desc);
 create index if not exists pins_anonymous_user_id_idx on public.pins (anonymous_user_id);
 
+do $$
+begin
+  if exists (select 1 from pg_publication where pubname = 'supabase_realtime')
+    and not exists (
+      select 1
+      from pg_publication_tables
+      where pubname = 'supabase_realtime'
+        and schemaname = 'public'
+        and tablename = 'pins'
+    )
+  then
+    alter publication supabase_realtime add table public.pins;
+  end if;
+end
+$$;
+
 alter table public.pins drop constraint if exists pins_caption_check;
 alter table public.pins
   add constraint pins_caption_check

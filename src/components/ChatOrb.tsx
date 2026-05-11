@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUp } from "lucide-react";
+import { toast } from "sonner";
 
 interface Message {
   id: string;
@@ -117,7 +118,7 @@ const ChatOrb = () => {
               background: "hsl(var(--foreground))",
               boxShadow: softShadow,
             }}
-            onClick={() => setIsOpen(true)}
+            onClick={() => toast("Indexed search and AI assistant coming soon")}
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: [1, 1.12, 1], opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}

@@ -52,7 +52,7 @@ const ProjectDetailPage = () => {
               className="absolute inset-0 bg-[hsl(50_33%_12%)] origin-right scale-x-0 group-hover:scale-x-100 transition-transform duration-700"
               style={{ transitionTimingFunction: "cubic-bezier(0.22,1,0.36,1)" }}
             />
-            <span className="relative z-10 flex items-center text-background group-hover:text-[hsl(200_25%_83%)] transition-colors duration-500">
+            <span className="relative z-10 flex items-center text-background group-hover:text-[hsl(var(--highlight))] transition-colors duration-500">
               <span className="inline-flex overflow-hidden max-w-0 opacity-0 group-hover:max-w-[1.5rem] group-hover:opacity-100 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]">
                 <ArrowLeft className="w-3 h-3 mr-1.5 shrink-0" strokeWidth={1.5} />
               </span>

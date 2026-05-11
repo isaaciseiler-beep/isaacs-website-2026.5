@@ -1,5 +1,5 @@
 import { useRef, useState, useCallback, useEffect } from "react";
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring, useMotionValue, MotionValue } from "framer-motion";
 import SectionHeading from "@/components/SectionHeading";
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
@@ -16,17 +16,28 @@ interface InspirationItem {
   w: number;
   aspect: number;
   rotate: number;
+  transparent?: boolean;
 }
 
+const R2 = "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev";
+
 const ITEMS: InspirationItem[] = [
-  { id: 1, type: "website", title: "John Provencher", content: "Brooklyn-based artist & designer — interfaces as sculpture.", url: "https://johnprovencher.com/", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/john_provencherpicture-34-copy.webp", x: 1, y: 2, w: 17.5, aspect: 1912 / 1982, rotate: -2 },
-  { id: 2, type: "music", title: "Mr. Lovebomb", content: "Isaiah Huron — atmospheric R&B, late-night drives, neon reflections.", url: "https://open.spotify.com/artist/1hJx89kEIcAmlZzUWat9w6", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/lovebomb.jpg", x: 21, y: 4, w: 16.25, aspect: 1, rotate: 2.5 },
-  { id: 3, type: "place", title: "Hong Kong", content: "Density as poetry. Neon, mist, signage stacked to the sky.", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/hk.JPG", x: 38, y: 3, w: 27.5, aspect: 1.5, rotate: -1.5 },
-  { id: 4, type: "podcast", title: "Search Engine", content: "PJ Vogt asks the questions you'd Google but never finish.", url: "https://www.searchengine.show/", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/1200x1200bf-60.jpg", x: 67, y: 2, w: 16.25, aspect: 1, rotate: -3.5 },
-  { id: 5, type: "video", title: "Greg Girard", content: "Interview with the photographer of Kowloon Walled City and the vanished Asian metropolis.", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/ggirard.jpg", url: "https://www.youtube.com/watch?v=Ss1L7SaMnAU&t=937s", x: 84, y: 4, w: 17.5, aspect: 1, rotate: 1.5 },
-  { id: 6, type: "book", title: "I Deliver Parcels in Beijing", content: "Hu Anyan — a courier's view of the city, one doorbell at a time.", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/parcels.jpg", x: 4, y: 50, w: 12.5, aspect: 2 / 3, rotate: 2.5 },
-  { id: 7, type: "book", title: "My Year of Rest and Relaxation", content: "Ottessa Moshfegh — pharmaceutical hibernation in pre-9/11 Manhattan.", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/myyearofrest.jpg", x: 22, y: 49, w: 12.5, aspect: 294 / 450, rotate: -1 },
-  { id: 8, type: "book", title: "What We Can Know", content: "Ian McEwan — a future scholar reconstructs a lost world from fragments.", imageUrl: "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev/What_We_Can_Know.jpg", x: 41, y: 49, w: 12.5, aspect: 250 / 396, rotate: 3 },
+  // Row 1
+  { id: 1, type: "website", title: "John Provencher", content: "", url: "https://johnprovencher.com/", imageUrl: `${R2}/john_provencherpicture-34-copy.webp`, x: 0, y: 2, w: 19.25, aspect: 1912 / 1982, rotate: -2 },
+  { id: 2, type: "music", title: "Mr. Lovebomb", content: "", url: "https://open.spotify.com/artist/1hJx89kEIcAmlZzUWat9w6", imageUrl: `${R2}/lovebomb.jpg`, x: 21, y: 4, w: 17.9, aspect: 1, rotate: 2.5 },
+  { id: 3, type: "place", title: "Hong Kong", content: "", imageUrl: `${R2}/hk.JPG`, x: 40, y: 3, w: 30.25, aspect: 1.5, rotate: -1.5 },
+  { id: 4, type: "podcast", title: "Search Engine", content: "", url: "https://www.searchengine.show/", imageUrl: `${R2}/1200x1200bf-60.jpg`, x: 72, y: 2, w: 17.9, aspect: 1, rotate: -3.5 },
+  { id: 5, type: "video", title: "Greg Girard", content: "Interview with the photographer of Kowloon Walled City.", imageUrl: `${R2}/ggirard.jpg`, url: "https://www.youtube.com/watch?v=Ss1L7SaMnAU&t=937s", x: 90, y: 24, w: 19.25, aspect: 1, rotate: 1.5 },
+  // Row 2
+  { id: 6, type: "book", title: "I Deliver Parcels in Beijing", content: "", imageUrl: `${R2}/parcels.jpg`, x: 2, y: 36, w: 13.75, aspect: 2 / 3, rotate: 2.5 },
+  { id: 7, type: "book", title: "My Year of Rest and Relaxation", content: "", imageUrl: `${R2}/myyearofrest.jpg`, x: 18, y: 35, w: 13.75, aspect: 294 / 450, rotate: -1 },
+  { id: 9, type: "website", title: "OpenAI Supply Co.", content: "", url: "https://supplyco.openai.com/", imageUrl: `${R2}/oaisupply.png`, x: 35, y: 36, w: 13, aspect: 819 / 1350, rotate: 2, transparent: true },
+  { id: 10, type: "music", title: "I'll Finish the Lyrics Later", content: "", url: "https://genius.com/albums/Isaia-huron/Ill-finish-the-lyrics-later", imageUrl: `${R2}/lyricsarentfinished.jpg`, x: 50, y: 38, w: 16, aspect: 1, rotate: -2 },
+  { id: 11, type: "video", title: "Tales from the Road", content: "Jack Fitz", url: "https://vimeo.com/1125286551", imageUrl: `${R2}/jackfitz.jpg`, x: 70, y: 50, w: 22, aspect: 16 / 9, rotate: 1.5 },
+  // Row 3
+  { id: 12, type: "photo", title: "1989 Volvo 240 Wagon", content: "The best car ever made.", imageUrl: `${R2}/volvo_240_brochure_single_picture.webp`, x: 6, y: 70, w: 24, aspect: 1024 / 511, rotate: -2 },
+  { id: 13, type: "video", title: "Of An Age", content: "", url: "https://letterboxd.com/film/of-an-age/", imageUrl: `${R2}/ofanage.jpg`, x: 36, y: 72, w: 22, aspect: 16 / 9, rotate: 1.5 },
+  { id: 14, type: "website", title: "Ricoh GRIIIx", content: "", url: "https://www.ricoh-imaging.co.jp/english/products/gr-3/", imageUrl: `${R2}/grIIIx-hdf4.png`, x: 62, y: 73, w: 18, aspect: 1026 / 721, rotate: -1.5, transparent: true },
 ];
 
 const typeLabel: Record<string, string> = {
@@ -46,7 +57,6 @@ const InspirationBoard = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const boardRef = useRef<HTMLDivElement>(null);
   const [items, setItems] = useState(ITEMS);
-  const [activeItem, setActiveItem] = useState<InspirationItem | null>(null);
   const [dragging, setDragging] = useState<number | null>(null);
   const dragOffset = useRef({ x: 0, y: 0 });
   const didDrag = useRef(false);
@@ -130,7 +140,7 @@ const InspirationBoard = () => {
     setDragging(null);
     if (!didDrag.current) {
       const item = items.find(i => i.id === id);
-      if (item) setActiveItem(item);
+      if (item?.url) window.open(item.url, "_blank", "noopener,noreferrer");
     }
   }, [items]);
 
@@ -138,11 +148,13 @@ const InspirationBoard = () => {
     if (item.imageUrl) {
       return (
         <div className="group relative w-full h-full overflow-hidden flex items-center justify-center">
-          <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" draggable={false} />
-          <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-background/95 via-background/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <p className="font-semibold tracking-tight text-foreground text-sm leading-tight">{item.title}</p>
-            <p className="mt-1 text-foreground/70 leading-snug text-[11px]">{item.content}</p>
-          </div>
+          <img src={item.imageUrl} alt={item.title} className="w-full h-full object-contain grayscale group-hover:grayscale-0 transition-all duration-500" draggable={false} />
+          {item.content && (
+            <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-background/95 via-background/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <p className="font-semibold tracking-tight text-foreground text-sm leading-tight">{item.title}</p>
+              <p className="mt-1 text-foreground/70 leading-snug text-[11px]">{item.content}</p>
+            </div>
+          )}
         </div>
       );
     }

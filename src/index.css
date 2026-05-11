@@ -226,4 +226,12 @@
   .light .group\/pill:hover .text-background {
     color: hsl(50 33% 7%);
   }
+
+  .back-projects-button-label {
+    color: hsl(var(--background));
+  }
+
+  .back-projects-button:hover .back-projects-button-label {
+    color: hsl(var(--highlight));
+  }
 }

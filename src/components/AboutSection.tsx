@@ -222,7 +222,7 @@ const AboutSection = () => {
                   variants={popdownTextVariants}
                   initial="closed"
                   animate={hasDeployedPopdown ? "open" : "closed"}
-                  className="relative z-10 flex h-full items-center justify-center px-6 pt-[26px] text-sm font-mono tracking-[0.2em] uppercase text-[hsl(200_25%_83%)] transition-colors duration-300"
+                  className="relative z-10 flex h-full items-center justify-center px-6 pt-[26px] text-sm font-mono tracking-[0.2em] uppercase text-[hsl(200_25%_83%)] group-hover/pill:text-highlight transition-colors duration-300"
                 >
                   Get in touch
                   <span className="inline-flex overflow-hidden max-w-0 opacity-0 transition-all duration-300 ease-out group-hover/pill:max-w-[2rem] group-hover/pill:opacity-100">

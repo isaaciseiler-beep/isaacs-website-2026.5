@@ -243,6 +243,31 @@
     filter: grayscale(1) contrast(1.08) brightness(1.02);
   }
 
+  .photo-map-panel-button {
+    @apply relative flex h-11 items-center justify-between overflow-hidden border border-white/20 bg-background px-3 font-mono text-[9px] uppercase tracking-[0.22em] text-foreground transition-colors duration-500;
+  }
+
+  .photo-map-panel-button::before {
+    content: '';
+    @apply absolute inset-0 bg-foreground;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .photo-map-panel-button:hover {
+    @apply text-background;
+  }
+
+  .photo-map-panel-button:hover::before {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  .photo-map-panel-icon-button {
+    @apply w-11 justify-center px-0;
+  }
+
   .photo-map-loading-bar {
     animation: photo-map-loading 0.9s cubic-bezier(0.16, 1, 0.3, 1) infinite;
     transform-origin: left;

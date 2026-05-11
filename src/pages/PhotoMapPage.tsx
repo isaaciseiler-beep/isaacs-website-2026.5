@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUpRight, Images, MapPin, RotateCcw } from "lucide-react";
+import { ArrowUpRight, RotateCcw } from "lucide-react";
 import mapboxgl, { type LngLatLike } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import Sidebar from "@/components/Sidebar";
@@ -59,15 +59,14 @@ const PhotoMapPage = () => {
     });
 
     mapRef.current = map;
-    map.addControl(new mapboxgl.NavigationControl({ visualizePitch: true }), "bottom-right");
     map.addControl(new mapboxgl.AttributionControl({ compact: true }), "bottom-left");
 
     const handleLoad = () => {
       map.setFog({
         color: "rgb(244, 244, 241)",
-        "high-color": "rgb(210, 210, 204)",
-        "horizon-blend": 0.1,
-        "space-color": "rgb(13, 12, 10)",
+        "high-color": "rgb(244, 244, 241)",
+        "horizon-blend": 0,
+        "space-color": "rgb(244, 244, 241)",
         "star-intensity": 0,
       });
       setMapReady(true);
@@ -218,58 +217,46 @@ const PhotoMapPage = () => {
               {activeEntry ? (
                 <motion.article
                   key={activeEntry.id}
-                  className="pointer-events-auto flex h-full w-full max-w-[390px] flex-col overflow-hidden border border-white/15 bg-[hsl(50_33%_7%/0.92)] text-white shadow-2xl shadow-black/35 backdrop-blur-2xl"
+                  className="pointer-events-auto relative flex h-full w-full max-w-[390px] overflow-hidden border border-white/15 bg-[hsl(50_33%_7%)] text-white shadow-2xl shadow-black/35"
                   initial={{ opacity: 0, x: 36, filter: "blur(8px)" }}
                   animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
                   exit={{ opacity: 0, x: 28, filter: "blur(6px)" }}
                   transition={{ duration: 0.35, ease: EASE }}
                 >
-                  <div className="flex min-h-0 flex-1 flex-col">
+                  <img
+                    src={activeEntry.coverImage}
+                    alt=""
+                    className="absolute inset-0 h-full w-full object-cover grayscale"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/22 to-black/20" />
+                  <div className="relative z-10 flex min-h-0 flex-1 flex-col justify-end p-5">
                     <button
                       type="button"
-                      className="group relative h-[46%] min-h-[220px] overflow-hidden bg-white/5 text-left"
+                      className="mb-6 text-left"
                       onClick={() => openAlbum(activeEntry)}
                       aria-label={`Open ${activeEntry.location} album`}
                     >
-                      <img src={activeEntry.coverImage} alt="" className="h-full w-full object-cover grayscale transition duration-700 group-hover:grayscale-0 group-hover:scale-[1.02]" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/10" />
+                      <h1 className="text-5xl font-semibold leading-[0.9] tracking-tight">{activeEntry.title}</h1>
                     </button>
 
-                    <div className="flex min-h-0 flex-1 flex-col justify-between p-5">
-                      <button
-                        type="button"
-                        className="text-left"
-                        onClick={() => openAlbum(activeEntry)}
-                        aria-label={`Open ${activeEntry.location} album`}
+                    <div className="grid grid-cols-[1fr_auto] gap-2">
+                      <Link
+                        to={albumHref(activeEntry)}
+                        className="photo-map-panel-button group"
                       >
-                        <div className="mb-4 flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.22em] text-white/42">
-                          <MapPin className="h-3 w-3" />
-                          {activeEntry.kind}
-                        </div>
-                        <h1 className="text-4xl font-semibold leading-[0.95] tracking-tight">{activeEntry.title}</h1>
-                        <div className="mt-5 flex items-center gap-2 text-sm text-white/58">
-                          <Images className="h-4 w-4" />
-                          <span>{activeEntry.images.length} photos</span>
-                        </div>
-                      </button>
-
-                      <div className="mt-8 grid grid-cols-[1fr_auto] gap-2">
-                        <Link
-                          to={albumHref(activeEntry)}
-                          className="group flex h-11 items-center justify-between border border-white/16 px-3 font-mono text-[9px] uppercase tracking-[0.22em] text-white/72 transition hover:border-white/34 hover:bg-white/8 hover:text-white"
-                        >
+                        <span className="relative z-10 flex items-center justify-between">
                           Open Album
                           <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                        </Link>
-                        <button
-                          type="button"
-                          onClick={resetGlobe}
-                          className="flex h-11 w-11 items-center justify-center border border-white/16 text-white/58 transition hover:border-white/34 hover:bg-white/8 hover:text-white"
-                          aria-label="Reset map view"
-                        >
-                          <RotateCcw className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
+                        </span>
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={resetGlobe}
+                        className="photo-map-panel-button photo-map-panel-icon-button group"
+                        aria-label="Reset map view"
+                      >
+                        <RotateCcw className="relative z-10 h-3.5 w-3.5" />
+                      </button>
                     </div>
                   </div>
                 </motion.article>

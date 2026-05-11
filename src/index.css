@@ -173,3 +173,134 @@
     display: none;
   }
 }
+
+.fulbright-pin-popup .mapboxgl-popup-content {
+  padding: 0;
+  border-radius: 1.25rem;
+  background: transparent;
+  box-shadow: none;
+}
+
+.fulbright-pin-popup .mapboxgl-popup-tip {
+  border-top-color: white;
+  border-bottom-color: white;
+}
+
+.fulbright-map-shell .mapboxgl-ctrl-top-left {
+  left: 0.75rem;
+  top: 10.75rem;
+}
+
+.fulbright-map-shell .mapboxgl-ctrl-top-left .mapboxgl-ctrl {
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 0.32);
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 0.92);
+  box-shadow: 0 20px 45px rgb(0 0 0 / 0.28);
+  backdrop-filter: blur(18px);
+}
+
+.fulbright-map-shell .mapboxgl-ctrl-group button {
+  transition:
+    background-color 160ms ease,
+    opacity 160ms ease;
+}
+
+.fulbright-map-shell .mapboxgl-ctrl-bottom-left {
+  bottom: 0.75rem;
+  left: 0.75rem;
+  max-width: calc(100vw - 1.5rem);
+}
+
+.fulbright-map-shell .mapboxgl-ctrl-attrib {
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.85);
+  box-shadow: 0 12px 28px rgb(0 0 0 / 0.18);
+  backdrop-filter: blur(14px);
+}
+
+.fulbright-top-panel {
+  animation: fulbright-fade-down 480ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.fulbright-detail-panel[data-state="open"] .fulbright-detail-card {
+  animation: fulbright-panel-in 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.fulbright-modal-scrim {
+  animation: fulbright-fade-in 180ms ease-out both;
+}
+
+.fulbright-modal-card {
+  animation: fulbright-sheet-in 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes fulbright-fade-down {
+  from {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fulbright-panel-in {
+  from {
+    opacity: 0;
+    transform: translateX(28px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes fulbright-sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fulbright-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (min-width: 640px) {
+  .fulbright-map-shell .mapboxgl-ctrl-top-left {
+    left: 1.25rem;
+    top: 12.25rem;
+  }
+
+  .fulbright-map-shell .mapboxgl-ctrl-bottom-left {
+    bottom: 1rem;
+    left: 1.25rem;
+  }
+}
+
+@media (max-width: 639px) {
+  .fulbright-detail-panel[data-state="open"] .fulbright-detail-card {
+    animation-name: fulbright-sheet-in;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fulbright-top-panel,
+  .fulbright-detail-panel[data-state="open"] .fulbright-detail-card,
+  .fulbright-modal-scrim,
+  .fulbright-modal-card {
+    animation: none;
+  }
+}

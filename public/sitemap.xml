@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://isaacseiler.xyz/</loc>
     <changefreq>weekly</changefreq>
@@ -13,6 +14,61 @@
   <url>
     <loc>https://isaacseiler.xyz/projects</loc>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://isaacseiler.xyz/seo/projects/artificial-intelligence-in-state-government-index.jpg</image:loc>
+      <image:title>Artificial Intelligence in State Government Index</image:title>
+      <image:caption>A public-information benchmark measuring state and territory government responses to generative AI.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://isaacseiler.xyz/seo/projects/congressional-office-setup-100-day-report.jpg</image:loc>
+      <image:title>Congressional Office Setup and 100 Day Report</image:title>
+      <image:caption>A report on systems, staffing, and benchmarks used to stand up a brand-new congressional office.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://isaacseiler.xyz/seo/projects/senior-thesis-local-journalism.jpg</image:loc>
+      <image:title>AI, Digital Platforms, and Journalism Research</image:title>
+      <image:caption>A qualitative honors thesis on local journalism, democracy, labor, and media policy.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://isaacseiler.xyz/seo/projects/electric-vehicle-access-analysis.jpg</image:loc>
+      <image:title>Electric Vehicle Charging Access Analysis</image:title>
+      <image:caption>A GIS and quantitative analysis project examining EV infrastructure access and charger gaps.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://isaacseiler.xyz/seo/projects/communications-consultancy-supporting-local-candidates.jpg</image:loc>
+      <image:title>Communications Consultancy and Supporting Local Candidates</image:title>
+      <image:caption>Campaign websites, digital strategy, and rapid-response communications for local candidates.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://isaacseiler.xyz/seo/projects/fulbright-focus-group-sponsored-by-openai.jpg</image:loc>
+      <image:title>Fulbright Focus Group Sponsored by OpenAI</image:title>
+      <image:caption>A six-session educator lab focused on practical and responsible uses of ChatGPT in education.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://isaacseiler.xyz/seo/projects/political-reporting-at-washu.jpg</image:loc>
+      <image:title>Political Reporting at WashU</image:title>
+      <image:caption>Student political reporting on protest, campus governance, elections, and institutional accountability.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://isaacseiler.xyz/seo/projects/boehringer-cares-foundation-rebrand-strategy-shift.jpg</image:loc>
+      <image:title>Boehringer Cares Foundation Rebrand and Strategy Shift</image:title>
+      <image:caption>A rebrand and strategic redirect spanning narrative, UX, visual identity, and internal communications.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://isaacseiler.xyz/seo/projects/2022-institute-for-nonprofit-news-index-survey.jpg</image:loc>
+      <image:title>The 2022 Institute for Nonprofit News Index Survey</image:title>
+      <image:caption>A nonprofit news research project involving data collection, survey synthesis, and stakeholder outreach.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://isaacseiler.xyz/seo/projects/exclusive-interview-with-high-visibility-congressperson.jpg</image:loc>
+      <image:title>Exclusive Interview with High-Visibility Congressperson</image:title>
+      <image:caption>Political reporting on then-Congressman Peter Meijer during a volatile post-impeachment period.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://isaacseiler.xyz/seo/projects/sustainable-development-health-access-report.jpg</image:loc>
+      <image:title>Sustainable Development and Health Access Report</image:title>
+      <image:caption>Strategy and communications work around health access policy and sustainable development.</image:caption>
+    </image:image>
   </url>
 </urlset>

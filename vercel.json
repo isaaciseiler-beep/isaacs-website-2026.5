@@ -1,4 +1,21 @@
 {
+  "headers": [
+    {
+      "source": "/fulbrightmap",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow, noarchive"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/fulbrightmap",
+      "destination": "/index.html"
+    }
+  ],
   "functions": {
     "api/*.ts": {
       "includeFiles": "knowledge/**"

@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /fulbrightmap
 Sitemap: https://isaacseiler.xyz/sitemap.xml
 Host: https://isaacseiler.xyz

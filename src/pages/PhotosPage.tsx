@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
+import { useSearchParams } from "react-router-dom";
 import Footer from "@/components/Footer";
 import Sidebar from "@/components/Sidebar";
 import SiteHeader from "@/components/SiteHeader";
@@ -167,10 +168,22 @@ const PhotosPage = () => {
   const [openAlbum, setOpenAlbum] = useState<string | null>(null);
   const [previewIdx, setPreviewIdx] = useState<number | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
   const isMobile = useIsMobile();
 
   const filtered = filter === "All" ? albums : albums.filter((a) => a.continent === filter);
   const currentAlbum = openAlbum ? albums.find((a) => a.location === openAlbum) : null;
+
+  useEffect(() => {
+    const albumFolder = searchParams.get("album");
+    if (!albumFolder) return;
+
+    const album = albums.find((candidate) => candidate.folder === albumFolder);
+    if (album && album.location !== openAlbum) {
+      setFilter("All");
+      setOpenAlbum(album.location);
+    }
+  }, [openAlbum, searchParams]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -225,7 +238,7 @@ const PhotosPage = () => {
                     return (
                       <button
                         key={loc}
-                        onClick={() => { setFilter(loc); setOpenAlbum(null); }}
+                        onClick={() => { setFilter(loc); setOpenAlbum(null); setSearchParams({}); }}
                         className="relative px-3 py-1 font-mono text-[9px] tracking-[0.2em] uppercase transition-colors duration-300"
                         style={{ color: active ? "hsl(var(--background))" : "hsl(var(--foreground) / 0.3)" }}
                       >
@@ -257,7 +270,7 @@ const PhotosPage = () => {
                 className="px-6 max-w-5xl mx-auto"
               >
                 <motion.button
-                  onClick={() => setOpenAlbum(null)}
+                  onClick={() => { setOpenAlbum(null); setSearchParams({}); }}
                   className="flex items-center gap-2 mb-12 text-foreground/30 hover:text-foreground transition-colors"
                   initial={{ opacity: 0, x: -8 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -326,7 +339,13 @@ const PhotosPage = () => {
                       animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                       transition={{ delay: i * 0.07, duration: 0.5, ease: EASE }}
                     >
-                      <AlbumCover album={album} onClick={() => setOpenAlbum(album.location)} />
+                      <AlbumCover
+                        album={album}
+                        onClick={() => {
+                          setOpenAlbum(album.location);
+                          setSearchParams({ album: album.folder });
+                        }}
+                      />
                     </motion.div>
                   ))}
                 </div>

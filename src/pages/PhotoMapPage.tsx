@@ -1,17 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { Images, MapPin, X } from "lucide-react";
+import { ArrowUpRight, Images, MapPin, RotateCcw } from "lucide-react";
 import mapboxgl, { type LngLatLike } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import Sidebar from "@/components/Sidebar";
 import SiteHeader from "@/components/SiteHeader";
-import PhotoPreview from "@/components/PhotoPreview";
 import { photoMapEntries, photoMapInitialView, type PhotoMapEntry } from "@/lib/photoMap";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const EASE_TEXT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
+const MONOCHROME_MAP_STYLE = "mapbox://styles/mapbox/light-v11";
 
 type MarkerEntry = {
   marker: mapboxgl.Marker;
@@ -28,11 +28,11 @@ const PhotoMapPage = () => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markerEntriesRef = useRef<Map<string, MarkerEntry>>(new Map());
+  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mapReady, setMapReady] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
   const [activeEntryId, setActiveEntryId] = useState<string | null>(null);
-  const [previewIdx, setPreviewIdx] = useState<number | null>(null);
   const isMobile = useIsMobile();
 
   const activeEntry = useMemo(
@@ -46,7 +46,7 @@ const PhotoMapPage = () => {
     mapboxgl.accessToken = mapboxToken;
     const map = new mapboxgl.Map({
       container: containerRef.current,
-      style: "mapbox://styles/mapbox/standard",
+      style: MONOCHROME_MAP_STYLE,
       center: photoMapInitialView.center,
       zoom: photoMapInitialView.zoom,
       minZoom: 1,
@@ -55,6 +55,7 @@ const PhotoMapPage = () => {
       bearing: photoMapInitialView.bearing,
       projection: { name: "globe" },
       attributionControl: false,
+      fadeDuration: 0,
     });
 
     mapRef.current = map;
@@ -63,11 +64,11 @@ const PhotoMapPage = () => {
 
     const handleLoad = () => {
       map.setFog({
-        color: "rgb(18, 22, 24)",
-        "high-color": "rgb(130, 166, 190)",
-        "horizon-blend": 0.18,
-        "space-color": "rgb(4, 5, 6)",
-        "star-intensity": 0.12,
+        color: "rgb(244, 244, 241)",
+        "high-color": "rgb(210, 210, 204)",
+        "horizon-blend": 0.1,
+        "space-color": "rgb(13, 12, 10)",
+        "star-intensity": 0,
       });
       setMapReady(true);
     };
@@ -77,6 +78,7 @@ const PhotoMapPage = () => {
 
     map.on("load", handleLoad);
     map.on("error", handleError);
+    map.on("click", () => setActiveEntryId(null));
 
     return () => {
       markerEntriesRef.current.forEach(({ marker }) => marker.remove());
@@ -118,7 +120,6 @@ const PhotoMapPage = () => {
         event.preventDefault();
         event.stopPropagation();
         setActiveEntryId(entry.id);
-        setPreviewIdx(null);
         map.flyTo({
           center: entry.coordinates as LngLatLike,
           zoom: Math.max(map.getZoom(), 3.25),
@@ -159,6 +160,13 @@ const PhotoMapPage = () => {
     });
   };
 
+  const albumHref = (entry: PhotoMapEntry) =>
+    entry.albumFolder ? `/photos?album=${encodeURIComponent(entry.albumFolder)}` : "/photos";
+
+  const openAlbum = (entry: PhotoMapEntry) => {
+    navigate(albumHref(entry));
+  };
+
   if (!mapboxToken) {
     return (
       <main className="flex min-h-[100svh] items-center justify-center bg-background px-6 text-foreground">
@@ -183,91 +191,93 @@ const PhotoMapPage = () => {
           width: sidebarOpen && !isMobile ? "calc(100% - 240px)" : "100%",
         }}
         transition={{ duration: 0.4, ease: EASE_TEXT }}
-        className="relative h-[100svh] overflow-hidden"
+        className="relative h-[100svh] overflow-hidden bg-background px-3 pb-3 pt-[4.75rem] sm:px-5 sm:pb-5 md:px-6 md:pb-6 md:pt-20"
       >
-        <div ref={containerRef} className="photo-map-shell h-full w-full" />
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,transparent_0%,rgba(0,0,0,0.05)_45%,rgba(0,0,0,0.58)_100%)]" />
+        <section className="relative h-full overflow-hidden border border-foreground/10 bg-secondary shadow-[0_24px_80px_rgba(0,0,0,0.18)]">
+          <div ref={containerRef} className="photo-map-shell h-full w-full" />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,transparent_0%,rgba(0,0,0,0.03)_48%,rgba(0,0,0,0.2)_100%)]" />
 
-        {!mapReady || mapError ? (
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-6">
-            <div className="border border-white/15 bg-neutral-950/70 px-5 py-4 text-center text-white shadow-2xl backdrop-blur-xl">
-              <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-white/45">
-                {mapError ? "Map unavailable" : "Loading globe"}
-              </p>
-              <p className="mt-2 text-sm text-white/70">{mapError ?? "Preparing the photo map."}</p>
+          {!mapReady || mapError ? (
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-background/96 p-6">
+              <div className="w-full max-w-xs text-center">
+                <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-foreground/45">
+                  {mapError ? "Map unavailable" : "Photo Map"}
+                </p>
+                <div className="mx-auto mt-4 h-px w-40 overflow-hidden bg-foreground/10">
+                  {!mapError ? <div className="photo-map-loading-bar h-full w-1/2 bg-foreground/60" /> : null}
+                </div>
+                <p className="mt-4 text-sm leading-6 text-foreground/60">
+                  {mapError ?? "Loading locations"}
+                </p>
+              </div>
             </div>
-          </div>
-        ) : null}
+          ) : null}
 
-        <section className="pointer-events-none absolute inset-x-0 bottom-0 z-20 p-3 sm:bottom-4 sm:left-auto sm:right-4 sm:w-[390px] sm:p-0">
-          <AnimatePresence mode="wait">
-            {activeEntry ? (
-              <motion.article
-                key={activeEntry.id}
-                className="pointer-events-auto overflow-hidden border border-white/15 bg-[hsl(50_33%_7%/0.86)] text-white shadow-2xl shadow-black/35 backdrop-blur-2xl"
-                initial={{ opacity: 0, y: 18, filter: "blur(8px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                exit={{ opacity: 0, y: 14, filter: "blur(6px)" }}
-                transition={{ duration: 0.35, ease: EASE }}
-              >
-                <div className="grid grid-cols-[116px_1fr] gap-0">
-                  <button
-                    type="button"
-                    className="relative aspect-square overflow-hidden bg-white/5"
-                    onClick={() => setPreviewIdx(0)}
-                    aria-label={`Open ${activeEntry.location} photo preview`}
-                  >
-                    <img src={activeEntry.coverImage} alt="" className="h-full w-full object-cover grayscale transition duration-500 hover:grayscale-0" />
-                  </button>
-                  <div className="min-w-0 p-4">
-                    <div className="mb-2 flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.22em] text-white/42">
-                      <MapPin className="h-3 w-3" />
-                      {activeEntry.kind}
-                    </div>
-                    <h1 className="text-2xl font-semibold leading-none tracking-tight">{activeEntry.title}</h1>
-                    <div className="mt-3 flex items-center gap-2 text-sm text-white/60">
-                      <Images className="h-4 w-4" />
-                      <span>{activeEntry.images.length} photos ready for coordinates</span>
+          <section className="pointer-events-none absolute inset-y-0 right-0 z-20 flex w-full justify-end p-3 sm:w-[430px] sm:p-4">
+            <AnimatePresence mode="wait">
+              {activeEntry ? (
+                <motion.article
+                  key={activeEntry.id}
+                  className="pointer-events-auto flex h-full w-full max-w-[390px] flex-col overflow-hidden border border-white/15 bg-[hsl(50_33%_7%/0.92)] text-white shadow-2xl shadow-black/35 backdrop-blur-2xl"
+                  initial={{ opacity: 0, x: 36, filter: "blur(8px)" }}
+                  animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+                  exit={{ opacity: 0, x: 28, filter: "blur(6px)" }}
+                  transition={{ duration: 0.35, ease: EASE }}
+                >
+                  <div className="flex min-h-0 flex-1 flex-col">
+                    <button
+                      type="button"
+                      className="group relative h-[46%] min-h-[220px] overflow-hidden bg-white/5 text-left"
+                      onClick={() => openAlbum(activeEntry)}
+                      aria-label={`Open ${activeEntry.location} album`}
+                    >
+                      <img src={activeEntry.coverImage} alt="" className="h-full w-full object-cover grayscale transition duration-700 group-hover:grayscale-0 group-hover:scale-[1.02]" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/10" />
+                    </button>
+
+                    <div className="flex min-h-0 flex-1 flex-col justify-between p-5">
+                      <button
+                        type="button"
+                        className="text-left"
+                        onClick={() => openAlbum(activeEntry)}
+                        aria-label={`Open ${activeEntry.location} album`}
+                      >
+                        <div className="mb-4 flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.22em] text-white/42">
+                          <MapPin className="h-3 w-3" />
+                          {activeEntry.kind}
+                        </div>
+                        <h1 className="text-4xl font-semibold leading-[0.95] tracking-tight">{activeEntry.title}</h1>
+                        <div className="mt-5 flex items-center gap-2 text-sm text-white/58">
+                          <Images className="h-4 w-4" />
+                          <span>{activeEntry.images.length} photos</span>
+                        </div>
+                      </button>
+
+                      <div className="mt-8 grid grid-cols-[1fr_auto] gap-2">
+                        <Link
+                          to={albumHref(activeEntry)}
+                          className="group flex h-11 items-center justify-between border border-white/16 px-3 font-mono text-[9px] uppercase tracking-[0.22em] text-white/72 transition hover:border-white/34 hover:bg-white/8 hover:text-white"
+                        >
+                          Open Album
+                          <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={resetGlobe}
+                          className="flex h-11 w-11 items-center justify-center border border-white/16 text-white/58 transition hover:border-white/34 hover:bg-white/8 hover:text-white"
+                          aria-label="Reset map view"
+                        >
+                          <RotateCcw className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-
-                <div className="flex items-center justify-between border-t border-white/10 px-4 py-3">
-                  <button
-                    type="button"
-                    onClick={resetGlobe}
-                    className="font-mono text-[9px] uppercase tracking-[0.22em] text-white/45 transition hover:text-white"
-                  >
-                    Full globe
-                  </button>
-                  <Link
-                    to="/photos"
-                    className="font-mono text-[9px] uppercase tracking-[0.22em] text-white/45 transition hover:text-white"
-                  >
-                    Portfolio
-                  </Link>
-                </div>
-              </motion.article>
-            ) : null}
-          </AnimatePresence>
+                </motion.article>
+              ) : null}
+            </AnimatePresence>
+          </section>
         </section>
-
-        <button
-          type="button"
-          onClick={() => setActiveEntryId(null)}
-          aria-label="Clear selected photo location"
-          className="absolute right-4 top-4 z-20 hidden h-9 w-9 items-center justify-center border border-white/15 bg-black/35 text-white/70 backdrop-blur-xl transition hover:text-white sm:flex"
-        >
-          <X className="h-4 w-4" />
-        </button>
       </motion.main>
-
-      <PhotoPreview
-        images={activeEntry?.images ?? []}
-        currentIndex={previewIdx}
-        onClose={() => setPreviewIdx(null)}
-        onNavigate={setPreviewIdx}
-      />
 
       <SiteHeader open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
     </div>

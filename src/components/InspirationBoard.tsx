@@ -312,21 +312,38 @@ const InspirationBoard = () => {
           <div className="px-6 pt-12 pb-4">
             <SectionHeading className="mb-0">Inspiration</SectionHeading>
           </div>
-          <div className="grid grid-cols-1 gap-3 px-6 pb-12">
-            {ITEMS.map((item, i) => (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, y: 24, filter: "blur(6px)" }}
-                whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                viewport={{ once: true, margin: "-40px" }}
-                transition={{ delay: i * 0.05, duration: 0.55, ease: EASE }}
-                className="relative h-44 bg-background cursor-pointer"
-                style={{ boxShadow: "1px 2px 6px rgba(0,0,0,0.08)" }}
-                onClick={() => item.url && window.open(item.url, "_blank", "noopener,noreferrer")}
-              >
-                {renderCard(item)}
-              </motion.div>
-            ))}
+          <div
+            className="flex gap-6 overflow-x-auto scrollbar-hide px-6 pb-12 items-center"
+            style={{ scrollSnapType: "x mandatory", scrollPaddingLeft: 24 }}
+          >
+            {ITEMS.map((item, i) => {
+              const baseW = 240;
+              const h = baseW / item.aspect;
+              return (
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ delay: i * 0.04, duration: 0.5, ease: EASE }}
+                  className="flex-shrink-0 cursor-pointer"
+                  style={{ width: baseW, height: h, scrollSnapAlign: "start" }}
+                  onClick={() => item.url && window.open(item.url, "_blank", "noopener,noreferrer")}
+                >
+                  {item.imageUrl ? (
+                    <img
+                      src={item.imageUrl}
+                      alt={item.title}
+                      className="w-full h-full object-contain"
+                      draggable={false}
+                    />
+                  ) : (
+                    renderCard(item)
+                  )}
+                </motion.div>
+              );
+            })}
+            <div className="flex-shrink-0 w-3" aria-hidden />
           </div>
         </div>
       ) : (

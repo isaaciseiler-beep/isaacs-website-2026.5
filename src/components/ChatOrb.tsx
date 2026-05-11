@@ -115,7 +115,7 @@ const ChatOrb = () => {
               right: DOT_RIGHT,
               width: DOT_SIZE,
               height: DOT_SIZE,
-              background: "hsl(var(--foreground))",
+              background: "hsl(var(--highlight))",
               boxShadow: softShadow,
             }}
             onClick={() => toast("Indexed search and AI assistant coming soon")}
@@ -229,7 +229,7 @@ const ChatOrb = () => {
               {/* Input pill */}
               <div
                 className="w-full flex items-center gap-2 px-4"
-                style={{ borderRadius: 100, background: "hsl(var(--foreground))", boxShadow: "none", height: DOT_SIZE }}
+                style={{ borderRadius: 100, background: "hsl(var(--highlight))", boxShadow: "none", height: DOT_SIZE }}
               >
                 <input
                   ref={inputRef}

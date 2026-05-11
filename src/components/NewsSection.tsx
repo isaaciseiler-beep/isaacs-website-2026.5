@@ -72,10 +72,10 @@ const NewsSection = () => {
               rel="noopener noreferrer"
               className="news-card group relative block flex-shrink-0 transition-colors duration-300 overflow-hidden flex flex-col"
               style={{ width: "calc(40% - 2px)", scrollSnapAlign: "start", minWidth: 280 }}
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
+              initial={{ opacity: 0, x: -40 }}
+              whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, margin: "-20px" }}
-              transition={{ delay: index * 0.05, duration: 0.4 }}
+              transition={{ delay: index * 0.1, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             >
               {item.imageUrl && (
                 <div className="relative w-full overflow-hidden" style={{ aspectRatio: "16/9" }}>

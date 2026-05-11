@@ -44,13 +44,12 @@ const ProjectsSection = () => {
               key={project.id}
               className="relative overflow-hidden cursor-pointer aspect-[4/3] md:aspect-auto md:flex-[1_1_0%]"
               style={{ minWidth: 0 }}
-              initial={{ opacity: 0, x: -40 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
               viewport={{ once: true, margin: "-80px" }}
               animate={isDesktop ? { flex: isActive ? 6 : hasActive ? 0.8 : 1 } : {}}
               transition={{
                 opacity: { duration: 0.55, ease, delay: i * 0.12 },
-                x: { duration: 0.65, ease, delay: i * 0.12 },
                 flex: { duration: 0.85, ease },
               }}
               onMouseEnter={() => isDesktop && setActiveIndex(i)}

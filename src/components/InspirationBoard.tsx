@@ -27,7 +27,7 @@ const ITEMS: InspirationItem[] = [
   { id: 2, type: "music", title: "Mr. Lovebomb", content: "", url: "https://open.spotify.com/artist/1hJx89kEIcAmlZzUWat9w6", imageUrl: `${R2}/lovebomb.jpg`, x: 0, y: 0, w: 17.9, aspect: 1, rotate: 0 },
   { id: 3, type: "place", title: "Hong Kong", content: "", imageUrl: `${R2}/hk.JPG`, x: 0, y: 0, w: 30.25, aspect: 1.5, rotate: 0 },
   { id: 4, type: "podcast", title: "Search Engine", content: "", url: "https://www.searchengine.show/", imageUrl: `${R2}/1200x1200bf-60.jpg`, x: 0, y: 0, w: 17.9, aspect: 1, rotate: 0 },
-  { id: 5, type: "video", title: "Greg Girard", content: "Interview with the photographer of Kowloon Walled City.", imageUrl: `${R2}/newgirard.webp`, url: "https://www.youtube.com/watch?v=Ss1L7SaMnAU", x: 0, y: 0, w: 19.25, aspect: 1, rotate: 0 },
+  { id: 5, type: "video", title: "Greg Girard", content: "Interview with the photographer of Kowloon Walled City.", imageUrl: `${R2}/newgirard.webp`, url: "https://www.youtube.com/watch?v=Ss1L7SaMnAU", x: 0, y: 0, w: 19.25, aspect: 1128 / 846, rotate: 0 },
   { id: 6, type: "book", title: "I Deliver Parcels in Beijing", content: "", imageUrl: `${R2}/parcels.jpg`, x: 0, y: 0, w: 16.5, aspect: 2 / 3, rotate: 0 },
   { id: 7, type: "book", title: "My Year of Rest and Relaxation", content: "", imageUrl: `${R2}/myyearofrest.jpg`, x: 0, y: 0, w: 13.75, aspect: 294 / 450, rotate: 0 },
   { id: 9, type: "website", title: "OpenAI Supply Co.", content: "", url: "https://supplyco.openai.com/", imageUrl: `${R2}/oaisupply.png`, x: 0, y: 0, w: 16.9, aspect: 819 / 1350, rotate: 0, transparent: true },
@@ -52,14 +52,14 @@ function randomizeLayout(items: InspirationItem[]): InspirationItem[] {
   return shuffled.map((it, i) => {
     const r = Math.floor(i / cols);
     const c = i % cols;
-    const cx = c * slotW + slotW / 2 + (Math.random() - 0.5) * slotW * 0.7;
-    const cy = r * slotH + slotH / 2 + (Math.random() - 0.5) * slotH * 0.55;
+    const cx = c * slotW + slotW / 2 + (Math.random() - 0.5) * slotW * 0.35;
+    const cy = r * slotH + slotH / 2 + (Math.random() - 0.5) * slotH * 0.3;
     const hPercent = (it.w / it.aspect) / BOARD_RATIO;
     return {
       ...it,
       x: cx - it.w / 2,
       y: cy - hPercent / 2,
-      rotate: (Math.random() - 0.5) * 14,
+      rotate: (Math.random() - 0.5) * 10,
     };
   });
 }
@@ -75,12 +75,12 @@ const typeLabel: Record<string, string> = {
   podcast: "PODCAST",
 };
 
-const OVERHANG = 0.18; // max overhang past board edge
+const OVERHANG = 0.08; // max overhang past board edge (drag can go further? no, also clamps)
 
 const ROTATE_CURSOR_SVG = encodeURIComponent(
-  `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="black" stroke="white" stroke-width="1"/><path d="M17 8.5a5.5 5.5 0 1 0 1.5 4.5" fill="none" stroke="white" stroke-width="1.6" stroke-linecap="round"/><polyline points="18 5 18 9 14 9" fill="none" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+  `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"><path d="M17 8.5a5.5 5.5 0 1 0 1.5 4.5" fill="none" stroke="black" stroke-width="2.4" stroke-linecap="round"/><polyline points="18 5 18 9 14 9" fill="none" stroke="black" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`
 );
-const ROTATE_CURSOR = `url("data:image/svg+xml;utf8,${ROTATE_CURSOR_SVG}") 14 14, alias`;
+const ROTATE_CURSOR = `url("data:image/svg+xml;utf8,${ROTATE_CURSOR_SVG}") 7 7, alias`;
 
 const InspirationBoard = () => {
   const sectionRef = useRef<HTMLDivElement>(null);

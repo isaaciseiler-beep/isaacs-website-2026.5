@@ -30,7 +30,7 @@ const ThemeSwitch = () => {
             key={opt.value}
             onClick={() => setTheme(opt.value)}
             className={`w-10 h-10 flex items-center justify-center transition-colors duration-300 ${
-              active ? "bg-foreground text-background" : "bg-foreground/10 text-foreground hover:bg-[hsl(var(--highlight))] hover:text-background"
+              active ? "bg-foreground text-background" : "bg-foreground/10 text-foreground hover:bg-foreground/20"
             }`}
             aria-label={opt.label}
           >
@@ -208,7 +208,7 @@ const Sidebar = ({ open, onToggle, activeSection }: SidebarProps) => {
               <div className="grid grid-cols-4 gap-2">
                 <button
                   onClick={() => { window.location.href = CONTACT_MAILTO; }}
-                  className="w-10 h-10 bg-foreground/10 hover:bg-[hsl(var(--highlight))] hover:text-background text-foreground flex items-center justify-center transition-colors duration-300"
+                  className="w-10 h-10 bg-foreground/10 hover:bg-foreground/20 text-foreground flex items-center justify-center transition-colors duration-300"
                   aria-label="Contact"
                 >
                   <Mail className="w-4 h-4" />
@@ -217,7 +217,7 @@ const Sidebar = ({ open, onToggle, activeSection }: SidebarProps) => {
                   <button
                     key={link.id}
                     onClick={() => handleSocialClick(link.href)}
-                    className="w-10 h-10 bg-foreground/10 hover:bg-[hsl(var(--highlight))] hover:text-background text-foreground flex items-center justify-center transition-colors duration-300"
+                    className="w-10 h-10 bg-foreground/10 hover:bg-foreground/20 text-foreground flex items-center justify-center transition-colors duration-300"
                     aria-label={link.label}
                   >
                     {link.icon}

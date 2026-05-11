@@ -134,7 +134,7 @@ const NewsSection = () => {
               animate="animate"
               exit="exit"
               onClick={() => scroll("left")}
-              className="absolute left-8 top-1/2 -translate-y-1/2 z-20 text-foreground hover:text-foreground transition-colors drop-shadow-[0_0_8px_hsl(var(--background))]"
+              className="absolute left-8 top-1/2 -translate-y-1/2 z-20 text-white hover:text-white transition-colors drop-shadow-[0_0_8px_hsl(var(--background))]"
               whileHover={{ x: -3 }}
               whileTap={{ scale: 0.85 }}
             >
@@ -153,7 +153,7 @@ const NewsSection = () => {
               animate="animate"
               exit="exit"
               onClick={() => scroll("right")}
-              className="absolute right-8 top-1/2 -translate-y-1/2 z-20 text-foreground hover:text-foreground transition-colors drop-shadow-[0_0_8px_hsl(var(--background))]"
+              className="absolute right-8 top-1/2 -translate-y-1/2 z-20 text-white hover:text-white transition-colors drop-shadow-[0_0_8px_hsl(var(--background))]"
               whileHover={{ x: 3 }}
               whileTap={{ scale: 0.85 }}
             >

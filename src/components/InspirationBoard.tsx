@@ -22,23 +22,43 @@ interface InspirationItem {
 const R2 = "https://pub-5c0f4d5b9b8b4bd6869b22a9a8099b3e.r2.dev";
 
 const ITEMS: InspirationItem[] = [
-  // Row 1
-  { id: 1, type: "website", title: "John Provencher", content: "", url: "https://johnprovencher.com/", imageUrl: `${R2}/john_provencherpicture-34-copy.webp`, x: 0, y: 2, w: 19.25, aspect: 1912 / 1982, rotate: -2 },
-  { id: 2, type: "music", title: "Mr. Lovebomb", content: "", url: "https://open.spotify.com/artist/1hJx89kEIcAmlZzUWat9w6", imageUrl: `${R2}/lovebomb.jpg`, x: 21, y: 4, w: 17.9, aspect: 1, rotate: 2.5 },
-  { id: 3, type: "place", title: "Hong Kong", content: "", imageUrl: `${R2}/hk.JPG`, x: 40, y: 3, w: 30.25, aspect: 1.5, rotate: -1.5 },
-  { id: 4, type: "podcast", title: "Search Engine", content: "", url: "https://www.searchengine.show/", imageUrl: `${R2}/1200x1200bf-60.jpg`, x: 72, y: 2, w: 17.9, aspect: 1, rotate: -3.5 },
-  { id: 5, type: "video", title: "Greg Girard", content: "Interview with the photographer of Kowloon Walled City.", imageUrl: `${R2}/ggirard.jpg`, url: "https://www.youtube.com/watch?v=Ss1L7SaMnAU&t=937s", x: 90, y: 24, w: 19.25, aspect: 1, rotate: 1.5 },
-  // Row 2
-  { id: 6, type: "book", title: "I Deliver Parcels in Beijing", content: "", imageUrl: `${R2}/parcels.jpg`, x: 2, y: 36, w: 13.75, aspect: 2 / 3, rotate: 2.5 },
-  { id: 7, type: "book", title: "My Year of Rest and Relaxation", content: "", imageUrl: `${R2}/myyearofrest.jpg`, x: 18, y: 35, w: 13.75, aspect: 294 / 450, rotate: -1 },
-  { id: 9, type: "website", title: "OpenAI Supply Co.", content: "", url: "https://supplyco.openai.com/", imageUrl: `${R2}/oaisupply.png`, x: 35, y: 36, w: 13, aspect: 819 / 1350, rotate: 2, transparent: true },
-  { id: 10, type: "music", title: "I'll Finish the Lyrics Later", content: "", url: "https://genius.com/albums/Isaia-huron/Ill-finish-the-lyrics-later", imageUrl: `${R2}/lyricsarentfinished.jpg`, x: 50, y: 38, w: 16, aspect: 1, rotate: -2 },
-  { id: 11, type: "video", title: "Tales from the Road", content: "Jack Fitz", url: "https://vimeo.com/1125286551", imageUrl: `${R2}/jackfitz.jpg`, x: 70, y: 50, w: 22, aspect: 16 / 9, rotate: 1.5 },
-  // Row 3
-  { id: 12, type: "photo", title: "1989 Volvo 240 Wagon", content: "The best car ever made.", imageUrl: `${R2}/volvo_240_brochure_single_picture.webp`, x: 6, y: 70, w: 24, aspect: 1024 / 511, rotate: -2 },
-  { id: 13, type: "video", title: "Of An Age", content: "", url: "https://letterboxd.com/film/of-an-age/", imageUrl: `${R2}/ofanage.jpg`, x: 36, y: 72, w: 22, aspect: 16 / 9, rotate: 1.5 },
-  { id: 14, type: "website", title: "Ricoh GRIIIx", content: "", url: "https://www.ricoh-imaging.co.jp/english/products/gr-3/", imageUrl: `${R2}/grIIIx-hdf4.png`, x: 62, y: 73, w: 18, aspect: 1026 / 721, rotate: -1.5, transparent: true },
+  { id: 1, type: "website", title: "John Provencher", content: "", url: "https://johnprovencher.com/", imageUrl: `${R2}/john_provencherpicture-34-copy.webp`, x: 0, y: 0, w: 19.25, aspect: 1912 / 1982, rotate: 0 },
+  { id: 2, type: "music", title: "Mr. Lovebomb", content: "", url: "https://open.spotify.com/artist/1hJx89kEIcAmlZzUWat9w6", imageUrl: `${R2}/lovebomb.jpg`, x: 0, y: 0, w: 17.9, aspect: 1, rotate: 0 },
+  { id: 3, type: "place", title: "Hong Kong", content: "", imageUrl: `${R2}/hk.JPG`, x: 0, y: 0, w: 30.25, aspect: 1.5, rotate: 0 },
+  { id: 4, type: "podcast", title: "Search Engine", content: "", url: "https://www.searchengine.show/", imageUrl: `${R2}/1200x1200bf-60.jpg`, x: 0, y: 0, w: 17.9, aspect: 1, rotate: 0 },
+  { id: 5, type: "video", title: "Greg Girard", content: "Interview with the photographer of Kowloon Walled City.", imageUrl: `${R2}/ggirard.jpg`, url: "https://www.youtube.com/watch?v=Ss1L7SaMnAU&t=937s", x: 0, y: 0, w: 19.25, aspect: 1, rotate: 0 },
+  { id: 6, type: "book", title: "I Deliver Parcels in Beijing", content: "", imageUrl: `${R2}/parcels.jpg`, x: 0, y: 0, w: 16.5, aspect: 2 / 3, rotate: 0 },
+  { id: 7, type: "book", title: "My Year of Rest and Relaxation", content: "", imageUrl: `${R2}/myyearofrest.jpg`, x: 0, y: 0, w: 13.75, aspect: 294 / 450, rotate: 0 },
+  { id: 9, type: "website", title: "OpenAI Supply Co.", content: "", url: "https://supplyco.openai.com/", imageUrl: `${R2}/oaisupply.png`, x: 0, y: 0, w: 16.9, aspect: 819 / 1350, rotate: 0, transparent: true },
+  { id: 10, type: "music", title: "I'll Finish the Lyrics Later", content: "", url: "https://genius.com/albums/Isaia-huron/Ill-finish-the-lyrics-later", imageUrl: `${R2}/lyricsarentfinished.jpg`, x: 0, y: 0, w: 16, aspect: 1, rotate: 0 },
+  { id: 11, type: "video", title: "Tales from the Road", content: "Jack Fitz", url: "https://vimeo.com/1125286551", imageUrl: `${R2}/jackfitz.jpg`, x: 0, y: 0, w: 22, aspect: 16 / 9, rotate: 0 },
+  { id: 12, type: "photo", title: "1989 Volvo 240 Wagon", content: "The best car ever made.", imageUrl: `${R2}/volvo_240_brochure_single_picture.webp`, x: 0, y: 0, w: 24, aspect: 1024 / 511, rotate: 0 },
+  { id: 14, type: "website", title: "Ricoh GRIIIx", content: "", url: "https://www.ricoh-imaging.co.jp/english/products/gr-3/", imageUrl: `${R2}/grIIIx-hdf4.png`, x: 0, y: 0, w: 36, aspect: 1026 / 721, rotate: 0, transparent: true },
 ];
+
+// Approximate board width/height ratio (viewport-dependent; fine for initial layout)
+const BOARD_RATIO = 1.7;
+
+function randomizeLayout(items: InspirationItem[]): InspirationItem[] {
+  const cols = 4;
+  const shuffled = [...items].sort(() => Math.random() - 0.5);
+  const rows = Math.ceil(shuffled.length / cols);
+  const slotW = 100 / cols;
+  const slotH = 100 / rows;
+  return shuffled.map((it, i) => {
+    const r = Math.floor(i / cols);
+    const c = i % cols;
+    const cx = c * slotW + slotW / 2 + (Math.random() - 0.5) * slotW * 0.7;
+    const cy = r * slotH + slotH / 2 + (Math.random() - 0.5) * slotH * 0.55;
+    const hPercent = (it.w / it.aspect) / BOARD_RATIO;
+    return {
+      ...it,
+      x: cx - it.w / 2,
+      y: cy - hPercent / 2,
+      rotate: (Math.random() - 0.5) * 14,
+    };
+  });
+}
 
 const typeLabel: Record<string, string> = {
   photo: "PHOTO",
@@ -51,12 +71,17 @@ const typeLabel: Record<string, string> = {
   podcast: "PODCAST",
 };
 
-const OVERHANG = 0.12; // 12% max overhang
+const OVERHANG = 0.18; // max overhang past board edge
+
+const ROTATE_CURSOR_SVG = encodeURIComponent(
+  `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="black" stroke="white" stroke-width="1"/><path d="M17 8.5a5.5 5.5 0 1 0 1.5 4.5" fill="none" stroke="white" stroke-width="1.6" stroke-linecap="round"/><polyline points="18 5 18 9 14 9" fill="none" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+);
+const ROTATE_CURSOR = `url("data:image/svg+xml;utf8,${ROTATE_CURSOR_SVG}") 14 14, alias`;
 
 const InspirationBoard = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const boardRef = useRef<HTMLDivElement>(null);
-  const [items, setItems] = useState(ITEMS);
+  const [items, setItems] = useState(() => randomizeLayout(ITEMS));
   const [dragging, setDragging] = useState<number | null>(null);
   const dragOffset = useRef({ x: 0, y: 0 });
   const didDrag = useRef(false);
@@ -143,6 +168,10 @@ const InspirationBoard = () => {
       if (item?.url) window.open(item.url, "_blank", "noopener,noreferrer");
     }
   }, [items]);
+
+  const updateRotation = useCallback((id: number, rotate: number) => {
+    setItems(prev => prev.map(it => (it.id === id ? { ...it, rotate } : it)));
+  }, []);
 
   const renderCard = (item: InspirationItem) => {
     if (item.imageUrl) {
@@ -337,6 +366,7 @@ const InspirationBoard = () => {
                 cardY={cardY}
                 onPointerDown={e => handlePointerDown(e, item.id)}
                 onPointerUp={() => handlePointerUp(item.id)}
+                onRotate={updateRotation}
                 renderCard={renderCard}
               />
             ))}
@@ -359,30 +389,73 @@ interface BoardCardProps {
   cardY: any;
   onPointerDown: (e: React.PointerEvent) => void;
   onPointerUp: () => void;
+  onRotate: (id: number, rotate: number) => void;
   renderCard: (item: InspirationItem) => React.ReactNode;
 }
 
-const BoardCard = ({ item, index, dragging, zIndex, cardOpacity, cardY, onPointerDown, onPointerUp, renderCard }: BoardCardProps) => {
-  const offsetX = useSpring(useMotionValue(0), { stiffness: 200, damping: 18 });
-  const offsetY = useSpring(useMotionValue(0), { stiffness: 200, damping: 18 });
+const BoardCard = ({ item, index, dragging, zIndex, cardOpacity, cardY, onPointerDown, onPointerUp, onRotate, renderCard }: BoardCardProps) => {
+  const rotX = useSpring(useMotionValue(0), { stiffness: 220, damping: 18 });
+  const rotY = useSpring(useMotionValue(0), { stiffness: 220, damping: 18 });
+  const [cornerHover, setCornerHover] = useState(false);
+  const [rotating, setRotating] = useState(false);
+  const rotateState = useRef<{ startAngle: number; baseRot: number; cx: number; cy: number } | null>(null);
+
+  const isCorner = (e: React.PointerEvent<HTMLDivElement>) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    const nx = ((e.clientX - r.left) / r.width - 0.5) * 2;
+    const ny = ((e.clientY - r.top) / r.height - 0.5) * 2;
+    return Math.abs(nx) > 0.62 && Math.abs(ny) > 0.62;
+  };
+
+  const handleDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (isCorner(e)) {
+      e.preventDefault();
+      e.stopPropagation();
+      const r = e.currentTarget.getBoundingClientRect();
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
+      const startAngle = (Math.atan2(e.clientY - cy, e.clientX - cx) * 180) / Math.PI;
+      rotateState.current = { startAngle, baseRot: item.rotate, cx, cy };
+      setRotating(true);
+      (e.target as HTMLElement).setPointerCapture(e.pointerId);
+      return;
+    }
+    onPointerDown(e);
+  };
 
   const handleMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (rotating && rotateState.current) {
+      const { startAngle, baseRot, cx, cy } = rotateState.current;
+      const angle = (Math.atan2(e.clientY - cy, e.clientX - cx) * 180) / Math.PI;
+      onRotate(item.id, baseRot + (angle - startAngle));
+      return;
+    }
     if (dragging) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    // normalized -1..1 from center
-    const nx = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
-    const ny = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
-    // corner intensity: stronger near corners
-    const intensity = Math.min(1, Math.max(Math.abs(nx), Math.abs(ny)));
-    const factor = 8 * intensity; // px
-    offsetX.set(nx * factor);
-    offsetY.set(ny * factor);
+    setCornerHover(isCorner(e));
+    const r = e.currentTarget.getBoundingClientRect();
+    const nx = ((e.clientX - r.left) / r.width - 0.5) * 2;
+    const ny = ((e.clientY - r.top) / r.height - 0.5) * 2;
+    // tilt: corners lift while center stays planar
+    rotY.set(nx * 12);
+    rotX.set(-ny * 12);
+  };
+
+  const handleUp = () => {
+    if (rotating) {
+      setRotating(false);
+      rotateState.current = null;
+      return;
+    }
+    onPointerUp();
   };
 
   const handleLeave = () => {
-    offsetX.set(0);
-    offsetY.set(0);
+    rotX.set(0);
+    rotY.set(0);
+    setCornerHover(false);
   };
+
+  const cursor = rotating || cornerHover ? ROTATE_CURSOR : dragging ? "grabbing" : "grab";
 
   return (
     <motion.div
@@ -394,25 +467,23 @@ const BoardCard = ({ item, index, dragging, zIndex, cardOpacity, cardY, onPointe
         aspectRatio: item.aspect,
         zIndex,
         rotate: item.rotate,
-        cursor: dragging ? "grabbing" : "grab",
+        cursor,
         opacity: cardOpacity,
         y: cardY,
+        perspective: 800,
       }}
-      transition={{
-        delay: 0.12 + index * 0.06,
-        duration: 0.7,
-        ease: EASE,
-      }}
-      onPointerDown={onPointerDown}
-      onPointerUp={onPointerUp}
+      transition={{ delay: 0.12 + index * 0.06, duration: 0.7, ease: EASE }}
+      onPointerDown={handleDown}
+      onPointerUp={handleUp}
       onPointerMove={handleMove}
       onPointerLeave={handleLeave}
     >
       <motion.div
         className={`h-full transition-shadow duration-300 ${item.transparent ? "" : "bg-background shadow-sm hover:shadow-md"}`}
         style={{
-          x: offsetX,
-          y: offsetY,
+          rotateX: rotX,
+          rotateY: rotY,
+          transformStyle: "preserve-3d",
           boxShadow: item.transparent
             ? undefined
             : dragging

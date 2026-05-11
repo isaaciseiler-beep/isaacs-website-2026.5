@@ -162,7 +162,15 @@ const PhotoMapPage = () => {
   const albumHref = (entry: PhotoMapEntry) =>
     entry.albumFolder ? `/photos?album=${encodeURIComponent(entry.albumFolder)}` : "/photos";
 
-  const openAlbum = (entry: PhotoMapEntry) => {
+  const entryHref = (entry: PhotoMapEntry) => entry.href ?? albumHref(entry);
+  const entryActionLabel = (entry: PhotoMapEntry) => entry.href ? "Open Photo" : "Open Album";
+
+  const openEntry = (entry: PhotoMapEntry) => {
+    if (entry.href) {
+      window.open(entry.href, "_blank", "noopener");
+      return;
+    }
+
     navigate(albumHref(entry));
   };
 
@@ -192,9 +200,8 @@ const PhotoMapPage = () => {
         transition={{ duration: 0.4, ease: EASE_TEXT }}
         className="relative h-[100svh] overflow-hidden bg-background px-3 pb-3 pt-[4.75rem] sm:px-5 sm:pb-5 md:px-6 md:pb-6 md:pt-20"
       >
-        <section className="relative h-full overflow-hidden border border-foreground/10 bg-secondary shadow-[0_24px_80px_rgba(0,0,0,0.18)]">
+        <section className="relative h-full overflow-hidden bg-[#e6e6e3]">
           <div ref={containerRef} className="photo-map-shell h-full w-full" />
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,transparent_0%,rgba(0,0,0,0.03)_48%,rgba(0,0,0,0.2)_100%)]" />
 
           {!mapReady || mapError ? (
             <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-background/96 p-6">
@@ -233,22 +240,36 @@ const PhotoMapPage = () => {
                     <button
                       type="button"
                       className="mb-6 text-left"
-                      onClick={() => openAlbum(activeEntry)}
-                      aria-label={`Open ${activeEntry.location} album`}
+                      onClick={() => openEntry(activeEntry)}
+                      aria-label={`${entryActionLabel(activeEntry)} for ${activeEntry.location}`}
                     >
                       <h1 className="text-5xl font-semibold leading-[0.9] tracking-tight">{activeEntry.title}</h1>
                     </button>
 
                     <div className="grid grid-cols-[1fr_auto] gap-2">
-                      <Link
-                        to={albumHref(activeEntry)}
-                        className="photo-map-panel-button group"
-                      >
+                      {activeEntry.href ? (
+                        <a
+                          href={entryHref(activeEntry)}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="photo-map-panel-button group"
+                        >
+                          <span className="relative z-10 flex items-center justify-between">
+                            {entryActionLabel(activeEntry)}
+                            <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                          </span>
+                        </a>
+                      ) : (
+                        <Link
+                          to={entryHref(activeEntry)}
+                          className="photo-map-panel-button group"
+                        >
                         <span className="relative z-10 flex items-center justify-between">
-                          Open Album
+                          {entryActionLabel(activeEntry)}
                           <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                         </span>
-                      </Link>
+                        </Link>
+                      )}
                       <button
                         type="button"
                         onClick={resetGlobe}

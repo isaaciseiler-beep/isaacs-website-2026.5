@@ -1,4 +1,4 @@
-import { albums, albumPhotos, coverFor, type Album } from "@/lib/photoAlbums";
+import { R2_BASE, albums, albumPhotos, coverFor, type Album } from "@/lib/photoAlbums";
 
 export type PhotoMapEntryKind = "album" | "photo";
 
@@ -12,6 +12,7 @@ export interface PhotoMapEntry {
   images: string[];
   albumFolder?: Album["folder"];
   photoIds?: string[];
+  href?: string;
 }
 
 const albumCoordinates: Record<Album["folder"], [number, number]> = {
@@ -20,7 +21,7 @@ const albumCoordinates: Record<Album["folder"], [number, number]> = {
   HongKong: [114.1694, 22.3193],
   Iceland: [-19.0208, 64.9631],
   Indonesia: [115.1889, -8.4095],
-  Japan: [138.2529, 36.2048],
+  Japan: [135.7681, 35.0116],
   Korea: [126.5312, 33.4996],
   NewZealand: [170.5, -44],
   Portugal: [-8.2245, 39.3999],
@@ -30,7 +31,60 @@ const albumCoordinates: Record<Album["folder"], [number, number]> = {
   Vietnam: [105.8342, 21.0278],
 };
 
-export const photoMapEntries: PhotoMapEntry[] = albums
+const standalonePhotoEntries: PhotoMapEntry[] = [
+  {
+    id: "photo-athens",
+    kind: "photo",
+    title: "Athens, GA",
+    location: "Athens, GA",
+    coordinates: [-83.3773, 33.9519],
+    coverImage: `${R2_BASE}/ATHENS.JPG`,
+    images: [`${R2_BASE}/ATHENS.JPG`],
+    href: `${R2_BASE}/ATHENS.JPG`,
+  },
+  {
+    id: "photo-dc",
+    kind: "photo",
+    title: "Washington, DC",
+    location: "Washington, DC",
+    coordinates: [-77.0369, 38.9072],
+    coverImage: `${R2_BASE}/DC.JPG`,
+    images: [`${R2_BASE}/DC.JPG`],
+    href: `${R2_BASE}/DC.JPG`,
+  },
+  {
+    id: "photo-glenhaven",
+    kind: "photo",
+    title: "Glen Haven",
+    location: "Glen Haven",
+    coordinates: [-85.9854, 44.9056],
+    coverImage: `${R2_BASE}/GLENHAVEN.JPG`,
+    images: [`${R2_BASE}/GLENHAVEN.JPG`],
+    href: `${R2_BASE}/GLENHAVEN.JPG`,
+  },
+  {
+    id: "photo-oakridge",
+    kind: "photo",
+    title: "Oak Ridge",
+    location: "Oak Ridge",
+    coordinates: [-84.2696, 36.0104],
+    coverImage: `${R2_BASE}/OAKRIDGE.JPG`,
+    images: [`${R2_BASE}/OAKRIDGE.JPG`],
+    href: `${R2_BASE}/OAKRIDGE.JPG`,
+  },
+  {
+    id: "photo-stl",
+    kind: "photo",
+    title: "St. Louis",
+    location: "St. Louis",
+    coordinates: [-90.1994, 38.627],
+    coverImage: `${R2_BASE}/STL.JPG`,
+    images: [`${R2_BASE}/STL.JPG`],
+    href: `${R2_BASE}/STL.JPG`,
+  },
+];
+
+const albumMapEntries: PhotoMapEntry[] = albums
   .map((album) => ({
     id: `album-${album.folder}`,
     kind: "album" as const,
@@ -43,6 +97,8 @@ export const photoMapEntries: PhotoMapEntry[] = albums
     photoIds: album.photos,
   }))
   .filter((entry) => Boolean(entry.coordinates));
+
+export const photoMapEntries: PhotoMapEntry[] = [...albumMapEntries, ...standalonePhotoEntries];
 
 export const photoMapInitialView = {
   center: [105, 26] as [number, number],

@@ -171,6 +171,12 @@
     -webkit-backdrop-filter: none;
   }
 
+  .photo-map-shell,
+  .photo-map-shell .mapboxgl-canvas-container,
+  .photo-map-shell .mapboxgl-canvas {
+    background: #e6e6e3 !important;
+  }
+
   .photo-map-shell .mapboxgl-ctrl-group {
     border-radius: 0;
     overflow: hidden;

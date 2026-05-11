@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronRight, Mail, Sun, Laptop } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { toast } from "sonner";
 import { useTheme } from "@/components/ThemeProvider";
 import { CONTACT_MAILTO, GITHUB_URL, LINKEDIN_URL, SUBSTACK_URL } from "@/lib/site";
 
@@ -28,7 +29,13 @@ const ThemeSwitch = () => {
         return (
           <button
             key={opt.value}
-            onClick={() => setTheme(opt.value)}
+            onClick={() => {
+              if (opt.value === "dark") {
+                toast("Dark Mode coming soon");
+                return;
+              }
+              setTheme(opt.value);
+            }}
             className={`w-10 h-10 flex items-center justify-center transition-colors duration-300 ${
               active ? "bg-foreground text-background" : "bg-foreground/10 text-foreground hover:bg-foreground/20"
             }`}
@@ -52,8 +59,8 @@ interface SitemapItem {
 
 export const sitemapItems: SitemapItem[] = [
   { id: "hero", label: "Home", scrollTo: "hero" },
-  { id: "projects", label: "Projects", scrollTo: "projects", children: [
-    { id: "project-archive", label: "Archive", href: "/projects" },
+  { id: "projects", label: "Work", scrollTo: "projects", children: [
+    { id: "project-archive", label: "Projects", href: "/projects" },
   ]},
   { id: "about", label: "About", scrollTo: "about" },
   { id: "news", label: "News", scrollTo: "news" },

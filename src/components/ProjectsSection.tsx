@@ -27,7 +27,7 @@ const ProjectsSection = () => {
   return (
     <section className="py-12">
       <div className="px-6 mb-6">
-        <SectionHeading className="mb-0">Projects</SectionHeading>
+        <SectionHeading className="mb-0">Work</SectionHeading>
       </div>
 
       <div
@@ -119,7 +119,7 @@ const ProjectsSection = () => {
         <Link to="/projects" className="block w-full md:w-1/2">
           <div className="group relative w-full py-3 text-sm font-mono tracking-[0.2em] uppercase bg-[hsl(50_33%_7%)] hover:bg-[hsl(50_33%_12%)] text-[hsl(200_25%_83%)] transition-colors duration-300 flex items-center justify-center cursor-pointer">
             <span className="flex items-center justify-center">
-              My Work
+              More Projects
               <span className="inline-flex overflow-hidden max-w-0 group-hover:max-w-[2rem] opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">
                 <ArrowUpRight className="w-4 h-4 ml-2 shrink-0" strokeWidth={1.5} />
               </span>

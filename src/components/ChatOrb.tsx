@@ -98,7 +98,7 @@ const ChatOrb = () => {
     }, 1200);
   };
 
-  const softShadow = "none";
+  const softShadow = "0 6px 20px -6px rgba(0,0,0,0.35), 0 2px 6px rgba(0,0,0,0.18)";
 
   if (!isVisible && !isOpen) return null;
 

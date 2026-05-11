@@ -3,7 +3,8 @@ export const SITE_NAME = "Isaac Seiler";
 export const SITE_DESCRIPTION =
   "Isaac Seiler is a recent graduate of Washington University in St. Louis, Fulbright Scholar, and Truman Scholar.";
 export const PREVIEW_IMAGE_URL =
-  "https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev/webpreview.png";
+  "https://isaacseiler.xyz/webpreview-linkedin.png";
+export const PREVIEW_IMAGE_URLS = [PREVIEW_IMAGE_URL];
 
 export const CONTACT_EMAIL = "isaaciseiler@gmail.com";
 export const CONTACT_MAILTO = `mailto:${CONTACT_EMAIL}`;

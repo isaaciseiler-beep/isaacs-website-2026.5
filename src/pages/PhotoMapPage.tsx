@@ -72,9 +72,9 @@ const addWorldGeographyLayers = (map: mapboxgl.Map) => {
         filter: ["!=", ["get", "disputed"], "true"],
         paint: {
           "line-color": MAP_BORDER,
-          "line-width": ["interpolate", ["linear"], ["zoom"], 0, 0.38, 1.2, 0.66, 3, 1, 6, 1.5],
-          "line-opacity": ["interpolate", ["linear"], ["zoom"], 0, 0.46, 1.2, 0.62, 4, 0.76],
-          "line-blur": 0.12,
+          "line-width": ["interpolate", ["linear"], ["zoom"], 0, 0.3, 1.2, 0.48, 3, 0.72, 6, 1.1],
+          "line-opacity": ["interpolate", ["linear"], ["zoom"], 0, 0.34, 1.2, 0.48, 4, 0.62],
+          "line-blur": 0.28,
         },
       });
     }
@@ -88,8 +88,8 @@ const addWorldGeographyLayers = (map: mapboxgl.Map) => {
         filter: ["==", ["get", "disputed"], "true"],
         paint: {
           "line-color": MAP_BORDER,
-          "line-width": ["interpolate", ["linear"], ["zoom"], 0, 0.28, 1.2, 0.5, 4, 0.82],
-          "line-opacity": 0.32,
+          "line-width": ["interpolate", ["linear"], ["zoom"], 0, 0.2, 1.2, 0.36, 4, 0.62],
+          "line-opacity": 0.22,
           "line-dasharray": [2, 1.2],
         },
       });
@@ -127,7 +127,7 @@ const applyMapPalette = (map: mapboxgl.Map) => {
         const isBorder = /admin|boundary|border|country/.test(id);
         const isCoast = id.includes("coast");
         map.setPaintProperty(layer.id, "line-color", isBorder ? MAP_BORDER : isCoast ? MAP_COAST : MAP_DETAIL);
-        map.setPaintProperty(layer.id, "line-opacity", isBorder ? 0.72 : isCoast ? 0.64 : id.includes("road") ? 0.42 : 0.38);
+        map.setPaintProperty(layer.id, "line-opacity", isBorder ? 0.08 : isCoast ? 0.26 : id.includes("road") ? 0.24 : 0.18);
       }
 
       if (layer.type === "symbol") {
@@ -223,26 +223,41 @@ const PhotoMapPage = () => {
     if (!mapReady || !mapRef.current) return;
 
     const map = mapRef.current;
-    const resizeAndCenter = () => {
+    let frame = 0;
+    let start = 0;
+    const view = defaultMapView(isMobile);
+
+    const resizeDuringTransition = (time: number) => {
+      if (!start) start = time;
       map.resize();
       if (!activeEntry) {
-        const view = defaultMapView(isMobile);
-        map.jumpTo({
+        map.setCenter(view.center);
+      }
+
+      if (time - start < 460) {
+        frame = window.requestAnimationFrame(resizeDuringTransition);
+      }
+    };
+
+    frame = window.requestAnimationFrame(resizeDuringTransition);
+    const settle = window.setTimeout(() => {
+      map.resize();
+      if (!activeEntry) {
+        map.easeTo({
           center: view.center,
           zoom: view.zoom,
           pitch: view.pitch,
           bearing: view.bearing,
+          duration: 220,
+          easing: (t) => 1 - Math.pow(1 - t, 3),
+          essential: true,
         });
       }
-    };
-
-    resizeAndCenter();
-    const firstFrame = window.setTimeout(resizeAndCenter, 80);
-    const afterTransition = window.setTimeout(resizeAndCenter, 430);
+    }, 470);
 
     return () => {
-      window.clearTimeout(firstFrame);
-      window.clearTimeout(afterTransition);
+      if (frame) window.cancelAnimationFrame(frame);
+      window.clearTimeout(settle);
     };
   }, [activeEntry, isMobile, mapReady, sidebarOpen]);
 

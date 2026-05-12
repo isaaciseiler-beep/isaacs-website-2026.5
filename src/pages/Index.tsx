@@ -82,7 +82,7 @@ const Index = () => {
           <div id="inspiration">
             <ParallaxSection offset={55} clip={false}><InspirationBoard /></ParallaxSection>
           </div>
-          <ParallaxSection id="isaac-ai" offset={70} clip={false}><IsaacAISection /></ParallaxSection>
+          <ParallaxSection id="isaac-ai" offset={28} clip={false}><IsaacAISection /></ParallaxSection>
           <Footer />
         </main>
       </motion.div>

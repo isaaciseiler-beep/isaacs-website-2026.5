@@ -246,7 +246,7 @@
   }
 
   .photo-map-shell .mapboxgl-canvas {
-    filter: grayscale(1) contrast(1.08) brightness(1.02);
+    filter: none;
   }
 
   .photo-map-panel-button {

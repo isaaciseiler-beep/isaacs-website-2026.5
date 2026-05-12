@@ -13,6 +13,8 @@ const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const EASE_TEXT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 const MONOCHROME_MAP_STYLE = "mapbox://styles/mapbox/light-v11";
 const MAP_BACKGROUND = "#f4f7fe";
+const MAP_DETAIL = "#d9e0ee";
+const MAP_LABEL = "#6c7482";
 
 type MarkerEntry = {
   marker: mapboxgl.Marker;
@@ -20,6 +22,41 @@ type MarkerEntry = {
 };
 
 const stopMarkerEvent = (event: Event) => event.stopPropagation();
+
+const applyMapPalette = (map: mapboxgl.Map) => {
+  const layers = map.getStyle().layers ?? [];
+
+  layers.forEach((layer) => {
+    const id = layer.id.toLowerCase();
+
+    try {
+      if (layer.type === "background") {
+        map.setPaintProperty(layer.id, "background-color", MAP_BACKGROUND);
+      }
+
+      if (layer.type === "fill") {
+        if (id.includes("water") || id.includes("land") || id.includes("background")) {
+          map.setPaintProperty(layer.id, "fill-color", MAP_BACKGROUND);
+        } else if (id.includes("park") || id.includes("landuse")) {
+          map.setPaintProperty(layer.id, "fill-color", "#eef3fd");
+        }
+      }
+
+      if (layer.type === "line" && /admin|boundary|road|waterway|bridge|tunnel/.test(id)) {
+        map.setPaintProperty(layer.id, "line-color", MAP_DETAIL);
+        map.setPaintProperty(layer.id, "line-opacity", id.includes("road") ? 0.35 : 0.22);
+      }
+
+      if (layer.type === "symbol") {
+        map.setPaintProperty(layer.id, "text-color", MAP_LABEL);
+        map.setPaintProperty(layer.id, "text-halo-color", MAP_BACKGROUND);
+        map.setPaintProperty(layer.id, "text-halo-width", 0.7);
+      }
+    } catch {
+      // Mapbox base styles vary by layer; unsupported paint properties can be ignored.
+    }
+  });
+};
 
 const PhotoMapPage = () => {
   const mapboxToken =
@@ -63,6 +100,7 @@ const PhotoMapPage = () => {
     map.addControl(new mapboxgl.AttributionControl({ compact: true }), "bottom-left");
 
     const handleLoad = () => {
+      applyMapPalette(map);
       map.setFog({
         color: MAP_BACKGROUND,
         "high-color": MAP_BACKGROUND,
@@ -77,6 +115,7 @@ const PhotoMapPage = () => {
     };
 
     map.on("load", handleLoad);
+    map.on("style.load", () => applyMapPalette(map));
     map.on("error", handleError);
     map.on("click", () => setActiveEntryId(null));
 
@@ -103,15 +142,11 @@ const PhotoMapPage = () => {
       const button = document.createElement("button");
       button.type = "button";
       button.className =
-        "photo-map-marker group absolute -left-5 -top-5 h-10 w-10 overflow-hidden rounded-full border border-white/80 bg-neutral-950 shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition duration-200 hover:scale-110 hover:border-white focus:outline-none focus:ring-2 focus:ring-white/80";
+        "photo-map-marker group absolute -left-4 -top-4 h-8 w-8 overflow-hidden border border-[hsl(50_33%_7%/0.24)] bg-[#f4f7fe] shadow-[0_8px_24px_rgba(18,24,34,0.18)] transition-[transform,border-color,box-shadow,filter] duration-200 hover:scale-110 hover:border-[hsl(50_33%_7%/0.52)] hover:shadow-[0_12px_30px_rgba(18,24,34,0.24)] focus:outline-none focus:ring-2 focus:ring-[hsl(50_33%_7%/0.24)]";
       button.setAttribute("aria-label", `Open ${entry.location} photos`);
-      button.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.08), rgba(0,0,0,0.28)), url("${entry.coverImage}")`;
+      button.style.backgroundImage = `linear-gradient(rgba(244,247,254,0.02), rgba(0,0,0,0.18)), url("${entry.coverImage}")`;
       button.style.backgroundSize = "cover";
       button.style.backgroundPosition = "center";
-
-      const pulse = document.createElement("span");
-      pulse.className = "absolute inset-[-6px] rounded-full border border-white/25 opacity-0 transition-opacity duration-200 group-hover:opacity-100";
-      button.appendChild(pulse);
 
       button.addEventListener("pointerdown", stopMarkerEvent);
       button.addEventListener("mousedown", stopMarkerEvent);

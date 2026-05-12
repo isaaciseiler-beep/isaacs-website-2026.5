@@ -30,6 +30,8 @@ const albumCoordinates: Record<Album["folder"], [number, number]> = {
   Vietnam: [105.8342, 21.0278],
 };
 
+const miscUsPhoto = (fileName: string) => `${R2_BASE}/may8portfolio/misc-USA/${fileName}`;
+
 const standalonePhotoEntries: PhotoMapEntry[] = [
   {
     id: "photo-athens",
@@ -37,8 +39,8 @@ const standalonePhotoEntries: PhotoMapEntry[] = [
     title: "Athens, GA",
     location: "Athens, GA",
     coordinates: [-83.3773, 33.9519],
-    coverImage: `${R2_BASE}/ATHENS.JPG`,
-    images: [`${R2_BASE}/ATHENS.JPG`],
+    coverImage: miscUsPhoto("ATHENS.JPG"),
+    images: [miscUsPhoto("ATHENS.JPG")],
   },
   {
     id: "photo-dc",
@@ -46,8 +48,8 @@ const standalonePhotoEntries: PhotoMapEntry[] = [
     title: "Washington, DC",
     location: "Washington, DC",
     coordinates: [-77.0369, 38.9072],
-    coverImage: `${R2_BASE}/DC.JPG`,
-    images: [`${R2_BASE}/DC.JPG`],
+    coverImage: miscUsPhoto("DC.JPG"),
+    images: [miscUsPhoto("DC.JPG")],
   },
   {
     id: "photo-glenhaven",
@@ -55,8 +57,8 @@ const standalonePhotoEntries: PhotoMapEntry[] = [
     title: "Glen Haven",
     location: "Glen Haven",
     coordinates: [-85.9854, 44.9056],
-    coverImage: `${R2_BASE}/GLENHAVEN.JPG`,
-    images: [`${R2_BASE}/GLENHAVEN.JPG`],
+    coverImage: miscUsPhoto("GLENHAVEN.JPG"),
+    images: [miscUsPhoto("GLENHAVEN.JPG")],
   },
   {
     id: "photo-oakridge",
@@ -64,8 +66,8 @@ const standalonePhotoEntries: PhotoMapEntry[] = [
     title: "Oak Ridge",
     location: "Oak Ridge",
     coordinates: [-84.2696, 36.0104],
-    coverImage: `${R2_BASE}/OAKRIDGE.JPG`,
-    images: [`${R2_BASE}/OAKRIDGE.JPG`],
+    coverImage: miscUsPhoto("OAKRIDGE.JPG"),
+    images: [miscUsPhoto("OAKRIDGE.JPG")],
   },
   {
     id: "photo-stl",
@@ -73,8 +75,8 @@ const standalonePhotoEntries: PhotoMapEntry[] = [
     title: "St. Louis",
     location: "St. Louis",
     coordinates: [-90.1994, 38.627],
-    coverImage: `${R2_BASE}/STL.JPG`,
-    images: [`${R2_BASE}/STL.JPG`],
+    coverImage: miscUsPhoto("STL.JPG"),
+    images: [miscUsPhoto("STL.JPG")],
   },
 ];
 

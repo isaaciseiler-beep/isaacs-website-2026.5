@@ -168,7 +168,7 @@ const AboutSection = () => {
           </div>
 
           <motion.div
-            className="relative w-full overflow-hidden justify-self-end self-center"
+            className="group/headshot relative w-full overflow-hidden justify-self-end self-center"
             style={{ width: photoSize }}
             initial={{ opacity: 0, scale: 0.95, filter: "blur(8px)" }}
             whileInView={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
@@ -183,6 +183,13 @@ const AboutSection = () => {
                 loading="lazy"
               />
             </motion.div>
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 overflow-hidden">
+              <div className="translate-y-full border-t border-white/20 bg-[hsl(50_33%_7%/0.86)] px-4 py-3 text-background backdrop-blur-sm transition-transform duration-500 ease-out group-hover/headshot:translate-y-0 group-focus-within/headshot:translate-y-0">
+                <p className="mono-text translate-y-2 text-[10px] uppercase tracking-[0.24em] opacity-0 transition-all delay-75 duration-500 ease-out group-hover/headshot:translate-y-0 group-hover/headshot:opacity-100 group-focus-within/headshot:translate-y-0 group-focus-within/headshot:opacity-100">
+                  Isaac Seiler
+                </p>
+              </div>
+            </div>
           </motion.div>
         </div>
 

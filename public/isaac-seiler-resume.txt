@@ -1,0 +1,62 @@
+Isaac Seiler
+Resume
+
+Profile
+Work at the intersection of AI, emerging technology, communications, operations, policy research, and the systems people use every day. Fulbright Scholar in Taiwan, Truman Scholar, and member of OpenAI's ChatGPT Lab.
+
+Experience
+
+Fulbright Taiwan
+Fulbright Scholar | 2025-Present
+- Created and led an OpenAI-supported AI literacy program for educators in Taiwan.
+- Designed six applied sessions on AI use cases, prompt design, LLM basics, and safe adoption.
+- Led an LLM fundamentals and alignment workshop at a 250+ person international education conference.
+- Published a Substack with OpenAI highlighting nine high-impact education use cases for ChatGPT.
+Focus: AI enablement, user education, community communications, curriculum design.
+
+Council of State Governments
+State AI Adoption Index | 2025
+- Built a 900-input index measuring AI adoption and preparedness across 56 U.S. states and territories.
+- Created a normalized scoring rubric, collected and cleaned data, and translated a messy policy landscape into comparative analysis.
+- Supported planning for an AI policy summit by mapping 50+ technology partners and structuring outreach.
+Focus: AI policy research, data systems, partner mapping, strategy support.
+
+OpenAI
+ChatGPT Lab | 2025-Present
+- Joined the first cohort of OpenAI's ChatGPT Lab, testing new ChatGPT products and sharing structured feedback with product and go-to-market teams.
+- Co-authored a book featuring 100 uses for ChatGPT, focused on practical workflows and real user behavior.
+Focus: product feedback, GTM insight, AI education, user behavior, early testing.
+
+Boehringer Ingelheim
+Communications and Operations | 2024-2025
+- Worked across communications, operations, internal strategy, and employee engagement for two internal functions.
+- Managed rebrand and strategy work, built a company-wide newsletter system with an 80% open rate, and shipped dozens of cross-functional communications assets.
+- Redesigned internal messaging and UX around employee volunteering, helping increase annual participation by 25%.
+Focus: internal operations, cross-functional execution, systems design, stakeholder communications.
+
+Washington University in St. Louis
+AI and Journalism Research | 2024-2025
+- Authored a 100+ page honors thesis on AI, digital platforms, and local journalism.
+- Conducted 17 in-depth interviews with Australian journalists, editors, owners, and policy experts.
+- Explored journalism as a public good, platform incentives, economic decline, and uncertainty surrounding generative AI.
+Focus: user research, qualitative analysis, platform strategy, longform synthesis.
+
+United States House of Representatives
+Communications Director and Transition Lead | 2022-2023
+- Helped build the communications function for a new congressional office from the ground up.
+- Created workflows, managed press outreach, organized events and official travel, and helped the office reach 350,000 people weekly.
+- Secured 34+ interviews with national outlets including The New York Times, CNN, and MSNBC.
+Focus: operational setup, communications strategy, rapid execution, stakeholder management.
+
+Scholten for Congress
+Digital Communications and Operations | 2022
+- Worked across digital communications, content, events, and logistics on a competitive congressional campaign.
+- Helped run a cross-platform digital program generating 1M+ weekly impressions and $30k+ in organic fundraising.
+- Supported logistics for 100+ events with elected officials, cabinet secretaries, senators, and community leaders.
+Focus: digital strategy, campaign operations, audience growth, event logistics.
+
+Institute for Nonprofit News
+Digital Ecosystems Research | 2021-2022
+- Contributed to research on nonprofit newsrooms and digital ecosystems for the 2022 INN Index.
+- Cleaned, synthesized, and organized complex data from 100+ editors.
+Focus: data cleaning, research synthesis, ecosystem analysis, editorial operations.

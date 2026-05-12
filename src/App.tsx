@@ -11,6 +11,7 @@ const PhotosPage = lazy(() => import("./pages/PhotosPage.tsx"));
 const PhotoMapPage = lazy(() => import("./pages/PhotoMapPage.tsx"));
 const ProjectsPage = lazy(() => import("./pages/ProjectsPage.tsx"));
 const ProjectDetailPage = lazy(() => import("./pages/ProjectDetailPage.tsx"));
+const ExperiencePage = lazy(() => import("./pages/ExperiencePage.tsx"));
 const FulbrightMapPage = lazy(() => import("./pages/FulbrightMapPage.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
@@ -30,6 +31,7 @@ const App = () => (
               <Route path="/photos/map" element={<PhotoMapPage />} />
               <Route path="/projects" element={<ProjectsPage />} />
               <Route path="/projects/:id" element={<ProjectDetailPage />} />
+              <Route path="/experience" element={<ExperiencePage />} />
               <Route path="/fulbrightmap" element={<FulbrightMapPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

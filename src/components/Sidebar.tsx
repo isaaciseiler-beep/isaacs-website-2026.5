@@ -1,5 +1,6 @@
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mail, Sun } from "lucide-react";
+import { ChevronRight, Mail, Sun } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { useTheme } from "@/components/ThemeProvider";
@@ -100,9 +101,23 @@ const Sidebar = ({ open, onToggle, onClose, activeSection, showToggle = true }: 
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useIsMobile();
+  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
   const isOnPhotos = location.pathname.startsWith("/photos");
   const isOnProjects = location.pathname.startsWith("/projects");
   const isOnExperience = location.pathname.startsWith("/experience");
+
+  useEffect(() => {
+    const activeParents = sitemapItems.reduce<Record<string, boolean>>((acc, item) => {
+      if (item.children?.some((child) => location.pathname === child.href)) {
+        acc[item.id] = true;
+      }
+      return acc;
+    }, {});
+
+    if (Object.keys(activeParents).length) {
+      setExpandedItems((current) => ({ ...current, ...activeParents }));
+    }
+  }, [location.pathname]);
 
   const handleItemClick = (item: SitemapItem) => {
     if (item.scrollTo) {
@@ -129,6 +144,10 @@ const Sidebar = ({ open, onToggle, onClose, activeSection, showToggle = true }: 
   const handleSocialClick = (href: string) => {
     if (href.startsWith("http")) window.open(href, "_blank", "noopener");
     else window.location.href = href;
+  };
+
+  const toggleChildren = (id: string) => {
+    setExpandedItems((current) => ({ ...current, [id]: !current[id] }));
   };
 
   const isItemActive = (item: SitemapItem) => {
@@ -178,40 +197,76 @@ const Sidebar = ({ open, onToggle, onClose, activeSection, showToggle = true }: 
                 {sitemapItems.map((item) => {
                   const idx = flatIndex++;
                   const active = isItemActive(item);
+                  const hasChildren = Boolean(item.children?.length);
+                  const expanded = Boolean(expandedItems[item.id]);
                   return (
                     <div key={item.id}>
-                      <motion.button
+                      <motion.div
                         initial={{ opacity: 0, y: 12, filter: "blur(6px)" }}
                         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                         exit={{ opacity: 0, y: 8, filter: "blur(4px)" }}
                         transition={{ delay: 0.08 + idx * 0.05, duration: 0.5, ease: EASE }}
-                        onClick={() => handleItemClick(item)}
-                        className={`text-left py-1.5 text-[28px] font-medium leading-none transition-colors duration-300 origin-left md:text-sm md:leading-normal ${
-                          active ? "text-foreground" : "text-foreground/30 hover:text-foreground/60"
-                        }`}
+                        className="flex items-center gap-2"
                       >
-                        {item.label}
-                      </motion.button>
+                        <button
+                          onClick={() => handleItemClick(item)}
+                          className={`text-left py-1.5 text-[28px] font-medium leading-none transition-colors duration-300 origin-left md:text-sm md:leading-normal ${
+                            active ? "text-foreground" : "text-foreground/30 hover:text-foreground/60"
+                          }`}
+                        >
+                          {item.label}
+                        </button>
 
-                      {item.children?.map((child) => {
-                        const childIdx = flatIndex++;
-                        const childActive = isChildActive(child);
-                        return (
+                        {hasChildren ? (
                           <motion.button
-                            key={child.id}
-                            initial={{ opacity: 0, y: 12, filter: "blur(6px)" }}
-                            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                            exit={{ opacity: 0, y: 8, filter: "blur(4px)" }}
-                            transition={{ delay: 0.08 + childIdx * 0.05, duration: 0.5, ease: EASE }}
-                            onClick={() => handleChildClick(child)}
-                            className={`text-left py-1.5 pl-6 text-[28px] font-medium leading-none transition-colors duration-300 origin-left block md:pl-4 md:text-sm md:leading-normal ${
-                              childActive ? "text-foreground" : "text-foreground/30 hover:text-foreground/60"
+                            type="button"
+                            onClick={() => toggleChildren(item.id)}
+                            aria-label={`${expanded ? "Collapse" : "Expand"} ${item.label} links`}
+                            aria-expanded={expanded}
+                            aria-controls={`sidebar-${item.id}-children`}
+                            className={`flex h-7 w-7 items-center justify-center transition-colors duration-300 md:h-5 md:w-5 ${
+                              active ? "text-foreground" : "text-foreground/30 hover:text-foreground/60"
                             }`}
+                            animate={{ rotate: expanded ? 90 : 0 }}
+                            transition={{ duration: 0.3, ease: EASE_TEXT }}
                           >
-                            {child.label}
+                            <ChevronRight className="h-4 w-4 md:h-3.5 md:w-3.5" strokeWidth={1.65} />
                           </motion.button>
-                        );
-                      })}
+                        ) : null}
+                      </motion.div>
+
+                      <AnimatePresence initial={false}>
+                        {hasChildren && expanded ? (
+                          <motion.div
+                            id={`sidebar-${item.id}-children`}
+                            className="overflow-hidden"
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.28, ease: EASE_TEXT }}
+                          >
+                            {item.children?.map((child) => {
+                              const childIdx = flatIndex++;
+                              const childActive = isChildActive(child);
+                              return (
+                                <motion.button
+                                  key={child.id}
+                                  initial={{ opacity: 0, y: 8, filter: "blur(4px)" }}
+                                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                                  exit={{ opacity: 0, y: 6, filter: "blur(3px)" }}
+                                  transition={{ delay: 0.03 + childIdx * 0.03, duration: 0.4, ease: EASE }}
+                                  onClick={() => handleChildClick(child)}
+                                  className={`block py-1.5 pl-6 text-left text-[28px] font-medium leading-none transition-colors duration-300 origin-left md:pl-4 md:text-sm md:leading-normal ${
+                                    childActive ? "text-foreground" : "text-foreground/30 hover:text-foreground/60"
+                                  }`}
+                                >
+                                  {child.label}
+                                </motion.button>
+                              );
+                            })}
+                          </motion.div>
+                        ) : null}
+                      </AnimatePresence>
                     </div>
                   );
                 })}

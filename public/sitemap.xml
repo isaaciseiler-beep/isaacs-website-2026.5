@@ -71,4 +71,9 @@
       <image:caption>Strategy and communications work around health access policy and sustainable development.</image:caption>
     </image:image>
   </url>
+  <url>
+    <loc>https://isaacseiler.xyz/experience</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>

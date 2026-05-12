@@ -304,15 +304,10 @@ const ExperiencePage = () => {
 
       <motion.div
         animate={{
-          marginLeft: sidebarOpen && !isMobile ? 240 : 0,
-          marginRight: searchOpen && !isMobile ? 240 : 0,
-          width:
-            sidebarOpen && !isMobile
-              ? "calc(100% - 240px)"
-              : searchOpen && !isMobile
-                ? "calc(100% - 240px)"
-                : "100%",
+          paddingLeft: sidebarOpen && !isMobile ? 240 : 0,
+          paddingRight: searchOpen && !isMobile ? 240 : 0,
         }}
+        className="min-w-0"
         transition={{ duration: 0.56, ease: EASE_TEXT }}
       >
         <motion.main
@@ -322,8 +317,8 @@ const ExperiencePage = () => {
           transition={{ duration: 0.6, ease: EASE_TEXT, delay: 0.1 }}
         >
           <section className="px-6 pb-10 md:pb-14">
-            <div className="flex min-h-[58svh] flex-col justify-end gap-10 md:min-h-[62vh] md:flex-row md:items-end md:justify-between">
-              <div className="max-w-5xl">
+            <div className="grid min-h-[58svh] grid-cols-1 content-end gap-10 md:min-h-[62vh] md:grid-cols-[minmax(0,1fr)_minmax(18rem,22rem)] md:items-end">
+              <div className="min-w-0 max-w-5xl">
                 <motion.h1
                   className="max-w-5xl text-[2.55rem] font-semibold leading-[0.98] tracking-tight text-foreground md:text-7xl md:leading-[0.95] lg:text-8xl"
                   initial={{ opacity: 0, y: 18, filter: "blur(8px)" }}
@@ -337,7 +332,7 @@ const ExperiencePage = () => {
               <motion.a
                 href={RESUME_HREF}
                 download
-                className="block w-full shrink-0 md:w-1/2 lg:w-[22rem]"
+                className="block w-full min-w-0 shrink-0"
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.55, ease: EASE_TEXT, delay: 0.32 }}

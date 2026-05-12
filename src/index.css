@@ -174,7 +174,7 @@
   .photo-map-shell,
   .photo-map-shell .mapboxgl-canvas-container,
   .photo-map-shell .mapboxgl-canvas {
-    background: hsl(var(--background)) !important;
+    background: #f4f7fe !important;
   }
 
   .photo-map-shell .mapboxgl-ctrl-group {

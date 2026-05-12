@@ -12,6 +12,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const EASE_TEXT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 const MONOCHROME_MAP_STYLE = "mapbox://styles/mapbox/light-v11";
+const MAP_BACKGROUND = "#f4f7fe";
 
 type MarkerEntry = {
   marker: mapboxgl.Marker;
@@ -62,17 +63,11 @@ const PhotoMapPage = () => {
     map.addControl(new mapboxgl.AttributionControl({ compact: true }), "bottom-left");
 
     const handleLoad = () => {
-      const siteBackground = window
-        .getComputedStyle(document.documentElement)
-        .getPropertyValue("--background")
-        .trim();
-      const backgroundColor = siteBackground ? `hsl(${siteBackground})` : "hsl(50 33% 7%)";
-
       map.setFog({
-        color: backgroundColor,
-        "high-color": backgroundColor,
+        color: MAP_BACKGROUND,
+        "high-color": MAP_BACKGROUND,
         "horizon-blend": 0,
-        "space-color": backgroundColor,
+        "space-color": MAP_BACKGROUND,
         "star-intensity": 0,
       });
       setMapReady(true);
@@ -191,7 +186,7 @@ const PhotoMapPage = () => {
   }
 
   return (
-    <div className="relative min-h-[100svh] overflow-hidden bg-background text-foreground">
+    <div className="relative min-h-[100svh] overflow-hidden bg-[#f4f7fe] text-foreground">
       <Sidebar open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} onClose={() => setSidebarOpen(false)} showToggle={false} />
 
       <motion.main
@@ -200,9 +195,9 @@ const PhotoMapPage = () => {
           width: sidebarOpen && !isMobile ? "calc(100% - 240px)" : "100%",
         }}
         transition={{ duration: 0.4, ease: EASE_TEXT }}
-        className="relative h-[100svh] overflow-hidden bg-background"
+        className="relative h-[100svh] overflow-hidden bg-[#f4f7fe]"
       >
-        <section className="relative h-full overflow-hidden bg-background">
+        <section className="relative h-full overflow-hidden bg-[#f4f7fe]">
           <div ref={containerRef} className="photo-map-shell h-full w-full" />
 
           {!mapReady || mapError ? (

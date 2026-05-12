@@ -96,6 +96,8 @@
   html, body {
     background: hsl(var(--background));
     overscroll-behavior-y: none;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 
   body {

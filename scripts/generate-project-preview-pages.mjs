@@ -165,8 +165,10 @@ const replaceLink = (html, rel, value) => {
   );
 };
 
+const absoluteUrl = (url) => new URL(url, siteUrl).toString();
+
 const imageTypeFor = (url) => {
-  const extension = new URL(url).pathname.split(".").pop()?.toLowerCase();
+  const extension = new URL(url, siteUrl).pathname.split(".").pop()?.toLowerCase();
 
   if (extension === "jpg" || extension === "jpeg") return "image/jpeg";
   if (extension === "gif") return "image/gif";
@@ -193,6 +195,7 @@ fs.writeFileSync(indexPath, homepageHtml);
 for (const project of projects) {
   const url = `${siteUrl}/projects/${project.id}`;
   const title = `${project.title} | Isaac Seiler`;
+  const imageUrl = absoluteUrl(project.image);
 
   let html = homepageHtml;
   html = html.replace(/<title>.*?<\/title>/, `<title>${escapeHtml(title)}</title>`);
@@ -202,15 +205,15 @@ for (const project of projects) {
   html = replaceMeta(html, 'property="og:description"', project.summary);
   html = replaceMeta(html, 'property="og:type"', "article");
   html = replaceMeta(html, 'property="og:url"', url);
-  html = replaceMeta(html, 'property="og:image"', project.image);
-  html = replaceMeta(html, 'property="og:image:secure_url"', project.image);
+  html = replaceMeta(html, 'property="og:image"', imageUrl);
+  html = replaceMeta(html, 'property="og:image:secure_url"', imageUrl);
   html = replaceMeta(html, 'property="og:image:type"', imageTypeFor(project.image));
   html = replaceMeta(html, 'property="og:image:width"', "1200");
   html = replaceMeta(html, 'property="og:image:height"', "630");
   html = replaceMeta(html, 'property="og:image:alt"', `${project.title} preview image`);
   html = replaceMeta(html, 'name="twitter:title"', title);
   html = replaceMeta(html, 'name="twitter:description"', project.summary);
-  html = replaceMeta(html, 'name="twitter:image"', project.image);
+  html = replaceMeta(html, 'name="twitter:image"', imageUrl);
 
   const projectDir = path.join(distDir, "projects", project.id);
   fs.mkdirSync(projectDir, { recursive: true });

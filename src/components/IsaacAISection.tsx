@@ -1,6 +1,6 @@
 import { FormEvent, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowUp, Sparkles } from "lucide-react";
+import { ArrowUp } from "lucide-react";
 import { CONTACT_EMAIL } from "@/lib/site";
 
 interface ChatApiResponse {
@@ -75,7 +75,7 @@ const IsaacAISection = () => {
           Isaac AI
         </p>
 
-        <div className="flex h-[340px] w-full max-w-2xl flex-col bg-foreground/[0.035] text-left shadow-[0_24px_70px_rgba(0,0,0,0.16)] transition-all duration-500 ease-out focus-within:bg-foreground/[0.045] md:h-[400px]">
+        <div className="flex h-[340px] w-full max-w-2xl flex-col bg-foreground/[0.035] text-left shadow-[0_0_70px_rgba(0,0,0,0.18)] transition-all duration-500 ease-out focus-within:bg-foreground/[0.045] md:h-[400px]">
           <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 pb-3 pt-4 md:px-5 md:pt-5">
             {hasResponse && (
               <>
@@ -137,11 +137,8 @@ const IsaacAISection = () => {
 
           <form
             onSubmit={askAssistant}
-            className="flex min-h-[70px] items-end gap-2 px-3 py-3 md:px-4"
+            className="flex min-h-[70px] items-end gap-3 px-4 py-3 md:px-5"
           >
-            <div className="flex h-11 w-10 shrink-0 items-center justify-center text-foreground/35">
-              <Sparkles className="h-4 w-4" strokeWidth={1.5} />
-            </div>
             <textarea
               value={query}
               onChange={(event) => setQuery(event.target.value)}

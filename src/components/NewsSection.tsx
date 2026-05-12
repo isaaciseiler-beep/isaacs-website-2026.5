@@ -70,47 +70,42 @@ const NewsSection = () => {
               href={item.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="news-card group relative block flex-shrink-0 transition-colors duration-300 overflow-hidden flex flex-col"
+              className="news-card group relative block flex-shrink-0 overflow-hidden bg-background"
               style={{ width: "calc(40% - 2px)", scrollSnapAlign: "start", minWidth: 280 }}
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true, margin: "-20px" }}
               transition={{ delay: index * 0.1, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             >
-              {item.imageUrl && (
-                <div className="relative w-full overflow-hidden border-b border-foreground/20" style={{ aspectRatio: "16/9" }}>
+              <div className="relative aspect-[4/3] w-full overflow-hidden">
+                {item.imageUrl && (
                   <img
                     src={item.imageUrl}
                     alt={item.title}
-                    className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 ease-out"
+                    className="absolute inset-0 h-full w-full object-cover grayscale transition-all duration-700 ease-out group-hover:scale-[1.02] group-hover:grayscale-0"
                     loading="lazy"
                   />
-                </div>
-              )}
-
-              <div className="p-6 flex-1 flex flex-col">
-                <div className="flex items-start justify-between mb-5">
-                  <div className="flex h-[37px] items-center">
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-[hsl(50_33%_7%/0.94)] via-[hsl(50_33%_7%/0.48)] to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 p-5">
+                  <div className="mb-4 flex h-[30px] items-center">
                     <img
                       src={item.logoUrl}
                       alt={item.logoAlt}
-                      className="h-full w-auto max-w-[128px] object-contain opacity-80 transition-opacity duration-200 group-hover:opacity-100"
+                      className="h-full w-auto max-w-[120px] object-contain opacity-90 brightness-0 invert transition-opacity duration-200 group-hover:opacity-100"
                       loading="lazy"
                     />
                   </div>
+                  <h3 className="news-card-title pr-8 text-base font-semibold leading-tight tracking-tight text-white transition-colors duration-200 md:text-lg">
+                    {item.title}
+                  </h3>
                 </div>
-
-                <h3 className="news-card-title text-lg font-semibold tracking-tight text-foreground mb-2 transition-colors duration-200">
-                  {item.title}
-                </h3>
                 <div className="absolute bottom-5 right-5">
-                  <span className="text-foreground text-sm opacity-0 group-hover:opacity-100 group-hover:text-[hsl(var(--highlight))] translate-x-[-4px] group-hover:translate-x-0 transition-all duration-300">
-                    <ArrowUpRight className="w-4 h-4" />
+                  <span className="translate-x-[-4px] text-sm text-white/80 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:text-[hsl(var(--highlight))] group-hover:opacity-100">
+                    <ArrowUpRight className="h-4 w-4" />
                   </span>
                 </div>
               </div>
-
-              <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-foreground scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
             </motion.a>
           ))}
           {/* Spacer for right padding */}

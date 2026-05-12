@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 import Sidebar from "@/components/Sidebar";
 import SiteHeader from "@/components/SiteHeader";
 import PhotoPreview from "@/components/PhotoPreview";
-import { albums, albumPhotos, coverFor, type Album, type Continent } from "@/lib/photoAlbums";
+import { albums, albumPhotoFiles, albumPhotos, coverFor, type Album, type Continent } from "@/lib/photoAlbums";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const continents: ("All" | Continent)[] = ["All", "Asia", "Europe", "Oceania"];
@@ -36,18 +36,20 @@ const AlbumCover = ({ album, onClick }: { album: Album; onClick: () => void }) =
   const [hovering, setHovering] = useState(false);
   const [flashIdx, setFlashIdx] = useState(-1);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const photos = albumPhotos(album);
+  const photoCount = photos.length;
 
   useEffect(() => {
-    if (hovering) {
+    if (hovering && photoCount > 0) {
       let tick = 0;
-      const maxFlashes = Math.min(album.photos.length, 3);
+      const maxFlashes = Math.min(photoCount, 3);
       intervalRef.current = setInterval(() => {
         tick++;
         if (tick > maxFlashes) {
           setFlashIdx(-1);
           if (intervalRef.current) clearInterval(intervalRef.current);
         } else {
-          setFlashIdx(tick % album.photos.length);
+          setFlashIdx(tick % photoCount);
         }
       }, 320);
     } else {
@@ -55,12 +57,12 @@ const AlbumCover = ({ album, onClick }: { album: Album; onClick: () => void }) =
       if (intervalRef.current) clearInterval(intervalRef.current);
     }
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, [hovering, album.photos.length]);
+  }, [hovering, photoCount]);
 
   const cover = coverFor(album);
-  const allSrcs = [cover, ...albumPhotos(album)];
+  const allSrcs = [cover, ...photos];
   const uniqueSrcs = [...new Set(allSrcs)];
-  const activeImage = flashIdx >= 0 ? albumPhotos(album)[flashIdx] : cover;
+  const activeImage = flashIdx >= 0 ? photos[flashIdx] : cover;
 
   return (
     <div
@@ -88,7 +90,7 @@ const AlbumCover = ({ album, onClick }: { album: Album; onClick: () => void }) =
       <div className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 35%)" }} />
       <div className="absolute bottom-0 left-0 right-0 p-4">
         <h3 className="text-sm font-medium tracking-tight text-white/90">{album.location}</h3>
-        <p className="font-mono text-[8px] tracking-[0.2em] uppercase text-white/30 mt-0.5">{album.photos.length}</p>
+        <p className="font-mono text-[8px] tracking-[0.2em] uppercase text-white/30 mt-0.5">{albumPhotoFiles(album).length}</p>
       </div>
     </div>
   );

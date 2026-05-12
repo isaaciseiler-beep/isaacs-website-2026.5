@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { motion, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import SectionHeading from "@/components/SectionHeading";
-const headshotUrl = "https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev/8B142F31-3FF0-440E-8771-33A465C8C9FE_1_201_a.jpeg";
+import headshotUrl from "@/assets/headshot.jpg";
 import { bioLines } from "@/lib/siteContent";
 import { CONTACT_MAILTO } from "@/lib/site";
 

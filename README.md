@@ -18,7 +18,7 @@ cp .env.example .env.local
 Then set:
 
 ```bash
-OPENAI_API_KEY=sk-your-openai-api-key
+OPENAI_API=sk-your-openai-api-key
 ```
 
 `OPENAI_CHAT_MODEL` is optional. If it is not set, the API uses the default in
@@ -42,7 +42,7 @@ Then open the local URL from Vercel and test the chat orb with prompts like:
 In Vercel, add these project environment variables:
 
 ```bash
-OPENAI_API_KEY=sk-your-production-key
+OPENAI_API=sk-your-production-key
 OPENAI_CHAT_MODEL=gpt-4.1-mini
 ```
 

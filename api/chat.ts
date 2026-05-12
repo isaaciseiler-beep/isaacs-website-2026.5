@@ -55,10 +55,10 @@ export default async function handler(request: any, response: any) {
     return;
   }
 
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = process.env.OPENAI_API || process.env.OPENAI_API_KEY;
   if (!apiKey) {
     json(response, 500);
-    response.end(JSON.stringify({ error: "OPENAI_API_KEY is not configured." }));
+    response.end(JSON.stringify({ error: "OPENAI_API is not configured." }));
     return;
   }
 

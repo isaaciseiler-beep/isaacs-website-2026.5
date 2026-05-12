@@ -94,7 +94,6 @@ export const albums: Album[] = [
       "ABCF0558-3934-4495-BF8E-0E952787CDE2_1_102_o.jpeg",
       "B709BAFC-602A-4660-BB69-B8F1220CEE0B_1_102_o.jpeg",
       "E1FF2232-D5EE-4D5D-825C-A4F7D4CDDD38_1_105_c.jpeg",
-      "EDAAD852-E42F-4437-9D6D-8757849A41FC_1_201_a.jpeg",
     ],
   },
   {
@@ -165,7 +164,6 @@ export const albums: Album[] = [
     photos: [
       "2CB47B2E-5C03-41B4-8449-53077A18AD83_1_105_c.jpeg",
       "3CE2F2C0-F9DB-446D-82EA-C51016065E40_1_105_c.jpeg",
-      "663E1304-E1D3-4B53-871C-DD87EB2A7E5C_1_201_a.jpeg",
       "8BE8D671-0B88-4DF7-B191-7997860C48DE_1_105_c.jpeg",
       "9A081BDE-6537-4C91-9441-1A4B03851A81_1_105_c.jpeg",
       "CC340844-A006-4382-BAE2-4E095F3DBC05_1_105_c.jpeg",
@@ -182,10 +180,8 @@ export const albums: Album[] = [
     photos: [
       "14BC8F70-A1CE-4D79-8FBE-665B57EB131F_1_105_c.jpeg",
       "2FFD2476-0D22-4807-8C5E-E7D1C21C6B83_1_105_c.jpeg",
-      "4AD14582-EB50-40CD-8A8F-3CB202A6E70F_1_201_a.jpeg",
       "4C91004E-F742-4994-AE32-5297C9E0AFD0_1_105_c.jpeg",
       "58804FE5-138F-4AA9-B322-E808875DF864_1_105_c.jpeg",
-      "6C7CF6B4-F4D9-4132-80E9-D08ED42339C2_1_201_a.jpeg",
       "6DFD57E6-CF70-4571-9455-60EE7A0FFBCC_1_105_c.jpeg",
       "8586F94D-82A1-4D13-8C7C-25D5D3FFCFAD_1_105_c.jpeg",
       "8A0F3EEE-A0C1-4F44-951B-FC83E755112D_1_105_c.jpeg",
@@ -193,7 +189,6 @@ export const albums: Album[] = [
       "C66E080D-0849-47AD-8F7D-7674B89FBC8A_1_105_c.jpeg",
       "D2F4C59D-1C57-47D0-8F4B-E63118DE1837_1_105_c.jpeg",
       "D911954A-465E-4BAC-A6EC-4A31837E1A5A_1_105_c.jpeg",
-      "E2FF9AA1-9F9D-47AC-9451-91291343E5C6_1_201_a.jpeg",
       "F92F599D-D241-46CB-A6D0-3187EE3E5A23_1_105_c.jpeg",
     ],
   },
@@ -226,7 +221,6 @@ export const albums: Album[] = [
       "6E2C1761-BB0A-4086-AC48-A730E2EE9C19_1_102_o.jpeg",
       "9218D849-806D-4017-9181-7E962BC1CF6F_1_102_o.jpeg",
       "BB231F3A-3C2E-4EF0-92CC-E47C535A1940_1_102_a.jpeg",
-      "D4113293-1527-4DA7-ABDC-C17802541769_1_201_a.jpeg",
       "E4EA2C98-E4CD-4343-A139-8825EDA4B87F_1_105_c.jpeg",
       "EC92F2EF-9724-4A6C-9DD6-B00612542344_1_105_c.jpeg",
     ],
@@ -239,7 +233,6 @@ export const albums: Album[] = [
       "4ABE8E8C-0966-4ED6-BD8D-464389569B77_1_105_c.jpeg",
       "6922AA55-2554-41DB-9A5E-9F5FF5CCD7C1_1_105_c.jpeg",
       "893DAA99-125B-4A1E-88F3-8D0510C35C3B_1_105_c.jpeg",
-      "B56A8C5D-C368-4D5F-9242-B96ADF984C6D_1_201_a.jpeg",
       "E2B47120-5EB0-4D70-A055-A3E182072695_1_105_c.jpeg",
     ],
   },
@@ -248,10 +241,14 @@ export const albums: Album[] = [
 export const photoUrl = (folder: string, file: string) =>
   `${R2_BASE}/${folder}/${file}`;
 
-export const albumPhotos = (album: Album) =>
-  album.photos.map((f) => photoUrl(album.folder, f));
+export const isHdrPhotoFile = (file: string) => /_1_201_a\.(jpe?g|png|webp)$/i.test(file);
 
-export const coverFor = (album: Album) => photoUrl(album.folder, album.photos[0]);
+export const albumPhotoFiles = (album: Album) => album.photos.filter((file) => !isHdrPhotoFile(file));
+
+export const albumPhotos = (album: Album) =>
+  albumPhotoFiles(album).map((f) => photoUrl(album.folder, f));
+
+export const coverFor = (album: Album) => photoUrl(album.folder, albumPhotoFiles(album)[0] ?? album.photos[0]);
 
 // Curated picks: one image per album for home preview & featured tiles.
 export const curatedPicks = albums.map((a) => ({

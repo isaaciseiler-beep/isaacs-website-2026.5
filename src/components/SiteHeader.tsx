@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import Logo from "@/components/Logo";
+import SearchTrigger from "@/components/SearchOverlay";
 
 const EASE_TEXT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 
@@ -105,6 +106,7 @@ const SiteHeader = ({ open, onToggle }: SiteHeaderProps) => {
       >
         <ChevronRight className="h-3.5 w-3.5" />
       </motion.button>
+      <SearchTrigger style={{ color: ink }} />
     </div>
   );
 };

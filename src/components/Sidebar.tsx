@@ -3,6 +3,7 @@ import { Mail, Sun } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { useTheme } from "@/components/ThemeProvider";
+import SearchTrigger from "@/components/SearchOverlay";
 import { CONTACT_MAILTO, GITHUB_URL, LINKEDIN_URL, SUBSTACK_URL } from "@/lib/site";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -60,6 +61,7 @@ interface SitemapItem {
 export const sitemapItems: SitemapItem[] = [
   { id: "hero", label: "Home", scrollTo: "hero" },
   { id: "projects", label: "Work", scrollTo: "projects", children: [
+    { id: "experience", label: "Experience", href: "/experience" },
     { id: "project-archive", label: "Projects", href: "/projects" },
   ]},
   { id: "about", label: "About", scrollTo: "about" },
@@ -100,6 +102,7 @@ const Sidebar = ({ open, onToggle, onClose, activeSection, showToggle = true }: 
   const isMobile = useIsMobile();
   const isOnPhotos = location.pathname.startsWith("/photos");
   const isOnProjects = location.pathname.startsWith("/projects");
+  const isOnExperience = location.pathname.startsWith("/experience");
 
   const handleItemClick = (item: SitemapItem) => {
     if (item.scrollTo) {
@@ -131,6 +134,7 @@ const Sidebar = ({ open, onToggle, onClose, activeSection, showToggle = true }: 
   const isItemActive = (item: SitemapItem) => {
     if (isOnPhotos && item.id === "photos") return true;
     if (isOnProjects && item.id === "projects") return true;
+    if (isOnExperience && item.id === "projects") return true;
     if (activeSection && activeSection === item.id) return true;
     return false;
   };
@@ -138,6 +142,7 @@ const Sidebar = ({ open, onToggle, onClose, activeSection, showToggle = true }: 
   const isChildActive = (child: { id: string; href: string }) => {
     if (location.pathname === "/photos/map" && child.id === "photo-map") return true;
     if (location.pathname === "/photos" && child.id === "portfolio") return true;
+    if (isOnExperience && child.id === "experience") return true;
     if (isOnProjects && child.id === "project-archive") return true;
     return location.pathname === child.href;
   };
@@ -169,6 +174,7 @@ const Sidebar = ({ open, onToggle, onClose, activeSection, showToggle = true }: 
           {open && (
             <div className="flex flex-1 items-center md:mt-4 md:block md:flex-none">
               <div className="flex flex-col gap-1.5 relative md:gap-0.5">
+                <SearchTrigger variant="sidebar" />
                 {sitemapItems.map((item) => {
                   const idx = flatIndex++;
                   const active = isItemActive(item);

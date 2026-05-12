@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUp } from "lucide-react";
-import { toast } from "sonner";
+import { hasSearchResults, searchSite } from "@/lib/searchIndex";
 
 interface Message {
   id: string;
@@ -90,9 +90,28 @@ const ChatOrb = () => {
     setInput("");
     setIsLoading(true);
 
+    if (mode === "search") {
+      const groups = searchSite(userMsg.content, 3);
+      const content = hasSearchResults(groups)
+        ? groups
+            .filter((group) => group.results.length)
+            .map((group) => `${group.label}: ${group.results.map((result) => result.title).join(", ")}`)
+            .join("\n")
+        : "No strong matches.";
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: (Date.now() + 1).toString(),
+          role: "assistant",
+          content,
+        },
+      ]);
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const endpoint = mode === "ai" ? "/api/chat" : "/api/search";
-      const response = await fetch(endpoint, {
+      const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -110,9 +129,7 @@ const ChatOrb = () => {
           content:
             data.message ||
             data.error ||
-            (mode === "ai"
-              ? "I could not reach the AI assistant yet."
-              : "No results found. Search indexing is not yet connected."),
+            "I could not reach the AI assistant yet.",
         },
       ]);
     } catch {
@@ -122,9 +139,7 @@ const ChatOrb = () => {
           id: (Date.now() + 1).toString(),
           role: "assistant",
           content:
-            mode === "ai"
-              ? "I could not reach the AI assistant yet. On local dev, run this through Vercel so /api/chat is available."
-              : "Search is not connected yet.",
+            "I could not reach the AI assistant yet. On local dev, run this through Vercel so /api/chat is available.",
         },
       ]);
     } finally {
@@ -151,7 +166,7 @@ const ChatOrb = () => {
               background: "hsl(var(--highlight))",
               boxShadow: softShadow,
             }}
-            onClick={() => toast("Indexed search and AI assistant coming soon")}
+            onClick={() => setIsOpen(true)}
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: [1, 1.12, 1], opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}

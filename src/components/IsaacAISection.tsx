@@ -54,7 +54,7 @@ const IsaacAISection = () => {
       setSources(data.sources || []);
     } catch {
       if (requestIdRef.current !== requestId) return;
-      setError("I could not reach the AI assistant yet. On local dev, run this through Vercel so /api/chat is available.");
+      setError("I could not reach the AI assistant yet. Make sure local dev has OPENAI_API set and restart the dev server.");
     } finally {
       if (requestIdRef.current === requestId) setIsLoading(false);
     }

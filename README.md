@@ -24,13 +24,13 @@ OPENAI_API=sk-your-openai-api-key
 `OPENAI_CHAT_MODEL` is optional. If it is not set, the API uses the default in
 `api/chat.ts`.
 
-Run the site through Vercel so `/api/chat` is available:
+Run the site with Vite. Local dev mounts `/api/chat` through the Vite server:
 
 ```bash
-npx vercel dev
+npm run dev
 ```
 
-Then open the local URL from Vercel and test the chat orb with prompts like:
+Then open the local URL and test the chat with prompts like:
 
 - `Who is Isaac?`
 - `What is Isaac's AI work?`

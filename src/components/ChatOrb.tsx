@@ -139,7 +139,7 @@ const ChatOrb = () => {
           id: (Date.now() + 1).toString(),
           role: "assistant",
           content:
-            "I could not reach the AI assistant yet. On local dev, run this through Vercel so /api/chat is available.",
+            "I could not reach the AI assistant yet. Make sure local dev has OPENAI_API set and restart the dev server.",
         },
       ]);
     } finally {

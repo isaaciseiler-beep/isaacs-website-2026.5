@@ -10,6 +10,11 @@ interface ChatMessage {
 const OPENAI_RESPONSES_URL = "https://api.openai.com/v1/responses";
 const DEFAULT_MODEL = "gpt-4.1-mini";
 
+const getEnvValue = (value?: string) => {
+  const trimmed = value?.trim();
+  return trimmed && trimmed !== "undefined" ? trimmed : undefined;
+};
+
 const json = (response: any, status = 200) => {
   response.statusCode = status;
   response.setHeader("Content-Type", "application/json");
@@ -55,7 +60,7 @@ export default async function handler(request: any, response: any) {
     return;
   }
 
-  const apiKey = process.env.OPENAI_API || process.env.OPENAI_API_KEY;
+  const apiKey = getEnvValue(process.env.OPENAI_API) || getEnvValue(process.env.OPENAI_API_KEY);
   if (!apiKey) {
     json(response, 500);
     response.end(JSON.stringify({ error: "OPENAI_API is not configured." }));

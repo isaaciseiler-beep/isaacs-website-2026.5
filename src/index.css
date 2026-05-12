@@ -231,6 +231,7 @@
     font-size: 8px;
     letter-spacing: 0.04em;
     line-height: 1.5;
+    border-radius: 0 !important;
     opacity: 0.46;
     backdrop-filter: blur(12px) saturate(0);
     -webkit-backdrop-filter: blur(12px) saturate(0);

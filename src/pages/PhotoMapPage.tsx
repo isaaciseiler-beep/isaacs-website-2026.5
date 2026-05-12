@@ -189,7 +189,7 @@ const PhotoMapPage = () => {
     });
 
     mapRef.current = map;
-    map.addControl(new mapboxgl.AttributionControl({ compact: true }), "bottom-left");
+    map.addControl(new mapboxgl.AttributionControl({ compact: true }), "bottom-right");
 
     const handleLoad = () => {
       applyMapPalette(map);

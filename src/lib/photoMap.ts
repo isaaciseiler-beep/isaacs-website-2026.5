@@ -30,7 +30,7 @@ const albumCoordinates: Record<Album["folder"], [number, number]> = {
   Vietnam: [105.8342, 21.0278],
 };
 
-const miscUsPhoto = (fileName: string) => `${R2_BASE}/may8portfolio/misc-USA/${fileName}`;
+const miscUsPhoto = (fileName: string) => `${R2_BASE}/misc-USA/${fileName}`;
 
 const standalonePhotoEntries: PhotoMapEntry[] = [
   {

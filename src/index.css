@@ -180,9 +180,9 @@
   .photo-map-shell .mapboxgl-ctrl-group {
     border-radius: 0;
     overflow: hidden;
-    background: hsl(var(--background) / 0.9) !important;
-    border: 1px solid hsl(var(--foreground) / 0.14);
-    box-shadow: 0 16px 42px rgb(0 0 0 / 0.16);
+    background: hsl(var(--background) / 0.96) !important;
+    border: 1px solid hsl(var(--foreground) / 0.22);
+    box-shadow: 0 16px 42px rgb(0 0 0 / 0.24);
     backdrop-filter: blur(18px) saturate(0);
     -webkit-backdrop-filter: blur(18px) saturate(0);
   }
@@ -225,13 +225,13 @@
   }
 
   .photo-map-shell .mapboxgl-ctrl-attrib {
-    background: hsl(var(--background) / 0.42) !important;
-    color: hsl(var(--foreground) / 0.3) !important;
+    background: hsl(var(--background) / 0.56) !important;
+    color: hsl(var(--foreground) / 0.42) !important;
     font-family: 'JetBrains Mono', monospace;
     font-size: 8px;
     letter-spacing: 0.04em;
     line-height: 1.5;
-    opacity: 0.38;
+    opacity: 0.46;
     backdrop-filter: blur(12px) saturate(0);
     -webkit-backdrop-filter: blur(12px) saturate(0);
     transition: opacity 180ms ease;
@@ -250,7 +250,7 @@
   }
 
   .photo-map-panel-button {
-    @apply relative flex h-11 items-center justify-between overflow-hidden border border-white/20 bg-background px-3 font-mono text-[9px] uppercase tracking-[0.22em] text-foreground transition-colors duration-500;
+    @apply relative flex h-11 items-center justify-between overflow-hidden border border-white/20 bg-background px-3 font-mono text-sm uppercase tracking-[0.2em] text-foreground transition-colors duration-500;
   }
 
   .photo-map-panel-button::before {

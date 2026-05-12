@@ -13,8 +13,13 @@ const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const EASE_TEXT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 const MONOCHROME_MAP_STYLE = "mapbox://styles/mapbox/light-v11";
 const MAP_BACKGROUND = "#f4f7fe";
-const MAP_DETAIL = "#d9e0ee";
-const MAP_LABEL = "#6c7482";
+const MAP_LAND = "#e2e8f4";
+const MAP_PARK = "#d8e1ef";
+const MAP_DETAIL = "#c8d0df";
+const MAP_LABEL = "#535d6b";
+const DESKTOP_PANEL_WIDTH = 350;
+const DESKTOP_PANEL_GUTTER = 16;
+const MOBILE_PANEL_HEIGHT = 260;
 
 type MarkerEntry = {
   marker: mapboxgl.Marker;
@@ -35,16 +40,18 @@ const applyMapPalette = (map: mapboxgl.Map) => {
       }
 
       if (layer.type === "fill") {
-        if (id.includes("water") || id.includes("land") || id.includes("background")) {
+        if (id.includes("water") || id.includes("background")) {
           map.setPaintProperty(layer.id, "fill-color", MAP_BACKGROUND);
+        } else if (id.includes("land")) {
+          map.setPaintProperty(layer.id, "fill-color", MAP_LAND);
         } else if (id.includes("park") || id.includes("landuse")) {
-          map.setPaintProperty(layer.id, "fill-color", "#eef3fd");
+          map.setPaintProperty(layer.id, "fill-color", MAP_PARK);
         }
       }
 
       if (layer.type === "line" && /admin|boundary|road|waterway|bridge|tunnel/.test(id)) {
         map.setPaintProperty(layer.id, "line-color", MAP_DETAIL);
-        map.setPaintProperty(layer.id, "line-opacity", id.includes("road") ? 0.35 : 0.22);
+        map.setPaintProperty(layer.id, "line-opacity", id.includes("road") ? 0.5 : 0.32);
       }
 
       if (layer.type === "symbol") {
@@ -77,6 +84,12 @@ const PhotoMapPage = () => {
     () => photoMapEntries.find((entry) => entry.id === activeEntryId) ?? null,
     [activeEntryId],
   );
+
+  const selectedLocationOffset = () => {
+    if (isMobile) return [0, -(MOBILE_PANEL_HEIGHT / 2)] as [number, number];
+
+    return [-(DESKTOP_PANEL_WIDTH + DESKTOP_PANEL_GUTTER * 2) / 2, 0] as [number, number];
+  };
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current || !mapboxToken) return;
@@ -131,6 +144,32 @@ const PhotoMapPage = () => {
     if (!mapReady || !mapRef.current) return;
 
     const map = mapRef.current;
+    const resizeAndCenter = () => {
+      map.resize();
+      if (!activeEntry) {
+        map.jumpTo({
+          center: photoMapInitialView.center,
+          zoom: photoMapInitialView.zoom,
+          pitch: photoMapInitialView.pitch,
+          bearing: photoMapInitialView.bearing,
+        });
+      }
+    };
+
+    resizeAndCenter();
+    const firstFrame = window.setTimeout(resizeAndCenter, 80);
+    const afterTransition = window.setTimeout(resizeAndCenter, 430);
+
+    return () => {
+      window.clearTimeout(firstFrame);
+      window.clearTimeout(afterTransition);
+    };
+  }, [activeEntry, isMobile, mapReady, sidebarOpen]);
+
+  useEffect(() => {
+    if (!mapReady || !mapRef.current) return;
+
+    const map = mapRef.current;
     const entries = markerEntriesRef.current;
 
     photoMapEntries.forEach((entry) => {
@@ -142,7 +181,7 @@ const PhotoMapPage = () => {
       const button = document.createElement("button");
       button.type = "button";
       button.className =
-        "photo-map-marker group absolute -left-4 -top-4 h-8 w-8 overflow-hidden border border-[hsl(50_33%_7%/0.24)] bg-[#f4f7fe] shadow-[0_8px_24px_rgba(18,24,34,0.18)] transition-[transform,border-color,box-shadow,filter] duration-200 hover:scale-110 hover:border-[hsl(50_33%_7%/0.52)] hover:shadow-[0_12px_30px_rgba(18,24,34,0.24)] focus:outline-none focus:ring-2 focus:ring-[hsl(50_33%_7%/0.24)]";
+        "photo-map-marker group absolute -left-[18px] -top-[18px] h-9 w-9 overflow-hidden rounded-full border border-[hsl(50_33%_7%/0.34)] bg-[#e2e8f4] shadow-[0_9px_24px_rgba(18,24,34,0.24)] grayscale transition-[transform,border-color,box-shadow,filter] duration-200 hover:scale-110 hover:border-[hsl(50_33%_7%/0.62)] hover:shadow-[0_12px_30px_rgba(18,24,34,0.3)] hover:grayscale-0 focus:outline-none focus:ring-2 focus:ring-[hsl(50_33%_7%/0.28)]";
       button.setAttribute("aria-label", `Open ${entry.location} photos`);
       button.style.backgroundImage = `linear-gradient(rgba(244,247,254,0.02), rgba(0,0,0,0.18)), url("${entry.coverImage}")`;
       button.style.backgroundSize = "cover";
@@ -158,6 +197,7 @@ const PhotoMapPage = () => {
         map.flyTo({
           center: entry.coordinates as LngLatLike,
           zoom: Math.max(map.getZoom(), 3.25),
+          offset: selectedLocationOffset(),
           speed: 0.65,
           curve: 1.35,
           essential: true,
@@ -179,6 +219,7 @@ const PhotoMapPage = () => {
       element.classList.toggle("border-[hsl(var(--highlight))]", isActive);
       element.classList.toggle("ring-2", isActive);
       element.classList.toggle("ring-[hsl(var(--highlight))]/60", isActive);
+      element.classList.toggle("grayscale-0", isActive);
       element.style.zIndex = isActive ? "5" : "1";
     });
   }, [activeEntryId]);
@@ -251,12 +292,12 @@ const PhotoMapPage = () => {
             </div>
           ) : null}
 
-          <section className="pointer-events-none absolute inset-x-0 bottom-0 right-0 z-20 flex justify-end p-3 sm:inset-y-0 sm:left-auto sm:w-[430px] sm:p-4">
+          <section className="pointer-events-none absolute inset-x-0 bottom-0 right-0 z-20 flex justify-end p-3 sm:inset-y-0 sm:left-auto sm:w-[382px] sm:p-4">
             <AnimatePresence mode="wait">
               {activeEntry ? (
                 <motion.article
                   key={activeEntry.id}
-                  className="pointer-events-auto relative flex h-[42svh] min-h-[280px] w-full overflow-hidden border border-white/15 bg-[hsl(50_33%_7%)] text-white shadow-2xl shadow-black/35 sm:h-full sm:max-w-[390px]"
+                  className="group/photo-panel pointer-events-auto relative flex h-[40svh] min-h-[260px] w-full overflow-hidden border border-white/18 bg-[hsl(50_33%_7%)] text-white shadow-2xl shadow-black/45 sm:h-full sm:max-w-[350px]"
                   initial={isMobile ? { opacity: 0, y: 28, filter: "blur(8px)" } : { opacity: 0, x: 36, filter: "blur(8px)" }}
                   animate={{ opacity: 1, x: 0, y: 0, filter: "blur(0px)" }}
                   exit={isMobile ? { opacity: 0, y: 24, filter: "blur(6px)" } : { opacity: 0, x: 28, filter: "blur(6px)" }}
@@ -265,7 +306,7 @@ const PhotoMapPage = () => {
                   <img
                     src={activeEntry.coverImage}
                     alt=""
-                    className="absolute inset-0 h-full w-full object-cover grayscale"
+                    className="absolute inset-0 h-full w-full object-cover grayscale transition-[filter,transform] duration-700 ease-out group-hover/photo-panel:scale-[1.015] group-hover/photo-panel:grayscale-0"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/22 to-black/20" />
                   <div className="relative z-10 flex min-h-0 flex-1 flex-col justify-end p-4 sm:p-5">

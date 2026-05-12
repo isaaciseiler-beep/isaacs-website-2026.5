@@ -1,8 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { motion, useScroll, useSpring } from "framer-motion";
+import { type PointerEvent, useEffect, useMemo, useRef, useState } from "react";
+import { motion, useMotionValue, useScroll, useSpring } from "framer-motion";
 import { ArrowUpRight, Download, FileText } from "lucide-react";
 import { Link } from "react-router-dom";
+import AnimatedText from "@/components/AnimatedText";
 import Footer from "@/components/Footer";
+import ParallaxSection from "@/components/ParallaxSection";
 import Sidebar from "@/components/Sidebar";
 import SiteHeader from "@/components/SiteHeader";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -12,6 +14,8 @@ import { newsItems, projectItems } from "@/lib/siteContent";
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const EASE_TEXT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const RESUME_HREF = "/isaac-seiler-resume.pdf";
+const TIMELINE_STICKY_TOP = 112;
+const TIMELINE_HEADER_OFFSET = 66;
 
 interface RelatedItem {
   id: string;
@@ -122,13 +126,12 @@ const EmployerLink = ({
 const RelatedLink = ({ item }: { item: RelatedItem }) => {
   const content = (
     <>
-      <span className="relative h-14 w-20 shrink-0 overflow-hidden bg-foreground/5 md:h-16 md:w-24">
+      <span className="relative h-14 w-20 shrink-0 bg-foreground/5 md:h-16 md:w-24">
         {item.image ? (
-          <img
+          <ExperienceImage
             src={item.image}
-            alt=""
-            loading="lazy"
-            className="h-full w-full object-cover grayscale transition duration-500 group-hover:scale-[1.03] group-hover:grayscale-0"
+            className="h-full w-full"
+            imageClassName="h-full w-full object-cover grayscale transition-[filter,transform] duration-700 ease-out will-change-[filter,transform] group-hover:scale-[1.015] group-hover:grayscale-0"
           />
         ) : (
           <span className="flex h-full w-full items-center justify-center text-foreground/35">
@@ -163,6 +166,58 @@ const RelatedLink = ({ item }: { item: RelatedItem }) => {
   );
 };
 
+const ExperienceImage = ({
+  src,
+  className,
+  imageClassName,
+}: {
+  src: string;
+  className?: string;
+  imageClassName?: string;
+}) => {
+  const rotX = useSpring(useMotionValue(0), { stiffness: 120, damping: 18, mass: 0.6 });
+  const rotY = useSpring(useMotionValue(0), { stiffness: 120, damping: 18, mass: 0.6 });
+
+  const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const nx = ((event.clientX - rect.left) / rect.width - 0.5) * 2;
+    const ny = ((event.clientY - rect.top) / rect.height - 0.5) * 2;
+    const hoveringCorner = Math.abs(nx) > 0.62 && Math.abs(ny) > 0.62;
+
+    rotY.set(hoveringCorner ? nx * 5 : 0);
+    rotX.set(hoveringCorner ? -ny * 5 : 0);
+  };
+
+  const handlePointerLeave = () => {
+    rotX.set(0);
+    rotY.set(0);
+  };
+
+  return (
+    <motion.div
+      className={`group/resume-image relative overflow-hidden shadow-sm transition-shadow duration-300 group-hover:shadow-md ${className ?? ""}`}
+      style={{
+        perspective: 900,
+        rotateX: rotX,
+        rotateY: rotY,
+        transformStyle: "preserve-3d",
+      }}
+      onPointerMove={handlePointerMove}
+      onPointerLeave={handlePointerLeave}
+    >
+      <img
+        src={src}
+        alt=""
+        loading="lazy"
+        className={
+          imageClassName ??
+          "absolute inset-0 h-full w-full object-cover grayscale transition-[filter,transform] duration-700 ease-out will-change-[filter,transform] group-hover/resume-image:grayscale-0"
+        }
+      />
+    </motion.div>
+  );
+};
+
 const ExperienceGroupSection = ({
   group,
   index,
@@ -171,11 +226,12 @@ const ExperienceGroupSection = ({
   index: number;
 }) => {
   const related = useMemo(() => relatedForGroup(group), [group]);
+  const [primaryEntry, ...secondaryEntries] = group.entries;
 
   return (
     <motion.article
       id={group.id}
-      className={`experience-entry scroll-mt-28 py-10 md:py-14 ${
+      className={`experience-entry scroll-mt-[180px] py-10 md:py-14 ${
         index === 0 ? "pt-0" : "border-t border-foreground/10"
       }`}
       data-experience-id={group.id}
@@ -185,48 +241,68 @@ const ExperienceGroupSection = ({
       transition={{ delay: Math.min(index * 0.04, 0.24), duration: 0.72, ease: EASE }}
     >
       <div>
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_18rem] xl:items-start xl:gap-10">
-          <div>
-            <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm font-medium text-foreground/54 lg:hidden">
-              <EmployerLink group={group} />
-            </div>
-            {group.entries.map((entry, entryIndex) => (
-              <section
-                key={entry.id}
-                className={entryIndex === 0 ? "" : "mt-9 border-t border-foreground/10 pt-8"}
-              >
-                <h2 className="max-w-3xl text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
-                  {entry.role}
-                </h2>
-                <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/38">
-                  <span>{entry.period}</span>
-                </div>
-                <div className="mt-5 space-y-4">
-                  {entry.paragraphs.map((paragraph) => (
-                    <p key={paragraph} className="max-w-2xl text-[15px] leading-relaxed text-foreground/68 md:text-base">
-                      {paragraph}
-                    </p>
-                  ))}
-                </div>
-              </section>
-            ))}
-          </div>
-
-          <motion.div
-            className="group relative aspect-square w-full overflow-hidden bg-foreground/5"
-            initial={{ opacity: 0.72 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.65, ease: EASE }}
-          >
-            <img
-              src={group.image}
-              alt=""
-              loading="lazy"
-              className="absolute inset-0 h-full w-full object-cover grayscale transition duration-500 group-hover:grayscale-0"
-            />
-          </motion.div>
+        <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm font-medium text-foreground/54 lg:hidden">
+          <EmployerLink group={group} />
         </div>
+
+        <section>
+          <AnimatedText
+            text={primaryEntry.role}
+            as="p"
+            className="max-w-3xl text-3xl font-semibold tracking-tight text-foreground md:text-4xl"
+            margin="-80px"
+          />
+
+          <div className="mt-5 grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(13rem,18rem)] md:items-start md:gap-8 xl:gap-10">
+            <motion.div
+              className="space-y-4"
+              initial={{ opacity: 0, y: 12, filter: "blur(6px)" }}
+              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.42, ease: EASE_TEXT, delay: 0.05 }}
+            >
+              {primaryEntry.paragraphs.map((paragraph) => (
+                <p key={paragraph} className="max-w-2xl text-[15px] leading-relaxed text-foreground/68 md:text-base">
+                  {paragraph}
+                </p>
+              ))}
+            </motion.div>
+
+            <motion.div
+              className="relative aspect-square w-full bg-foreground/5"
+              initial={{ opacity: 0.72, y: 10, filter: "blur(6px)" }}
+              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.5, ease: EASE }}
+            >
+              <ExperienceImage src={group.image} className="h-full w-full" />
+            </motion.div>
+          </div>
+        </section>
+
+        {secondaryEntries.map((entry) => (
+          <section key={entry.id} className="mt-9 border-t border-foreground/10 pt-8">
+            <AnimatedText
+              text={entry.role}
+              as="p"
+              className="max-w-3xl text-3xl font-semibold tracking-tight text-foreground md:text-4xl"
+              margin="-80px"
+            />
+            <motion.div
+              className="mt-5 space-y-4"
+              initial={{ opacity: 0, y: 12, filter: "blur(6px)" }}
+              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.42, ease: EASE_TEXT, delay: 0.05 }}
+            >
+              {entry.paragraphs.map((paragraph) => (
+                <p key={paragraph} className="max-w-2xl text-[15px] leading-relaxed text-foreground/68 md:text-base">
+                  {paragraph}
+                </p>
+              ))}
+            </motion.div>
+          </section>
+        ))}
 
         {related.length > 0 ? (
           <div className="mt-8">
@@ -254,28 +330,34 @@ const ExperiencePage = () => {
   const timelineRef = useRef<HTMLElement | null>(null);
   const { scrollYProgress } = useScroll({
     target: timelineRef,
-    offset: ["start center", "end center"],
+    offset: [
+      `start ${TIMELINE_STICKY_TOP + TIMELINE_HEADER_OFFSET}px`,
+      `end ${TIMELINE_STICKY_TOP + TIMELINE_HEADER_OFFSET}px`,
+    ],
   });
   const scaleY = useSpring(scrollYProgress, { stiffness: 120, damping: 28, mass: 0.35 });
-  const activeGroup = experienceGroups.find((group) => group.id === activeId) ?? experienceGroups[0];
 
   useEffect(() => {
-    const nodes = Array.from(document.querySelectorAll<HTMLElement>("[data-experience-id]"));
+    const nodes = Array.from(document.querySelectorAll<HTMLElement>(".experience-entry"));
     if (!nodes.length) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        const id = visible?.target.getAttribute("data-experience-id");
-        if (id) setActiveId(id);
-      },
-      { threshold: [0.2, 0.4, 0.65], rootMargin: "-18% 0px -45% 0px" },
-    );
+    const updateActiveEntry = () => {
+      const readingLine = TIMELINE_STICKY_TOP + TIMELINE_HEADER_OFFSET + 8;
+      const current =
+        [...nodes]
+          .reverse()
+          .find((node) => node.getBoundingClientRect().top <= readingLine) ?? nodes[0];
+      const id = current.getAttribute("data-experience-id");
+      if (id) setActiveId(id);
+    };
 
-    nodes.forEach((node) => observer.observe(node));
-    return () => observer.disconnect();
+    updateActiveEntry();
+    window.addEventListener("scroll", updateActiveEntry, { passive: true });
+    window.addEventListener("resize", updateActiveEntry);
+    return () => {
+      window.removeEventListener("scroll", updateActiveEntry);
+      window.removeEventListener("resize", updateActiveEntry);
+    };
   }, []);
 
   const scrollToEntry = (id: string) => {
@@ -293,7 +375,7 @@ const ExperiencePage = () => {
   };
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-background text-foreground">
+    <div className="relative min-h-screen overflow-x-clip bg-background text-foreground">
       <Sidebar
         open={sidebarOpen}
         onToggle={handleSidebarToggle}
@@ -312,82 +394,73 @@ const ExperiencePage = () => {
       >
         <motion.main
           className="pt-28"
-          initial={{ opacity: 0, y: 20, filter: "blur(6px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.6, ease: EASE_TEXT, delay: 0.1 }}
         >
-          <section className="px-6 pb-10 md:pb-14">
-            <div className="grid min-h-[58svh] grid-cols-1 content-end gap-10 md:min-h-[62vh] md:grid-cols-[minmax(0,1fr)_minmax(18rem,22rem)] md:items-end">
-              <div className="min-w-0 max-w-5xl">
-                <motion.h1
-                  className="max-w-5xl text-[2.55rem] font-semibold leading-[0.98] tracking-tight text-foreground md:text-7xl md:leading-[0.95] lg:text-8xl"
-                  initial={{ opacity: 0, y: 18, filter: "blur(8px)" }}
-                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                  transition={{ duration: 0.72, ease: EASE_TEXT, delay: 0.18 }}
-                >
-                  Experience built where AI, communications, and operations meet.
-                </motion.h1>
-              </div>
-
-              <motion.a
-                href={RESUME_HREF}
-                download
-                className="block w-full min-w-0 shrink-0"
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.55, ease: EASE_TEXT, delay: 0.32 }}
-              >
-                <div className="homepage-cta group relative flex w-full cursor-pointer items-center justify-center bg-[hsl(50_33%_7%)] py-3 font-mono text-sm uppercase tracking-[0.2em] transition-colors duration-300 hover:bg-[hsl(50_33%_12%)]">
-                  <span className="flex items-center justify-center">
-                    Download resume
-                    <span className="inline-flex max-w-0 overflow-hidden opacity-0 transition-all duration-300 ease-out group-hover:max-w-[2rem] group-hover:opacity-100">
-                      <Download className="ml-2 h-4 w-4 shrink-0" strokeWidth={1.5} />
-                    </span>
-                  </span>
-                </div>
-              </motion.a>
-            </div>
-          </section>
-
-          <section className="px-6">
+          <section className="flex min-h-[calc(100svh-7rem)] flex-col justify-end px-6 pb-12 pt-16 md:pb-16">
             <motion.div
-              className="border-t border-foreground/12 py-7 md:grid md:grid-cols-[minmax(14rem,0.32fr)_minmax(0,1fr)] md:gap-10 md:py-9"
+              className="pt-7 pb-4 md:grid md:grid-cols-[minmax(14rem,0.32fr)_minmax(0,1fr)] md:gap-10 md:pt-9 md:pb-5"
               initial={{ opacity: 0, y: 24, filter: "blur(8px)" }}
               whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               viewport={{ once: true, margin: "-80px" }}
               transition={{ duration: 0.7, ease: EASE }}
             >
               <div className="mb-5 md:mb-0">
-                <h2 className="text-xl font-semibold tracking-tight text-foreground md:text-2xl">
-                  {experienceIntro.title}
-                </h2>
+                <AnimatedText
+                  text={experienceIntro.title}
+                  as="p"
+                  className="text-xl font-semibold tracking-tight text-foreground md:text-2xl"
+                  delay={0.05}
+                />
               </div>
-              <div className="grid max-w-4xl gap-4 text-[15px] leading-relaxed text-foreground/68 md:text-base">
+              <motion.div
+                className="grid max-w-4xl gap-4 text-[15px] leading-relaxed text-foreground/68 md:text-base"
+                initial={{ opacity: 0, y: 12, filter: "blur(6px)" }}
+                whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.42, ease: EASE_TEXT, delay: 0.1 }}
+              >
                 {experienceIntro.paragraphs.map((paragraph) => (
                   <p key={paragraph}>{paragraph}</p>
                 ))}
-              </div>
+              </motion.div>
             </motion.div>
+
+            <motion.a
+              href={RESUME_HREF}
+              download
+              className="mt-5 block w-full min-w-0 shrink-0 md:mt-6 md:w-1/2"
+              initial={{ opacity: 0, y: 14 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.55, ease: EASE_TEXT }}
+            >
+              <div className="homepage-cta group relative flex w-full cursor-pointer items-center justify-center bg-[hsl(50_33%_7%)] py-3 font-mono text-sm uppercase tracking-[0.2em] transition-colors duration-300 hover:bg-[hsl(50_33%_12%)]">
+                <span className="flex items-center justify-center">
+                  Download resume
+                  <span className="inline-flex max-w-0 overflow-hidden opacity-0 transition-all duration-300 ease-out group-hover:max-w-[2rem] group-hover:opacity-100">
+                    <Download className="ml-2 h-4 w-4 shrink-0" strokeWidth={1.5} />
+                  </span>
+                </span>
+              </div>
+            </motion.a>
           </section>
 
           <section ref={timelineRef} className="px-6 py-14 md:py-20">
             <div className="grid gap-10 lg:grid-cols-[minmax(13rem,17rem)_minmax(0,1fr)] lg:gap-14">
-              <aside className="hidden lg:block">
-                <div className="sticky top-28">
-                  <motion.p
-                    key={activeGroup.id}
-                    className="mb-8 text-xl font-semibold leading-tight tracking-tight text-foreground"
-                    initial={{ opacity: 0, y: 10, filter: "blur(6px)" }}
-                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                    transition={{ duration: 0.35, ease: EASE_TEXT }}
-                  >
-                    <EmployerLink group={activeGroup} />
-                  </motion.p>
-
+              <aside className="sticky top-28 hidden max-h-[calc(100svh-8rem)] self-start overflow-visible lg:block">
+                <motion.div
+                  className="pt-[66px]"
+                  initial={{ opacity: 0, y: 12, filter: "blur(6px)" }}
+                  whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                  viewport={{ once: true, margin: "-80px" }}
+                  transition={{ duration: 0.42, ease: EASE_TEXT }}
+                >
                   <div className="relative">
-                    <div className="absolute left-[5px] top-2 h-[calc(100%-1rem)] w-px bg-foreground/10" />
+                    <div className="absolute left-[5px] top-0 h-full w-px bg-foreground/10" />
                     <motion.div
-                      className="absolute left-[5px] top-2 h-[calc(100%-1rem)] w-px origin-top bg-[hsl(var(--highlight))]"
+                      className="absolute left-[5px] top-0 h-full w-px origin-top bg-[hsl(var(--highlight))]"
                       style={{ scaleY }}
                     />
                     <div className="space-y-2">
@@ -396,13 +469,13 @@ const ExperiencePage = () => {
                         return (
                           <div
                             key={group.id}
-                            className="group relative flex w-full items-start gap-4 py-1.5 text-left"
+                            className="group relative flex w-full items-start gap-4 text-left"
                           >
                             <button
                               type="button"
                               onClick={() => scrollToEntry(group.id)}
                               aria-label={`Scroll to ${group.organization}`}
-                              className={`relative z-10 mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full border transition-colors ${
+                              className={`relative z-10 mt-1 h-2.5 w-2.5 shrink-0 rounded-full border transition-colors ${
                                 active ? "border-[hsl(var(--highlight))] bg-[hsl(var(--highlight))]" : "border-foreground/30 bg-background"
                               }`}
                             />
@@ -410,18 +483,23 @@ const ExperiencePage = () => {
                               <span className={`block text-[13px] leading-tight transition-colors ${active ? "text-foreground" : "text-foreground/40 group-hover:text-foreground/72"}`}>
                                 <EmployerLink group={group} />
                               </span>
+                              <span className={`mt-1 block font-mono text-[9px] uppercase leading-tight tracking-[0.18em] transition-colors ${active ? "text-foreground/54" : "text-foreground/28 group-hover:text-foreground/46"}`}>
+                                {group.period}
+                              </span>
                             </span>
                           </div>
                         );
                       })}
                     </div>
                   </div>
-                </div>
+                </motion.div>
               </aside>
 
               <div>
                 {experienceGroups.map((group, index) => (
-                  <ExperienceGroupSection key={group.id} group={group} index={index} />
+                  <ParallaxSection key={group.id} offset={index === 0 ? 0 : 24} clip={false}>
+                    <ExperienceGroupSection group={group} index={index} />
+                  </ParallaxSection>
                 ))}
               </div>
             </div>

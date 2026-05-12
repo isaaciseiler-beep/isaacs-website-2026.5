@@ -155,7 +155,7 @@ const IsaacAISection = () => {
             <motion.button
               type="submit"
               disabled={!query.trim() || isLoading}
-              className="flex h-11 w-11 shrink-0 items-center justify-center bg-[#123f2c] text-white shadow-[0_10px_24px_rgba(18,63,44,0.24)] transition-colors hover:bg-[#185239] disabled:pointer-events-none disabled:bg-foreground/12 disabled:text-foreground/32 disabled:shadow-none"
+              className="flex h-11 w-11 shrink-0 items-center justify-center bg-[hsl(50_33%_7%)] text-white shadow-[0_10px_24px_rgba(18,24,14,0.24)] transition-colors hover:bg-[hsl(50_33%_12%)] disabled:pointer-events-none disabled:bg-foreground/12 disabled:text-foreground/32 disabled:shadow-none"
               whileHover={{ y: -2, scale: 1.04 }}
               whileTap={{ y: 0, scale: 0.94 }}
               transition={{ duration: 0.18, ease: EASE }}

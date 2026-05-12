@@ -89,7 +89,7 @@ const SearchPanel = ({ open, onClose }: { open: boolean; onClose: () => void }) 
       {open ? (
         <>
           <motion.div
-            className="fixed inset-0 z-[80] bg-background/18 backdrop-blur-[2px]"
+            className="fixed inset-0 z-[80] bg-transparent"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -100,34 +100,40 @@ const SearchPanel = ({ open, onClose }: { open: boolean; onClose: () => void }) 
             role="dialog"
             aria-modal="true"
             aria-label="Search"
-            className="site-sidebar-panel fixed right-0 top-0 z-[85] isolate flex h-[100svh] w-screen flex-col overflow-hidden bg-background px-6 pb-[calc(env(safe-area-inset-bottom)+2rem)] pt-20 text-foreground shadow-[-40px_0_120px_-70px_rgb(0_0_0/0.9)] md:h-screen md:w-[240px] md:py-20"
-            initial={{ x: "100%", opacity: 0.72, clipPath: "inset(0 0 0 100%)", filter: "blur(10px)" }}
-            animate={{ x: 0, opacity: 1, clipPath: "inset(0 0 0 0%)", filter: "blur(0px)" }}
-            exit={{ x: "100%", opacity: 0.78, clipPath: "inset(0 0 0 84%)", filter: "blur(7px)" }}
+            className="site-sidebar-panel fixed right-0 top-0 z-[85] isolate flex h-[100dvh] w-screen flex-col overflow-hidden bg-background px-6 pb-[calc(env(safe-area-inset-bottom)+2rem)] pt-20 text-foreground shadow-[-40px_0_120px_-70px_rgb(0_0_0/0.9)] md:w-[360px]"
+            initial={{ x: "100%", opacity: 0.96, clipPath: "inset(0 0 0 100%)" }}
+            animate={{ x: 0, opacity: 1, clipPath: "inset(0 0 0 0%)" }}
+            exit={{ x: "100%", opacity: 0.96, clipPath: "inset(0 0 0 84%)" }}
             transition={{ duration: 0.52, ease: EASE_TEXT, clipPath: { duration: 0.62, ease: EASE } }}
           >
-            <div className="mb-8 flex items-center gap-2 md:mb-6">
-              <div className="flex min-w-0 flex-1 items-center gap-2">
-                <Search className="h-5 w-5 shrink-0 text-foreground/35 md:h-3.5 md:w-3.5" strokeWidth={1.5} />
+            <div className="absolute right-6 top-4 flex h-[25px] w-[calc(100%-3rem)] items-center justify-end gap-2 md:w-[312px]">
+              <motion.div
+                className="flex min-w-0 flex-1 origin-right items-center justify-end gap-2"
+                initial={{ width: 25, opacity: 0 }}
+                animate={{ width: "100%", opacity: 1 }}
+                exit={{ width: 25, opacity: 0 }}
+                transition={{ duration: 0.46, ease: EASE }}
+              >
                 <input
                   ref={inputRef}
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
                   placeholder="Search"
-                  className="min-w-0 flex-1 bg-transparent text-[28px] font-medium leading-none text-foreground outline-none placeholder:text-foreground/30 md:text-sm md:leading-normal"
+                  className="min-w-0 flex-1 bg-transparent text-right text-[28px] font-medium leading-none text-foreground outline-none placeholder:text-foreground/30 md:text-sm md:leading-normal"
                 />
-              </div>
+                <Search className="h-5 w-5 shrink-0 text-foreground/45 md:h-3.5 md:w-3.5" strokeWidth={1.5} />
+              </motion.div>
               <button
                 type="button"
                 onClick={onClose}
-                className="flex h-8 w-8 shrink-0 items-center justify-center text-foreground/35 transition-colors duration-200 hover:text-foreground md:h-5 md:w-5"
+                className="flex h-[25px] w-[25px] shrink-0 items-center justify-center text-foreground/35 transition-colors duration-200 hover:text-foreground"
                 aria-label="Close search"
               >
                 <X className="h-5 w-5 md:h-3.5 md:w-3.5" strokeWidth={1.5} />
               </button>
             </div>
 
-            <div className="min-h-0 flex-1 overflow-y-auto pb-4 scrollbar-hide">
+            <div className="min-h-0 flex-1 overflow-y-auto pb-4 pt-8 scrollbar-hide">
               {!hasQuery ? (
                 <div className="h-full" aria-hidden />
               ) : hasResults ? (
@@ -185,7 +191,7 @@ const SearchTrigger = ({ variant = "header", className, style, onOpen }: SearchT
           <Search className="h-5 w-5 md:h-3.5 md:w-3.5" strokeWidth={1.5} />
           <span>Search</span>
         </button>
-      ) : (
+      ) : !open ? (
         <button
           type="button"
           onClick={handleOpen}
@@ -195,6 +201,8 @@ const SearchTrigger = ({ variant = "header", className, style, onOpen }: SearchT
         >
           <Search className="h-3.5 w-3.5" strokeWidth={1.65} />
         </button>
+      ) : (
+        null
       )}
       <SearchPanel open={open} onClose={() => setOpen(false)} />
     </>

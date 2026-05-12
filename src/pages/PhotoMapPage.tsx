@@ -13,6 +13,7 @@ const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const EASE_TEXT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 const MONOCHROME_MAP_STYLE = "mapbox://styles/mapbox/light-v11";
 const MAP_BACKGROUND = "#f4f7fe";
+const MAP_WATER = "#eceff4";
 const MAP_LAND = "#dce4f1";
 const MAP_PARK = "#d2dceb";
 const MAP_COAST = "#aeb9ca";
@@ -71,8 +72,8 @@ const addWorldGeographyLayers = (map: mapboxgl.Map) => {
         filter: ["!=", ["get", "disputed"], "true"],
         paint: {
           "line-color": MAP_BORDER,
-          "line-width": ["interpolate", ["linear"], ["zoom"], 0, 0.55, 1.2, 0.9, 3, 1.35, 6, 2],
-          "line-opacity": ["interpolate", ["linear"], ["zoom"], 0, 0.58, 1.2, 0.72, 4, 0.86],
+          "line-width": ["interpolate", ["linear"], ["zoom"], 0, 0.38, 1.2, 0.66, 3, 1, 6, 1.5],
+          "line-opacity": ["interpolate", ["linear"], ["zoom"], 0, 0.46, 1.2, 0.62, 4, 0.76],
           "line-blur": 0.12,
         },
       });
@@ -87,8 +88,8 @@ const addWorldGeographyLayers = (map: mapboxgl.Map) => {
         filter: ["==", ["get", "disputed"], "true"],
         paint: {
           "line-color": MAP_BORDER,
-          "line-width": ["interpolate", ["linear"], ["zoom"], 0, 0.4, 1.2, 0.7, 4, 1.1],
-          "line-opacity": 0.42,
+          "line-width": ["interpolate", ["linear"], ["zoom"], 0, 0.28, 1.2, 0.5, 4, 0.82],
+          "line-opacity": 0.32,
           "line-dasharray": [2, 1.2],
         },
       });
@@ -111,7 +112,7 @@ const applyMapPalette = (map: mapboxgl.Map) => {
 
       if (layer.type === "fill") {
         if (id.includes("water") || id.includes("background")) {
-          map.setPaintProperty(layer.id, "fill-color", MAP_BACKGROUND);
+          map.setPaintProperty(layer.id, "fill-color", id.includes("water") ? MAP_WATER : MAP_BACKGROUND);
         } else if (id.includes("park") || id.includes("landuse")) {
           map.setPaintProperty(layer.id, "fill-color", MAP_PARK);
         } else if (id.includes("land") || id.includes("country") || id.includes("continent")) {

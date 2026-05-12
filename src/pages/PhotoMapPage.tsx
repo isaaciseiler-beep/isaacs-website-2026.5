@@ -62,11 +62,17 @@ const PhotoMapPage = () => {
     map.addControl(new mapboxgl.AttributionControl({ compact: true }), "bottom-left");
 
     const handleLoad = () => {
+      const siteBackground = window
+        .getComputedStyle(document.documentElement)
+        .getPropertyValue("--background")
+        .trim();
+      const backgroundColor = siteBackground ? `hsl(${siteBackground})` : "hsl(50 33% 7%)";
+
       map.setFog({
-        color: "rgb(244, 244, 241)",
-        "high-color": "rgb(244, 244, 241)",
+        color: backgroundColor,
+        "high-color": backgroundColor,
         "horizon-blend": 0,
-        "space-color": "rgb(244, 244, 241)",
+        "space-color": backgroundColor,
         "star-intensity": 0,
       });
       setMapReady(true);
@@ -194,9 +200,9 @@ const PhotoMapPage = () => {
           width: sidebarOpen && !isMobile ? "calc(100% - 240px)" : "100%",
         }}
         transition={{ duration: 0.4, ease: EASE_TEXT }}
-        className="relative h-[100svh] overflow-hidden bg-background px-3 pb-3 pt-[4.75rem] sm:px-5 sm:pb-5 md:px-6 md:pb-6 md:pt-20"
+        className="relative h-[100svh] overflow-hidden bg-background"
       >
-        <section className="relative h-full overflow-hidden bg-[#e6e6e3]">
+        <section className="relative h-full overflow-hidden bg-background">
           <div ref={containerRef} className="photo-map-shell h-full w-full" />
 
           {!mapReady || mapError ? (
@@ -215,15 +221,15 @@ const PhotoMapPage = () => {
             </div>
           ) : null}
 
-          <section className="pointer-events-none absolute inset-y-0 right-0 z-20 flex w-full justify-end p-3 sm:w-[430px] sm:p-4">
+          <section className="pointer-events-none absolute inset-x-0 bottom-0 right-0 z-20 flex justify-end p-3 sm:inset-y-0 sm:left-auto sm:w-[430px] sm:p-4">
             <AnimatePresence mode="wait">
               {activeEntry ? (
                 <motion.article
                   key={activeEntry.id}
-                  className="pointer-events-auto relative flex h-full w-full max-w-[390px] overflow-hidden border border-white/15 bg-[hsl(50_33%_7%)] text-white shadow-2xl shadow-black/35"
-                  initial={{ opacity: 0, x: 36, filter: "blur(8px)" }}
-                  animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-                  exit={{ opacity: 0, x: 28, filter: "blur(6px)" }}
+                  className="pointer-events-auto relative flex h-[42svh] min-h-[280px] w-full overflow-hidden border border-white/15 bg-[hsl(50_33%_7%)] text-white shadow-2xl shadow-black/35 sm:h-full sm:max-w-[390px]"
+                  initial={isMobile ? { opacity: 0, y: 28, filter: "blur(8px)" } : { opacity: 0, x: 36, filter: "blur(8px)" }}
+                  animate={{ opacity: 1, x: 0, y: 0, filter: "blur(0px)" }}
+                  exit={isMobile ? { opacity: 0, y: 24, filter: "blur(6px)" } : { opacity: 0, x: 28, filter: "blur(6px)" }}
                   transition={{ duration: 0.35, ease: EASE }}
                 >
                   <img
@@ -232,14 +238,14 @@ const PhotoMapPage = () => {
                     className="absolute inset-0 h-full w-full object-cover grayscale"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/22 to-black/20" />
-                  <div className="relative z-10 flex min-h-0 flex-1 flex-col justify-end p-5">
+                  <div className="relative z-10 flex min-h-0 flex-1 flex-col justify-end p-4 sm:p-5">
                     <button
                       type="button"
-                      className="mb-6 text-left"
+                      className="mb-4 text-left sm:mb-6"
                       onClick={() => openEntry(activeEntry)}
                       aria-label={hasAlbum(activeEntry) ? `Open ${activeEntry.location} album` : `${activeEntry.location} album not available`}
                     >
-                      <h1 className="text-5xl font-semibold leading-[0.9] tracking-tight">{activeEntry.title}</h1>
+                      <h1 className="text-4xl font-semibold leading-[0.9] tracking-tight sm:text-5xl">{activeEntry.title}</h1>
                     </button>
 
                     <div className="grid grid-cols-[1fr_auto] gap-2">

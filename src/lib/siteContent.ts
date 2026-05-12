@@ -233,7 +233,7 @@ export const projectItems: ProjectItem[] = [
     year: "2025",
     summary:
       "A report capturing the systems, staffing, and benchmarks used to stand up a brand-new congressional office from zero.",
-    image: projectImg.capHill,
+    image: "/experience/potus.jpeg",
     sections: [
       {
         heading: "Overview",

@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUpRight, Search, Sparkles, X } from "lucide-react";
+import { ArrowUp, ArrowUpRight, Search, Sparkles, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { hasSearchResults, searchSite, type SearchResult } from "@/lib/searchIndex";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useLockBodyScroll } from "@/hooks/use-lock-body-scroll";
 
 const EASE: [number, number, number, number] = [0.19, 1, 0.22, 1];
 const EASE_TEXT: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -75,6 +74,7 @@ const ResultCard = ({
 
 export const SearchPanel = ({ open, onClose }: { open: boolean; onClose: () => void }) => {
   const [query, setQuery] = useState("");
+  const [mode, setMode] = useState<"search" | "ai">("search");
   const [aiQuery, setAiQuery] = useState("");
   const [aiMessage, setAiMessage] = useState("");
   const [aiError, setAiError] = useState("");
@@ -89,8 +89,7 @@ export const SearchPanel = ({ open, onClose }: { open: boolean; onClose: () => v
   const trimmedQuery = query.trim();
   const hasQuery = trimmedQuery.length > 0;
   const hasResults = hasSearchResults(groups);
-  const showAiPanel = hasQuery && trimmedQuery.length > 2;
-  useLockBodyScroll(open);
+  const firstResult = groups.find((group) => group.results.length)?.results[0];
 
   useEffect(() => {
     latestQueryRef.current = trimmedQuery;
@@ -122,6 +121,7 @@ export const SearchPanel = ({ open, onClose }: { open: boolean; onClose: () => v
       setAiError("");
       setAiSources([]);
       setAiLoading(false);
+      setMode("search");
       aiRequestIdRef.current += 1;
     }
   }, [open]);
@@ -172,25 +172,32 @@ export const SearchPanel = ({ open, onClose }: { open: boolean; onClose: () => v
     navigate(result.href);
   };
 
+  const handleEnter = () => {
+    if (mode === "ai") {
+      askAssistant();
+      return;
+    }
+    if (firstResult) handleSelect(firstResult);
+  };
+
   return (
     <AnimatePresence>
       {open ? (
         <>
           <motion.div
             role="dialog"
-            aria-modal="true"
             aria-label="Search"
-            className="site-sidebar-panel fixed inset-y-0 right-0 z-[85] isolate flex h-[100dvh] w-screen transform-gpu flex-col overflow-y-auto overscroll-contain px-6 pb-[calc(env(safe-area-inset-bottom)+2rem)] pt-20 text-foreground will-change-transform md:w-[240px] md:py-20"
+            className="site-sidebar-panel fixed inset-y-0 right-0 z-[85] isolate flex h-[100dvh] w-screen transform-gpu flex-col px-6 pb-[calc(env(safe-area-inset-bottom)+2rem)] pt-20 text-foreground will-change-transform md:w-[var(--site-panel-width)] md:py-20"
             initial={{ x: isMobile ? "100%" : 240 }}
             animate={{ x: 0, opacity: 1, filter: "blur(0px)" }}
             exit={{ x: isMobile ? "100%" : 240 }}
             transition={{ duration: 0.56, ease: EASE_TEXT }}
           >
-            <div className="flex h-[25px] shrink-0 items-center justify-end gap-2">
+            <div className="flex min-h-9 shrink-0 items-center justify-end gap-2 md:min-h-[25px]">
               <button
                 type="button"
                 onClick={onClose}
-                className="flex h-[25px] w-[25px] shrink-0 items-center justify-center text-foreground/35 transition-colors duration-200 hover:text-foreground"
+                className="flex h-9 w-9 shrink-0 items-center justify-center text-foreground/35 transition-colors duration-200 hover:text-foreground md:h-[25px] md:w-[25px]"
                 aria-label="Close search"
               >
                 <X className="h-5 w-5 md:h-3.5 md:w-3.5" strokeWidth={1.5} />
@@ -202,30 +209,64 @@ export const SearchPanel = ({ open, onClose }: { open: boolean; onClose: () => v
                 exit={{ width: 25, opacity: 0 }}
                 transition={{ duration: 0.58, ease: EASE }}
               >
+                <div className="relative flex h-9 w-[74px] shrink-0 items-center bg-foreground/[0.055] p-0.5 md:h-[25px] md:w-[58px]">
+                  <motion.span
+                    className="absolute inset-y-0.5 w-[35px] bg-foreground text-background md:w-[27px]"
+                    animate={{ x: mode === "search" ? 0 : "100%" }}
+                    transition={{ duration: 0.36, ease: EASE_TEXT }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setMode("search")}
+                    className={`relative z-10 flex h-full flex-1 items-center justify-center transition-colors duration-200 ${
+                      mode === "search" ? "text-background" : "text-foreground/42 hover:text-foreground/70"
+                    }`}
+                    aria-label="Search mode"
+                    aria-pressed={mode === "search"}
+                  >
+                    <Search className="h-4 w-4 md:h-3 w-3" strokeWidth={1.65} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMode("ai")}
+                    className={`relative z-10 flex h-full flex-1 items-center justify-center transition-colors duration-200 ${
+                      mode === "ai" ? "text-background" : "text-foreground/42 hover:text-foreground/70"
+                    }`}
+                    aria-label="AI mode"
+                    aria-pressed={mode === "ai"}
+                  >
+                    <Sparkles className="h-4 w-4 md:h-3 w-3" strokeWidth={1.65} />
+                  </button>
+                </div>
                 <input
                   ref={inputRef}
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
                   onKeyDown={(event) => {
-                    if (event.key === "Enter") askAssistant();
+                    if (event.key === "Enter") handleEnter();
                   }}
-                  placeholder="Search"
+                  placeholder={mode === "ai" ? "Ask AI" : "Search"}
                   className="min-w-0 flex-1 bg-transparent text-right text-[28px] font-medium leading-none text-foreground outline-none placeholder:text-foreground/30 md:text-sm md:leading-normal"
                 />
-                <Search className="h-5 w-5 shrink-0 text-foreground/45 md:h-3.5 md:w-3.5" strokeWidth={1.5} />
+                {mode === "ai" ? (
+                  <button
+                    type="button"
+                    onClick={askAssistant}
+                    disabled={!hasQuery || aiLoading}
+                    className="flex h-9 w-9 shrink-0 items-center justify-center bg-[hsl(var(--highlight))] text-background transition-opacity hover:opacity-85 disabled:pointer-events-none disabled:opacity-30 md:h-[25px] md:w-[25px]"
+                    aria-label="Ask Isaac AI"
+                  >
+                    <ArrowUp className="h-4 w-4 md:h-3.5 md:w-3.5" strokeWidth={1.7} />
+                  </button>
+                ) : (
+                  <Search className="h-5 w-5 shrink-0 text-foreground/45 md:h-3.5 md:w-3.5" strokeWidth={1.5} />
+                )}
               </motion.div>
             </div>
 
             <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-4 pt-12 scrollbar-hide md:pt-14">
-              {!hasQuery ? (
-                <div className="grid h-full min-h-[260px] place-items-center">
-                  <p className="max-w-[18rem] text-right text-[13px] leading-relaxed text-foreground/35">
-                    Search my work or ask Isaac AI.
-                  </p>
-                </div>
-              ) : (
+              {!hasQuery ? null : mode === "ai" ? (
                 <div>
-                  {showAiPanel ? (
                     <motion.section
                       className="pb-5"
                       initial={{ opacity: 0, y: 10 }}
@@ -283,8 +324,9 @@ export const SearchPanel = ({ open, onClose }: { open: boolean; onClose: () => v
                         </div>
                       ) : null}
                     </motion.section>
-                  ) : null}
-
+                </div>
+              ) : (
+                <div>
                   {hasResults ? (
                     groups.map((group) =>
                       group.results.length ? (

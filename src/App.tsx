@@ -28,13 +28,12 @@ const AnimatedRoutes = () => {
     <AnimatePresence initial={false} mode="wait">
       <motion.div
         key={location.pathname}
-        initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, filter: "blur(8px)" }}
-        animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, filter: "blur(0px)" }}
-        exit={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, filter: "blur(10px)" }}
+        initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0 }}
+        animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1 }}
+        exit={prefersReducedMotion ? { opacity: 1 } : { opacity: 0 }}
         transition={{
           duration: prefersReducedMotion ? 0 : 0.24,
           ease: PAGE_TRANSITION_EASE,
-          filter: { duration: prefersReducedMotion ? 0 : 0.2, ease: PAGE_TRANSITION_EASE },
         }}
       >
         <Suspense fallback={null}>

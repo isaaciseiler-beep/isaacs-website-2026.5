@@ -59,7 +59,7 @@ const IsaacAISection = () => {
   };
 
   return (
-    <section className="relative z-20 px-6 pb-20 pt-14 md:pb-28 md:pt-12">
+    <section className="relative z-20 flex min-h-[78vh] items-center px-6 py-24 md:min-h-screen md:py-32">
       <motion.div
         className="mx-auto flex max-w-3xl flex-col items-center text-center"
         initial={{ opacity: 0, y: 18 }}

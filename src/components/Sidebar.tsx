@@ -7,7 +7,6 @@ import { useTheme } from "@/components/ThemeProvider";
 import SearchTrigger from "@/components/SearchOverlay";
 import { CONTACT_MAILTO, GITHUB_URL, LINKEDIN_URL, SUBSTACK_URL } from "@/lib/site";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useLockBodyScroll } from "@/hooks/use-lock-body-scroll";
 
 const EASE: [number, number, number, number] = [0.19, 1, 0.22, 1];
 const EASE_TEXT: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -73,6 +72,7 @@ export const sitemapItems: SitemapItem[] = [
     { id: "photo-map", label: "Photo Map", href: "/photos/map" },
   ]},
   { id: "inspiration", label: "Inspiration", scrollTo: "inspiration" },
+  { id: "isaac-ai", label: "Isaac AI", scrollTo: "isaac-ai" },
 ];
 
 const socialLinks = [
@@ -107,7 +107,6 @@ const Sidebar = ({ open, onToggle, onClose, onSearchOpen, activeSection, showTog
   const isOnPhotos = location.pathname.startsWith("/photos");
   const isOnProjects = location.pathname.startsWith("/projects");
   const isOnExperience = location.pathname.startsWith("/experience");
-  useLockBodyScroll(open);
 
   useEffect(() => {
     const activeParents = sitemapItems.reduce<Record<string, boolean>>((acc, item) => {
@@ -188,7 +187,7 @@ const Sidebar = ({ open, onToggle, onClose, onSearchOpen, activeSection, showTog
       ) : null}
 
       <motion.nav
-        className="site-sidebar-panel fixed inset-y-0 left-0 z-[45] isolate flex h-[100dvh] w-screen transform-gpu flex-col overflow-y-auto overscroll-contain px-6 pb-[calc(env(safe-area-inset-bottom)+2rem)] pt-20 will-change-transform md:w-[240px] md:justify-between md:py-20"
+        className="site-sidebar-panel fixed inset-y-0 left-0 z-[45] isolate flex h-[100dvh] w-screen transform-gpu flex-col overflow-y-auto overscroll-contain px-6 pb-[calc(env(safe-area-inset-bottom)+2rem)] pt-20 will-change-transform md:w-[var(--site-panel-width)] md:justify-between md:py-20"
         animate={{ x: open ? 0 : isMobile ? "-100%" : -240 }}
         transition={{ duration: 0.56, ease: EASE_TEXT }}
       >

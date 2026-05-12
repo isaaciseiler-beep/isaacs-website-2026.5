@@ -8,7 +8,6 @@ import InspirationBoard from "@/components/InspirationBoard";
 import IsaacAISection from "@/components/IsaacAISection";
 import AboutSection from "@/components/AboutSection";
 import Footer from "@/components/Footer";
-import ChatOrb from "@/components/ChatOrb";
 import ParallaxSection from "@/components/ParallaxSection";
 import Sidebar, { sitemapItems } from "@/components/Sidebar";
 import SiteHeader from "@/components/SiteHeader";
@@ -82,13 +81,11 @@ const Index = () => {
           <ParallaxSection id="photos" offset={80}><PhotoSection /></ParallaxSection>
           <div id="inspiration">
             <ParallaxSection offset={55} clip={false}><InspirationBoard /></ParallaxSection>
-            <IsaacAISection />
           </div>
+          <ParallaxSection id="isaac-ai" offset={70} clip={false}><IsaacAISection /></ParallaxSection>
           <Footer />
         </main>
       </motion.div>
-
-      {!sidebarOpen && !searchOpen && <ChatOrb />}
 
       <SiteHeader
         open={sidebarOpen}

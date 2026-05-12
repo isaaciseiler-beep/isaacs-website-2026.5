@@ -5,7 +5,6 @@ import { ArrowUp } from "lucide-react";
 import Footer from "@/components/Footer";
 import Sidebar from "@/components/Sidebar";
 import SiteHeader from "@/components/SiteHeader";
-import ChatOrb from "@/components/ChatOrb";
 import { projectItems, type ProjectItem } from "@/lib/siteContent";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -228,8 +227,6 @@ const ProjectsPage = () => {
           </motion.button>
         )}
       </AnimatePresence>
-
-      {!sidebarOpen && !searchOpen && <ChatOrb />}
 
       <SiteHeader
         open={sidebarOpen}

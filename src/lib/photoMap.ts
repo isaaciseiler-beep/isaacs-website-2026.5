@@ -98,7 +98,7 @@ export const photoMapEntries: PhotoMapEntry[] = [...albumMapEntries, ...standalo
 
 export const photoMapInitialView = {
   center: [105, 26] as [number, number],
-  zoom: 1.22,
+  zoom: 0.84,
   pitch: 0,
   bearing: 0,
 };

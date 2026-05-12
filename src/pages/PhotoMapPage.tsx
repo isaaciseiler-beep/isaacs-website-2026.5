@@ -100,7 +100,7 @@ const PhotoMapPage = () => {
       style: MONOCHROME_MAP_STYLE,
       center: photoMapInitialView.center,
       zoom: photoMapInitialView.zoom,
-      minZoom: 1,
+      minZoom: 0.35,
       maxZoom: 12,
       pitch: photoMapInitialView.pitch,
       bearing: photoMapInitialView.bearing,
@@ -292,7 +292,7 @@ const PhotoMapPage = () => {
             </div>
           ) : null}
 
-          <section className="pointer-events-none absolute inset-x-0 bottom-0 right-0 z-20 flex justify-end p-3 sm:inset-y-0 sm:left-auto sm:w-[382px] sm:p-4">
+          <section className="pointer-events-none absolute inset-x-0 bottom-0 right-0 z-[70] flex justify-end p-3 sm:inset-y-0 sm:left-auto sm:w-[382px] sm:p-4">
             <AnimatePresence mode="wait">
               {activeEntry ? (
                 <motion.article

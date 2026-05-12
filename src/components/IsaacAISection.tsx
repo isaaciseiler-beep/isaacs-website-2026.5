@@ -20,6 +20,7 @@ const IsaacAISection = () => {
   const [query, setQuery] = useState("");
   const [answer, setAnswer] = useState("");
   const [error, setError] = useState("");
+  const [submittedPrompt, setSubmittedPrompt] = useState("");
   const [sources, setSources] = useState<ChatApiResponse["sources"]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const requestIdRef = useRef(0);
@@ -33,6 +34,7 @@ const IsaacAISection = () => {
     requestIdRef.current = requestId;
     setAnswer("");
     setError("");
+    setSubmittedPrompt(prompt);
     setSources([]);
     setIsLoading(true);
 
@@ -73,19 +75,16 @@ const IsaacAISection = () => {
           Isaac AI
         </p>
 
-        <div
-          className={`w-full max-w-2xl border border-foreground/14 bg-foreground/[0.035] text-left shadow-[0_24px_70px_rgba(0,0,0,0.16)] transition-all duration-500 ease-out focus-within:border-foreground/28 ${
-            hasResponse ? "min-h-[280px] md:min-h-[340px]" : "min-h-[72px]"
-          }`}
-        >
-          {hasResponse && (
-            <div className="flex min-h-[204px] flex-col gap-4 px-4 pb-3 pt-4 md:min-h-[264px] md:px-5 md:pt-5">
+        <div className="flex h-[340px] w-full max-w-2xl flex-col bg-foreground/[0.035] text-left shadow-[0_24px_70px_rgba(0,0,0,0.16)] transition-all duration-500 ease-out focus-within:bg-foreground/[0.045] md:h-[400px]">
+          <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 pb-3 pt-4 md:px-5 md:pt-5">
+            {hasResponse && (
+              <>
               <div className="ml-auto max-w-[86%] bg-foreground/[0.08] px-3 py-2 text-sm leading-relaxed text-foreground/75 md:max-w-[78%]">
-                {query.trim() || "Ask about my work, projects, or background"}
+                {submittedPrompt || query.trim()}
               </div>
 
               <motion.div
-                className="mr-auto max-w-[92%] border border-foreground/10 bg-background/45 px-3.5 py-3 md:max-w-[84%]"
+                className="mr-auto max-w-[92%] bg-background/45 px-3.5 py-3 md:max-w-[84%]"
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.38, ease: EASE }}
@@ -132,12 +131,13 @@ const IsaacAISection = () => {
                   </div>
                 ) : null}
               </motion.div>
-            </div>
-          )}
+              </>
+            )}
+          </div>
 
           <form
             onSubmit={askAssistant}
-            className="flex min-h-[70px] items-end gap-2 border-t border-foreground/10 px-3 py-3 first:border-t-0 md:px-4"
+            className="flex min-h-[70px] items-end gap-2 px-3 py-3 md:px-4"
           >
             <div className="flex h-11 w-10 shrink-0 items-center justify-center text-foreground/35">
               <Sparkles className="h-4 w-4" strokeWidth={1.5} />
@@ -155,18 +155,21 @@ const IsaacAISection = () => {
               rows={1}
               className="max-h-32 min-h-11 min-w-0 flex-1 resize-none bg-transparent py-3 text-sm leading-relaxed text-foreground outline-none placeholder:text-foreground/32 md:text-base"
             />
-            <button
+            <motion.button
               type="submit"
               disabled={!query.trim() || isLoading}
-              className="flex h-11 w-11 shrink-0 items-center justify-center bg-[#123f2c] text-white transition-colors hover:bg-[#185239] disabled:pointer-events-none disabled:bg-foreground/12 disabled:text-foreground/32"
+              className="flex h-11 w-11 shrink-0 items-center justify-center bg-[#123f2c] text-white shadow-[0_10px_24px_rgba(18,63,44,0.24)] transition-colors hover:bg-[#185239] disabled:pointer-events-none disabled:bg-foreground/12 disabled:text-foreground/32 disabled:shadow-none"
+              whileHover={{ y: -2, scale: 1.04 }}
+              whileTap={{ y: 0, scale: 0.94 }}
+              transition={{ duration: 0.18, ease: EASE }}
               aria-label="Ask Isaac AI"
             >
               <ArrowUp className="h-4 w-4" strokeWidth={1.7} />
-            </button>
+            </motion.button>
           </form>
         </div>
 
-        <p className="mt-2.5 max-w-xl text-center text-[10px] italic leading-relaxed text-foreground/30 md:text-[11px]">
+        <p className="mt-2.5 max-w-xl text-center text-[9px] italic leading-relaxed text-foreground/30 md:text-[10px]">
           This AI is trained on a body of my work and does not speak for me. It is a prototype. Report output issues{" "}
           <a
             href={`mailto:${CONTACT_EMAIL}?subject=Isaac%20AI%20output%20issue`}

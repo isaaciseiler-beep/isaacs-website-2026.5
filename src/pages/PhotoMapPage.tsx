@@ -13,13 +13,19 @@ const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const EASE_TEXT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 const MONOCHROME_MAP_STYLE = "mapbox://styles/mapbox/light-v11";
 const MAP_BACKGROUND = "#f4f7fe";
-const MAP_LAND = "#e2e8f4";
-const MAP_PARK = "#d8e1ef";
-const MAP_DETAIL = "#c8d0df";
-const MAP_LABEL = "#535d6b";
+const MAP_LAND = "#dce4f1";
+const MAP_PARK = "#d2dceb";
+const MAP_COAST = "#aeb9ca";
+const MAP_BORDER = "#8d98ab";
+const MAP_DETAIL = "#bcc6d7";
+const MAP_LABEL = "#4f5a69";
 const DESKTOP_PANEL_WIDTH = 350;
 const DESKTOP_PANEL_GUTTER = 16;
 const MOBILE_PANEL_HEIGHT = 260;
+const WORLD_SOURCE = "photo-map-world";
+const WORLD_LAND_LAYER = "photo-map-world-land";
+const WORLD_BORDER_LAYER = "photo-map-world-borders";
+const WORLD_BORDER_DISPUTED_LAYER = "photo-map-world-borders-disputed";
 
 type MarkerEntry = {
   marker: mapboxgl.Marker;
@@ -27,6 +33,70 @@ type MarkerEntry = {
 };
 
 const stopMarkerEvent = (event: Event) => event.stopPropagation();
+
+const defaultMapView = (isMobile: boolean) => ({
+  ...photoMapInitialView,
+  center: (isMobile ? [105, 18] : photoMapInitialView.center) as [number, number],
+  zoom: isMobile ? 0.48 : photoMapInitialView.zoom,
+});
+
+const addWorldGeographyLayers = (map: mapboxgl.Map) => {
+  try {
+    if (!map.getSource(WORLD_SOURCE)) {
+      map.addSource(WORLD_SOURCE, {
+        type: "vector",
+        url: "mapbox://mapbox.country-boundaries-v1",
+      });
+    }
+
+    if (!map.getLayer(WORLD_LAND_LAYER)) {
+      map.addLayer({
+        id: WORLD_LAND_LAYER,
+        type: "fill",
+        source: WORLD_SOURCE,
+        "source-layer": "country_boundaries",
+        paint: {
+          "fill-color": MAP_LAND,
+          "fill-opacity": ["interpolate", ["linear"], ["zoom"], 0, 0.54, 1.2, 0.64, 4, 0.78],
+        },
+      });
+    }
+
+    if (!map.getLayer(WORLD_BORDER_LAYER)) {
+      map.addLayer({
+        id: WORLD_BORDER_LAYER,
+        type: "line",
+        source: WORLD_SOURCE,
+        "source-layer": "country_boundaries",
+        filter: ["!=", ["get", "disputed"], "true"],
+        paint: {
+          "line-color": MAP_BORDER,
+          "line-width": ["interpolate", ["linear"], ["zoom"], 0, 0.55, 1.2, 0.9, 3, 1.35, 6, 2],
+          "line-opacity": ["interpolate", ["linear"], ["zoom"], 0, 0.58, 1.2, 0.72, 4, 0.86],
+          "line-blur": 0.12,
+        },
+      });
+    }
+
+    if (!map.getLayer(WORLD_BORDER_DISPUTED_LAYER)) {
+      map.addLayer({
+        id: WORLD_BORDER_DISPUTED_LAYER,
+        type: "line",
+        source: WORLD_SOURCE,
+        "source-layer": "country_boundaries",
+        filter: ["==", ["get", "disputed"], "true"],
+        paint: {
+          "line-color": MAP_BORDER,
+          "line-width": ["interpolate", ["linear"], ["zoom"], 0, 0.4, 1.2, 0.7, 4, 1.1],
+          "line-opacity": 0.42,
+          "line-dasharray": [2, 1.2],
+        },
+      });
+    }
+  } catch {
+    // The dedicated boundary tiles require a valid Mapbox token; the base map still works without them.
+  }
+};
 
 const applyMapPalette = (map: mapboxgl.Map) => {
   const layers = map.getStyle().layers ?? [];
@@ -42,27 +112,34 @@ const applyMapPalette = (map: mapboxgl.Map) => {
       if (layer.type === "fill") {
         if (id.includes("water") || id.includes("background")) {
           map.setPaintProperty(layer.id, "fill-color", MAP_BACKGROUND);
-        } else if (id.includes("land")) {
-          map.setPaintProperty(layer.id, "fill-color", MAP_LAND);
         } else if (id.includes("park") || id.includes("landuse")) {
           map.setPaintProperty(layer.id, "fill-color", MAP_PARK);
+        } else if (id.includes("land") || id.includes("country") || id.includes("continent")) {
+          map.setPaintProperty(layer.id, "fill-color", MAP_LAND);
+        } else {
+          map.setPaintProperty(layer.id, "fill-color", MAP_LAND);
+          map.setPaintProperty(layer.id, "fill-opacity", 0.48);
         }
       }
 
-      if (layer.type === "line" && /admin|boundary|road|waterway|bridge|tunnel/.test(id)) {
-        map.setPaintProperty(layer.id, "line-color", MAP_DETAIL);
-        map.setPaintProperty(layer.id, "line-opacity", id.includes("road") ? 0.5 : 0.32);
+      if (layer.type === "line" && /admin|boundary|border|coast|country|road|waterway|bridge|tunnel/.test(id)) {
+        const isBorder = /admin|boundary|border|country/.test(id);
+        const isCoast = id.includes("coast");
+        map.setPaintProperty(layer.id, "line-color", isBorder ? MAP_BORDER : isCoast ? MAP_COAST : MAP_DETAIL);
+        map.setPaintProperty(layer.id, "line-opacity", isBorder ? 0.72 : isCoast ? 0.64 : id.includes("road") ? 0.42 : 0.38);
       }
 
       if (layer.type === "symbol") {
         map.setPaintProperty(layer.id, "text-color", MAP_LABEL);
         map.setPaintProperty(layer.id, "text-halo-color", MAP_BACKGROUND);
-        map.setPaintProperty(layer.id, "text-halo-width", 0.7);
+        map.setPaintProperty(layer.id, "text-halo-width", 0.9);
       }
     } catch {
       // Mapbox base styles vary by layer; unsupported paint properties can be ignored.
     }
   });
+
+  addWorldGeographyLayers(map);
 };
 
 const PhotoMapPage = () => {
@@ -95,15 +172,16 @@ const PhotoMapPage = () => {
     if (!containerRef.current || mapRef.current || !mapboxToken) return;
 
     mapboxgl.accessToken = mapboxToken;
+    const initialView = defaultMapView(isMobile);
     const map = new mapboxgl.Map({
       container: containerRef.current,
       style: MONOCHROME_MAP_STYLE,
-      center: photoMapInitialView.center,
-      zoom: photoMapInitialView.zoom,
+      center: initialView.center,
+      zoom: initialView.zoom,
       minZoom: 0.35,
       maxZoom: 12,
-      pitch: photoMapInitialView.pitch,
-      bearing: photoMapInitialView.bearing,
+      pitch: initialView.pitch,
+      bearing: initialView.bearing,
       projection: { name: "globe" },
       attributionControl: false,
       fadeDuration: 0,
@@ -138,7 +216,7 @@ const PhotoMapPage = () => {
       map.remove();
       mapRef.current = null;
     };
-  }, [mapboxToken]);
+  }, [isMobile, mapboxToken]);
 
   useEffect(() => {
     if (!mapReady || !mapRef.current) return;
@@ -147,11 +225,12 @@ const PhotoMapPage = () => {
     const resizeAndCenter = () => {
       map.resize();
       if (!activeEntry) {
+        const view = defaultMapView(isMobile);
         map.jumpTo({
-          center: photoMapInitialView.center,
-          zoom: photoMapInitialView.zoom,
-          pitch: photoMapInitialView.pitch,
-          bearing: photoMapInitialView.bearing,
+          center: view.center,
+          zoom: view.zoom,
+          pitch: view.pitch,
+          bearing: view.bearing,
         });
       }
     };
@@ -181,7 +260,7 @@ const PhotoMapPage = () => {
       const button = document.createElement("button");
       button.type = "button";
       button.className =
-        "photo-map-marker group absolute -left-[18px] -top-[18px] h-9 w-9 overflow-hidden rounded-full border border-[hsl(50_33%_7%/0.34)] bg-[#e2e8f4] shadow-[0_9px_24px_rgba(18,24,34,0.24)] grayscale transition-[transform,border-color,box-shadow,filter] duration-200 hover:scale-110 hover:border-[hsl(50_33%_7%/0.62)] hover:shadow-[0_12px_30px_rgba(18,24,34,0.3)] hover:grayscale-0 focus:outline-none focus:ring-2 focus:ring-[hsl(50_33%_7%/0.28)]";
+        "photo-map-marker group absolute -left-4 -top-4 h-8 w-8 overflow-hidden rounded-full border border-[hsl(50_33%_7%/0.34)] bg-[#e2e8f4] shadow-[0_8px_22px_rgba(18,24,34,0.22)] grayscale transition-[transform,border-color,box-shadow,filter] duration-200 hover:scale-110 hover:border-[hsl(50_33%_7%/0.62)] hover:shadow-[0_12px_30px_rgba(18,24,34,0.3)] hover:grayscale-0 focus:outline-none focus:ring-2 focus:ring-[hsl(50_33%_7%/0.28)] sm:-left-[18px] sm:-top-[18px] sm:h-9 sm:w-9 sm:shadow-[0_9px_24px_rgba(18,24,34,0.24)]";
       button.setAttribute("aria-label", `Open ${entry.location} photos`);
       button.style.backgroundImage = `linear-gradient(rgba(244,247,254,0.02), rgba(0,0,0,0.18)), url("${entry.coverImage}")`;
       button.style.backgroundSize = "cover";
@@ -225,11 +304,12 @@ const PhotoMapPage = () => {
   }, [activeEntryId]);
 
   const resetGlobe = () => {
+    const view = defaultMapView(isMobile);
     mapRef.current?.flyTo({
-      center: photoMapInitialView.center,
-      zoom: photoMapInitialView.zoom,
-      pitch: photoMapInitialView.pitch,
-      bearing: photoMapInitialView.bearing,
+      center: view.center,
+      zoom: view.zoom,
+      pitch: view.pitch,
+      bearing: view.bearing,
       speed: 0.55,
       curve: 1.2,
       essential: true,

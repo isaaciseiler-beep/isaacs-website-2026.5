@@ -6,11 +6,74 @@ import Footer from "@/components/Footer";
 import Sidebar from "@/components/Sidebar";
 import SiteHeader from "@/components/SiteHeader";
 import ChatOrb from "@/components/ChatOrb";
-import { projectItems } from "@/lib/siteContent";
+import { projectItems, type ProjectMedia } from "@/lib/siteContent";
 import { useIsMobile } from "@/hooks/use-mobile";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const EASE_TEXT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
+
+const ProjectMediaBlock = ({ media }: { media: ProjectMedia }) => {
+  if (media.type === "carousel" && media.images?.length) {
+    return (
+      <div className="my-6">
+        <Carousel opts={{ align: "start", loop: false }} className="w-full">
+          <CarouselContent>
+            {media.images.map((image, index) => (
+              <CarouselItem key={image.src}>
+                <figure className="overflow-hidden border border-foreground/10 bg-foreground/[0.02]">
+                  <div className="aspect-square overflow-hidden bg-foreground/[0.03]">
+                    <img
+                      src={image.src}
+                      alt={image.alt}
+                      className="h-full w-full object-contain"
+                      loading={index === 0 ? "eager" : "lazy"}
+                      decoding="async"
+                    />
+                  </div>
+                  {image.caption && (
+                    <figcaption className="border-t border-foreground/10 px-4 py-3 text-xs leading-relaxed text-foreground/55">
+                      {image.caption}
+                    </figcaption>
+                  )}
+                </figure>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious className="left-3 bg-background/90 text-foreground hover:bg-background" />
+          <CarouselNext className="right-3 bg-background/90 text-foreground hover:bg-background" />
+        </Carousel>
+      </div>
+    );
+  }
+
+  if (media.type === "image" && media.src) {
+    return (
+      <figure className="my-6 overflow-hidden border border-foreground/10 bg-foreground/[0.02]">
+        <img
+          src={media.src}
+          alt={media.alt ?? ""}
+          className="h-auto w-full"
+          loading="lazy"
+          decoding="async"
+        />
+        {media.caption && (
+          <figcaption className="border-t border-foreground/10 px-4 py-3 text-xs leading-relaxed text-foreground/55">
+            {media.caption}
+          </figcaption>
+        )}
+      </figure>
+    );
+  }
+
+  return null;
+};
 
 const ProjectDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -116,6 +179,12 @@ const ProjectDetailPage = () => {
                     ))}
                   </div>
                 )}
+                {section.media?.map((media) => (
+                  <ProjectMediaBlock
+                    key={media.src ?? media.images?.map((image) => image.src).join("|")}
+                    media={media}
+                  />
+                ))}
               </section>
             ))}
           </div>

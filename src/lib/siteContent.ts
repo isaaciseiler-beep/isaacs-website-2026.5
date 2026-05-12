@@ -1,5 +1,6 @@
 const PROJECT_IMG_BASE = "https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev";
 const projectImg = {
+  aiClassroom: `${PROJECT_IMG_BASE}/f05b7a06585e56e473e9e8ea2affa7b0.jpg`,
   aiIndex: `${PROJECT_IMG_BASE}/aiindex.png`,
   aiNews: `${PROJECT_IMG_BASE}/ainews.png`,
   biCares: `${PROJECT_IMG_BASE}/bicares.png`,
@@ -8,9 +9,16 @@ const projectImg = {
   charging: `${PROJECT_IMG_BASE}/charging.png`,
   chatLab: `${PROJECT_IMG_BASE}/chatlab.jpeg`,
   congressInterview: `${PROJECT_IMG_BASE}/congressinterview.png`,
+  firstWebsite: `${PROJECT_IMG_BASE}/My%20personal%20portfolio.png`,
+  firstWebsitePreview: `${PROJECT_IMG_BASE}/firstwebsitepreview.png`,
+  gisPoster: `${PROJECT_IMG_BASE}/GIS%20Poster.png`,
+  gisUsIncome: `${PROJECT_IMG_BASE}/usmap1.png`,
+  gisUsRace: `${PROJECT_IMG_BASE}/usmap2.png`,
   nonprofitNews: `${PROJECT_IMG_BASE}/nonprofitnews.png`,
+  philanthropyLab: `${PROJECT_IMG_BASE}/MLTM-3287_1025.jpg`,
   politicalConsult: `${PROJECT_IMG_BASE}/politicalconsult.png`,
   reporting: `${PROJECT_IMG_BASE}/reporting.png`,
+  workshopReference: `${PROJECT_IMG_BASE}/AI%20Workshop%20Reference%20Sheet.png`,
 };
 
 export interface NewsItem {
@@ -33,6 +41,19 @@ export interface ProjectSection {
   paragraphs?: string[];
   bullets?: string[];
   links?: ProjectLink[];
+  media?: ProjectMedia[];
+}
+
+export interface ProjectMedia {
+  type: "image" | "carousel";
+  src?: string;
+  alt?: string;
+  caption?: string;
+  images?: {
+    src: string;
+    alt: string;
+    caption?: string;
+  }[];
 }
 
 export interface ProjectItem {
@@ -239,6 +260,56 @@ export const projectItems: ProjectItem[] = [
     ],
   },
   {
+    id: "stl-immigrant-refugee-support-grant-process",
+    title: "Grant Process for Immigrant Support",
+    source: "PROJECT",
+    year: "2025",
+    summary:
+      "A Philanthropy Lab grantmaking process supporting immigrant and refugee-serving organizations in St. Louis.",
+    image: projectImg.philanthropyLab,
+    sections: [
+      {
+        heading: "Overview",
+        paragraphs: [
+          "For the WashU Philanthropy Lab, my team designed a grantmaking process focused on immigrant and refugee support in the St. Louis metropolitan area.",
+          "Our mission was to direct critical funding toward organizations addressing urgent and unmet needs, with special attention to recent federal policy changes, service disruptions, and the mental health burden that can come from living in prolonged uncertainty.",
+          "We evaluated organizations by mission fit, demonstrated community need, leadership strength, operational efficiency, reach, and ability to convert grant dollars into tangible support for immigrant and refugee families.",
+        ],
+        media: [
+          {
+            type: "image",
+            src: projectImg.philanthropyLab,
+            alt: "Philanthropy Lab course group",
+            caption: "The Philanthropy Lab course awarded grants to St. Louis organizations after a student-led review, site visit, and voting process.",
+          },
+        ],
+      },
+      {
+        heading: "Organizations Reviewed",
+        bullets: [
+          "Casa de Salud: medical care, mental health services, case management, and financial assistance for immigrant and refugee families.",
+          "International Institute of St. Louis: refugee resettlement, medical and legal support, employment, housing, and cultural integration services.",
+          "IHELP: personalized English tutoring, citizenship preparation, life skills, and in-home or virtual support that reduces barriers like transportation and childcare.",
+          "Monarch Immigrant Services: long-standing social and legal services for immigrant and refugee communities across the region.",
+        ],
+      },
+      {
+        heading: "Decision",
+        paragraphs: [
+          "We selected Casa de Salud because it aligned directly with our mission, served our target populations, and used a volunteer-centered model to deliver high-quality care at scale.",
+          "Casa's track record stood out: in 2023, the organization served 2,555 people from 59 nationalities, delivered more than 8,000 services, helped clients access more than $1 million in financial assistance through case management, and mobilized more than 8,000 volunteer hours.",
+          "We also recommended IHELP for additional funding because language services are foundational for immigrant and refugee families building stable lives in St. Louis.",
+        ],
+      },
+      {
+        heading: "Final Products",
+        links: [
+          { label: "WashU Philanthropy Lab Course Grants $71K to STL Orgs", href: "https://gephardtinstitute.wustl.edu/washu-philanthropy-lab-course-grants-71k-to-stl-orgs/" },
+        ],
+      },
+    ],
+  },
+  {
     id: "senior-thesis-local-journalism",
     title: "AI, Digital Platforms, and Journalism Research",
     source: "RESEARCH",
@@ -273,6 +344,69 @@ export const projectItems: ProjectItem[] = [
     ],
   },
   {
+    id: "ai-literacy-workshop-for-educators",
+    title: "AI Literacy Workshop for Educators",
+    source: "PROJECT",
+    year: "2025",
+    summary:
+      "A practical AI 101 workshop helping educators understand, question, and responsibly use generative AI.",
+    image: projectImg.aiClassroom,
+    sections: [
+      {
+        heading: "Overview",
+        paragraphs: [
+          "I led an AI literacy workshop for educators at a moment when the room was skeptical: when I asked whether AI was a net positive for society and whether it belonged in the classroom, only a few people raised their hands.",
+          "The workshop treated that skepticism as the starting point. Rather than selling AI as inevitable, I framed it as a tool that can support learning outcomes when educators understand how it works, keep judgment in human hands, and build classroom practices around actual needs.",
+          "The session covered core AI concepts, large language models, training and alignment, reasoning models, classroom preparation use cases, and concrete ways educators can use ChatGPT without surrendering professional judgment.",
+        ],
+        media: [
+          {
+            type: "image",
+            src: projectImg.workshopReference,
+            alt: "AI 101 reference sheet for educators",
+            caption: "The workshop handout condensed core AI concepts, LLM vocabulary, five usage principles, and follow-up resources into a one-page reference sheet.",
+          },
+        ],
+      },
+      {
+        heading: "Five Principles",
+        bullets: [
+          "Knowledge is power: learn how AI works, what the tools can do, who the major players are, and where the debates sit.",
+          "Maintain judgment: invite AI to the table, but do not give it a vote.",
+          "Tailor AI to you: test tools and modalities, then choose what fits the outcome instead of chasing the most powerful model.",
+          "Own the product: trust, but verify, with a human in the loop for anything students or colleagues will rely on.",
+          "Precision as principle: define clear goals, write concise prompts, and give the model enough context to be useful.",
+        ],
+      },
+      {
+        heading: "Educator Carousel",
+        paragraphs: [
+          "I also created a six-slide carousel translating those principles into a click-through format for educators who wanted a concise, shareable version after the workshop.",
+        ],
+        media: [
+          {
+            type: "carousel",
+            images: [1, 2, 3, 4, 5, 6].map((n) => ({
+              src: `${PROJECT_IMG_BASE}/${n}.png`,
+              alt: `AI classroom carousel slide ${n}`,
+              caption: `AI classroom carousel slide ${n}.`,
+            })),
+          },
+        ],
+      },
+      {
+        heading: "Materials",
+        paragraphs: [
+          "The event slides drew from my Fulbright Taiwan ChatGPT Lab work and from Anthropic's AI Fluency Foundations course, especially the emphasis on understanding AI systems well enough to use them deliberately.",
+        ],
+        links: [
+          { label: "Workshop Slide Deck", href: `${PROJECT_IMG_BASE}/Artificial%20Intelligence%20in%20the%20Classroom.pdf` },
+          { label: "Anthropic AI Fluency Foundations Course", href: "https://lnkd.in/gnUB8D7M" },
+        ],
+      },
+    ],
+  },
+  {
     id: "electric-vehicle-access-analysis",
     title: "Electric Vehicle Charging Access Analysis",
     source: "RESEARCH",
@@ -284,17 +418,43 @@ export const projectItems: ProjectItem[] = [
       {
         heading: "Overview",
         paragraphs: [
-          "This project used geographic information systems and quantitative analysis to examine electric vehicle access, infrastructure, and adoption.",
-          "I worked with spatial datasets covering population, infrastructure, and policy variables to identify where EV adoption is accelerating, and where structural gaps remain.",
-          "My role focused on data cleaning, spatial joins, and statistical interpretation, translating raw geographic data into interpretable findings through maps, charts, and written analysis.",
+          "This GIS project investigated how race and household income affect Americans' proximity to electric vehicle charging infrastructure.",
+          "Working with county-level bivariate maps and a Wayne County, Michigan case study, we tested whether communities with different income levels or racial demographics had meaningfully different access to public battery-electric vehicle chargers.",
+          "My role focused on national charging station and income mapping, county-level spatial joins, bivariate symbology, and regression interpretation that translated geographic data into an accessible research poster.",
+        ],
+        media: [
+          {
+            type: "image",
+            src: projectImg.gisPoster,
+            alt: "Electric Vehicle Charging Accessibility in the United States research poster",
+            caption: "Final GIS poster summarizing the research question, national and local maps, regression results, methods, and conclusions.",
+          },
         ],
       },
       {
         heading: "Key Takeaways",
         bullets: [
-          "Regression results indicated very weak relationships between charger proximity and both income and race in the studied geographies.",
-          "Charger gaps appeared regional and urban-rural, with higher density in states that prioritize EV policy.",
-          "Future work should examine tract-level national data and rural access over time.",
+          "Nationally, neither household income nor racial identity strongly correlated with proximity to EV chargers.",
+          "At the local level in Wayne County, the data also did not show a consistent racial or income disparity in EV charging access.",
+          "The results suggest charger access is shaped by a more complicated mix of region, density, public investment, car culture, and rural-urban geography.",
+          "Future work should examine rural communities, tract-level national data, and how access changes as EV adoption moves beyond early-adopter markets.",
+        ],
+      },
+      {
+        heading: "Map Details",
+        media: [
+          {
+            type: "image",
+            src: projectImg.gisUsIncome,
+            alt: "United States counties mapped by EV charging stations and median household income",
+            caption: "U.S. county bivariate map comparing EV charging station density with median household income. Higher-income counties in places like Los Angeles and San Francisco showed strong charger adoption, but low-income communities still had charger access across much of the country.",
+          },
+          {
+            type: "image",
+            src: projectImg.gisUsRace,
+            alt: "United States counties mapped by EV charging stations and racial minority concentration",
+            caption: "U.S. county bivariate map comparing EV charging station density with racial minority concentration. Areas with high minority concentrations, including parts of the American South, showed similar access patterns to other regions.",
+          },
         ],
       },
       {
@@ -302,6 +462,48 @@ export const projectItems: ProjectItem[] = [
         links: [
           { label: "Initial Report", href: "https://drive.google.com/file/d/11lfGLY0n4XqNRCgFE3Yk_ph7zb2OlH3d/view?usp=sharing" },
           { label: "Presentation Poster with Spatial Analysis", href: "https://drive.google.com/file/d/1a8RYeorbJRYYcGRrFKe6x2rKmQMft95j/view?usp=sharing" },
+        ],
+      },
+    ],
+  },
+  {
+    id: "first-personal-website",
+    title: "First Personal Website",
+    source: "PROJECT",
+    year: "2023",
+    summary:
+      "My first personal portfolio, built by hand as a way to learn Git, frontend development, databases, and the logic of shipping software.",
+    image: projectImg.firstWebsite,
+    sections: [
+      {
+        heading: "Overview",
+        paragraphs: [
+          "This was my first personal website, built before I used Codex or Claude Code.",
+          "The goal was simplicity: a lightweight portfolio inspired by social media feeds, where the work could feel browsable instead of overproduced.",
+          "Building it taught me the fundamentals that still shape how I work: Git, code organization, deployment, databases, content modeling, and the tiny decisions that turn a static page into a living project.",
+        ],
+        media: [
+          {
+            type: "image",
+            src: projectImg.firstWebsitePreview,
+            alt: "Preview of Isaac Seiler's first personal website",
+            caption: "A preview of the original site interface, designed around simple scrolling, personal updates, and a social-media-inspired content rhythm.",
+          },
+        ],
+      },
+      {
+        heading: "What I Learned",
+        bullets: [
+          "How to use Git as a real project history rather than just a file backup system.",
+          "How frontend components, routing, styling, and content structure fit together.",
+          "How databases and dynamic content change the way a portfolio can be organized.",
+          "How simplicity can be a design constraint, especially when the priority is clarity and maintainability.",
+        ],
+      },
+      {
+        heading: "Project Links",
+        links: [
+          { label: "GitHub Repository", href: "https://github.com/isaaciseiler-beep/isaacwebsite-v2/tree/main" },
         ],
       },
     ],

@@ -4,7 +4,7 @@ import SectionHeading from "@/components/SectionHeading";
 import { featuredProjectIds, projectItems } from "@/lib/siteContent";
 
 const featuredProjects = featuredProjectIds
-  .slice(0, 3)
+  .slice(0, 4)
   .map((id) => projectItems.find((project) => project.id === id))
   .filter(Boolean);
 
@@ -111,7 +111,7 @@ const FeaturedSection = () => {
                 style={{ background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 60%, transparent 100%)" }}
               >
                 <h3 className="text-2xl font-semibold tracking-tighter text-[#f3f6ff] leading-tight">
-                  {i === 0 ? p!.title : i === 1 ? "Projects archive" : "Photo portfolio"}
+                  {p!.title}
                 </h3>
               </div>
             </div>
@@ -159,44 +159,28 @@ const FeaturedSection = () => {
           </FeaturedTile>
 
           {/* Bottom thumbnails */}
-          <div className="grid grid-cols-2 shrink-0" style={{ gap: GAP, height: "28vh" }}>
-            <FeaturedTile
-              image={featuredProjects[1]!.image}
-              alt={featuredProjects[1]!.title}
-              filter={blFilter}
-              canHover={isOutPhase}
-            >
-              <div
-                className="absolute bottom-0 left-0 right-0 p-3"
-                style={{
-                  background:
-                    "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 70%, transparent 100%)",
-                }}
+          <div className="grid grid-cols-3 shrink-0" style={{ gap: GAP, height: "28vh" }}>
+            {featuredProjects.slice(1).map((project, index) => (
+              <FeaturedTile
+                key={project!.id}
+                image={project!.image}
+                alt={project!.title}
+                filter={index === 0 ? blFilter : brFilter}
+                canHover={isOutPhase}
               >
-                <h3 className="text-base md:text-[1.625rem] font-semibold tracking-tighter text-[#f3f6ff] leading-tight">
-                  Projects archive
-                </h3>
-              </div>
-            </FeaturedTile>
-
-            <FeaturedTile
-              image={featuredProjects[2]!.image}
-              alt={featuredProjects[2]!.title}
-              filter={brFilter}
-              canHover={isOutPhase}
-            >
-              <div
-                className="absolute bottom-0 left-0 right-0 p-3"
-                style={{
-                  background:
-                    "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 70%, transparent 100%)",
-                }}
-              >
-                <h3 className="text-base md:text-[1.625rem] font-semibold tracking-tighter text-[#f3f6ff] leading-tight">
-                  Photo portfolio
-                </h3>
-              </div>
-            </FeaturedTile>
+                <div
+                  className="absolute bottom-0 left-0 right-0 p-3"
+                  style={{
+                    background:
+                      "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 70%, transparent 100%)",
+                  }}
+                >
+                  <h3 className="text-base md:text-[1.35rem] font-semibold tracking-tighter text-[#f3f6ff] leading-tight">
+                    {project!.title}
+                  </h3>
+                </div>
+              </FeaturedTile>
+            ))}
           </div>
         </motion.div>
       </div>

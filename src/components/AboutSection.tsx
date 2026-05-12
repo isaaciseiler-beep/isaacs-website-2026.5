@@ -179,15 +179,16 @@ const AboutSection = () => {
               <img
                 src={headshotUrl}
                 alt="Portrait"
-                className="h-full w-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                className="h-full w-full object-cover grayscale transition-[filter] duration-700 group-hover/headshot:grayscale-0"
                 loading="lazy"
               />
             </motion.div>
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 overflow-hidden">
-              <div className="translate-y-full border-t border-white/20 bg-[hsl(50_33%_7%/0.86)] px-4 py-3 text-background backdrop-blur-sm transition-transform duration-500 ease-out group-hover/headshot:translate-y-0 group-focus-within/headshot:translate-y-0">
-                <p className="mono-text translate-y-2 text-[10px] uppercase tracking-[0.24em] opacity-0 transition-all delay-75 duration-500 ease-out group-hover/headshot:translate-y-0 group-hover/headshot:opacity-100 group-focus-within/headshot:translate-y-0 group-focus-within/headshot:opacity-100">
+            <div className="pointer-events-none absolute right-3 top-3 flex items-start justify-end">
+              <div className="flex h-8 items-center overflow-hidden bg-[hsl(50_33%_7%/0.88)] text-[#f3f6ff] backdrop-blur-sm transition-colors duration-500 group-hover/headshot:text-[hsl(var(--highlight))]">
+                <p className="max-w-0 whitespace-nowrap pl-0 pr-0 font-mono text-[9px] uppercase tracking-[0.22em] opacity-0 transition-all duration-500 ease-out group-hover/headshot:max-w-[10rem] group-hover/headshot:pl-3 group-hover/headshot:pr-2 group-hover/headshot:opacity-100 group-focus-within/headshot:max-w-[10rem] group-focus-within/headshot:pl-3 group-focus-within/headshot:pr-2 group-focus-within/headshot:opacity-100">
                   Isaac Seiler
                 </p>
+                <span className="block h-8 w-8 shrink-0 border-l border-white/10 bg-[hsl(50_33%_7%)]" />
               </div>
             </div>
           </motion.div>

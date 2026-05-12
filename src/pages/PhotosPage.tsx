@@ -168,6 +168,7 @@ const PhotosPage = () => {
   const [openAlbum, setOpenAlbum] = useState<string | null>(null);
   const [previewIdx, setPreviewIdx] = useState<number | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const isMobile = useIsMobile();
 
@@ -208,14 +209,36 @@ const PhotosPage = () => {
 
   const previewImages = currentAlbum ? albumPhotos(currentAlbum) : [];
 
+  const handleSidebarToggle = () => {
+    setSearchOpen(false);
+    setSidebarOpen((open) => !open);
+  };
+
+  const handleSearchOpen = () => {
+    setSidebarOpen(false);
+    setSearchOpen(true);
+  };
+
   return (
     <div className="relative min-h-screen bg-background text-foreground overflow-x-hidden">
-      <Sidebar open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} onClose={() => setSidebarOpen(false)} showToggle={false} />
+      <Sidebar
+        open={sidebarOpen}
+        onToggle={handleSidebarToggle}
+        onClose={() => setSidebarOpen(false)}
+        onSearchOpen={handleSearchOpen}
+        showToggle={false}
+      />
 
       <motion.div
         animate={{
           marginLeft: sidebarOpen && !isMobile ? 240 : 0,
-          width: sidebarOpen && !isMobile ? "calc(100% - 240px)" : "100%",
+          marginRight: searchOpen && !isMobile ? 390 : 0,
+          width:
+            sidebarOpen && !isMobile
+              ? "calc(100% - 240px)"
+              : searchOpen && !isMobile
+                ? "calc(100% - 390px)"
+                : "100%",
         }}
         transition={{ duration: 0.4, ease: EASE_TEXT }}
       >
@@ -366,7 +389,13 @@ const PhotosPage = () => {
         onNavigate={setPreviewIdx}
       />
 
-      <SiteHeader open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
+      <SiteHeader
+        open={sidebarOpen}
+        onToggle={handleSidebarToggle}
+        searchOpen={searchOpen}
+        onSearchOpen={handleSearchOpen}
+        onSearchClose={() => setSearchOpen(false)}
+      />
     </div>
   );
 };

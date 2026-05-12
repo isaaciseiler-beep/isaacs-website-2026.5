@@ -93,6 +93,7 @@ const ProjectCard = ({ project, index, isMobile, revealImmediately, onOpen }: Pr
 
 const ProjectsPage = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [isLightTheme, setIsLightTheme] = useState(false);
   const [bottomOffset, setBottomOffset] = useState(FLOAT_BOTTOM);
@@ -100,6 +101,16 @@ const ProjectsPage = () => {
   const isMobile = useIsMobile();
 
   const filteredProjects = projectItems;
+
+  const handleSidebarToggle = () => {
+    setSearchOpen(false);
+    setSidebarOpen((open) => !open);
+  };
+
+  const handleSearchOpen = () => {
+    setSidebarOpen(false);
+    setSearchOpen(true);
+  };
 
   useEffect(() => {
     filteredProjects.forEach((project) => {
@@ -140,12 +151,24 @@ const ProjectsPage = () => {
 
   return (
     <div className="relative min-h-screen bg-background text-foreground">
-      <Sidebar open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} onClose={() => setSidebarOpen(false)} showToggle={false} />
+      <Sidebar
+        open={sidebarOpen}
+        onToggle={handleSidebarToggle}
+        onClose={() => setSidebarOpen(false)}
+        onSearchOpen={handleSearchOpen}
+        showToggle={false}
+      />
 
       <motion.div
         animate={{
           marginLeft: sidebarOpen && !isMobile ? 240 : 0,
-          width: sidebarOpen && !isMobile ? "calc(100% - 240px)" : "100%",
+          marginRight: searchOpen && !isMobile ? 390 : 0,
+          width:
+            sidebarOpen && !isMobile
+              ? "calc(100% - 240px)"
+              : searchOpen && !isMobile
+                ? "calc(100% - 390px)"
+                : "100%",
         }}
         transition={{ duration: 0.4, ease: EASE_TEXT }}
       >
@@ -186,7 +209,7 @@ const ProjectsPage = () => {
       </motion.div>
 
       <AnimatePresence>
-        {showBackToTop && !sidebarOpen && (
+        {showBackToTop && !sidebarOpen && !searchOpen && (
           <motion.button
             className={`fixed left-[calc(env(safe-area-inset-left)+1.5rem)] z-50 flex h-8 w-8 items-center justify-center rounded-full backdrop-blur-xl transition-colors duration-300 ${
               isLightTheme
@@ -206,9 +229,15 @@ const ProjectsPage = () => {
         )}
       </AnimatePresence>
 
-      {!sidebarOpen && <ChatOrb />}
+      {!sidebarOpen && !searchOpen && <ChatOrb />}
 
-      <SiteHeader open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
+      <SiteHeader
+        open={sidebarOpen}
+        onToggle={handleSidebarToggle}
+        searchOpen={searchOpen}
+        onSearchOpen={handleSearchOpen}
+        onSearchClose={() => setSearchOpen(false)}
+      />
     </div>
   );
 };

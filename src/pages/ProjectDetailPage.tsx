@@ -20,6 +20,19 @@ const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const EASE_TEXT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 
 const ProjectMediaBlock = ({ media }: { media: ProjectMedia }) => {
+  if (media.type === "pdf" && media.src) {
+    return (
+      <figure className="my-6 overflow-hidden bg-foreground/[0.02]">
+        <iframe
+          src={`${media.src}#toolbar=0&navpanes=0&view=FitH`}
+          title={media.title ?? media.alt ?? "Project slide deck"}
+          className="h-[72vh] min-h-[420px] w-full bg-foreground/[0.03]"
+          loading="lazy"
+        />
+      </figure>
+    );
+  }
+
   if (media.type === "carousel" && media.images?.length) {
     return (
       <div className="my-6">
@@ -79,9 +92,20 @@ const ProjectDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const isMobile = useIsMobile();
 
   const project = projectItems.find((p) => p.id === id);
+
+  const handleSidebarToggle = () => {
+    setSearchOpen(false);
+    setSidebarOpen((open) => !open);
+  };
+
+  const handleSearchOpen = () => {
+    setSidebarOpen(false);
+    setSearchOpen(true);
+  };
 
   useEffect(() => {
     window.scrollTo({ top: 0 });
@@ -97,12 +121,24 @@ const ProjectDetailPage = () => {
 
   return (
     <div className="relative min-h-screen bg-background text-foreground overflow-x-hidden">
-      <Sidebar open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} onClose={() => setSidebarOpen(false)} showToggle={false} />
+      <Sidebar
+        open={sidebarOpen}
+        onToggle={handleSidebarToggle}
+        onClose={() => setSidebarOpen(false)}
+        onSearchOpen={handleSearchOpen}
+        showToggle={false}
+      />
 
       <motion.div
         animate={{
           marginLeft: sidebarOpen && !isMobile ? 240 : 0,
-          width: sidebarOpen && !isMobile ? "calc(100% - 240px)" : "100%",
+          marginRight: searchOpen && !isMobile ? 390 : 0,
+          width:
+            sidebarOpen && !isMobile
+              ? "calc(100% - 240px)"
+              : searchOpen && !isMobile
+                ? "calc(100% - 390px)"
+                : "100%",
         }}
         transition={{ duration: 0.4, ease: EASE_TEXT }}
       >
@@ -133,7 +169,7 @@ const ProjectDetailPage = () => {
           </div>
 
           <h1 className="text-3xl md:text-5xl font-semibold tracking-tight text-foreground mb-4">{project.title}</h1>
-          <p className="text-base md:text-lg text-foreground/65 leading-relaxed mb-10 max-w-2xl">{project.summary}</p>
+          <p className="text-base md:text-lg text-foreground/65 leading-relaxed mb-10">{project.summary}</p>
 
           <div className="aspect-[16/9] overflow-hidden mb-12">
             <img
@@ -146,7 +182,7 @@ const ProjectDetailPage = () => {
             />
           </div>
 
-          <div className="space-y-10 max-w-2xl">
+          <div className="space-y-10">
             {project.sections.map((section) => (
               <section key={section.heading}>
                 <h2 className="text-xl md:text-2xl font-semibold tracking-tight text-foreground mb-3">{section.heading}</h2>
@@ -192,9 +228,15 @@ const ProjectDetailPage = () => {
 
         <Footer />
       </motion.div>
-      {!sidebarOpen && <ChatOrb />}
+      {!sidebarOpen && !searchOpen && <ChatOrb />}
 
-      <SiteHeader open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
+      <SiteHeader
+        open={sidebarOpen}
+        onToggle={handleSidebarToggle}
+        searchOpen={searchOpen}
+        onSearchOpen={handleSearchOpen}
+        onSearchClose={() => setSearchOpen(false)}
+      />
     </div>
   );
 };

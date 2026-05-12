@@ -93,11 +93,12 @@ interface SidebarProps {
   open: boolean;
   onToggle: () => void;
   onClose?: () => void;
+  onSearchOpen?: () => void;
   activeSection?: string;
   showToggle?: boolean;
 }
 
-const Sidebar = ({ open, onToggle, onClose, activeSection, showToggle = true }: SidebarProps) => {
+const Sidebar = ({ open, onToggle, onClose, onSearchOpen, activeSection, showToggle = true }: SidebarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useIsMobile();
@@ -193,7 +194,7 @@ const Sidebar = ({ open, onToggle, onClose, activeSection, showToggle = true }: 
           {open && (
             <div className="flex flex-1 items-center md:mt-4 md:block md:flex-none">
               <div className="flex flex-col gap-1.5 relative md:gap-0.5">
-                <SearchTrigger variant="sidebar" />
+                <SearchTrigger variant="sidebar" renderPanel={false} onOpen={onSearchOpen} />
                 {sitemapItems.map((item) => {
                   const idx = flatIndex++;
                   const active = isItemActive(item);

@@ -200,6 +200,7 @@ const ExperienceBlock = ({
 
 const ExperiencePage = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [activeId, setActiveId] = useState(experienceEntries[0]?.id ?? "");
   const isMobile = useIsMobile();
   const timelineRef = useRef<HTMLElement | null>(null);
@@ -233,14 +234,36 @@ const ExperiencePage = () => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  const handleSidebarToggle = () => {
+    setSearchOpen(false);
+    setSidebarOpen((open) => !open);
+  };
+
+  const handleSearchOpen = () => {
+    setSidebarOpen(false);
+    setSearchOpen(true);
+  };
+
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-background text-foreground">
-      <Sidebar open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} onClose={() => setSidebarOpen(false)} showToggle={false} />
+      <Sidebar
+        open={sidebarOpen}
+        onToggle={handleSidebarToggle}
+        onClose={() => setSidebarOpen(false)}
+        onSearchOpen={handleSearchOpen}
+        showToggle={false}
+      />
 
       <motion.div
         animate={{
           marginLeft: sidebarOpen && !isMobile ? 240 : 0,
-          width: sidebarOpen && !isMobile ? "calc(100% - 240px)" : "100%",
+          marginRight: searchOpen && !isMobile ? 390 : 0,
+          width:
+            sidebarOpen && !isMobile
+              ? "calc(100% - 240px)"
+              : searchOpen && !isMobile
+                ? "calc(100% - 390px)"
+                : "100%",
         }}
         transition={{ duration: 0.4, ease: EASE_TEXT }}
       >
@@ -369,9 +392,15 @@ const ExperiencePage = () => {
         <Footer />
       </motion.div>
 
-      {!sidebarOpen && <ChatOrb />}
+      {!sidebarOpen && !searchOpen && <ChatOrb />}
 
-      <SiteHeader open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
+      <SiteHeader
+        open={sidebarOpen}
+        onToggle={handleSidebarToggle}
+        searchOpen={searchOpen}
+        onSearchOpen={handleSearchOpen}
+        onSearchClose={() => setSearchOpen(false)}
+      />
     </div>
   );
 };

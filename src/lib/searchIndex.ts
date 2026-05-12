@@ -125,8 +125,18 @@ const projectMetadata: Record<string, { date: string; topics: string[]; tags: st
   },
   "senior-thesis-local-journalism": {
     date: "2025",
-    topics: ["journalism", "local news", "digital platforms", "democracy", "media policy"],
-    tags: ["Australia", "newsrooms", "platform dominance", "qualitative interviews", "labor precarity", "thesis"],
+    topics: ["artificial intelligence", "journalism", "local news", "digital platforms", "democracy", "media policy"],
+    tags: ["AI platforms", "Australia", "newsrooms", "platform dominance", "qualitative interviews", "labor precarity", "thesis"],
+  },
+  "stl-immigrant-refugee-support-grant-process": {
+    date: "2025",
+    topics: ["philanthropy", "St. Louis", "public service", "grantmaking", "nonprofits"],
+    tags: ["Philanthropy Lab", "WashU", "Casa de Salud", "IHELP", "Monarch Immigrant Services", "immigrant support"],
+  },
+  "ai-literacy-workshop-for-educators": {
+    date: "2025",
+    topics: ["artificial intelligence", "education", "classroom", "teacher training", "conference presentation"],
+    tags: ["AI applications", "large language models", "ChatGPT", "educators", "presentation slides", "AI literacy"],
   },
   "electric-vehicle-access-analysis": {
     date: "2024",
@@ -173,14 +183,14 @@ const projectMetadata: Record<string, { date: string; topics: string[]; tags: st
 const newsMetadata: Record<number, { date: string; topics: string[]; tags: string[] }> = {
   1: { date: "2025-12-22", topics: ["education", "OpenAI", "Fulbright", "ChatGPT Lab"], tags: ["Taiwan", "lesson planning", "teaching", "cultural context", "Substack"] },
   2: { date: "2024-04-13", topics: ["Truman Scholarship", "public service", "national recognition"], tags: ["Forbes", "2024 Truman Scholars", "higher education", "award"] },
-  3: { date: "2026-05-05", topics: ["OpenAI", "GPT-5.5 Instant", "early testing"], tags: ["ChatGPT", "model testing", "AI", "product release"] },
+  3: { date: "2026-05-05", topics: ["OpenAI", "product feedback", "early testing"], tags: ["ChatGPT", "AI", "user feedback"] },
   4: { date: "2024-04-12", topics: ["Truman Scholarship", "WashU", "public service"], tags: ["civil liberties", "Congress", "award", "sociology", "political science"] },
-  5: { date: "2025", topics: ["OpenAI", "ChatGPT Lab", "student research", "AI use cases"], tags: ["100 Chats Project", "co-authored", "college students", "ChatGPT"] },
+  5: { date: "2025", topics: ["OpenAI", "ChatGPT Lab", "student research", "AI use cases"], tags: ["100 Chats Project", "contributor", "college students", "ChatGPT"] },
   6: { date: "2024-11-18", topics: ["Rhodes Scholarship", "WashU", "academic recognition"], tags: ["finalist", "public interest journalism", "student leader", "honor"] },
   7: { date: "2025-06-20", topics: ["Fulbright", "Taiwan", "international education"], tags: ["WashU alumni", "teaching English", "grant", "cultural exchange"] },
   8: { date: "2025-07-29", topics: ["OpenAI", "study mode", "education", "student learning"], tags: ["ChatGPT Instagram", "spotlight", "tutoring", "step by step learning"] },
   9: { date: "2025-09-25", topics: ["OpenAI", "ChatGPT Pulse", "personalized updates"], tags: ["testimonial", "calendar", "Taiwan", "proactive AI", "student use case"] },
-  10: { date: "2025-10-21", topics: ["OpenAI", "ChatGPT Atlas", "browser", "early testing"], tags: ["AI browser", "product testing", "web", "memory"] },
+  10: { date: "2025-10-21", topics: ["OpenAI", "browser", "product feedback"], tags: ["AI browser", "product testing", "web", "memory"] },
   11: { date: "2025-05-02", topics: ["photojournalism", "student media", "awards"], tags: ["Missouri College Media Awards", "Student Life", "newspaper photography", "WashU"] },
   12: { date: "2025-03-27", topics: ["profile", "WashU", "scholarships", "public service"], tags: ["Arts and Sciences", "Capitol Hill", "Truman", "Fulbright", "sociology"] },
 };

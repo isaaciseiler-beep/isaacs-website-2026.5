@@ -15,8 +15,19 @@ import { useIsMobile } from "@/hooks/use-mobile";
 
 const Index = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("hero");
   const isMobile = useIsMobile();
+
+  const handleSidebarToggle = () => {
+    setSearchOpen(false);
+    setSidebarOpen((open) => !open);
+  };
+
+  const handleSearchOpen = () => {
+    setSidebarOpen(false);
+    setSearchOpen(true);
+  };
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -42,8 +53,9 @@ const Index = () => {
     <div className="relative">
       <Sidebar
         open={sidebarOpen}
-        onToggle={() => setSidebarOpen(!sidebarOpen)}
+        onToggle={handleSidebarToggle}
         onClose={() => setSidebarOpen(false)}
+        onSearchOpen={handleSearchOpen}
         activeSection={activeSection}
         showToggle={false}
       />
@@ -51,7 +63,13 @@ const Index = () => {
       <motion.div
         animate={{
           marginLeft: sidebarOpen && !isMobile ? 240 : 0,
-          width: sidebarOpen && !isMobile ? "calc(100% - 240px)" : "100%",
+          marginRight: searchOpen && !isMobile ? 390 : 0,
+          width:
+            sidebarOpen && !isMobile
+              ? "calc(100% - 240px)"
+              : searchOpen && !isMobile
+                ? "calc(100% - 390px)"
+                : "100%",
         }}
         transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
       >
@@ -66,9 +84,15 @@ const Index = () => {
         </main>
       </motion.div>
 
-      {!sidebarOpen && <ChatOrb />}
+      {!sidebarOpen && !searchOpen && <ChatOrb />}
 
-      <SiteHeader open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
+      <SiteHeader
+        open={sidebarOpen}
+        onToggle={handleSidebarToggle}
+        searchOpen={searchOpen}
+        onSearchOpen={handleSearchOpen}
+        onSearchClose={() => setSearchOpen(false)}
+      />
     </div>
   );
 };

@@ -45,10 +45,11 @@ export interface ProjectSection {
 }
 
 export interface ProjectMedia {
-  type: "image" | "carousel";
+  type: "image" | "carousel" | "pdf";
   src?: string;
   alt?: string;
   caption?: string;
+  title?: string;
   images?: {
     src: string;
     alt: string;
@@ -98,7 +99,7 @@ export const newsItems: NewsItem[] = [
   {
     id: 3,
     source: "OpenAI",
-    title: "Selected as Early Tester for GPT 5.5 Instant",
+    title: "Shared Early Product Feedback with OpenAI",
     href: "#",
     logoUrl: "https://pub-e466b845a9ef4344b05811b344fb11e1.r2.dev/openai-text.png",
     logoAlt: "OpenAI",
@@ -116,7 +117,7 @@ export const newsItems: NewsItem[] = [
   {
     id: 5,
     source: "OpenAI",
-    title: "Co-Authored 100 Chats Project with the ChatGPT Lab",
+    title: "Contributed to 100 Chats Project with the ChatGPT Lab",
     href: "https://chatgpt.com/100chats-project",
     logoUrl: "https://pub-e466b845a9ef4344b05811b344fb11e1.r2.dev/openai-text.png",
     logoAlt: "OpenAI",
@@ -161,7 +162,7 @@ export const newsItems: NewsItem[] = [
   {
     id: 10,
     source: "OpenAI",
-    title: "Served in Early Testing Group for ChatGPT Atlas",
+    title: "Shared Early Browser Product Feedback with OpenAI",
     href: "#",
     logoUrl: "https://pub-e466b845a9ef4344b05811b344fb11e1.r2.dev/openai-text.png",
     logoAlt: "OpenAI",
@@ -261,33 +262,25 @@ export const projectItems: ProjectItem[] = [
   },
   {
     id: "stl-immigrant-refugee-support-grant-process",
-    title: "Grant Process for Immigrant Support",
+    title: "Raised $20k for Local St. Louis Organizations",
     source: "PROJECT",
     year: "2025",
     summary:
-      "A Philanthropy Lab grantmaking process supporting immigrant and refugee-serving organizations in St. Louis.",
+      "A student-led philanthropy process that helped move real dollars to St. Louis nonprofits, including immigrant and refugee-serving organizations.",
     image: projectImg.philanthropyLab,
     sections: [
       {
         heading: "Overview",
         paragraphs: [
-          "For the WashU Philanthropy Lab, my team designed a grantmaking process focused on immigrant and refugee support in the St. Louis metropolitan area.",
-          "Our mission was to direct critical funding toward organizations addressing urgent and unmet needs, with special attention to recent federal policy changes, service disruptions, and the mental health burden that can come from living in prolonged uncertainty.",
-          "We evaluated organizations by mission fit, demonstrated community need, leadership strength, operational efficiency, reach, and ability to convert grant dollars into tangible support for immigrant and refugee families.",
-        ],
-        media: [
-          {
-            type: "image",
-            src: projectImg.philanthropyLab,
-            alt: "Philanthropy Lab course group",
-            caption: "The Philanthropy Lab course awarded grants to St. Louis organizations after a student-led review, site visit, and voting process.",
-          },
+          "In WashU's Philanthropy Lab course, students learned philanthropy by doing it: defining grant priorities, reviewing proposals, conducting site visits, and deciding how to allocate funding to St. Louis nonprofits.",
+          "My team focused on immigrant and refugee support, evaluating organizations by community need, mission fit, leadership strength, operational efficiency, reach, and their ability to convert grant dollars into direct service.",
+          "The course awarded $70,900 to 22 local nonprofits at its April 2025 closing ceremony, with additional course grants bringing the 2025 total to $133,400. Our work contributed to that broader student-led funding process while sharpening my understanding of responsible, place-based grantmaking.",
         ],
       },
       {
-        heading: "Organizations Reviewed",
+        heading: "Organizations Reviewed and Funded",
         bullets: [
-          "Casa de Salud: medical care, mental health services, case management, and financial assistance for immigrant and refugee families.",
+          "Casa de Salud: medical care, mental health services, case management, and financial assistance for underinsured and uninsured immigrant and refugee families.",
           "International Institute of St. Louis: refugee resettlement, medical and legal support, employment, housing, and cultural integration services.",
           "IHELP: personalized English tutoring, citizenship preparation, life skills, and in-home or virtual support that reduces barriers like transportation and childcare.",
           "Monarch Immigrant Services: long-standing social and legal services for immigrant and refugee communities across the region.",
@@ -296,22 +289,23 @@ export const projectItems: ProjectItem[] = [
       {
         heading: "Decision",
         paragraphs: [
-          "We selected Casa de Salud because it aligned directly with our mission, served our target populations, and used a volunteer-centered model to deliver high-quality care at scale.",
-          "Casa's track record stood out: in 2023, the organization served 2,555 people from 59 nationalities, delivered more than 8,000 services, helped clients access more than $1 million in financial assistance through case management, and mobilized more than 8,000 volunteer hours.",
-          "We also recommended IHELP for additional funding because language services are foundational for immigrant and refugee families building stable lives in St. Louis.",
+          "We selected Casa de Salud because it matched our mission and served immigrant and refugee families through a model that combined medical care, mental health support, and case management.",
+          "The class ultimately awarded Casa de Salud $17,100, the largest single grant of the 2025 cycle, after all student groups chose to contribute to its award.",
+          "We also recommended support for IHELP and Monarch Immigrant Services because language access and legal-social services are foundational for families building stable lives in St. Louis.",
         ],
       },
       {
-        heading: "Final Products",
+        heading: "References",
         links: [
           { label: "WashU Philanthropy Lab Course Grants $71K to STL Orgs", href: "https://gephardtinstitute.wustl.edu/washu-philanthropy-lab-course-grants-71k-to-stl-orgs/" },
+          { label: "The Philanthropy Lab at Washington University in St. Louis", href: "https://thephilanthropylab.org/washington-university-in-st-louis/" },
         ],
       },
     ],
   },
   {
     id: "senior-thesis-local-journalism",
-    title: "AI, Digital Platforms, and Journalism Research",
+    title: "AI Platforms and Journalism Research",
     source: "RESEARCH",
     year: "2025",
     summary:
@@ -345,59 +339,56 @@ export const projectItems: ProjectItem[] = [
   },
   {
     id: "ai-literacy-workshop-for-educators",
-    title: "AI Literacy Workshop for Educators",
+    title: "Education Conference Presentation on AI Applications",
     source: "PROJECT",
     year: "2025",
     summary:
-      "A practical AI 101 workshop helping educators understand, question, and responsibly use generative AI.",
+      "A conference-style educator presentation translating AI concepts into practical classroom and planning applications.",
     image: projectImg.aiClassroom,
     sections: [
       {
         heading: "Overview",
         paragraphs: [
-          "I led an AI literacy workshop for educators at a moment when the room was skeptical: when I asked whether AI was a net positive for society and whether it belonged in the classroom, only a few people raised their hands.",
-          "The workshop treated that skepticism as the starting point. Rather than selling AI as inevitable, I framed it as a tool that can support learning outcomes when educators understand how it works, keep judgment in human hands, and build classroom practices around actual needs.",
-          "The session covered core AI concepts, large language models, training and alignment, reasoning models, classroom preparation use cases, and concrete ways educators can use ChatGPT without surrendering professional judgment.",
+          "I developed and delivered an education conference presentation on how teachers can understand, evaluate, and responsibly apply artificial intelligence in classroom contexts.",
+          "The session started from educator skepticism rather than brushing past it. I framed AI as a set of systems that can support planning, differentiation, feedback, and student exploration when teachers understand the tradeoffs and keep professional judgment in the loop.",
+          "The presentation moved from fundamentals to practice: what AI is, how large language models work, why models can be useful and unreliable at the same time, and how educators can design classroom uses around clear learning goals instead of novelty.",
         ],
         media: [
           {
             type: "image",
             src: projectImg.workshopReference,
             alt: "AI 101 reference sheet for educators",
-            caption: "The workshop handout condensed core AI concepts, LLM vocabulary, five usage principles, and follow-up resources into a one-page reference sheet.",
+            caption: "A one-page reference sheet condensed the core AI concepts, vocabulary, usage principles, and follow-up resources into a practical takeaway.",
           },
         ],
       },
       {
-        heading: "Five Principles",
+        heading: "Core Principles",
         bullets: [
-          "Knowledge is power: learn how AI works, what the tools can do, who the major players are, and where the debates sit.",
-          "Maintain judgment: invite AI to the table, but do not give it a vote.",
-          "Tailor AI to you: test tools and modalities, then choose what fits the outcome instead of chasing the most powerful model.",
-          "Own the product: trust, but verify, with a human in the loop for anything students or colleagues will rely on.",
-          "Precision as principle: define clear goals, write concise prompts, and give the model enough context to be useful.",
+          "Build enough technical literacy to understand what AI systems can do, where they fail, and why outputs need review.",
+          "Keep human judgment central: AI can support the work, but educators should own the instructional decisions.",
+          "Choose tools around learning outcomes rather than model hype, matching the modality and workflow to the task.",
+          "Verify anything students, colleagues, or families will rely on, especially factual claims and sensitive guidance.",
+          "Prompt with precision by defining the goal, audience, constraints, and context before asking for output.",
         ],
       },
       {
-        heading: "Educator Carousel",
+        heading: "Conference Slides",
         paragraphs: [
-          "I also created a six-slide carousel translating those principles into a click-through format for educators who wanted a concise, shareable version after the workshop.",
+          "The deck translates the presentation into a visual sequence educators can revisit after the session. It introduces the conceptual foundations, gives concrete classroom and planning applications, and closes with practical habits for using AI without outsourcing teacher judgment.",
         ],
         media: [
           {
-            type: "carousel",
-            images: [1, 2, 3, 4, 5, 6].map((n) => ({
-              src: `${PROJECT_IMG_BASE}/${n}.png`,
-              alt: `AI classroom carousel slide ${n}`,
-              caption: `AI classroom carousel slide ${n}.`,
-            })),
+            type: "pdf",
+            src: `${PROJECT_IMG_BASE}/Artificial%20Intelligence%20in%20the%20Classroom.pdf`,
+            title: "Artificial Intelligence in the Classroom",
           },
         ],
       },
       {
         heading: "Materials",
         paragraphs: [
-          "The event slides drew from my Fulbright Taiwan ChatGPT Lab work and from Anthropic's AI Fluency Foundations course, especially the emphasis on understanding AI systems well enough to use them deliberately.",
+          "The materials drew from my Fulbright Taiwan ChatGPT Lab work and from AI fluency training resources, especially the idea that responsible use starts with understanding systems well enough to use them deliberately.",
         ],
         links: [
           { label: "Workshop Slide Deck", href: `${PROJECT_IMG_BASE}/Artificial%20Intelligence%20in%20the%20Classroom.pdf` },
@@ -544,17 +535,17 @@ export const projectItems: ProjectItem[] = [
   },
   {
     id: "fulbright-focus-group-sponsored-by-openai",
-    title: "Fulbright Focus Group Sponsored by OpenAI",
+    title: "Fulbright Taiwan Educator Lab with OpenAI Support",
     source: "PROJECT",
     year: "2025",
     summary:
-      "A six-session educator lab, sponsored by OpenAI, focused on practical and responsible uses of ChatGPT in education.",
+      "A six-session educator lab with OpenAI/ChatGPT for Education support, focused on practical and responsible uses of ChatGPT in education.",
     image: projectImg.chatLab,
     sections: [
       {
         heading: "Overview",
         paragraphs: [
-          "I founded and led the Fulbright Taiwan ChatGPT Lab, the first educator-focused lab of its kind supported by OpenAI.",
+          "I founded and led the Fulbright Taiwan ChatGPT Lab, an OpenAI-supported educator lab focused on practical classroom uses of ChatGPT.",
           "The Lab brought together Fulbright educators to explore practical, responsible uses of ChatGPT in education. Over six structured sessions, I designed the curriculum, facilitated discussions, and guided participants toward concrete classroom use cases.",
           "The Lab culminated in a published Substack with specific, lightweight use cases of ChatGPT that educators of all kinds can utilize in their daily workflows.",
         ],
@@ -562,7 +553,7 @@ export const projectItems: ProjectItem[] = [
       {
         heading: "Key Components of the Lab",
         bullets: [
-          "Co-developed the Lab's structure with OpenAI staff.",
+          "Developed the Lab's structure with OpenAI/ChatGPT for Education support.",
           "Independently facilitated six stakeholder sessions.",
           "Produced nine specific uses of ChatGPT for educators, summarized in a Substack post authored by me.",
         ],
@@ -723,4 +714,9 @@ export const projectItems: ProjectItem[] = [
   },
 ];
 
-export const featuredProjectIds = projectItems.slice(0, 4).map((project) => project.id);
+export const featuredProjectIds = [
+  "artificial-intelligence-in-state-government-index",
+  "congressional-office-setup-100-day-report",
+  "senior-thesis-local-journalism",
+  "electric-vehicle-access-analysis",
+];

@@ -153,6 +153,7 @@ const PhotoMapPage = () => {
   const markerEntriesRef = useRef<Map<string, MarkerEntry>>(new Map());
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [mapReady, setMapReady] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
   const [activeEntryId, setActiveEntryId] = useState<string | null>(null);
@@ -259,7 +260,17 @@ const PhotoMapPage = () => {
       if (frame) window.cancelAnimationFrame(frame);
       window.clearTimeout(settle);
     };
-  }, [activeEntry, isMobile, mapReady, sidebarOpen]);
+  }, [activeEntry, isMobile, mapReady, sidebarOpen, searchOpen]);
+
+  const handleSidebarToggle = () => {
+    setSearchOpen(false);
+    setSidebarOpen((open) => !open);
+  };
+
+  const handleSearchOpen = () => {
+    setSidebarOpen(false);
+    setSearchOpen(true);
+  };
 
   useEffect(() => {
     if (!mapReady || !mapRef.current) return;
@@ -359,12 +370,24 @@ const PhotoMapPage = () => {
 
   return (
     <div className="relative min-h-[100svh] overflow-hidden bg-[#f4f7fe] text-foreground">
-      <Sidebar open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} onClose={() => setSidebarOpen(false)} showToggle={false} />
+      <Sidebar
+        open={sidebarOpen}
+        onToggle={handleSidebarToggle}
+        onClose={() => setSidebarOpen(false)}
+        onSearchOpen={handleSearchOpen}
+        showToggle={false}
+      />
 
       <motion.main
         animate={{
           marginLeft: sidebarOpen && !isMobile ? 240 : 0,
-          width: sidebarOpen && !isMobile ? "calc(100% - 240px)" : "100%",
+          marginRight: searchOpen && !isMobile ? 390 : 0,
+          width:
+            sidebarOpen && !isMobile
+              ? "calc(100% - 240px)"
+              : searchOpen && !isMobile
+                ? "calc(100% - 390px)"
+                : "100%",
         }}
         transition={{ duration: 0.4, ease: EASE_TEXT }}
         className="relative h-[100svh] overflow-hidden bg-[#f4f7fe]"
@@ -448,7 +471,13 @@ const PhotoMapPage = () => {
         </section>
       </motion.main>
 
-      <SiteHeader open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
+      <SiteHeader
+        open={sidebarOpen}
+        onToggle={handleSidebarToggle}
+        searchOpen={searchOpen}
+        onSearchOpen={handleSearchOpen}
+        onSearchClose={() => setSearchOpen(false)}
+      />
     </div>
   );
 };

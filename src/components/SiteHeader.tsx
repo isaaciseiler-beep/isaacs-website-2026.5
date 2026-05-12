@@ -10,6 +10,9 @@ const EASE_TEXT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 interface SiteHeaderProps {
   open: boolean;
   onToggle: () => void;
+  searchOpen?: boolean;
+  onSearchOpen?: () => void;
+  onSearchClose?: () => void;
 }
 
 const parseRgb = (value: string) => {
@@ -48,7 +51,7 @@ const backgroundAtPoint = (x: number, y: number, header: HTMLElement | null) => 
   return parseRgb(window.getComputedStyle(document.body).backgroundColor) ?? { r: 0, g: 0, b: 0 };
 };
 
-const SiteHeader = ({ open, onToggle }: SiteHeaderProps) => {
+const SiteHeader = ({ open, onToggle, searchOpen, onSearchOpen, onSearchClose }: SiteHeaderProps) => {
   const headerRef = useRef<HTMLDivElement | null>(null);
   const [ink, setInk] = useState("rgb(255 255 255)");
 
@@ -106,7 +109,12 @@ const SiteHeader = ({ open, onToggle }: SiteHeaderProps) => {
       >
         <ChevronRight className="h-3.5 w-3.5" />
       </motion.button>
-      <SearchTrigger style={{ color: ink }} />
+      <SearchTrigger
+        style={{ color: ink }}
+        open={searchOpen}
+        onOpen={onSearchOpen}
+        onClose={onSearchClose}
+      />
     </div>
   );
 };

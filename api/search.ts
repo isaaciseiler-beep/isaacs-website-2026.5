@@ -1,4 +1,4 @@
-import { retrieveKnowledge } from "./knowledge";
+import { retrieveKnowledge } from "./knowledge.js";
 
 const json = (response: any, status = 200) => {
   response.statusCode = status;

@@ -2,16 +2,12 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUp } from "lucide-react";
 import { hasSearchResults, searchSite } from "@/lib/searchIndex";
+import { askSiteAssistant, isChatLimitReached, MAX_CHAT_USER_MESSAGES } from "@/lib/chatClient";
 
 interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
-}
-
-interface ChatApiResponse {
-  message?: string;
-  error?: string;
 }
 
 const DOT_SIZE = 36;
@@ -84,6 +80,8 @@ const ChatOrb = () => {
 
   const handleSend = async () => {
     if (!input.trim()) return;
+    if (mode === "ai" && isChatLimitReached(messages)) return;
+
     const userMsg: Message = { id: Date.now().toString(), role: "user", content: input.trim() };
     const nextMessages = [...messages, userMsg];
     setMessages(nextMessages);
@@ -111,35 +109,22 @@ const ChatOrb = () => {
     }
 
     try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: nextMessages.map(({ role, content }) => ({ role, content })),
-          query: userMsg.content,
-        }),
-      });
-
-      const data = (await response.json()) as ChatApiResponse;
+      const data = await askSiteAssistant(nextMessages.map(({ role, content }) => ({ role, content })));
       setMessages((prev) => [
         ...prev,
         {
           id: (Date.now() + 1).toString(),
           role: "assistant",
-          content:
-            data.message ||
-            data.error ||
-            "I could not reach the AI assistant yet.",
+          content: data.message || "The AI assistant is temporarily unavailable. Please try again shortly.",
         },
       ]);
-    } catch {
+    } catch (error) {
       setMessages((prev) => [
         ...prev,
         {
           id: (Date.now() + 1).toString(),
           role: "assistant",
-          content:
-            "I could not reach the AI assistant yet. Make sure local dev has OPENAI_API set and restart the dev server.",
+          content: error instanceof Error ? error.message : "The AI assistant is temporarily unavailable. Please try again shortly.",
         },
       ]);
     } finally {
@@ -224,7 +209,7 @@ const ChatOrb = () => {
               <AnimatePresence>
                 {messages.length > 0 && (
                   <motion.div
-                    className="w-full mb-2 max-h-[50vh] overflow-y-auto scrollbar-hide"
+                    className="mb-2 h-[260px] w-full overflow-y-auto scrollbar-hide"
                     style={{
                       borderRadius: 24,
                       background: "hsl(var(--background) / 0.35)",
@@ -233,7 +218,7 @@ const ChatOrb = () => {
                       boxShadow: "none",
                     }}
                     initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
+                    animate={{ opacity: 1, height: 260 }}
                     exit={{ opacity: 0, height: 0 }}
                     transition={fastSlowTransition}
                   >
@@ -286,10 +271,11 @@ const ChatOrb = () => {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSend()}
                   placeholder={mode === "ai" ? "Ask me anything…" : "Search my work…"}
+                  disabled={mode === "ai" && isChatLimitReached(messages)}
                   className="flex-1 bg-transparent text-xs text-background placeholder:text-background/25 outline-none min-w-0"
                 />
                 <AnimatePresence>
-                  {mode === "ai" && input.trim() && (
+                  {mode === "ai" && input.trim() && !isChatLimitReached(messages) && (
                     <motion.button
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
@@ -334,6 +320,8 @@ const ChatOrb = () => {
                       transition={{ duration: 0.2 }}
                     >
                       Grounded in public knowledge. May be inaccurate.
+                      {" "}
+                      {Math.min(messages.filter((message) => message.role === "user").length, MAX_CHAT_USER_MESSAGES)}/{MAX_CHAT_USER_MESSAGES}
                     </motion.p>
                   )}
                 </AnimatePresence>

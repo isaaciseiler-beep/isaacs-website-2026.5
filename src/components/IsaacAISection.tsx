@@ -1,66 +1,79 @@
-import { FormEvent, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowUp } from "lucide-react";
 import { CONTACT_EMAIL } from "@/lib/site";
+import {
+  askSiteAssistant,
+  countUserMessages,
+  isChatLimitReached,
+  MAX_CHAT_USER_MESSAGES,
+  type ChatRequestMessage,
+  type ChatSource,
+} from "@/lib/chatClient";
 
-interface ChatApiResponse {
-  message?: string;
-  error?: string;
-  sources?: Array<{
-    id: string;
-    title: string;
-    source: string;
-    url?: string;
-  }>;
+interface ChatMessage extends ChatRequestMessage {
+  id: string;
+  sources?: ChatSource[];
 }
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
+const createMessageId = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
 const IsaacAISection = () => {
   const [query, setQuery] = useState("");
-  const [answer, setAnswer] = useState("");
-  const [error, setError] = useState("");
-  const [submittedPrompt, setSubmittedPrompt] = useState("");
-  const [sources, setSources] = useState<ChatApiResponse["sources"]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const requestIdRef = useRef(0);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  const userMessageCount = countUserMessages(messages);
+  const limitReached = isChatLimitReached(messages);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [messages, isLoading]);
 
   const askAssistant = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const prompt = query.trim();
-    if (!prompt || isLoading) return;
+    if (!prompt || isLoading || limitReached) return;
 
     const requestId = requestIdRef.current + 1;
     requestIdRef.current = requestId;
-    setAnswer("");
-    setError("");
-    setSubmittedPrompt(prompt);
-    setSources([]);
+    const userMessage: ChatMessage = { id: createMessageId(), role: "user", content: prompt };
+    const nextMessages = [...messages, userMessage];
+    setMessages(nextMessages);
+    setQuery("");
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: [{ role: "user", content: prompt }],
-        }),
-      });
-      const data = (await response.json()) as ChatApiResponse;
+      const data = await askSiteAssistant(nextMessages.map(({ role, content }) => ({ role, content })));
       if (requestIdRef.current !== requestId) return;
 
-      setAnswer(data.message || "");
-      setError(data.error || (!data.message ? "I could not reach the AI assistant yet." : ""));
-      setSources(data.sources || []);
-    } catch {
+      setMessages((current) => [
+        ...current,
+        {
+          id: createMessageId(),
+          role: "assistant",
+          content: data.message || "The AI assistant is temporarily unavailable. Please try again shortly.",
+          sources: data.sources || [],
+        },
+      ]);
+    } catch (error) {
       if (requestIdRef.current !== requestId) return;
-      setError("I could not reach the AI assistant yet. Make sure local dev has OPENAI_API set and restart the dev server.");
+      setMessages((current) => [
+        ...current,
+        {
+          id: createMessageId(),
+          role: "assistant",
+          content: error instanceof Error ? error.message : "The AI assistant is temporarily unavailable. Please try again shortly.",
+        },
+      ]);
     } finally {
       if (requestIdRef.current === requestId) setIsLoading(false);
     }
   };
-
-  const hasResponse = Boolean(answer || error || isLoading);
 
   return (
     <section className="relative z-20 flex items-start px-6 pb-14 pt-12 md:pb-16 md:pt-16">
@@ -77,38 +90,23 @@ const IsaacAISection = () => {
 
         <div className="flex h-[340px] w-full max-w-2xl flex-col bg-foreground/[0.035] text-left shadow-[0_0_70px_rgba(0,0,0,0.18)] transition-all duration-500 ease-out focus-within:bg-foreground/[0.045] md:h-[400px]">
           <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 pb-3 pt-4 md:px-5 md:pt-5">
-            {hasResponse && (
-              <>
-              <div className="ml-auto max-w-[86%] bg-foreground/[0.08] px-3 py-2 text-sm leading-relaxed text-foreground/75 md:max-w-[78%]">
-                {submittedPrompt || query.trim()}
-              </div>
-
+            {messages.map((message) => (
               <motion.div
-                className="mr-auto max-w-[92%] bg-background/45 px-3.5 py-3 md:max-w-[84%]"
+                key={message.id}
+                className={`max-w-[92%] px-3.5 py-3 ${
+                  message.role === "user"
+                    ? "ml-auto bg-foreground/[0.08] text-foreground/75 md:max-w-[78%]"
+                    : "mr-auto bg-background/45 text-foreground/72 md:max-w-[84%]"
+                }`}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.38, ease: EASE }}
               >
-                {isLoading ? (
-                  <div className="flex h-5 items-center gap-1.5" aria-label="Loading AI answer">
-                    {[0, 1, 2].map((dot) => (
-                      <motion.span
-                        key={dot}
-                        className="block h-1 w-1 bg-foreground/35"
-                        animate={{ opacity: [0.25, 1, 0.25] }}
-                        transition={{ duration: 1, repeat: Infinity, delay: dot * 0.16 }}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <p className="whitespace-pre-line text-[14px] leading-relaxed text-foreground/72 md:text-[15px]">
-                    {answer || error}
-                  </p>
-                )}
+                <p className="whitespace-pre-line text-[14px] leading-relaxed md:text-[15px]">{message.content}</p>
 
-                {!isLoading && sources?.length ? (
+                {message.role === "assistant" && message.sources?.length ? (
                   <div className="mt-4 flex flex-wrap gap-2">
-                    {sources.slice(0, 4).map((source) =>
+                    {message.sources.slice(0, 4).map((source) =>
                       source.url ? (
                         <a
                           key={source.id}
@@ -131,8 +129,28 @@ const IsaacAISection = () => {
                   </div>
                 ) : null}
               </motion.div>
-              </>
-            )}
+            ))}
+
+            {isLoading ? (
+              <motion.div
+                className="mr-auto max-w-[84%] bg-background/45 px-3.5 py-3"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.38, ease: EASE }}
+              >
+                <div className="flex h-5 items-center gap-1.5" aria-label="Loading AI answer">
+                  {[0, 1, 2].map((dot) => (
+                    <motion.span
+                      key={dot}
+                      className="block h-1 w-1 bg-foreground/35"
+                      animate={{ opacity: [0.25, 1, 0.25] }}
+                      transition={{ duration: 1, repeat: Infinity, delay: dot * 0.16 }}
+                    />
+                  ))}
+                </div>
+              </motion.div>
+            ) : null}
+            <div ref={messagesEndRef} />
           </div>
 
           <form
@@ -148,13 +166,18 @@ const IsaacAISection = () => {
                   event.currentTarget.form?.requestSubmit();
                 }
               }}
-              placeholder="Ask about my work, projects, or background"
+              placeholder={limitReached ? "Conversation limit reached" : "Ask about my work, projects, or background"}
               rows={1}
+              disabled={limitReached}
+              aria-label={`Message ${Math.min(userMessageCount + 1, MAX_CHAT_USER_MESSAGES)} of ${MAX_CHAT_USER_MESSAGES}`}
               className="max-h-32 min-h-11 min-w-0 flex-1 resize-none bg-transparent py-3 text-sm leading-relaxed text-foreground outline-none placeholder:text-foreground/32 md:text-base"
             />
+            <span className="shrink-0 font-mono text-[9px] text-foreground/25" aria-hidden>
+              {userMessageCount}/{MAX_CHAT_USER_MESSAGES}
+            </span>
             <motion.button
               type="submit"
-              disabled={!query.trim() || isLoading}
+              disabled={!query.trim() || isLoading || limitReached}
               className="flex h-11 w-11 shrink-0 items-center justify-center bg-[hsl(50_33%_7%)] text-white shadow-[0_10px_24px_rgba(18,24,14,0.24)] transition-colors hover:bg-[hsl(50_33%_12%)] disabled:pointer-events-none disabled:bg-foreground/12 disabled:text-foreground/32 disabled:shadow-none"
               whileHover={{ y: -2, scale: 1.04 }}
               whileTap={{ y: 0, scale: 0.94 }}

@@ -7,9 +7,10 @@ import { useTheme } from "@/components/ThemeProvider";
 import SearchTrigger from "@/components/SearchOverlay";
 import { CONTACT_MAILTO, GITHUB_URL, LINKEDIN_URL, SUBSTACK_URL } from "@/lib/site";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useLockBodyScroll } from "@/hooks/use-lock-body-scroll";
 
-const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
-const EASE_TEXT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
+const EASE: [number, number, number, number] = [0.19, 1, 0.22, 1];
+const EASE_TEXT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 const SlimMoon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
@@ -106,6 +107,7 @@ const Sidebar = ({ open, onToggle, onClose, onSearchOpen, activeSection, showTog
   const isOnPhotos = location.pathname.startsWith("/photos");
   const isOnProjects = location.pathname.startsWith("/projects");
   const isOnExperience = location.pathname.startsWith("/experience");
+  useLockBodyScroll(open);
 
   useEffect(() => {
     const activeParents = sitemapItems.reduce<Record<string, boolean>>((acc, item) => {
@@ -186,9 +188,9 @@ const Sidebar = ({ open, onToggle, onClose, onSearchOpen, activeSection, showTog
       ) : null}
 
       <motion.nav
-        className="site-sidebar-panel fixed left-0 top-0 z-[45] isolate flex h-[100svh] w-screen flex-col overflow-y-auto px-6 pb-[calc(env(safe-area-inset-bottom)+2rem)] pt-20 md:h-screen md:w-[240px] md:justify-between md:py-20"
+        className="site-sidebar-panel fixed inset-y-0 left-0 z-[45] isolate flex h-[100dvh] w-screen transform-gpu flex-col overflow-y-auto overscroll-contain px-6 pb-[calc(env(safe-area-inset-bottom)+2rem)] pt-20 will-change-transform md:w-[240px] md:justify-between md:py-20"
         animate={{ x: open ? 0 : isMobile ? "-100%" : -240 }}
-        transition={{ duration: 0.4, ease: EASE_TEXT }}
+        transition={{ duration: 0.56, ease: EASE_TEXT }}
       >
         <AnimatePresence>
           {open && (
@@ -206,7 +208,7 @@ const Sidebar = ({ open, onToggle, onClose, onSearchOpen, activeSection, showTog
                         initial={{ opacity: 0, y: 12, filter: "blur(6px)" }}
                         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                         exit={{ opacity: 0, y: 8, filter: "blur(4px)" }}
-                        transition={{ delay: 0.08 + idx * 0.05, duration: 0.5, ease: EASE }}
+                        transition={{ delay: 0.08 + idx * 0.045, duration: 0.62, ease: EASE }}
                         className="flex items-center gap-2"
                       >
                         <button
@@ -229,7 +231,7 @@ const Sidebar = ({ open, onToggle, onClose, onSearchOpen, activeSection, showTog
                               active ? "text-foreground" : "text-foreground/30 hover:text-foreground/60"
                             }`}
                             animate={{ rotate: expanded ? 90 : 0 }}
-                            transition={{ duration: 0.3, ease: EASE_TEXT }}
+                            transition={{ duration: 0.42, ease: EASE_TEXT }}
                           >
                             <ChevronRight className="h-4 w-4 md:h-3.5 md:w-3.5" strokeWidth={1.65} />
                           </motion.button>
@@ -244,7 +246,7 @@ const Sidebar = ({ open, onToggle, onClose, onSearchOpen, activeSection, showTog
                             initial={{ height: 0, opacity: 0 }}
                             animate={{ height: "auto", opacity: 1 }}
                             exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.28, ease: EASE_TEXT }}
+                            transition={{ duration: 0.42, ease: EASE_TEXT }}
                           >
                             {item.children?.map((child) => {
                               const childIdx = flatIndex++;
@@ -255,7 +257,7 @@ const Sidebar = ({ open, onToggle, onClose, onSearchOpen, activeSection, showTog
                                   initial={{ opacity: 0, y: 8, filter: "blur(4px)" }}
                                   animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                                   exit={{ opacity: 0, y: 6, filter: "blur(3px)" }}
-                                  transition={{ delay: 0.03 + childIdx * 0.03, duration: 0.4, ease: EASE }}
+                                  transition={{ delay: 0.03 + childIdx * 0.025, duration: 0.5, ease: EASE }}
                                   onClick={() => handleChildClick(child)}
                                   className={`block py-1.5 pl-6 text-left text-[28px] font-medium leading-none transition-colors duration-300 origin-left md:pl-4 md:text-sm md:leading-normal ${
                                     childActive ? "text-foreground" : "text-foreground/30 hover:text-foreground/60"
@@ -283,7 +285,7 @@ const Sidebar = ({ open, onToggle, onClose, onSearchOpen, activeSection, showTog
               initial={{ opacity: 0, y: 16, scale: 0.94, filter: "blur(6px)" }}
               animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
               exit={{ opacity: 0, y: 12, scale: 0.96, filter: "blur(4px)" }}
-              transition={{ delay: 0.25, duration: 0.5, ease: EASE, filter: { duration: 0.6, delay: 0.3 } }}
+              transition={{ delay: 0.2, duration: 0.62, ease: EASE, filter: { duration: 0.66, delay: 0.24 } }}
             >
               <div>
                 <p className="mono-text mb-3">Get in Touch</p>

@@ -6,11 +6,18 @@ The Vercel chat function automatically reads `.md` and `.mdx` files from this fo
 
 Suggested files:
 
+- `isaac-ai-agent-training.md`
 - `bio.md`
 - `projects.md`
 - `resume.md`
 - `voice.md`
 - `faq.md`
+
+`isaac-ai-agent-training.md` is treated specially by the chat API. It is agent
+grounding and retrieval guidance, not fine-tuning data: selected voice,
+identity, freshness, behavior, and privacy sections are included as persistent
+assistant guidance, while the full file remains retrievable like any other
+Markdown knowledge file.
 
 Example:
 

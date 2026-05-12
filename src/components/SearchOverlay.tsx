@@ -4,9 +4,11 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRight, Search, Sparkles, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { hasSearchResults, searchSite, type SearchResult } from "@/lib/searchIndex";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useLockBodyScroll } from "@/hooks/use-lock-body-scroll";
 
-const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
-const EASE_TEXT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
+const EASE: [number, number, number, number] = [0.19, 1, 0.22, 1];
+const EASE_TEXT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 interface SearchTriggerProps {
   variant?: "header" | "sidebar";
@@ -29,15 +31,6 @@ interface ChatApiResponse {
     url?: string;
   }>;
 }
-
-const SEARCH_IDEAS = [
-  { id: "public-ai", label: "Public AI", query: "state government ai policy genai" },
-  { id: "education", label: "Education", query: "education classroom fulbright chatgpt teaching" },
-  { id: "civic", label: "Civic Work", query: "congress philanthropy public service st louis" },
-  { id: "platforms", label: "Platforms", query: "ai digital platforms journalism research" },
-  { id: "climate", label: "Climate", query: "electric vehicle charging infrastructure gis" },
-  { id: "visual", label: "Visual", query: "photography maps design portfolio" },
-];
 
 const ResultCard = ({
   index,
@@ -82,7 +75,6 @@ const ResultCard = ({
 
 export const SearchPanel = ({ open, onClose }: { open: boolean; onClose: () => void }) => {
   const [query, setQuery] = useState("");
-  const [selectedIdeaIds, setSelectedIdeaIds] = useState<string[]>([]);
   const [aiQuery, setAiQuery] = useState("");
   const [aiMessage, setAiMessage] = useState("");
   const [aiError, setAiError] = useState("");
@@ -92,11 +84,13 @@ export const SearchPanel = ({ open, onClose }: { open: boolean; onClose: () => v
   const latestQueryRef = useRef("");
   const aiRequestIdRef = useRef(0);
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const groups = useMemo(() => searchSite(query, 5), [query]);
   const trimmedQuery = query.trim();
   const hasQuery = trimmedQuery.length > 0;
   const hasResults = hasSearchResults(groups);
   const showAiPanel = hasQuery && trimmedQuery.length > 2;
+  useLockBodyScroll(open);
 
   useEffect(() => {
     latestQueryRef.current = trimmedQuery;
@@ -123,7 +117,6 @@ export const SearchPanel = ({ open, onClose }: { open: boolean; onClose: () => v
   useEffect(() => {
     if (!open) {
       setQuery("");
-      setSelectedIdeaIds([]);
       setAiQuery("");
       setAiMessage("");
       setAiError("");
@@ -132,21 +125,6 @@ export const SearchPanel = ({ open, onClose }: { open: boolean; onClose: () => v
       aiRequestIdRef.current += 1;
     }
   }, [open]);
-
-  const toggleIdea = (ideaId: string) => {
-    setSelectedIdeaIds((current) => {
-      const next = current.includes(ideaId)
-        ? current.filter((id) => id !== ideaId)
-        : [...current, ideaId];
-      setQuery(
-        next
-          .map((id) => SEARCH_IDEAS.find((idea) => idea.id === id)?.query)
-          .filter(Boolean)
-          .join(" "),
-      );
-      return next;
-    });
-  };
 
   const askAssistant = async () => {
     const requestQuery = trimmedQuery;
@@ -202,17 +180,13 @@ export const SearchPanel = ({ open, onClose }: { open: boolean; onClose: () => v
             role="dialog"
             aria-modal="true"
             aria-label="Search"
-            className="fixed right-0 top-0 z-[85] isolate flex h-[100dvh] w-screen flex-col overflow-hidden px-6 pb-[calc(env(safe-area-inset-bottom)+2rem)] pt-32 text-foreground md:w-[390px]"
-            initial={{ x: "100%", opacity: 0.96, filter: "blur(8px)" }}
+            className="site-sidebar-panel fixed inset-y-0 right-0 z-[85] isolate flex h-[100dvh] w-screen transform-gpu flex-col overflow-y-auto overscroll-contain px-6 pb-[calc(env(safe-area-inset-bottom)+2rem)] pt-20 text-foreground will-change-transform md:w-[240px] md:py-20"
+            initial={{ x: isMobile ? "100%" : 240 }}
             animate={{ x: 0, opacity: 1, filter: "blur(0px)" }}
-            exit={{ x: "100%", opacity: 0.96, filter: "blur(8px)" }}
-            transition={{ duration: 0.4, ease: EASE_TEXT }}
+            exit={{ x: isMobile ? "100%" : 240 }}
+            transition={{ duration: 0.56, ease: EASE_TEXT }}
           >
-            <div className="absolute inset-0 -z-20 bg-[linear-gradient(90deg,hsl(var(--background)/0)_0%,hsl(var(--background)/0.94)_16%,hsl(var(--background))_100%)]" />
-            <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-36 bg-gradient-to-b from-background via-background/95 to-transparent" />
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-28 bg-gradient-to-t from-background via-background/80 to-transparent" />
-
-            <div className="absolute right-6 top-4 z-10 flex h-[25px] w-[calc(100%-3rem)] items-center justify-end gap-2 md:w-[342px]">
+            <div className="flex h-[25px] shrink-0 items-center justify-end gap-2">
               <button
                 type="button"
                 onClick={onClose}
@@ -226,15 +200,12 @@ export const SearchPanel = ({ open, onClose }: { open: boolean; onClose: () => v
                 initial={{ width: 25, opacity: 0 }}
                 animate={{ width: "100%", opacity: 1 }}
                 exit={{ width: 25, opacity: 0 }}
-                transition={{ duration: 0.48, ease: EASE }}
+                transition={{ duration: 0.58, ease: EASE }}
               >
                 <input
                   ref={inputRef}
                   value={query}
-                  onChange={(event) => {
-                    setQuery(event.target.value);
-                    setSelectedIdeaIds([]);
-                  }}
+                  onChange={(event) => setQuery(event.target.value)}
                   onKeyDown={(event) => {
                     if (event.key === "Enter") askAssistant();
                   }}
@@ -245,38 +216,11 @@ export const SearchPanel = ({ open, onClose }: { open: boolean; onClose: () => v
               </motion.div>
             </div>
 
-            <motion.div
-              className="absolute right-6 top-12 z-10 flex w-[calc(100%-3rem)] flex-wrap justify-end gap-1.5 md:w-[342px]"
-              initial={{ opacity: 0, y: -4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.34, ease: EASE_TEXT, delay: 0.06 }}
-            >
-              {SEARCH_IDEAS.map((idea) => {
-                const selected = selectedIdeaIds.includes(idea.id);
-                return (
-                  <button
-                    key={idea.id}
-                    type="button"
-                    onClick={() => toggleIdea(idea.id)}
-                    className={`px-2 py-1 font-mono text-[9px] uppercase tracking-[0.18em] transition-colors duration-200 ${
-                      selected
-                        ? "bg-[hsl(var(--highlight))] text-[hsl(var(--background))]"
-                        : "bg-foreground/[0.045] text-foreground/45 hover:bg-foreground/[0.08] hover:text-foreground/72"
-                    }`}
-                    aria-pressed={selected}
-                  >
-                    {idea.label}
-                  </button>
-                );
-              })}
-            </motion.div>
-
-            <div className="min-h-0 flex-1 overflow-y-auto pb-4 pt-2 scrollbar-hide">
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-4 pt-12 scrollbar-hide md:pt-14">
               {!hasQuery ? (
                 <div className="grid h-full min-h-[260px] place-items-center">
                   <p className="max-w-[18rem] text-right text-[13px] leading-relaxed text-foreground/35">
-                    Select a few ideas or type your own search.
+                    Search my work or ask Isaac AI.
                   </p>
                 </div>
               ) : (
@@ -286,7 +230,7 @@ export const SearchPanel = ({ open, onClose }: { open: boolean; onClose: () => v
                       className="pb-5"
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.42, ease: EASE, delay: 0.01 }}
+                      transition={{ duration: 0.58, ease: EASE, delay: 0.03 }}
                     >
                       <div className="mb-3 flex items-center justify-between gap-3">
                         <h2 className="font-mono text-[10px] uppercase tracking-[0.26em] text-foreground/45">AI</h2>
@@ -349,7 +293,7 @@ export const SearchPanel = ({ open, onClose }: { open: boolean; onClose: () => v
                           className="pb-8 pt-5 first:pt-0"
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.42, ease: EASE, delay: 0.02 }}
+                          transition={{ duration: 0.58, ease: EASE, delay: 0.05 }}
                         >
                           <div className="mb-3">
                             <h2 className="font-mono text-[10px] uppercase tracking-[0.26em] text-foreground/45">{group.label}</h2>

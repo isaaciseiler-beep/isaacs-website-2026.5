@@ -2,6 +2,54 @@
 
 TODO: Document your project here
 
+## Website AI Assistant
+
+The chat assistant uses Vercel Serverless Functions in `api/chat.ts` and reads
+Markdown grounding files from `knowledge/` at request time.
+
+### Local setup
+
+Create a local env file:
+
+```bash
+cp .env.example .env.local
+```
+
+Then set:
+
+```bash
+OPENAI_API_KEY=sk-your-openai-api-key
+```
+
+`OPENAI_CHAT_MODEL` is optional. If it is not set, the API uses the default in
+`api/chat.ts`.
+
+Run the site through Vercel so `/api/chat` is available:
+
+```bash
+npx vercel dev
+```
+
+Then open the local URL from Vercel and test the chat orb with prompts like:
+
+- `Who is Isaac?`
+- `What is Isaac's AI work?`
+- `How can I contact Isaac?`
+- `Tell me about the Fulbright educator lab.`
+
+### Production setup
+
+In Vercel, add these project environment variables:
+
+```bash
+OPENAI_API_KEY=sk-your-production-key
+OPENAI_CHAT_MODEL=gpt-4.1-mini
+```
+
+After deploying, verify that the chat answers from public knowledge, refuses or
+redirects private/sensitive questions, and uses careful wording for current or
+OpenAI-related claims.
+
 ## Fulbright Map
 
 The unlinked map page lives at `https://www.isaacseiler.xyz/fulbrightmap`. It is

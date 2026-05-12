@@ -1,4 +1,4 @@
-import { retrieveKnowledge } from "./knowledge";
+import { getAssistantGuidance, retrieveKnowledge } from "./knowledge";
 
 type ChatRole = "user" | "assistant";
 
@@ -38,13 +38,14 @@ const getResponseText = (payload: any) => {
   return textParts?.join("\n").trim() || "I could not generate a response.";
 };
 
-const buildInstructions = (context: string) => `You are Isaac Seiler's website assistant.
+const buildInstructions = (context: string, guidance: string) => `You are Isaac Seiler's website assistant.
 Answer in Isaac's first person only when it sounds natural, but do not invent private experiences or credentials.
-Use the supplied knowledge as your source of truth.
+Use the supplied knowledge as your source of truth for specific facts.
 If the answer is not supported by the knowledge, say that you do not have enough information yet and invite the visitor to contact Isaac.
 Keep answers concise, specific, and useful.
+Your backend has already retrieved the most relevant knowledge chunks below. Treat them as the indexed-search results.
 
-Knowledge:
+${guidance ? `Assistant guidance:\n${guidance}\n\n` : ""}Retrieved knowledge:
 ${context}`;
 
 export default async function handler(request: any, response: any) {
@@ -78,6 +79,8 @@ export default async function handler(request: any, response: any) {
       ? retrieved.map((chunk, index) => `[${index + 1}] ${chunk.title} (${chunk.source})\n${chunk.content}`).join("\n\n")
       : "No matching knowledge chunks were retrieved.";
 
+    const guidance = getAssistantGuidance();
+
     const openAiResponse = await fetch(OPENAI_RESPONSES_URL, {
       method: "POST",
       headers: {
@@ -86,7 +89,7 @@ export default async function handler(request: any, response: any) {
       },
       body: JSON.stringify({
         model: process.env.OPENAI_CHAT_MODEL || DEFAULT_MODEL,
-        instructions: buildInstructions(context),
+        instructions: buildInstructions(context, guidance),
         input: messages.slice(-8).map((message) => ({
           role: message.role,
           content: message.content,

@@ -5,6 +5,7 @@ import ProjectsSection from "@/components/ProjectsSection";
 import NewsSection from "@/components/NewsSection";
 import PhotoSection from "@/components/PhotoSection";
 import InspirationBoard from "@/components/InspirationBoard";
+import IsaacAISection from "@/components/IsaacAISection";
 import AboutSection from "@/components/AboutSection";
 import Footer from "@/components/Footer";
 import ChatOrb from "@/components/ChatOrb";
@@ -63,15 +64,15 @@ const Index = () => {
       <motion.div
         animate={{
           marginLeft: sidebarOpen && !isMobile ? 240 : 0,
-          marginRight: searchOpen && !isMobile ? 390 : 0,
+          marginRight: searchOpen && !isMobile ? 240 : 0,
           width:
             sidebarOpen && !isMobile
               ? "calc(100% - 240px)"
               : searchOpen && !isMobile
-                ? "calc(100% - 390px)"
+                ? "calc(100% - 240px)"
                 : "100%",
         }}
-        transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+        transition={{ duration: 0.56, ease: [0.22, 1, 0.36, 1] }}
       >
         <main>
           <div id="hero"><HeroSection /></div>
@@ -79,7 +80,10 @@ const Index = () => {
           <ParallaxSection id="about" offset={60}><AboutSection /></ParallaxSection>
           <ParallaxSection id="news" offset={55}><NewsSection /></ParallaxSection>
           <ParallaxSection id="photos" offset={80}><PhotoSection /></ParallaxSection>
-          <ParallaxSection id="inspiration" offset={55}><InspirationBoard /></ParallaxSection>
+          <div id="inspiration">
+            <ParallaxSection offset={55} clip={false}><InspirationBoard /></ParallaxSection>
+            <IsaacAISection />
+          </div>
           <Footer />
         </main>
       </motion.div>

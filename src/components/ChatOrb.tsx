@@ -333,7 +333,7 @@ const ChatOrb = () => {
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.2 }}
                     >
-                      Trained on my knowledge. May be inaccurate.
+                      Grounded in public knowledge. May be inaccurate.
                     </motion.p>
                   )}
                 </AnimatePresence>

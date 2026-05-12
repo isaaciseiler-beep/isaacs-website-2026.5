@@ -16,7 +16,7 @@ describe("search index", () => {
   });
 
   it("finds education work without exact title terms", () => {
-    expect(titlesFor("classroom teaching with chatgpt", "projects")).toContain("Fulbright Focus Group Sponsored by OpenAI");
+    expect(titlesFor("classroom teaching with chatgpt", "projects")).toContain("Fulbright Taiwan Educator Lab with OpenAI Support");
   });
 
   it("groups photo album matches separately", () => {

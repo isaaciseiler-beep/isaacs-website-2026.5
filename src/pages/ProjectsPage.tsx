@@ -5,12 +5,11 @@ import { ArrowUp } from "lucide-react";
 import Footer from "@/components/Footer";
 import Sidebar from "@/components/Sidebar";
 import SiteHeader from "@/components/SiteHeader";
-import ChatOrb from "@/components/ChatOrb";
 import { projectItems, type ProjectItem } from "@/lib/siteContent";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
-const EASE_TEXT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
+const EASE_TEXT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const FLOAT_BOTTOM = 20;
 
 const useCenteredInFrame = <T extends HTMLElement>(enabled: boolean) => {
@@ -162,15 +161,15 @@ const ProjectsPage = () => {
       <motion.div
         animate={{
           marginLeft: sidebarOpen && !isMobile ? 240 : 0,
-          marginRight: searchOpen && !isMobile ? 390 : 0,
+          marginRight: searchOpen && !isMobile ? 240 : 0,
           width:
             sidebarOpen && !isMobile
               ? "calc(100% - 240px)"
               : searchOpen && !isMobile
-                ? "calc(100% - 390px)"
+                ? "calc(100% - 240px)"
                 : "100%",
         }}
-        transition={{ duration: 0.4, ease: EASE_TEXT }}
+        transition={{ duration: 0.56, ease: EASE_TEXT }}
       >
         <motion.main
           className="pt-28 pb-20"
@@ -228,8 +227,6 @@ const ProjectsPage = () => {
           </motion.button>
         )}
       </AnimatePresence>
-
-      {!sidebarOpen && !searchOpen && <ChatOrb />}
 
       <SiteHeader
         open={sidebarOpen}

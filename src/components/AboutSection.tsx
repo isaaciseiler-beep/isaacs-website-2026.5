@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import SectionHeading from "@/components/SectionHeading";
 const headshotUrl = "https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev/8B142F31-3FF0-440E-8771-33A465C8C9FE_1_201_a.jpeg";
@@ -23,6 +23,8 @@ const AboutSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const pillRef = useRef<HTMLDivElement>(null);
   const [hasDeployedPopdown, setHasDeployedPopdown] = useState(false);
+  const headshotRotX = useSpring(useMotionValue(0), { stiffness: 120, damping: 18, mass: 0.6 });
+  const headshotRotY = useSpring(useMotionValue(0), { stiffness: 120, damping: 18, mass: 0.6 });
   const photoSize = "clamp(320px, 34vw, 520px)";
   const popdownVariants = {
     closed: { height: 0, y: -18 },
@@ -111,6 +113,21 @@ const AboutSection = () => {
 
   const imgY = useTransform(scrollYProgress, [0, 1], [40, -40]);
 
+  const handleHeadshotMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const nx = ((event.clientX - rect.left) / rect.width - 0.5) * 2;
+    const ny = ((event.clientY - rect.top) / rect.height - 0.5) * 2;
+    const hoveringCorner = Math.abs(nx) > 0.62 && Math.abs(ny) > 0.62;
+
+    headshotRotY.set(hoveringCorner ? nx * 5 : 0);
+    headshotRotX.set(hoveringCorner ? -ny * 5 : 0);
+  };
+
+  const handleHeadshotLeave = () => {
+    headshotRotX.set(0);
+    headshotRotY.set(0);
+  };
+
   return (
     <section ref={sectionRef} className="py-12 px-6">
       <SectionHeading>About</SectionHeading>
@@ -168,14 +185,24 @@ const AboutSection = () => {
           </div>
 
           <motion.div
-            className="group/headshot relative w-full overflow-hidden justify-self-end self-center"
-            style={{ width: photoSize }}
+            className="group/headshot relative w-full justify-self-end self-center"
+            style={{ width: photoSize, perspective: 900 }}
             initial={{ opacity: 0, scale: 0.95, filter: "blur(8px)" }}
             whileInView={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            onPointerMove={handleHeadshotMove}
+            onPointerLeave={handleHeadshotLeave}
           >
-            <motion.div className="aspect-square overflow-hidden" style={{ y: imgY }}>
+            <motion.div
+              className="aspect-square overflow-hidden shadow-sm transition-shadow duration-300 group-hover/headshot:shadow-md"
+              style={{
+                y: imgY,
+                rotateX: headshotRotX,
+                rotateY: headshotRotY,
+                transformStyle: "preserve-3d",
+              }}
+            >
               <img
                 src={headshotUrl}
                 alt="Portrait"
@@ -183,14 +210,6 @@ const AboutSection = () => {
                 loading="lazy"
               />
             </motion.div>
-            <div className="pointer-events-none absolute right-3 top-3 flex items-start justify-end">
-              <div className="flex h-8 items-center overflow-hidden bg-[hsl(50_33%_7%/0.88)] text-[#f3f6ff] backdrop-blur-sm transition-colors duration-500 group-hover/headshot:text-[hsl(var(--highlight))]">
-                <p className="max-w-0 whitespace-nowrap pl-0 pr-0 font-mono text-[9px] uppercase tracking-[0.22em] opacity-0 transition-all duration-500 ease-out group-hover/headshot:max-w-[10rem] group-hover/headshot:pl-3 group-hover/headshot:pr-2 group-hover/headshot:opacity-100 group-focus-within/headshot:max-w-[10rem] group-focus-within/headshot:pl-3 group-focus-within/headshot:pr-2 group-focus-within/headshot:opacity-100">
-                  Isaac Seiler
-                </p>
-                <span className="block h-8 w-8 shrink-0 border-l border-white/10 bg-[hsl(50_33%_7%)]" />
-              </div>
-            </div>
           </motion.div>
         </div>
 

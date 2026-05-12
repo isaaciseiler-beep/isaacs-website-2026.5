@@ -59,10 +59,10 @@ const SITE_CHUNKS: KnowledgeChunk[] = [
   },
   {
     id: "fulbright-chatgpt-lab",
-    title: "Fulbright Focus Group Sponsored by OpenAI",
+    title: "Fulbright Taiwan Educator Lab with OpenAI Support",
     source: "Project",
     content:
-      "A 2025 six-session educator lab sponsored by OpenAI. Isaac founded and led the Fulbright Taiwan ChatGPT Lab, bringing Fulbright educators together to explore practical, responsible uses of ChatGPT in education. He co-developed the lab structure with OpenAI staff, facilitated six sessions, designed curriculum, and produced nine lightweight educator use cases summarized in a published Substack post.",
+      "A 2025 six-session educator lab with OpenAI/ChatGPT for Education support. Isaac founded and led the Fulbright Taiwan ChatGPT Lab, bringing Fulbright educators together to explore practical, responsible uses of ChatGPT in education. He facilitated six sessions, designed curriculum, and produced nine lightweight educator use cases summarized in a published ChatGPT for Education post.",
     url: "https://edunewsletter.openai.com/p/top-chats-from-the-fulbright-taiwan",
   },
   {
@@ -135,6 +135,19 @@ const STOP_WORDS = new Set([
   "you",
 ]);
 
+const KNOWLEDGE_DIR = "knowledge";
+const ASSISTANT_GUIDANCE_FILE = "isaac-ai-agent-training.md";
+const ASSISTANT_GUIDANCE_HEADINGS = new Set([
+  "Role in the AI System",
+  "Canonical Public Identity",
+  "Source and Freshness Rules",
+  "Voice Model",
+  "Search-Companion Behavior",
+  "Privacy and Safety Policy",
+  "Identity Throughlines",
+  "Sample Website Agent Answers",
+]);
+
 const tokenize = (value: string) =>
   value
     .toLowerCase()
@@ -160,22 +173,42 @@ const chunkMarkdown = (filePath: string, text: string): KnowledgeChunk[] => {
   }));
 };
 
+const getKnowledgeDir = () => path.join(process.cwd(), KNOWLEDGE_DIR);
+
 const readMarkdownKnowledge = () => {
-  const knowledgeDir = path.join(process.cwd(), "knowledge");
+  const knowledgeDir = getKnowledgeDir();
   if (!fs.existsSync(knowledgeDir)) return [];
 
   const files = fs
     .readdirSync(knowledgeDir)
     .filter((file) => /\.mdx?$/i.test(file))
+    .sort()
     .map((file) => path.join(knowledgeDir, file));
 
   return files.flatMap((filePath) => chunkMarkdown(filePath, fs.readFileSync(filePath, "utf8")));
 };
 
+const extractAssistantGuidance = (text: string) =>
+  text
+    .split(/\n(?=##\s+)/g)
+    .map((section) => section.trim())
+    .filter((section) => {
+      const heading = section.match(/^##\s+(.+)$/m)?.[1]?.trim();
+      return heading ? ASSISTANT_GUIDANCE_HEADINGS.has(heading) : false;
+    })
+    .join("\n\n");
+
 export const getKnowledgeChunks = (): KnowledgeChunk[] => [
   ...SITE_CHUNKS,
   ...readMarkdownKnowledge(),
 ];
+
+export const getAssistantGuidance = () => {
+  const filePath = path.join(getKnowledgeDir(), ASSISTANT_GUIDANCE_FILE);
+  if (!fs.existsSync(filePath)) return "";
+
+  return extractAssistantGuidance(fs.readFileSync(filePath, "utf8"));
+};
 
 export const retrieveKnowledge = (query: string, limit = 5): RetrievedChunk[] => {
   const queryTerms = tokenize(query);

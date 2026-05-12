@@ -20,7 +20,7 @@ const featuredPhotos = {
   bottom: coverFor(findAlbum("Australia")),
 };
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
-const EASE_TEXT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
+const EASE_TEXT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 // Eager preload covers + hero picks only (avoid 100+ image flood)
 if (typeof window !== "undefined") {
@@ -232,15 +232,15 @@ const PhotosPage = () => {
       <motion.div
         animate={{
           marginLeft: sidebarOpen && !isMobile ? 240 : 0,
-          marginRight: searchOpen && !isMobile ? 390 : 0,
+          marginRight: searchOpen && !isMobile ? 240 : 0,
           width:
             sidebarOpen && !isMobile
               ? "calc(100% - 240px)"
               : searchOpen && !isMobile
-                ? "calc(100% - 390px)"
+                ? "calc(100% - 240px)"
                 : "100%",
         }}
-        transition={{ duration: 0.4, ease: EASE_TEXT }}
+        transition={{ duration: 0.56, ease: EASE_TEXT }}
       >
         <motion.main
           className="pt-28 pb-0"

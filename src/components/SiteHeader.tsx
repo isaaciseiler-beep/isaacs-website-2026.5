@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import Logo from "@/components/Logo";
 import SearchTrigger from "@/components/SearchOverlay";
 
-const EASE_TEXT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
+const EASE_TEXT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 interface SiteHeaderProps {
   open: boolean;

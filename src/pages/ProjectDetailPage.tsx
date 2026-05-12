@@ -5,7 +5,6 @@ import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import Footer from "@/components/Footer";
 import Sidebar from "@/components/Sidebar";
 import SiteHeader from "@/components/SiteHeader";
-import ChatOrb from "@/components/ChatOrb";
 import { projectItems, type ProjectMedia } from "@/lib/siteContent";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
@@ -17,7 +16,7 @@ import {
 } from "@/components/ui/carousel";
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
-const EASE_TEXT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
+const EASE_TEXT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 const ProjectMediaBlock = ({ media }: { media: ProjectMedia }) => {
   if (media.type === "pdf" && media.src) {
@@ -132,15 +131,15 @@ const ProjectDetailPage = () => {
       <motion.div
         animate={{
           marginLeft: sidebarOpen && !isMobile ? 240 : 0,
-          marginRight: searchOpen && !isMobile ? 390 : 0,
+          marginRight: searchOpen && !isMobile ? 240 : 0,
           width:
             sidebarOpen && !isMobile
               ? "calc(100% - 240px)"
               : searchOpen && !isMobile
-                ? "calc(100% - 390px)"
+                ? "calc(100% - 240px)"
                 : "100%",
         }}
-        transition={{ duration: 0.4, ease: EASE_TEXT }}
+        transition={{ duration: 0.56, ease: EASE_TEXT }}
       >
         <motion.main
           className="pt-28 pb-20 px-6 max-w-4xl mx-auto"
@@ -157,7 +156,10 @@ const ProjectDetailPage = () => {
               style={{ transitionTimingFunction: "cubic-bezier(0.22,1,0.36,1)" }}
             />
             <span className="back-projects-button-label relative z-10 flex items-center transition-colors duration-500">
-              <span className="inline-flex overflow-hidden max-w-0 opacity-0 group-hover:max-w-[1.5rem] group-hover:opacity-100 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]">
+              <span
+                className="inline-flex max-w-0 overflow-hidden opacity-0 transition-all duration-500 group-hover:max-w-[1.5rem] group-hover:opacity-100"
+                style={{ transitionTimingFunction: "cubic-bezier(0.22,1,0.36,1)" }}
+              >
                 <ArrowLeft className="w-3 h-3 mr-1.5 shrink-0" strokeWidth={1.5} />
               </span>
               All Projects
@@ -228,8 +230,6 @@ const ProjectDetailPage = () => {
 
         <Footer />
       </motion.div>
-      {!sidebarOpen && !searchOpen && <ChatOrb />}
-
       <SiteHeader
         open={sidebarOpen}
         onToggle={handleSidebarToggle}

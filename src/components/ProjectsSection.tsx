@@ -84,7 +84,6 @@ const FeaturedProjectCard = ({
         alt={project.title}
         loading="eager"
         decoding="async"
-        fetchPriority={index === 0 ? "high" : "auto"}
         className="absolute inset-0 w-full h-full object-cover"
         animate={{
           filter: isImageActive ? "grayscale(0%) brightness(1)" : "grayscale(100%) brightness(0.7)",

@@ -572,7 +572,7 @@ const BoardCard = ({ item, index, dragging, zIndex, cardOpacity, cardY, onPointe
       onPointerLeave={handleLeave}
     >
       <motion.div
-        className={`h-full transition-shadow duration-300 ${item.transparent ? "" : "bg-background shadow-sm hover:shadow-md"}`}
+        className={`site-corner h-full overflow-hidden transition-shadow duration-300 ${item.transparent ? "" : "bg-background shadow-sm hover:shadow-md"}`}
         style={{
           rotateX: rotX,
           rotateY: rotY,

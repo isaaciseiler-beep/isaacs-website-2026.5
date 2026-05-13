@@ -195,7 +195,7 @@ const AboutSection = () => {
             onPointerLeave={handleHeadshotLeave}
           >
             <motion.div
-              className="aspect-square overflow-hidden shadow-sm transition-shadow duration-300 group-hover/headshot:shadow-md"
+              className="site-corner aspect-square overflow-hidden shadow-sm transition-shadow duration-300 group-hover/headshot:shadow-md"
               style={{
                 y: imgY,
                 rotateX: headshotRotX,
@@ -217,7 +217,12 @@ const AboutSection = () => {
         <div className="mt-8 md:mt-10 relative group/pill">
           <div
             ref={pillRef}
-            className={`relative flex items-center gap-3 px-6 py-3.5 bg-background border-2 border-foreground group-hover/pill:border-[hsl(50_33%_12%)] transition-colors duration-300 w-full z-10 ${hasDeployedPopdown ? "border-b-0" : ""}`}
+            className={`relative z-10 flex w-full items-center gap-3 border-2 border-foreground bg-background px-6 py-3.5 transition-colors duration-300 group-hover/pill:border-[hsl(50_33%_12%)] ${hasDeployedPopdown ? "border-b-0" : ""}`}
+            style={{
+              borderRadius: hasDeployedPopdown
+                ? "var(--site-corner-radius) var(--site-corner-radius) 0 0"
+                : "var(--site-corner-radius)",
+            }}
           >
             <motion.span
               className="rounded-full w-2.5 h-2.5 bg-foreground transition-colors duration-300 shrink-0"
@@ -242,6 +247,7 @@ const AboutSection = () => {
             >
               <button
                 className="homepage-cta relative pointer-events-auto h-full w-full bg-[hsl(50_33%_7%)] group-hover/pill:bg-[hsl(50_33%_12%)] transition-colors duration-300 overflow-hidden cursor-pointer"
+                style={{ borderRadius: "0 0 var(--site-corner-radius) var(--site-corner-radius)" }}
                 onClick={() => window.location.href = CONTACT_MAILTO}
               >
                 <motion.span

@@ -195,7 +195,7 @@ const ExperienceImage = ({
 
   return (
     <motion.div
-      className={`group/resume-image relative overflow-hidden shadow-sm transition-shadow duration-300 group-hover:shadow-md ${className ?? ""}`}
+      className={`site-corner group/resume-image relative overflow-hidden shadow-sm transition-shadow duration-300 group-hover:shadow-md ${className ?? ""}`}
       style={{
         perspective: 900,
         rotateX: rotX,
@@ -436,7 +436,7 @@ const ExperiencePage = () => {
               viewport={{ once: true, margin: "-80px" }}
               transition={{ duration: 0.55, ease: EASE_TEXT }}
             >
-              <div className="homepage-cta group relative flex w-full cursor-pointer items-center justify-center bg-[hsl(50_33%_7%)] py-3 font-mono text-sm uppercase tracking-[0.2em] transition-colors duration-300 hover:bg-[hsl(50_33%_12%)]">
+              <div className="site-corner homepage-cta group relative flex w-full cursor-pointer items-center justify-center bg-[hsl(50_33%_7%)] py-3 font-mono text-sm uppercase tracking-[0.2em] transition-colors duration-300 hover:bg-[hsl(50_33%_12%)]">
                 <span className="flex items-center justify-center">
                   Download resume
                   <span className="inline-flex max-w-0 overflow-hidden opacity-0 transition-all duration-300 ease-out group-hover:max-w-[2rem] group-hover:opacity-100">

@@ -37,7 +37,7 @@ const ResultCard = ({
     animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
     transition={{ delay: 0.05 + index * 0.035, duration: 0.46, ease: EASE }}
   >
-    <div className="relative aspect-[4/3] w-full overflow-hidden bg-[hsl(50_33%_7%)]">
+    <div className="site-corner relative aspect-[4/3] w-full overflow-hidden bg-[hsl(50_33%_7%)]">
       {result.image ? (
         <img
           src={result.image}

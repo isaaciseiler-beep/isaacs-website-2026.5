@@ -56,7 +56,7 @@ const ProjectModal = ({ projects, currentIndex, onClose, onNavigate }: ProjectMo
 
           <motion.div
             key={project.id}
-            className="relative z-10 mx-4 flex max-h-[88vh] w-full max-w-3xl flex-col overflow-hidden border border-foreground/10 bg-background shadow-[0_30px_120px_rgba(0,0,0,0.45)]"
+            className="site-corner relative z-10 mx-4 flex max-h-[88vh] w-full max-w-3xl flex-col overflow-hidden border border-foreground/10 bg-background shadow-[0_30px_120px_rgba(0,0,0,0.45)]"
             initial={{ opacity: 0, y: 24, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.98 }}

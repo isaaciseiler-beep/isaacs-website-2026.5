@@ -21,7 +21,7 @@ const EASE_TEXT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const ProjectMediaBlock = ({ media }: { media: ProjectMedia }) => {
   if (media.type === "pdf" && media.src) {
     return (
-      <figure className="my-6 overflow-hidden bg-foreground/[0.02]">
+      <figure className="site-corner my-6 overflow-hidden bg-foreground/[0.02]">
         <iframe
           src={`${media.src}#toolbar=0&navpanes=0&view=FitH`}
           title={media.title ?? media.alt ?? "Project slide deck"}
@@ -39,7 +39,7 @@ const ProjectMediaBlock = ({ media }: { media: ProjectMedia }) => {
           <CarouselContent>
             {media.images.map((image, index) => (
               <CarouselItem key={image.src}>
-                <figure className="overflow-hidden border border-foreground/10 bg-foreground/[0.02]">
+                <figure className="site-corner overflow-hidden border border-foreground/10 bg-foreground/[0.02]">
                   <div className="aspect-square overflow-hidden bg-foreground/[0.03]">
                     <img
                       src={image.src}
@@ -67,7 +67,7 @@ const ProjectMediaBlock = ({ media }: { media: ProjectMedia }) => {
 
   if (media.type === "image" && media.src) {
     return (
-      <figure className="my-6 overflow-hidden border border-foreground/10 bg-foreground/[0.02]">
+      <figure className="site-corner my-6 overflow-hidden border border-foreground/10 bg-foreground/[0.02]">
         <img
           src={media.src}
           alt={media.alt ?? ""}
@@ -173,7 +173,7 @@ const ProjectDetailPage = () => {
           <h1 className="text-3xl md:text-5xl font-semibold tracking-tight text-foreground mb-4">{project.title}</h1>
           <p className="text-base md:text-lg text-foreground/65 leading-relaxed mb-10">{project.summary}</p>
 
-          <div className="aspect-[16/9] overflow-hidden mb-12">
+          <div className="site-corner aspect-[16/9] overflow-hidden mb-12">
             <img
               src={project.image}
               alt={project.title}

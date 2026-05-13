@@ -36,7 +36,8 @@
     --highlight: 68 100% 81%;
     --site-panel-width: 240px;
 
-    --radius: 0px;
+    --site-corner-radius: 8px;
+    --radius: var(--site-corner-radius);
 
     --sidebar-background: 50 33% 5%;
     --sidebar-foreground: 225 100% 98%;
@@ -139,6 +140,10 @@
     font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
   }
 
+  .site-corner {
+    border-radius: var(--site-corner-radius);
+  }
+
   .site-header-xray {
     color: #fff;
     mix-blend-mode: normal;
@@ -189,7 +194,7 @@
   }
 
   .photo-map-shell .mapboxgl-ctrl-group {
-    border-radius: 0;
+    border-radius: var(--site-corner-radius);
     overflow: hidden;
     background: hsl(var(--background) / 0.96) !important;
     border: 1px solid hsl(var(--foreground) / 0.22);
@@ -242,7 +247,7 @@
     font-size: 8px;
     letter-spacing: 0.04em;
     line-height: 1.5;
-    border-radius: 0 !important;
+    border-radius: var(--site-corner-radius) !important;
     opacity: 0.46;
     backdrop-filter: blur(12px) saturate(0);
     -webkit-backdrop-filter: blur(12px) saturate(0);

@@ -95,7 +95,7 @@ const FeaturedSection = () => {
         <div className="px-6 pt-12 pb-4">
           <SectionHeading className="mb-0">Featured</SectionHeading>
         </div>
-        <div className="flex flex-col gap-[3px] px-6 pb-12">
+        <div className="site-corner mx-6 mb-12 flex flex-col gap-[3px] overflow-hidden">
           {featuredProjects.map((p, i) => (
             <div key={p!.id} className="relative aspect-[4/3] overflow-hidden">
               <img
@@ -129,7 +129,7 @@ const FeaturedSection = () => {
         </div>
 
         <motion.div
-          className="flex flex-col flex-1 min-h-0"
+          className="site-corner flex min-h-0 flex-1 flex-col overflow-hidden"
           style={{
             paddingLeft: padding,
             paddingRight: padding,

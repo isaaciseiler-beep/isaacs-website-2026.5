@@ -416,7 +416,7 @@ const PhotoMapPage = () => {
               {activeEntry ? (
                 <motion.article
                   key={activeEntry.id}
-                  className="group/photo-panel pointer-events-auto relative flex h-[40svh] min-h-[260px] w-full overflow-hidden border border-white/18 bg-[hsl(50_33%_7%)] text-white shadow-2xl shadow-black/45 sm:h-full sm:max-w-[350px]"
+                  className="site-corner group/photo-panel pointer-events-auto relative flex h-[40svh] min-h-[260px] w-full overflow-hidden border border-white/18 bg-[hsl(50_33%_7%)] text-white shadow-2xl shadow-black/45 sm:h-full sm:max-w-[350px]"
                   initial={isMobile ? { opacity: 0, y: 28, filter: "blur(8px)" } : { opacity: 0, x: 36, filter: "blur(8px)" }}
                   animate={{ opacity: 1, x: 0, y: 0, filter: "blur(0px)" }}
                   exit={isMobile ? { opacity: 0, y: 24, filter: "blur(6px)" } : { opacity: 0, x: 28, filter: "blur(6px)" }}

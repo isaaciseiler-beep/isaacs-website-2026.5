@@ -57,7 +57,7 @@ const PhotoSection = () => {
       <div className="px-6">
         <div
           ref={previewRef}
-          className="relative aspect-square w-full overflow-hidden cursor-pointer group md:aspect-[3/1.365]"
+          className="site-corner group relative aspect-square w-full cursor-pointer overflow-hidden md:aspect-[3/1.365]"
           onMouseEnter={() => setHovering(true)}
           onMouseLeave={() => setHovering(false)}
           onClick={() => setPreviewIdx(activeIdx)}
@@ -82,7 +82,7 @@ const PhotoSection = () => {
 
       <div className="px-6 mt-6">
         <Link to="/photos" className="block w-full md:w-1/2">
-          <div className="homepage-cta group relative w-full py-3 text-sm font-mono tracking-[0.2em] uppercase bg-[hsl(50_33%_7%)] hover:bg-[hsl(50_33%_12%)] transition-colors duration-300 flex items-center justify-center cursor-pointer">
+          <div className="site-corner homepage-cta group relative flex w-full cursor-pointer items-center justify-center bg-[hsl(50_33%_7%)] py-3 font-mono text-sm uppercase tracking-[0.2em] transition-colors duration-300 hover:bg-[hsl(50_33%_12%)]">
             <span className="flex items-center justify-center">
               Full Portfolio
               <span className="inline-flex overflow-hidden max-w-0 group-hover:max-w-[2rem] opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">

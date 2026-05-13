@@ -199,7 +199,7 @@ const ProjectsSection = () => {
       </div>
 
       <div
-        className="flex flex-col md:flex-row px-6 h-auto md:h-[66vh] md:min-h-[408px]"
+        className="site-corner mx-6 flex h-auto flex-col overflow-hidden md:h-[66vh] md:min-h-[408px] md:flex-row"
         style={{ gap: GAP }}
         onMouseLeave={() => setActiveIndex(null)}
       >
@@ -221,7 +221,7 @@ const ProjectsSection = () => {
       {/* Explore button */}
       <div className="px-6 mt-6">
         <Link to="/projects" className="block w-full md:w-1/2">
-          <div className="homepage-cta group relative w-full py-3 text-sm font-mono tracking-[0.2em] uppercase bg-[hsl(50_33%_7%)] hover:bg-[hsl(50_33%_12%)] transition-colors duration-300 flex items-center justify-center cursor-pointer">
+          <div className="site-corner homepage-cta group relative flex w-full cursor-pointer items-center justify-center bg-[hsl(50_33%_7%)] py-3 font-mono text-sm uppercase tracking-[0.2em] transition-colors duration-300 hover:bg-[hsl(50_33%_12%)]">
             <span className="flex items-center justify-center">
               More Projects
               <span className="inline-flex overflow-hidden max-w-0 group-hover:max-w-[2rem] opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">

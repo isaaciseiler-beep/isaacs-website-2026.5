@@ -60,7 +60,7 @@ const ProjectCard = ({ project, index, isMobile, revealImmediately, onOpen }: Pr
   return (
     <motion.button
       ref={cardRef}
-      className="group relative flex flex-col text-left bg-background overflow-hidden h-full border border-foreground/10 hover:border-foreground/30 transition-colors duration-300"
+      className="site-corner group relative flex h-full flex-col overflow-hidden border border-foreground/10 bg-background text-left transition-colors duration-300 hover:border-foreground/30"
       initial={revealImmediately ? { opacity: 1, y: 0, filter: "blur(0px)" } : { opacity: 0, y: 40, filter: "blur(8px)" }}
       whileInView={revealImmediately ? undefined : { opacity: 1, y: 0, filter: "blur(0px)" }}
       animate={revealImmediately ? { opacity: 1, y: 0, filter: "blur(0px)" } : undefined}

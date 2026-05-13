@@ -77,7 +77,7 @@ const ChatOrb = () => {
         <motion.button
           type="button"
           onClick={handleClick}
-          className="fixed z-[58] flex items-center justify-end overflow-hidden rounded-full bg-[hsl(var(--highlight))] text-[hsl(50_33%_7%)] shadow-[0_10px_28px_rgba(0,0,0,0.22)]"
+          className="site-corner fixed z-[58] flex items-center justify-end overflow-hidden bg-[hsl(var(--highlight))] text-[hsl(50_33%_7%)] shadow-[0_10px_28px_rgba(0,0,0,0.22)]"
           style={{
             bottom: bottomOffset,
             right: DOT_RIGHT,

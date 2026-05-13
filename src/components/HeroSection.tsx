@@ -38,6 +38,8 @@ const viewportEdge = () => {
   return SAFE_EDGE;
 };
 
+const viewportHeight = () => window.visualViewport?.height ?? window.innerHeight;
+
 const targetLeftsForRow = (widths: number[]) => {
   const edge = viewportEdge();
 
@@ -67,9 +69,10 @@ const targetLeftsForRow = (widths: number[]) => {
 };
 
 const targetTopFor = (lane: VerticalLane, height: number) => {
-  if (lane === "top") return HEADER_CLEARANCE;
-  if (lane === "bottom") return window.innerHeight - height - viewportEdge();
-  return (window.innerHeight - height) / 2;
+  const headerClearance = window.innerWidth < 768 ? 92 : HEADER_CLEARANCE;
+  if (lane === "top") return headerClearance;
+  if (lane === "bottom") return viewportHeight() - height - viewportEdge();
+  return (viewportHeight() - height) / 2;
 };
 
 const HeroSection = () => {
@@ -117,10 +120,11 @@ const HeroSection = () => {
               edge,
               window.innerWidth - rect.width - edge,
             );
+            const headerClearance = window.innerWidth < 768 ? 92 : HEADER_CLEARANCE;
             const targetTop = clamp(
               targetTopFor(word.y, rect.height),
-              HEADER_CLEARANCE,
-              window.innerHeight - rect.height - edge,
+              headerClearance,
+              viewportHeight() - rect.height - edge,
             );
 
             nextOffsets[wordIndex] = {
@@ -154,9 +158,11 @@ const HeroSection = () => {
     }
 
     window.addEventListener("resize", measure);
+    window.visualViewport?.addEventListener("resize", measure);
     return () => {
       disposed = true;
       window.removeEventListener("resize", measure);
+      window.visualViewport?.removeEventListener("resize", measure);
     };
   }, []);
 

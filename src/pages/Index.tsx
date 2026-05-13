@@ -29,6 +29,7 @@ const Index = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("hero");
+  const [aboutRevealEnabled, setAboutRevealEnabled] = useState(false);
   const isMobile = useIsMobile();
   const location = useLocation();
 
@@ -76,11 +77,40 @@ const Index = () => {
   }, [location.hash]);
 
   useEffect(() => {
-    if (location.hash || window.scrollY > 80) return;
+    if (location.hash || window.scrollY > 80) {
+      setAboutRevealEnabled(true);
+      return;
+    }
 
     let cancelled = false;
     let timer: number;
     let frame = 0;
+    let awaitingPostAutoIntent = false;
+
+    const postAutoIntentListeners: Array<[keyof WindowEventMap, EventListenerOrEventListenerObject]> = [
+      ["wheel", markAboutReady],
+      ["touchmove", markAboutReady],
+      ["keydown", markAboutReady],
+      ["pointerdown", markAboutReady],
+    ];
+
+    function removePostAutoIntentListeners() {
+      postAutoIntentListeners.forEach(([eventName, listener]) => {
+        window.removeEventListener(eventName, listener);
+      });
+    }
+
+    function waitForPostAutoIntent() {
+      awaitingPostAutoIntent = true;
+      postAutoIntentListeners.forEach(([eventName, listener]) => {
+        window.addEventListener(eventName, listener, { passive: eventName !== "keydown", once: true });
+      });
+    }
+
+    function markAboutReady() {
+      setAboutRevealEnabled(true);
+      removePostAutoIntentListeners();
+    }
 
     const removeIntentListeners = () => {
       window.removeEventListener("wheel", cancelAutoScroll);
@@ -91,9 +121,11 @@ const Index = () => {
 
     const cancelAutoScroll = () => {
       cancelled = true;
+      if (!awaitingPostAutoIntent) setAboutRevealEnabled(true);
       window.clearTimeout(timer);
       if (frame) window.cancelAnimationFrame(frame);
       removeIntentListeners();
+      removePostAutoIntentListeners();
     };
 
     const autoScrollToWork = () => {
@@ -117,6 +149,7 @@ const Index = () => {
       if (reduceMotion) {
         window.scrollTo(0, end);
         removeIntentListeners();
+        waitForPostAutoIntent();
         return;
       }
 
@@ -134,6 +167,7 @@ const Index = () => {
         }
 
         removeIntentListeners();
+        waitForPostAutoIntent();
       };
 
       frame = window.requestAnimationFrame(step);
@@ -154,6 +188,7 @@ const Index = () => {
       window.clearTimeout(timer);
       if (frame) window.cancelAnimationFrame(frame);
       removeIntentListeners();
+      removePostAutoIntentListeners();
     };
   }, [location.hash]);
 
@@ -184,7 +219,7 @@ const Index = () => {
         <main>
           <div id="hero"><HeroSection /></div>
           <ParallaxSection id="projects" offset={70}><ProjectsSection /></ParallaxSection>
-          <ParallaxSection id="about" offset={60}><AboutSection /></ParallaxSection>
+          <ParallaxSection id="about" offset={60}><AboutSection revealEnabled={aboutRevealEnabled} /></ParallaxSection>
           <ParallaxSection id="news" offset={55}><NewsSection /></ParallaxSection>
           <ParallaxSection id="photos" offset={80}><PhotoSection /></ParallaxSection>
           <div id="inspiration">

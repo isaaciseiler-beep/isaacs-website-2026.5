@@ -18,23 +18,22 @@ const TIMELINE_STICKY_TOP = 112;
 const TIMELINE_HEADER_OFFSET = 66;
 const GLITCH_IN_INITIAL = {
   opacity: 0,
-  x: -18,
-  y: 18,
-  skewX: -1.4,
-  filter: "blur(10px)",
+  x: 0,
+  y: 10,
+  skewX: 0,
+  filter: "blur(4px)",
 };
 const GLITCH_IN_VISIBLE = {
-  opacity: [0, 1, 1, 1],
-  x: [-18, 12, -3, 0],
-  y: [18, -5, 1, 0],
-  skewX: [-1.4, 0.85, -0.18, 0],
-  filter: ["blur(10px)", "blur(1px)", "blur(2px)", "blur(0px)"],
+  opacity: 1,
+  x: 0,
+  y: 0,
+  skewX: 0,
+  filter: "blur(0px)",
 };
 const glitchTransition = (delay = 0, duration = 0.62) => ({
   delay,
-  duration,
-  times: [0, 0.22, 0.52, 1],
-  ease: EASE,
+  duration: Math.min(duration, 0.42),
+  ease: EASE_TEXT,
 });
 
 interface RelatedItem {
@@ -290,12 +289,8 @@ const ExperienceGroupSection = ({
 
             <motion.div
               className="relative aspect-square w-full bg-foreground/5"
-              initial={{ ...GLITCH_IN_INITIAL, x: 18, skewX: 1.4 }}
-              whileInView={{
-                ...GLITCH_IN_VISIBLE,
-                x: [18, -12, 3, 0],
-                skewX: [1.4, -0.85, 0.18, 0],
-              }}
+              initial={{ ...GLITCH_IN_INITIAL, y: 8 }}
+              whileInView={GLITCH_IN_VISIBLE}
               viewport={{ once: true, margin: "-80px" }}
               transition={glitchTransition(0.12, 0.64)}
             >

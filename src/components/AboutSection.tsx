@@ -19,7 +19,11 @@ const popdownTextVariants = {
   },
 };
 
-const AboutSection = () => {
+interface AboutSectionProps {
+  revealEnabled?: boolean;
+}
+
+const AboutSection = ({ revealEnabled = true }: AboutSectionProps) => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const pillRef = useRef<HTMLDivElement>(null);
   const [hasDeployedPopdown, setHasDeployedPopdown] = useState(false);
@@ -80,7 +84,7 @@ const AboutSection = () => {
   }, []);
 
   useEffect(() => {
-    if (hasDeployedPopdown) return;
+    if (!revealEnabled || hasDeployedPopdown) return;
 
     const handleScrollTrigger = () => {
       const pill = pillRef.current;
@@ -104,7 +108,7 @@ const AboutSection = () => {
       window.removeEventListener("scroll", handleScrollTrigger);
       window.removeEventListener("resize", handleScrollTrigger);
     };
-  }, [hasDeployedPopdown]);
+  }, [hasDeployedPopdown, revealEnabled]);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -166,8 +170,9 @@ const AboutSection = () => {
 
               <motion.div
                 initial={{ opacity: 0, y: 12, filter: "blur(6px)" }}
-                whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                viewport={{ once: true, margin: "-60px" }}
+                animate={revealEnabled ? undefined : { opacity: 0, y: 12, filter: "blur(6px)" }}
+                whileInView={revealEnabled ? { opacity: 1, y: 0, filter: "blur(0px)" } : undefined}
+                viewport={revealEnabled ? { once: true, margin: "-60px" } : undefined}
                 transition={{ duration: 0.45, ease: [0.25, 0.1, 0.25, 1] }}
                 className="font-light tracking-tight leading-[1.18] text-foreground"
                 style={{ fontSize: `${bioFontPx}px` }}
@@ -188,8 +193,9 @@ const AboutSection = () => {
             className="group/headshot relative w-full justify-self-end self-center"
             style={{ width: photoSize, perspective: 900 }}
             initial={{ opacity: 0, scale: 0.95, filter: "blur(8px)" }}
-            whileInView={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-            viewport={{ once: true, margin: "-60px" }}
+            animate={revealEnabled ? undefined : { opacity: 0, scale: 0.95, filter: "blur(8px)" }}
+            whileInView={revealEnabled ? { opacity: 1, scale: 1, filter: "blur(0px)" } : undefined}
+            viewport={revealEnabled ? { once: true, margin: "-60px" } : undefined}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             onPointerMove={handleHeadshotMove}
             onPointerLeave={handleHeadshotLeave}

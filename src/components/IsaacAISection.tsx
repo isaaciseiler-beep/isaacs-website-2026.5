@@ -342,7 +342,7 @@ const IsaacAISection = () => {
               onSubmit={askAssistant}
               className="relative z-10 shrink-0 px-3 pb-3 pt-2 md:px-4 md:pb-4"
             >
-              <div className="site-corner relative flex min-h-11 w-full items-end bg-foreground/[0.045] transition-colors focus-within:bg-foreground/[0.07]">
+              <div className="site-corner relative flex min-h-11 w-full items-center bg-foreground/[0.045] transition-colors focus-within:bg-foreground/[0.07]">
                 <textarea
                   ref={textareaRef}
                   value={query}
@@ -375,9 +375,9 @@ const IsaacAISection = () => {
                 <motion.button
                   type="submit"
                   disabled={!query.trim() || isLoading || limitReached}
-                  className="absolute bottom-1.5 right-1.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-[calc(var(--site-corner-radius)-2px)] bg-primary text-primary-foreground shadow-[0_8px_18px_rgba(18,24,14,0.22)] transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:bg-foreground/12 disabled:text-foreground/32 disabled:shadow-none"
-                  whileHover={{ y: -1, scale: 1.03 }}
-                  whileTap={{ y: 0, scale: 0.94 }}
+                  className="absolute right-1.5 top-1/2 flex h-8 w-8 shrink-0 -translate-y-1/2 items-center justify-center rounded-[calc(var(--site-corner-radius)-2px)] bg-primary text-primary-foreground shadow-[0_8px_18px_rgba(18,24,14,0.22)] transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:bg-foreground/12 disabled:text-foreground/32 disabled:shadow-none"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.94 }}
                   transition={{ duration: 0.18, ease: EASE }}
                   aria-label="Ask Isaac AI"
                 >

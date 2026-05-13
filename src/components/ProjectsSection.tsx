@@ -178,13 +178,13 @@ const ProjectsSection = () => {
   }, [projects]);
 
   return (
-    <section data-work-scroll-content className="flex h-[calc(100svh-9.75rem)] min-h-[420px] flex-col py-0">
+    <section data-work-scroll-content className="flex flex-col py-0 md:h-[calc(100svh-9.75rem)] md:min-h-[420px]">
       <div className="mb-5 shrink-0 px-6 md:mb-6">
         <SectionHeading className="mb-0">Work</SectionHeading>
       </div>
 
       <div
-        className="site-corner mx-6 flex min-h-0 flex-1 flex-col overflow-hidden md:flex-row"
+        className="site-corner mx-6 flex h-[540px] min-h-0 flex-col overflow-hidden md:h-auto md:flex-1 md:flex-row"
         style={{ gap: GAP }}
         onMouseLeave={() => setActiveIndex(null)}
       >

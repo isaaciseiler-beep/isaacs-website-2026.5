@@ -83,8 +83,8 @@ const PhotoSection = () => {
       <div className="mt-5 shrink-0 px-6 md:mt-6">
         <div className="flex w-full gap-[3px] overflow-hidden site-corner">
           {[
-            { label: "Full Portfolio", href: "/photos" },
-            { label: "Photo Map", href: "/photos/map" },
+            { label: "Portfolio", href: "/photos" },
+            { label: "Map", href: "/photos/map" },
           ].map((item, index) => (
             <Link
               key={item.href}

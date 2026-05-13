@@ -50,27 +50,51 @@ const STOP_WORDS = new Set([
   "be",
   "but",
   "by",
+  "can",
+  "could",
+  "did",
+  "do",
+  "does",
+  "done",
   "for",
   "from",
+  "has",
+  "have",
   "how",
   "i",
   "in",
   "into",
   "is",
+  "isaac",
   "it",
+  "like",
+  "look",
+  "looking",
   "me",
   "my",
   "near",
   "of",
   "on",
   "or",
+  "please",
+  "seiler",
+  "show",
+  "tell",
   "the",
   "this",
   "to",
+  "you",
+  "your",
   "was",
   "what",
   "where",
+  "which",
+  "who",
   "with",
+  "work",
+  "worked",
+  "works",
+  "would",
 ]);
 
 const SEMANTIC_EXPANSIONS: Record<string, string[]> = {
@@ -84,6 +108,8 @@ const SEMANTIC_EXPANSIONS: Record<string, string[]> = {
   classroom: ["education", "teaching", "learning", "study", "students"],
   climate: ["sustainability", "environment", "ev", "electric vehicle"],
   college: ["university", "campus", "student", "washu"],
+  communication: ["communications", "media", "strategy", "campaign", "brand", "public affairs"],
+  communications: ["communication", "media", "strategy", "campaign", "brand", "public affairs"],
   congress: ["capitol hill", "office", "government", "politics", "representative"],
   design: ["brand", "rebrand", "website", "visual", "ux"],
   education: ["teaching", "students", "classroom", "study", "learning", "fulbright", "chatgpt lab"],
@@ -91,7 +117,11 @@ const SEMANTIC_EXPANSIONS: Record<string, string[]> = {
   ev: ["electric vehicle", "charging", "charger", "infrastructure", "transportation"],
   fulbright: ["taiwan", "education", "teaching", "scholarship", "award", "chatgpt lab"],
   government: ["state", "public sector", "policy", "congress", "capitol hill", "lawmakers"],
+  govt: ["government", "state", "public sector", "policy", "lawmakers"],
   health: ["access", "sustainable development", "boehringer", "pharmaceutical"],
+  image: ["photo", "photos", "photography", "album", "picture"],
+  images: ["photo", "photos", "photography", "album", "picture"],
+  interview: ["journalism", "reporting", "news", "congress", "politics"],
   journalism: ["news", "media", "local news", "reporting", "newsroom", "newspaper"],
   lab: ["openai", "chatgpt", "education", "focus group"],
   learning: ["education", "study", "classroom", "students", "teaching"],
@@ -101,6 +131,9 @@ const SEMANTIC_EXPANSIONS: Record<string, string[]> = {
   nonprofit: ["inn", "news", "journalism", "survey", "research"],
   photo: ["photos", "album", "photography", "camera", "travel"],
   photos: ["photo", "album", "photography", "camera", "travel"],
+  pics: ["photo", "photos", "photography", "album", "travel"],
+  picture: ["photo", "photos", "photography", "album"],
+  pictures: ["photo", "photos", "photography", "album"],
   politics: ["campaign", "congress", "public service", "government", "policy"],
   pulse: ["openai", "chatgpt", "proactive", "personalized updates"],
   reporting: ["journalism", "news", "media", "newspaper", "interview"],
@@ -108,8 +141,17 @@ const SEMANTIC_EXPANSIONS: Record<string, string[]> = {
   scholar: ["scholarship", "truman", "rhodes", "fulbright", "award"],
   scholarship: ["truman", "rhodes", "fulbright", "award", "public service"],
   study: ["education", "learning", "students", "classroom", "chatgpt"],
+  thesis: ["research", "journalism", "qualitative", "analysis", "washu"],
   travel: ["photos", "album", "asia", "europe", "oceania", "place"],
   truman: ["scholarship", "public service", "washu", "award"],
+  website: ["portfolio", "design", "brand", "web"],
+};
+
+const CATEGORY_INTENTS: Record<SearchCategory, string[]> = {
+  projects: ["project", "projects", "case study", "case studies", "built", "building", "made", "portfolio work"],
+  news: ["news", "article", "articles", "press", "featured", "coverage", "headline", "announcement"],
+  photos: ["photo", "photos", "picture", "pictures", "pics", "image", "images", "album", "albums", "map", "travel"],
+  inspiration: ["inspiration", "inspo", "influences", "references", "things", "moodboard", "taste"],
 };
 
 const projectMetadata: Record<string, { date: string; topics: string[]; tags: string[] }> = {
@@ -328,6 +370,27 @@ const expandTerm = (term: string) => {
   return uniq([term, ...direct.flatMap(tokenize)]);
 };
 
+const queryPhrases = (query: string) => {
+  const words = normalize(query)
+    .split(" ")
+    .map((word) => word.trim())
+    .filter((word) => word.length >= 2 && !STOP_WORDS.has(word));
+
+  const phrases: string[] = [];
+  for (let size = 2; size <= 3; size += 1) {
+    for (let index = 0; index <= words.length - size; index += 1) {
+      phrases.push(words.slice(index, index + size).join(" "));
+    }
+  }
+
+  return uniq(phrases);
+};
+
+const categoryIntentScore = (query: string, category: SearchCategory) => {
+  const normalizedQuery = normalize(query);
+  return CATEGORY_INTENTS[category].some((intent) => normalizedQuery.includes(intent)) ? 3 : 0;
+};
+
 const levenshtein = (a: string, b: string) => {
   if (Math.abs(a.length - b.length) > 2) return 3;
   const row = Array.from({ length: b.length + 1 }, (_, i) => i);
@@ -400,6 +463,7 @@ export const searchSite = (query: string, limitPerCategory = 5): SearchGroup[] =
   }
 
   const normalizedQuery = normalize(query);
+  const phrases = queryPhrases(query);
   const weightedFields: Array<[keyof ReturnType<typeof fieldTokens>, number]> = [
     ["title", 9],
     ["topics", 7],
@@ -432,7 +496,15 @@ export const searchSite = (query: string, limitPerCategory = 5): SearchGroup[] =
       const text = fieldText(doc);
       if (normalizedQuery.length > 2 && text.includes(normalizedQuery)) score += 8;
       if (doc.title && normalize(doc.title).includes(normalizedQuery) && normalizedQuery.length > 2) score += 10;
-      if (queryTerms.length > 1 && matchedOriginalTerms > 1) score *= 1.16;
+      phrases.forEach((phrase) => {
+        if (phrase.length > 4 && text.includes(phrase)) score += 5;
+        if (phrase.length > 4 && normalize(doc.title).includes(phrase)) score += 4;
+      });
+      if (score > 0) score += categoryIntentScore(query, doc.category);
+      if (matchedOriginalTerms > 0) {
+        score *= 1 + Math.min(matchedOriginalTerms / queryTerms.length, 1) * 0.14;
+      }
+      if (queryTerms.length > 1 && matchedOriginalTerms > 1) score *= 1.1;
       if (matchedOriginalTerms === 0) score = 0;
 
       return { ...doc, score, reason: explainMatch(doc, queryTerms) };

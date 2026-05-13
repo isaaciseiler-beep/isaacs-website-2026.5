@@ -16,6 +16,7 @@ const ChatOrb = () => {
   const [bottomOffset, setBottomOffset] = useState(DOT_BOTTOM);
   const location = useLocation();
   const navigate = useNavigate();
+  const disabled = location.pathname === "/photos" || location.pathname === "/photos/map";
 
   useEffect(() => {
     const handleScroll = () => {
@@ -41,6 +42,17 @@ const ChatOrb = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (!expanded) return;
+    const collapse = () => setExpanded(false);
+    window.addEventListener("scroll", collapse, { passive: true });
+    return () => window.removeEventListener("scroll", collapse);
+  }, [expanded]);
+
+  useEffect(() => {
+    if (disabled) setExpanded(false);
+  }, [disabled]);
+
   const scrollToIsaacAI = () => {
     if (location.pathname === "/") {
       scrollToPageSection("isaac-ai");
@@ -61,7 +73,7 @@ const ChatOrb = () => {
 
   return (
     <AnimatePresence>
-      {visible ? (
+      {visible && !disabled ? (
         <motion.button
           type="button"
           onClick={handleClick}

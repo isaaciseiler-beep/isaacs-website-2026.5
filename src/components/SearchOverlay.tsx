@@ -97,7 +97,7 @@ export const SearchPanel = ({ groups, hasQuery, hasResults, onClose, onSelect, o
             transition={{ duration: 0.56, ease: EASE_TEXT }}
           >
             <div className="pointer-events-none absolute inset-x-0 top-20 z-10 h-12 bg-[linear-gradient(to_bottom,hsl(var(--background))_0%,hsl(var(--background)/0.82)_34%,hsl(var(--background)/0)_100%)] md:top-20" />
-            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-0 pt-5 scrollbar-hide md:pt-8">
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-10 pt-5 scrollbar-hide md:pb-12 md:pt-8">
               {!hasQuery ? null : (
                 <div>
                   {hasResults ? (
@@ -105,12 +105,15 @@ export const SearchPanel = ({ groups, hasQuery, hasResults, onClose, onSelect, o
                       group.results.length ? (
                         <motion.section
                           key={group.category}
-                          className="pb-5 pt-4 first:pt-0 last:pb-0"
+                          className="pb-5 pt-5 first:pt-0 last:pb-6"
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.58, ease: EASE, delay: 0.05 }}
                         >
-                          <div className="space-y-5">
+                          <p className="mb-2 font-mono text-[9px] uppercase tracking-[0.22em] text-foreground/32">
+                            {group.label}
+                          </p>
+                          <div className="space-y-2.5">
                             {group.results.map((result, resultIndex) => (
                               <ResultCard key={result.id} index={resultIndex} result={result} onSelect={onSelect} />
                             ))}
@@ -154,6 +157,7 @@ const SearchTrigger = ({
   const hasQuery = trimmedQuery.length > 0;
   const hasResults = hasSearchResults(groups);
   const firstResult = groups.find((group) => group.results.length)?.results[0];
+  const expandedSearchWidth = isMobile ? "calc(100vw - 3rem)" : "calc(var(--site-panel-width) - 3rem)";
 
   const setOpen = (nextOpen: boolean) => {
     if (!isControlled) setInternalOpen(nextOpen);
@@ -228,7 +232,7 @@ const SearchTrigger = ({
               className={`site-header-search fixed right-6 top-4 z-[95] flex h-[25px] origin-right items-center gap-2 overflow-hidden ${className ?? ""}`}
               style={style}
               initial={{ width: 25 }}
-              animate={{ width: "min(22rem, calc(100vw - 8.5rem))" }}
+              animate={{ width: expandedSearchWidth }}
               exit={{ width: 25 }}
               transition={{ duration: 0.58, ease: EASE }}
             >

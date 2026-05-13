@@ -26,4 +26,14 @@ describe("search index", () => {
   it("surfaces inspiration items through hidden tags", () => {
     expect(titlesFor("compact camera photography", "inspiration")).toContain("Ricoh GRIIIx");
   });
+
+  it("handles conversational government AI queries", () => {
+    expect(titlesFor("what did Isaac build for gen AI in state govt", "projects")).toContain(
+      "Artificial Intelligence in State Government Index",
+    );
+  });
+
+  it("understands picture language for photo albums", () => {
+    expect(titlesFor("show me pictures from Taipei", "photos")).toContain("Taiwan");
+  });
 });

@@ -218,18 +218,24 @@ const ProjectsSection = () => {
         })}
       </div>
 
-      {/* Explore button */}
       <div className="px-6 mt-6">
-        <Link to="/projects" className="block w-full md:w-1/2">
-          <div className="site-corner homepage-cta group relative flex w-full cursor-pointer items-center justify-center bg-[hsl(50_33%_7%)] py-3 font-mono text-sm uppercase tracking-[0.2em] transition-colors duration-300 hover:bg-[hsl(50_33%_12%)]">
-            <span className="flex items-center justify-center">
-              More Projects
-              <span className="inline-flex overflow-hidden max-w-0 group-hover:max-w-[2rem] opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">
-                <ArrowUpRight className="w-4 h-4 ml-2 shrink-0" strokeWidth={1.5} />
-              </span>
-            </span>
-          </div>
-        </Link>
+        <div className="flex w-full gap-[3px] md:w-1/2">
+          {[
+            { label: "Experience", href: "/experience" },
+            { label: "Projects", href: "/projects" },
+          ].map((item) => (
+            <Link key={item.href} to={item.href} className="block min-w-0 flex-1">
+              <div className="site-corner homepage-cta group relative flex w-full cursor-pointer items-center justify-center bg-primary py-3 font-mono text-sm uppercase tracking-[0.2em] transition-colors duration-300 hover:bg-accent">
+                <span className="flex min-w-0 items-center justify-center">
+                  <span className="truncate">{item.label}</span>
+                  <span className="inline-flex max-w-0 overflow-hidden opacity-0 transition-all duration-300 ease-out group-hover:max-w-[2rem] group-hover:opacity-100">
+                    <ArrowUpRight className="ml-2 h-4 w-4 shrink-0" strokeWidth={1.5} />
+                  </span>
+                </span>
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
 
       <ProjectModal

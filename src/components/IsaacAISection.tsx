@@ -194,6 +194,7 @@ const IsaacAISection = () => {
 
   const userMessageCount = countUserMessages(messages);
   const limitReached = isChatLimitReached(messages);
+  const hasConversation = messages.length > 0 || isLoading;
 
   useEffect(() => {
     const list = messageListRef.current;
@@ -276,7 +277,7 @@ const IsaacAISection = () => {
             transition={{ duration: 0.76, ease: EASE }}
           />
           <AnimatedText
-            text="Isaac AI"
+            text="Ask away"
             as="p"
             className="relative text-center text-3xl font-semibold leading-none tracking-tight text-foreground md:text-5xl"
             controlledVisible={headingInView}
@@ -294,7 +295,9 @@ const IsaacAISection = () => {
           <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,hsl(var(--highlight)/0.08),transparent_38%,hsl(var(--foreground)/0.05))] opacity-0 transition-opacity duration-500 group-hover/ai:opacity-100 group-focus-within/ai:opacity-100" />
           <div
             ref={messageListRef}
-            className="relative z-10 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain px-4 pb-3 pt-4 scrollbar-hide md:px-5 md:pt-5"
+            className={`relative z-10 flex min-h-0 flex-1 flex-col gap-4 px-4 pb-3 pt-4 scrollbar-hide md:px-5 md:pt-5 ${
+              hasConversation ? "overflow-y-auto overscroll-contain" : "overflow-y-visible overscroll-auto"
+            }`}
           >
             {messages.map((message) => (
               <motion.div
@@ -362,7 +365,7 @@ const IsaacAISection = () => {
             <motion.button
               type="submit"
               disabled={!query.trim() || isLoading || limitReached}
-              className="site-corner flex h-11 w-11 shrink-0 items-center justify-center bg-[hsl(50_33%_7%)] text-white shadow-[0_10px_24px_rgba(18,24,14,0.24)] transition-colors hover:bg-[hsl(50_33%_12%)] disabled:pointer-events-none disabled:bg-foreground/12 disabled:text-foreground/32 disabled:shadow-none"
+              className="site-corner flex h-11 w-11 shrink-0 items-center justify-center bg-primary text-primary-foreground shadow-[0_10px_24px_rgba(18,24,14,0.24)] transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:bg-foreground/12 disabled:text-foreground/32 disabled:shadow-none"
               whileHover={{ y: -2, scale: 1.04 }}
               whileTap={{ y: 0, scale: 0.94 }}
               transition={{ duration: 0.18, ease: EASE }}

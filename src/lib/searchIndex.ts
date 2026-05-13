@@ -2,7 +2,7 @@ import { inspirationItems } from "@/lib/inspirationItems";
 import { albums, coverFor } from "@/lib/photoAlbums";
 import { newsItems, projectItems } from "@/lib/siteContent";
 
-export type SearchCategory = "projects" | "news" | "photos" | "inspiration";
+export type SearchCategory = "pages" | "projects" | "news" | "photos" | "inspiration";
 
 export interface SearchDocument {
   id: string;
@@ -31,13 +31,14 @@ export interface SearchGroup {
 }
 
 const CATEGORY_LABELS: Record<SearchCategory, string> = {
+  pages: "Pages",
   projects: "Projects",
   news: "News",
   photos: "Photos",
   inspiration: "Inspiration",
 };
 
-export const SEARCH_CATEGORY_ORDER: SearchCategory[] = ["projects", "news", "photos", "inspiration"];
+export const SEARCH_CATEGORY_ORDER: SearchCategory[] = ["pages", "projects", "news", "photos", "inspiration"];
 
 const STOP_WORDS = new Set([
   "a",
@@ -148,6 +149,7 @@ const SEMANTIC_EXPANSIONS: Record<string, string[]> = {
 };
 
 const CATEGORY_INTENTS: Record<SearchCategory, string[]> = {
+  pages: ["page", "pages", "section", "site", "website", "where is", "navigate", "go to", "open"],
   projects: ["project", "projects", "case study", "case studies", "built", "building", "made", "portfolio work"],
   news: ["news", "article", "articles", "press", "featured", "coverage", "headline", "announcement"],
   photos: ["photo", "photos", "picture", "pictures", "pics", "image", "images", "album", "albums", "map", "travel"],
@@ -276,7 +278,94 @@ const flattenProjectText = (project: (typeof projectItems)[number]) =>
     .flatMap((section) => [section.heading, ...(section.paragraphs ?? []), ...(section.bullets ?? []), ...(section.links?.map((link) => link.label) ?? [])])
     .join(" ");
 
+const experiencePageKeywords = () => [
+  "work experience",
+  "resume",
+  "employer",
+  "company",
+  "role",
+  "timeline",
+  "download resume",
+  "Fulbright Taiwan",
+  "Council of State Governments",
+  "OpenAI",
+  "Washington University in St. Louis",
+  "Boehringer Ingelheim",
+  "Isaac Seiler Strategies",
+  "U.S. House of Representatives",
+  "Scholten for Congress",
+  "Progressive Turnout Project",
+  "DCCC",
+  "Institute for Nonprofit News",
+];
+
+const primaryPhotoCover = coverFor(albums.find((album) => album.folder === "Taiwan") ?? albums[0]);
+
+const pageDocuments: SearchDocument[] = [
+  {
+    id: "page-home",
+    category: "pages",
+    title: "Home",
+    subtitle: "Overview",
+    description: "The main Isaac Seiler portfolio page with featured work, photos, news, inspiration, and Isaac AI.",
+    href: "/",
+    image: primaryPhotoCover,
+    topics: ["portfolio", "home", "overview", "Isaac AI", "featured work"],
+    tags: ["about", "homepage", "news", "photos", "projects", "inspiration"],
+    keywords: ["main page", "landing page", "ask away", "chat", "site overview"],
+  },
+  {
+    id: "page-experience",
+    category: "pages",
+    title: "Experience",
+    subtitle: "Resume and timeline",
+    description: "A timeline of Isaac's work experience, roles, employers, and resume.",
+    href: "/experience",
+    image: "/experience/fb.jpeg",
+    topics: ["experience", "resume", "timeline", "work history", "employers"],
+    tags: ["Fulbright Taiwan", "OpenAI", "Council of State Governments", "WashU", "Boehringer Ingelheim"],
+    keywords: experiencePageKeywords(),
+  },
+  {
+    id: "page-projects",
+    category: "pages",
+    title: "Projects",
+    subtitle: "Project archive",
+    description: "The full archive of research, reporting, strategy, communications, and AI projects.",
+    href: "/projects",
+    image: projectItems[0]?.image,
+    topics: ["projects", "archive", "portfolio work", "case studies"],
+    tags: ["AI", "journalism", "communications", "research", "policy"],
+    keywords: projectItems.flatMap((project) => [project.title, project.source, project.year, project.summary]),
+  },
+  {
+    id: "page-photos",
+    category: "pages",
+    title: "Photos",
+    subtitle: "Photo albums",
+    description: "Travel photography and individual photo albums by location.",
+    href: "/photos",
+    image: primaryPhotoCover,
+    topics: ["photos", "photography", "albums", "travel"],
+    tags: ["Asia", "Europe", "Oceania", "camera", "photo archive"],
+    keywords: albums.flatMap((album) => [album.location, album.folder, album.continent]),
+  },
+  {
+    id: "page-photo-map",
+    category: "pages",
+    title: "Photo Map",
+    subtitle: "Mapped photo archive",
+    description: "An interactive map for browsing Isaac's photography by place and album.",
+    href: "/photos/map",
+    image: primaryPhotoCover,
+    topics: ["photo map", "photos", "travel", "albums", "locations"],
+    tags: ["map", "geography", "places", "photo locations", "travel map"],
+    keywords: ["world map", "mapped photos", "photo geography", ...albums.map((album) => album.location)],
+  },
+];
+
 export const searchDocuments: SearchDocument[] = [
+  ...pageDocuments,
   ...projectItems.map((project) => {
     const meta = projectMetadata[project.id];
     return {

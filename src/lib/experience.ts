@@ -76,7 +76,7 @@ export const experienceEntries: ExperienceEntry[] = [
     id: "washu-head-ta",
     organization: "Washington University in St. Louis",
     organizationUrl: "https://washu.edu/",
-    role: "Teaching Assistant and Head Teaching Assistant",
+    role: "Assistant Teaching",
     period: "Jan 2024-May 2024; Jan 2025-Apr 2025",
     image: "/experience/washu2.jpg",
     paragraphs: [
@@ -173,7 +173,7 @@ export const experienceEntries: ExperienceEntry[] = [
     id: "scholten-campaign",
     organization: "Scholten for Congress",
     organizationUrl: "https://hillaryscholten.com/",
-    role: "Digital Communications and Operations",
+    role: "Communications Director and Transition Aide",
     period: "Jun 2022-Nov 2022",
     location: "Grand Rapids, Michigan, United States",
     image: "/experience/campaignscholten.jpeg",

@@ -110,7 +110,7 @@ const EmployerLink = ({
       href={group.organizationUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className={`${className ?? ""} group/employer-link inline-flex items-center gap-1.5 font-sans normal-case tracking-tight transition-colors hover:text-[hsl(50_33%_18%)]`}
+      className={`${className ?? ""} group/employer-link inline-flex items-center gap-1.5 font-sans normal-case tracking-tight transition-colors hover:text-foreground`}
     >
       <span className="relative after:absolute after:bottom-[-0.12em] after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-300 after:ease-out group-hover/employer-link:after:scale-x-100">
         {group.organization}
@@ -241,7 +241,7 @@ const ExperienceGroupSection = ({
       transition={{ delay: Math.min(index * 0.04, 0.24), duration: 0.72, ease: EASE }}
     >
       <div>
-        <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm font-medium text-foreground/54 lg:hidden">
+        <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm font-medium text-foreground/54">
           <EmployerLink group={group} />
         </div>
 
@@ -436,7 +436,7 @@ const ExperiencePage = () => {
               viewport={{ once: true, margin: "-80px" }}
               transition={{ duration: 0.55, ease: EASE_TEXT }}
             >
-              <div className="site-corner homepage-cta group relative flex w-full cursor-pointer items-center justify-center bg-[hsl(50_33%_7%)] py-3 font-mono text-sm uppercase tracking-[0.2em] transition-colors duration-300 hover:bg-[hsl(50_33%_12%)]">
+              <div className="site-corner homepage-cta group relative flex w-full cursor-pointer items-center justify-center bg-primary py-3 font-mono text-sm uppercase tracking-[0.2em] transition-colors duration-300 hover:bg-accent">
                 <span className="flex items-center justify-center">
                   Download resume
                   <span className="inline-flex max-w-0 overflow-hidden opacity-0 transition-all duration-300 ease-out group-hover:max-w-[2rem] group-hover:opacity-100">
@@ -467,27 +467,26 @@ const ExperiencePage = () => {
                       {experienceGroups.map((group) => {
                         const active = group.id === activeId;
                         return (
-                          <div
+                          <button
                             key={group.id}
+                            type="button"
+                            onClick={() => scrollToEntry(group.id)}
                             className="group relative flex w-full items-start gap-4 text-left"
                           >
-                            <button
-                              type="button"
-                              onClick={() => scrollToEntry(group.id)}
-                              aria-label={`Scroll to ${group.organization}`}
+                            <span
                               className={`relative z-10 mt-1 h-2.5 w-2.5 shrink-0 rounded-full border transition-colors ${
                                 active ? "border-[hsl(var(--highlight))] bg-[hsl(var(--highlight))]" : "border-foreground/30 bg-background"
                               }`}
                             />
                             <span>
                               <span className={`block text-[13px] leading-tight transition-colors ${active ? "text-foreground" : "text-foreground/40 group-hover:text-foreground/72"}`}>
-                                <EmployerLink group={group} />
+                                {group.organization}
                               </span>
                               <span className={`mt-1 block font-mono text-[9px] uppercase leading-tight tracking-[0.18em] transition-colors ${active ? "text-foreground/54" : "text-foreground/28 group-hover:text-foreground/46"}`}>
                                 {group.period}
                               </span>
                             </span>
-                          </div>
+                          </button>
                         );
                       })}
                     </div>

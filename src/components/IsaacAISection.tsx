@@ -75,7 +75,9 @@ const FormattedMessage = ({ text, cursor = false }: { text: string; cursor?: boo
         if (isBullet) {
           return (
             <div key={index} className="flex gap-2.5">
-              <span className="mt-[0.62em] h-1 w-1 shrink-0 rounded-full bg-foreground/42" aria-hidden />
+              <span className="shrink-0 text-foreground/58" aria-hidden>
+                -
+              </span>
               <span>
                 {renderInlineText(bulletText)}
                 {showCursor ? <span className="ml-0.5 inline-block h-4 w-px translate-y-0.5 animate-pulse bg-foreground/50" /> : null}

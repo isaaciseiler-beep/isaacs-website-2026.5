@@ -65,37 +65,41 @@ const ROTATE_CURSOR_SVG = encodeURIComponent(
 );
 const ROTATE_CURSOR = `url("data:image/svg+xml;utf8,${ROTATE_CURSOR_SVG}") 7 7, alias`;
 
-const glitchRevealInitial = (index: number) => ({
+const glitchRevealInitial = {
   opacity: 0,
-  x: index % 2 === 0 ? -10 : 10,
-  y: index % 3 === 0 ? 6 : -4,
+  x: 0,
+  y: 4,
   scale: 1,
-  clipPath: "inset(48% 0 48% 0)",
-});
-
-const glitchRevealVisible = (index: number) => {
-  const direction = index % 2 === 0 ? -1 : 1;
-
-  return {
-    opacity: [0, 1, 0.42, 1, 0.72, 1],
-    x: [direction * 10, direction * -7, direction * 5, direction * -2, direction * 1, 0],
-    y: [index % 3 === 0 ? 6 : -4, -2, 3, -1, 1, 0],
-    scale: [1, 1.012, 0.996, 1.006, 1, 1],
-    clipPath: [
-      "inset(48% 0 48% 0)",
-      "inset(0 0 62% 0)",
-      "inset(36% 0 22% 0)",
-      "inset(0 0 0 0)",
-      "inset(8% 0 4% 0)",
-      "inset(0 0 0 0)",
-    ],
-  };
+  filter: "blur(1.5px)",
 };
 
+const glitchRevealVisible = () => ({
+  opacity: 1,
+  x: 0,
+  y: 0,
+  scale: 1,
+  filter: "blur(0px)",
+});
+
 const glitchRevealTransition = (index: number) => ({
-  delay: Math.min(index * 0.032, 0.32),
-  duration: 0.34,
-  times: [0, 0.18, 0.36, 0.58, 0.78, 1],
+  delay: Math.min(index * 0.055, 0.62),
+  duration: 0.28,
+  ease: ITEM_REVEAL_EASE,
+});
+
+const carouselRevealInitial = {
+  opacity: 0,
+  y: 6,
+};
+
+const carouselRevealVisible = {
+  opacity: 1,
+  y: 0,
+};
+
+const carouselRevealTransition = (index: number) => ({
+  delay: Math.min(index * 0.035, 0.32),
+  duration: 0.24,
   ease: ITEM_REVEAL_EASE,
 });
 
@@ -529,10 +533,10 @@ const CarouselCard = ({ item, index, width, height, onOpen, renderCard }: Carous
 
   return (
     <motion.div
-      initial={glitchRevealInitial(index)}
-      whileInView={glitchRevealVisible(index)}
+      initial={carouselRevealInitial}
+      whileInView={carouselRevealVisible}
       viewport={{ once: true, margin: "-40px", amount: 0.35 }}
-      transition={glitchRevealTransition(index)}
+      transition={carouselRevealTransition(index)}
       className="flex-shrink-0 select-none"
       style={{
         width,
@@ -646,7 +650,7 @@ const BoardCard = ({ item, index, dragging, zIndex, onPointerDown, onPointerUp, 
   return (
     <motion.div
       className="absolute select-none"
-      initial={glitchRevealInitial(index)}
+      initial={glitchRevealInitial}
       whileInView={glitchRevealVisible(index)}
       viewport={{ once: true, margin: "-60px", amount: 0.22 }}
       style={{

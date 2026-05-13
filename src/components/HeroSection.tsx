@@ -80,10 +80,14 @@ const HeroSection = () => {
   const textOpacity = useTransform(scrollY, [0, 400], [1, 0]);
   const wordRefs = useRef<Array<HTMLSpanElement | null>>([]);
   const [wordOffsets, setWordOffsets] = useState<WordOffset[]>([]);
+  const [isMobileIntro, setIsMobileIntro] = useState(false);
   let order = 0;
 
   useLayoutEffect(() => {
+    const updateIntroMode = () => setIsMobileIntro(window.innerWidth < 768);
+
     const measure = () => {
+      updateIntroMode();
       const nextOffsets: WordOffset[] = [];
       let wordIndex = 0;
       const animatedElements = wordRefs.current.filter((element): element is HTMLSpanElement => Boolean(element));
@@ -156,11 +160,13 @@ const HeroSection = () => {
     } else {
       measure();
     }
+    const fallbackTimers = [80, 240, 520].map((delay) => window.setTimeout(measureWhenReady, delay));
 
     window.addEventListener("resize", measure);
     window.visualViewport?.addEventListener("resize", measure);
     return () => {
       disposed = true;
+      fallbackTimers.forEach((timer) => window.clearTimeout(timer));
       window.removeEventListener("resize", measure);
       window.visualViewport?.removeEventListener("resize", measure);
     };
@@ -178,6 +184,7 @@ const HeroSection = () => {
           className="max-w-6xl text-[clamp(2.2rem,10.8vw,3rem)] font-semibold leading-[0.85] tracking-tighter text-foreground sm:text-6xl md:text-7xl lg:text-8xl"
           aria-label="Building at the intersection of AI and society."
           data-ready={wordOffsets.length > 0 ? "true" : "false"}
+          data-mobile-intro={isMobileIntro ? "true" : "false"}
         >
           {headlineLines.map((line, lineIndex) => (
             <span

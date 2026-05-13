@@ -67,7 +67,7 @@ const FeaturedProjectCard = ({
   const card = (
     <motion.div
       ref={mobileCardRef}
-      className="group relative h-full min-h-0 flex-1 cursor-pointer overflow-hidden bg-background md:flex-[1_1_0%]"
+      className="group relative h-[clamp(11rem,36vw,14rem)] min-h-0 cursor-pointer overflow-hidden bg-background md:h-full md:flex-[1_1_0%]"
       style={{ minWidth: 0 }}
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
@@ -141,7 +141,7 @@ const FeaturedProjectCard = ({
 
   if (!isDesktop) {
     return (
-      <Link to={`/projects/${project.id}`} className="block min-h-0 flex-1">
+      <Link to={`/projects/${project.id}`} className="block min-h-0">
         {card}
       </Link>
     );
@@ -184,7 +184,7 @@ const ProjectsSection = () => {
       </div>
 
       <div
-        className="site-corner mx-6 flex h-[540px] min-h-0 flex-col overflow-hidden md:h-auto md:flex-1 md:flex-row"
+        className="site-corner mx-6 flex min-h-0 flex-col overflow-hidden md:h-auto md:flex-1 md:flex-row"
         style={{ gap: GAP }}
         onMouseLeave={() => setActiveIndex(null)}
       >

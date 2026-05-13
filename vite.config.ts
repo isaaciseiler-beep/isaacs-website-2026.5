@@ -14,12 +14,11 @@ const applyEnv = (key: string, value?: string) => {
 const localApiPlugin = (mode: string): Plugin => ({
   name: "local-api",
   configureServer(server) {
-    const env = loadEnv(mode, process.cwd(), "");
-    applyEnv("OPENAI_API", env.OPENAI_API);
-    applyEnv("OPENAI_API_KEY", env.OPENAI_API_KEY);
-    applyEnv("OPENAI_CHAT_MODEL", env.OPENAI_CHAT_MODEL);
-
     server.middlewares.use("/api/chat", (request, response) => {
+      const env = loadEnv(mode, process.cwd(), "");
+      applyEnv("OPENAI_API", env.OPENAI_API);
+      applyEnv("OPENAI_API_KEY", env.OPENAI_API_KEY);
+      applyEnv("OPENAI_CHAT_MODEL", env.OPENAI_CHAT_MODEL);
       void chatHandler(request, response);
     });
   },
@@ -27,6 +26,7 @@ const localApiPlugin = (mode: string): Plugin => ({
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  envPrefix: ["VITE_", "NEXT_PUBLIC_", "MAPBOX_"],
   server: {
     host: "::",
     port: 8080,

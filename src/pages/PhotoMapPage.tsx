@@ -8,18 +8,11 @@ import Sidebar from "@/components/Sidebar";
 import SiteHeader from "@/components/SiteHeader";
 import { photoMapEntries, photoMapInitialView, type PhotoMapEntry } from "@/lib/photoMap";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { getMapboxToken } from "@/lib/mapboxToken";
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const EASE_TEXT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const MONOCHROME_MAP_STYLE = "mapbox://styles/mapbox/light-v11";
-const MAP_BACKGROUND = "#f4f7fe";
-const MAP_WATER = "#eceff4";
-const MAP_LAND = "#dce4f1";
-const MAP_PARK = "#d2dceb";
-const MAP_COAST = "#aeb9ca";
-const MAP_BORDER = "#8d98ab";
-const MAP_DETAIL = "#bcc6d7";
-const MAP_LABEL = "#4f5a69";
 const DESKTOP_PANEL_WIDTH = 350;
 const DESKTOP_PANEL_GUTTER = 16;
 const MOBILE_PANEL_HEIGHT = 260;
@@ -33,7 +26,46 @@ type MarkerEntry = {
   element: HTMLButtonElement;
 };
 
+type MapPalette = {
+  background: string;
+  water: string;
+  land: string;
+  park: string;
+  coast: string;
+  border: string;
+  detail: string;
+  label: string;
+  labelHalo: string;
+};
+
+const lightMapPalette: MapPalette = {
+  background: "#f4f7fe",
+  water: "#eceff4",
+  land: "#dce4f1",
+  park: "#d2dceb",
+  coast: "#aeb9ca",
+  border: "#8d98ab",
+  detail: "#bcc6d7",
+  label: "#4f5a69",
+  labelHalo: "#f4f7fe",
+};
+
+const darkMapPalette: MapPalette = {
+  background: "#11160c",
+  water: "#17140d",
+  land: "#1f2616",
+  park: "#26301b",
+  coast: "#665a3e",
+  border: "#8a7651",
+  detail: "#4b4933",
+  label: "#d5d8c7",
+  labelHalo: "#11160c",
+};
+
 const stopMarkerEvent = (event: Event) => event.stopPropagation();
+
+const getMapPalette = (): MapPalette =>
+  document.documentElement.classList.contains("dark") ? darkMapPalette : lightMapPalette;
 
 const defaultMapView = (isMobile: boolean) => ({
   ...photoMapInitialView,
@@ -41,7 +73,7 @@ const defaultMapView = (isMobile: boolean) => ({
   zoom: isMobile ? 0.48 : photoMapInitialView.zoom,
 });
 
-const addWorldGeographyLayers = (map: mapboxgl.Map) => {
+const addWorldGeographyLayers = (map: mapboxgl.Map, palette: MapPalette) => {
   try {
     if (!map.getSource(WORLD_SOURCE)) {
       map.addSource(WORLD_SOURCE, {
@@ -57,10 +89,13 @@ const addWorldGeographyLayers = (map: mapboxgl.Map) => {
         source: WORLD_SOURCE,
         "source-layer": "country_boundaries",
         paint: {
-          "fill-color": MAP_LAND,
+          "fill-color": palette.land,
           "fill-opacity": ["interpolate", ["linear"], ["zoom"], 0, 0.54, 1.2, 0.64, 4, 0.78],
         },
       });
+    }
+    if (map.getLayer(WORLD_LAND_LAYER)) {
+      map.setPaintProperty(WORLD_LAND_LAYER, "fill-color", palette.land);
     }
 
     if (!map.getLayer(WORLD_BORDER_LAYER)) {
@@ -71,12 +106,15 @@ const addWorldGeographyLayers = (map: mapboxgl.Map) => {
         "source-layer": "country_boundaries",
         filter: ["!=", ["get", "disputed"], "true"],
         paint: {
-          "line-color": MAP_BORDER,
+          "line-color": palette.border,
           "line-width": ["interpolate", ["linear"], ["zoom"], 0, 0.3, 1.2, 0.48, 3, 0.72, 6, 1.1],
           "line-opacity": ["interpolate", ["linear"], ["zoom"], 0, 0.34, 1.2, 0.48, 4, 0.62],
           "line-blur": 0.28,
         },
       });
+    }
+    if (map.getLayer(WORLD_BORDER_LAYER)) {
+      map.setPaintProperty(WORLD_BORDER_LAYER, "line-color", palette.border);
     }
 
     if (!map.getLayer(WORLD_BORDER_DISPUTED_LAYER)) {
@@ -87,12 +125,15 @@ const addWorldGeographyLayers = (map: mapboxgl.Map) => {
         "source-layer": "country_boundaries",
         filter: ["==", ["get", "disputed"], "true"],
         paint: {
-          "line-color": MAP_BORDER,
+          "line-color": palette.border,
           "line-width": ["interpolate", ["linear"], ["zoom"], 0, 0.2, 1.2, 0.36, 4, 0.62],
           "line-opacity": 0.22,
           "line-dasharray": [2, 1.2],
         },
       });
+    }
+    if (map.getLayer(WORLD_BORDER_DISPUTED_LAYER)) {
+      map.setPaintProperty(WORLD_BORDER_DISPUTED_LAYER, "line-color", palette.border);
     }
   } catch {
     // The dedicated boundary tiles require a valid Mapbox token; the base map still works without them.
@@ -100,6 +141,7 @@ const addWorldGeographyLayers = (map: mapboxgl.Map) => {
 };
 
 const applyMapPalette = (map: mapboxgl.Map) => {
+  const palette = getMapPalette();
   const layers = map.getStyle().layers ?? [];
 
   layers.forEach((layer) => {
@@ -107,18 +149,18 @@ const applyMapPalette = (map: mapboxgl.Map) => {
 
     try {
       if (layer.type === "background") {
-        map.setPaintProperty(layer.id, "background-color", MAP_BACKGROUND);
+        map.setPaintProperty(layer.id, "background-color", palette.background);
       }
 
       if (layer.type === "fill") {
         if (id.includes("water") || id.includes("background")) {
-          map.setPaintProperty(layer.id, "fill-color", id.includes("water") ? MAP_WATER : MAP_BACKGROUND);
+          map.setPaintProperty(layer.id, "fill-color", id.includes("water") ? palette.water : palette.background);
         } else if (id.includes("park") || id.includes("landuse")) {
-          map.setPaintProperty(layer.id, "fill-color", MAP_PARK);
+          map.setPaintProperty(layer.id, "fill-color", palette.park);
         } else if (id.includes("land") || id.includes("country") || id.includes("continent")) {
-          map.setPaintProperty(layer.id, "fill-color", MAP_LAND);
+          map.setPaintProperty(layer.id, "fill-color", palette.land);
         } else {
-          map.setPaintProperty(layer.id, "fill-color", MAP_LAND);
+          map.setPaintProperty(layer.id, "fill-color", palette.land);
           map.setPaintProperty(layer.id, "fill-opacity", 0.48);
         }
       }
@@ -126,13 +168,13 @@ const applyMapPalette = (map: mapboxgl.Map) => {
       if (layer.type === "line" && /admin|boundary|border|coast|country|road|waterway|bridge|tunnel/.test(id)) {
         const isBorder = /admin|boundary|border|country/.test(id);
         const isCoast = id.includes("coast");
-        map.setPaintProperty(layer.id, "line-color", isBorder ? MAP_BORDER : isCoast ? MAP_COAST : MAP_DETAIL);
+        map.setPaintProperty(layer.id, "line-color", isBorder ? palette.border : isCoast ? palette.coast : palette.detail);
         map.setPaintProperty(layer.id, "line-opacity", isBorder ? 0.08 : isCoast ? 0.26 : id.includes("road") ? 0.24 : 0.18);
       }
 
       if (layer.type === "symbol") {
-        map.setPaintProperty(layer.id, "text-color", MAP_LABEL);
-        map.setPaintProperty(layer.id, "text-halo-color", MAP_BACKGROUND);
+        map.setPaintProperty(layer.id, "text-color", palette.label);
+        map.setPaintProperty(layer.id, "text-halo-color", palette.labelHalo);
         map.setPaintProperty(layer.id, "text-halo-width", 0.9);
       }
     } catch {
@@ -140,17 +182,22 @@ const applyMapPalette = (map: mapboxgl.Map) => {
     }
   });
 
-  addWorldGeographyLayers(map);
+  addWorldGeographyLayers(map, palette);
+  map.setFog({
+    color: palette.background,
+    "high-color": palette.background,
+    "horizon-blend": 0,
+    "space-color": palette.background,
+    "star-intensity": 0,
+  });
 };
 
 const PhotoMapPage = () => {
-  const mapboxToken =
-    import.meta.env.VITE_MAPBOX_ACCESS_TOKEN ??
-    import.meta.env.VITE_MAPBOX_TOKEN ??
-    "";
+  const mapboxToken = getMapboxToken();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markerEntriesRef = useRef<Map<string, MarkerEntry>>(new Map());
+  const mapLoadedRef = useRef(false);
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -193,18 +240,15 @@ const PhotoMapPage = () => {
     map.addControl(new mapboxgl.AttributionControl({ compact: true }), "bottom-right");
 
     const handleLoad = () => {
+      mapLoadedRef.current = true;
       applyMapPalette(map);
-      map.setFog({
-        color: MAP_BACKGROUND,
-        "high-color": MAP_BACKGROUND,
-        "horizon-blend": 0,
-        "space-color": MAP_BACKGROUND,
-        "star-intensity": 0,
-      });
+      setMapError(null);
       setMapReady(true);
     };
     const handleError = () => {
-      setMapError("The map could not load. Check that the Mapbox token is available.");
+      if (!mapLoadedRef.current) {
+        setMapError("The map could not load. Check that the Mapbox token is available.");
+      }
     };
 
     map.on("load", handleLoad);
@@ -217,30 +261,27 @@ const PhotoMapPage = () => {
       markerEntriesRef.current.clear();
       map.remove();
       mapRef.current = null;
+      mapLoadedRef.current = false;
     };
   }, [isMobile, mapboxToken]);
+
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    const observer = new MutationObserver(() => {
+      if (mapRef.current?.isStyleLoaded()) applyMapPalette(mapRef.current);
+    });
+
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!mapReady || !mapRef.current) return;
 
     const map = mapRef.current;
-    let frame = 0;
-    let start = 0;
     const view = defaultMapView(isMobile);
 
-    const resizeDuringTransition = (time: number) => {
-      if (!start) start = time;
-      map.resize();
-      if (!activeEntry) {
-        map.setCenter(view.center);
-      }
-
-      if (time - start < 460) {
-        frame = window.requestAnimationFrame(resizeDuringTransition);
-      }
-    };
-
-    frame = window.requestAnimationFrame(resizeDuringTransition);
     const settle = window.setTimeout(() => {
       map.resize();
       if (!activeEntry) {
@@ -249,18 +290,17 @@ const PhotoMapPage = () => {
           zoom: view.zoom,
           pitch: view.pitch,
           bearing: view.bearing,
-          duration: 220,
-          easing: (t) => 1 - Math.pow(1 - t, 3),
+          duration: 520,
+          easing: (t) => 1 - Math.pow(1 - t, 4),
           essential: true,
         });
       }
-    }, 470);
+    }, 120);
 
     return () => {
-      if (frame) window.cancelAnimationFrame(frame);
       window.clearTimeout(settle);
     };
-  }, [activeEntry, isMobile, mapReady, sidebarOpen, searchOpen]);
+  }, [activeEntry, isMobile, mapReady]);
 
   const handleSidebarToggle = () => {
     setSearchOpen(false);
@@ -300,12 +340,12 @@ const PhotoMapPage = () => {
         event.preventDefault();
         event.stopPropagation();
         setActiveEntryId(entry.id);
-        map.flyTo({
+        map.easeTo({
           center: entry.coordinates as LngLatLike,
           zoom: Math.max(map.getZoom(), 3.25),
           offset: selectedLocationOffset(),
-          speed: 0.65,
-          curve: 1.35,
+          duration: 980,
+          easing: (t) => 1 - Math.pow(1 - t, 4),
           essential: true,
         });
       });
@@ -332,13 +372,13 @@ const PhotoMapPage = () => {
 
   const resetGlobe = () => {
     const view = defaultMapView(isMobile);
-    mapRef.current?.flyTo({
+    mapRef.current?.easeTo({
       center: view.center,
       zoom: view.zoom,
       pitch: view.pitch,
       bearing: view.bearing,
-      speed: 0.55,
-      curve: 1.2,
+      duration: 900,
+      easing: (t) => 1 - Math.pow(1 - t, 4),
       essential: true,
     });
   };
@@ -361,7 +401,7 @@ const PhotoMapPage = () => {
           <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-foreground/40">Photo Map</p>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight">Mapbox token missing</h1>
           <p className="mt-3 text-sm leading-6 text-foreground/60">
-            Add `VITE_MAPBOX_ACCESS_TOKEN` or `VITE_MAPBOX_TOKEN` to enable the globe.
+            Add `VITE_MAPBOX_ACCESS_TOKEN`, `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN`, or `VITE_MAPBOX_TOKEN` to enable the globe.
           </p>
         </div>
       </main>
@@ -369,7 +409,7 @@ const PhotoMapPage = () => {
   }
 
   return (
-    <div className="relative min-h-[100svh] overflow-hidden bg-[#f4f7fe] text-foreground">
+    <div className="relative min-h-[100svh] overflow-hidden bg-background text-foreground">
       <Sidebar
         open={sidebarOpen}
         onToggle={handleSidebarToggle}
@@ -380,19 +420,12 @@ const PhotoMapPage = () => {
 
       <motion.main
         animate={{
-          marginLeft: sidebarOpen && !isMobile ? 240 : 0,
-          marginRight: searchOpen && !isMobile ? 240 : 0,
-          width:
-            sidebarOpen && !isMobile
-              ? "calc(100% - 240px)"
-              : searchOpen && !isMobile
-                ? "calc(100% - 240px)"
-                : "100%",
+          x: sidebarOpen && !isMobile ? 240 : searchOpen && !isMobile ? -240 : 0,
         }}
         transition={{ duration: 0.56, ease: EASE_TEXT }}
-        className="relative h-[100svh] overflow-hidden bg-[#f4f7fe]"
+        className="relative h-[100svh] w-full overflow-hidden bg-background will-change-transform"
       >
-        <section className="relative h-full overflow-hidden bg-[#f4f7fe]">
+        <section className="relative h-full overflow-hidden bg-background">
           <div ref={containerRef} className="photo-map-shell h-full w-full" />
 
           {!mapReady || mapError ? (

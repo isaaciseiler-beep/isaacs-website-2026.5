@@ -10,6 +10,7 @@ import MapView from "@/components/fulbrightmap/MapView";
 import SetupScreen from "@/components/fulbrightmap/SetupScreen";
 import Toast, { type ToastMessage } from "@/components/fulbrightmap/Toast";
 import TopPanel from "@/components/fulbrightmap/TopPanel";
+import { getMapboxToken } from "@/lib/mapboxToken";
 import {
   createPin,
   deletePin,
@@ -37,10 +38,7 @@ function mergePin(pins: Pin[], pin: Pin) {
 }
 
 export default function FulbrightMapPage() {
-  const mapboxToken =
-    import.meta.env.VITE_MAPBOX_ACCESS_TOKEN ??
-    import.meta.env.VITE_MAPBOX_TOKEN ??
-    "";
+  const mapboxToken = getMapboxToken();
   const [anonymousUserId, setAnonymousUserId] = useState("");
   const [pins, setPins] = useState<Pin[]>([]);
   const [pendingLocation, setPendingLocation] = useState<PendingLocation | null>(

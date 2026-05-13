@@ -15,10 +15,10 @@ import SiteHeader from "@/components/SiteHeader";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { scrollToPageSection } from "@/lib/scroll";
 
-const HOME_INTRO_AUTO_SCROLL_KEY = "home-intro-auto-scroll-v2";
 const HOME_INTRO_AUTO_SCROLL_DELAY = 3408;
 const HOME_INTRO_AUTO_SCROLL_DURATION = 2200;
 const HEADER_SCROLL_OFFSET = 96;
+const WORK_SCROLL_CONTENT_SELECTOR = "[data-work-scroll-content]";
 
 const easeIntroScroll = (progress: number) => {
   if (progress < 0.5) return 4 * progress * progress * progress;
@@ -78,23 +78,9 @@ const Index = () => {
   useEffect(() => {
     if (location.hash || window.scrollY > 80) return;
 
-    try {
-      if (window.sessionStorage.getItem(HOME_INTRO_AUTO_SCROLL_KEY)) return;
-    } catch {
-      // Session storage can be unavailable in some privacy modes; the timer can still run once for this mount.
-    }
-
     let cancelled = false;
     let timer: number;
     let frame = 0;
-
-    const markSeen = () => {
-      try {
-        window.sessionStorage.setItem(HOME_INTRO_AUTO_SCROLL_KEY, "true");
-      } catch {
-        // Ignore storage failures.
-      }
-    };
 
     const removeIntentListeners = () => {
       window.removeEventListener("wheel", cancelAutoScroll);
@@ -107,7 +93,6 @@ const Index = () => {
       cancelled = true;
       window.clearTimeout(timer);
       if (frame) window.cancelAnimationFrame(frame);
-      markSeen();
       removeIntentListeners();
     };
 
@@ -117,7 +102,17 @@ const Index = () => {
 
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const start = window.scrollY;
-      const end = Math.max(0, start + target.getBoundingClientRect().top - HEADER_SCROLL_OFFSET);
+      const workContent = target.querySelector<HTMLElement>(WORK_SCROLL_CONTENT_SELECTOR) ?? target;
+      const contentRect = workContent.getBoundingClientRect();
+      const viewportCenter = window.innerHeight / 2;
+      const centeredEnd = start + contentRect.top + contentRect.height / 2 - viewportCenter;
+      const topAlignedEnd = start + contentRect.top - HEADER_SCROLL_OFFSET;
+      const end = Math.max(
+        0,
+        contentRect.height > window.innerHeight - HEADER_SCROLL_OFFSET
+          ? topAlignedEnd
+          : centeredEnd,
+      );
 
       if (reduceMotion) {
         window.scrollTo(0, end);
@@ -146,7 +141,6 @@ const Index = () => {
 
     timer = window.setTimeout(() => {
       if (cancelled) return;
-      markSeen();
       autoScrollToWork();
     }, HOME_INTRO_AUTO_SCROLL_DELAY);
 

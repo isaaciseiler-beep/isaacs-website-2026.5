@@ -5,7 +5,7 @@ import SectionHeading from "@/components/SectionHeading";
 import { inspirationItems, type InspirationItem } from "@/lib/inspirationItems";
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
-const ITEM_REVEAL_EASE: [number, number, number, number] = [0.18, 1, 0.28, 1];
+const ITEM_REVEAL_EASE: [number, number, number, number] = [0.55, 0, 0.2, 1];
 
 // Approximate board width/height ratio (viewport-dependent; fine for initial layout)
 const BOARD_RATIO = 1.7;
@@ -67,10 +67,10 @@ const ROTATE_CURSOR = `url("data:image/svg+xml;utf8,${ROTATE_CURSOR_SVG}") 7 7, 
 
 const glitchRevealInitial = (index: number) => ({
   opacity: 0,
-  x: index % 2 === 0 ? -18 : 18,
-  y: 18,
-  scale: 0.94,
-  filter: "blur(12px)",
+  x: index % 2 === 0 ? -14 : 14,
+  y: 10,
+  scale: 0.98,
+  filter: "blur(10px)",
 });
 
 const glitchRevealVisible = (index: number) => {
@@ -78,17 +78,17 @@ const glitchRevealVisible = (index: number) => {
 
   return {
     opacity: [0, 1, 1],
-    x: [direction * 18, direction * -7, 0],
-    y: [18, -4, 0],
-    scale: [0.94, 1.025, 1],
-    filter: ["blur(12px)", "blur(1.5px)", "blur(0px)"],
+    x: [direction * 14, direction * 2, 0],
+    y: [10, 2, 0],
+    scale: [0.98, 1, 1],
+    filter: ["blur(10px)", "blur(1px)", "blur(0px)"],
   };
 };
 
 const glitchRevealTransition = (index: number) => ({
   delay: Math.min(index * 0.045, 0.45),
-  duration: 0.68,
-  times: [0, 0.34, 1],
+  duration: 0.52,
+  times: [0, 0.46, 1],
   ease: ITEM_REVEAL_EASE,
 });
 

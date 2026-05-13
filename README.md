@@ -65,7 +65,8 @@ Add a public Mapbox token before running the route:
 VITE_MAPBOX_ACCESS_TOKEN=pk_your_token_here
 ```
 
-`VITE_MAPBOX_TOKEN` is also accepted as a fallback.
+`NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN`, `VITE_MAPBOX_TOKEN`, and `MAPBOX_ACCESS_TOKEN`
+are also accepted as fallbacks for compatibility with older local env files.
 
 ### Required Supabase persistence for shared pins
 

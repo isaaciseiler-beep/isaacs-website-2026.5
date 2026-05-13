@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import ProjectModal from "@/components/ProjectModal";
@@ -8,6 +8,7 @@ import { featuredProjectIds, projectItems, type ProjectItem } from "@/lib/siteCo
 
 const GAP = 3;
 const ease = [0.16, 1, 0.3, 1] as [number, number, number, number];
+const EXPAND_EASE = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
 const useCenteredInFrame = <T extends HTMLElement>(enabled: boolean) => {
   const ref = useRef<T | null>(null);
@@ -66,15 +67,15 @@ const FeaturedProjectCard = ({
   const card = (
     <motion.div
       ref={mobileCardRef}
-      className="group relative overflow-hidden cursor-pointer aspect-[4/3] md:aspect-auto md:flex-[1_1_0%]"
+      className="group relative h-full min-h-0 flex-1 cursor-pointer overflow-hidden bg-background md:flex-[1_1_0%]"
       style={{ minWidth: 0 }}
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true, margin: "-80px" }}
-      animate={isDesktop ? { flex: isActive ? 6 : hasActive ? 0.8 : 1 } : {}}
+      animate={isDesktop ? { flex: isActive ? 5.8 : hasActive ? 0.9 : 1 } : {}}
       transition={{
         opacity: { duration: 0.55, ease, delay: index * 0.12 },
-        flex: { duration: 0.85, ease },
+        flex: { duration: 1.08, ease: EXPAND_EASE },
       }}
       onMouseEnter={() => isDesktop && onActivate(index)}
       onClick={() => isDesktop && onOpen(index)}
@@ -91,72 +92,56 @@ const FeaturedProjectCard = ({
         transition={{ duration: 0.85, ease }}
       />
 
-      <AnimatePresence>
-        {isActive && (
-          <motion.div
-            className="absolute inset-0 flex flex-col justify-end"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <div
-              className="absolute inset-0"
-              style={{
-                background:
-                  "linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.4) 45%, transparent 70%)",
+      <motion.div
+        className="pointer-events-none absolute -inset-x-px -bottom-1 top-0"
+        style={{
+          background:
+            "linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.76) 18%, rgba(0,0,0,0.34) 52%, transparent 76%)",
+        }}
+        animate={{ opacity: isActive ? 1 : 0 }}
+        transition={{ duration: 0.72, ease: EXPAND_EASE }}
+      />
+
+      <motion.div
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-10 overflow-hidden p-5 md:p-7"
+        animate={{
+          opacity: isActive ? 1 : 0,
+          y: isActive ? 0 : 14,
+          filter: isActive ? "blur(0px)" : "blur(3px)",
+          clipPath: isActive ? "inset(0% 0% 0% 0%)" : "inset(18% 0% 0% 0%)",
+        }}
+        transition={{ duration: 0.64, ease: EXPAND_EASE, delay: isActive ? 0.08 : 0 }}
+      >
+        <h3 className="mb-2 text-xl font-semibold leading-[0.95] tracking-tighter text-white md:text-3xl">
+          {project.title}
+        </h3>
+
+        {isDesktop ? (
+          <p className="max-w-sm text-[13px] leading-relaxed text-white/65">
+            {project.summary}
+          </p>
+        ) : (
+          <span className="inline-flex items-center text-base font-normal tracking-tight text-white/80">
+            Read more
+            <motion.span
+              className="inline-flex overflow-hidden"
+              animate={{
+                width: isImageActive ? "1.5rem" : "0rem",
+                opacity: isImageActive ? 1 : 0,
               }}
-            />
-
-            <div className="relative z-10 p-5 md:p-7">
-              <motion.h3
-                className="text-xl md:text-3xl font-semibold tracking-tighter text-white leading-[0.95] mb-2"
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, ease, delay: 0.15 }}
-              >
-                {project.title}
-              </motion.h3>
-
-              {isDesktop ? (
-                <motion.p
-                  className="text-[13px] text-white/65 leading-relaxed max-w-sm"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, ease, delay: 0.22 }}
-                >
-                  {project.summary}
-                </motion.p>
-              ) : (
-                <motion.span
-                  className="inline-flex items-center text-base font-normal tracking-tight text-white/80"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, ease, delay: 0.22 }}
-                >
-                  Read more
-                  <motion.span
-                    className="inline-flex overflow-hidden"
-                    animate={{
-                      maxWidth: isImageActive ? "2rem" : "0rem",
-                      opacity: isImageActive ? 1 : 0,
-                    }}
-                    transition={{ duration: 0.35, ease }}
-                  >
-                    <ArrowUpRight className="w-4 h-4 ml-2 shrink-0" strokeWidth={1.5} />
-                  </motion.span>
-                </motion.span>
-              )}
-            </div>
-          </motion.div>
+              transition={{ duration: 0.34, ease: EXPAND_EASE }}
+            >
+              <ArrowUpRight className="ml-2 h-4 w-4 shrink-0" strokeWidth={1.5} />
+            </motion.span>
+          </span>
         )}
-      </AnimatePresence>
+      </motion.div>
     </motion.div>
   );
 
   if (!isDesktop) {
     return (
-      <Link to={`/projects/${project.id}`} className="block">
+      <Link to={`/projects/${project.id}`} className="block min-h-0 flex-1">
         {card}
       </Link>
     );
@@ -193,13 +178,13 @@ const ProjectsSection = () => {
   }, [projects]);
 
   return (
-    <section className="py-12">
-      <div className="px-6 mb-6">
+    <section data-work-scroll-content className="flex h-[calc(100svh-9.75rem)] min-h-[420px] flex-col py-0">
+      <div className="mb-5 shrink-0 px-6 md:mb-6">
         <SectionHeading className="mb-0">Work</SectionHeading>
       </div>
 
       <div
-        className="site-corner mx-6 flex h-auto flex-col overflow-hidden md:h-[66vh] md:min-h-[408px] md:flex-row"
+        className="site-corner mx-6 flex min-h-0 flex-1 flex-col overflow-hidden md:flex-row"
         style={{ gap: GAP }}
         onMouseLeave={() => setActiveIndex(null)}
       >
@@ -218,7 +203,7 @@ const ProjectsSection = () => {
         })}
       </div>
 
-      <div className="px-6 mt-6">
+      <div className="mt-5 shrink-0 px-6 md:mt-6">
         <div className="flex w-full gap-[3px] overflow-hidden site-corner">
           {[
             { label: "Experience", href: "/experience" },

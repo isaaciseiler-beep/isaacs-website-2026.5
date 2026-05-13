@@ -5,9 +5,7 @@ import AnimatedText from "@/components/AnimatedText";
 import { CONTACT_EMAIL } from "@/lib/site";
 import {
   askSiteAssistant,
-  countUserMessages,
   isChatLimitReached,
-  MAX_CHAT_USER_MESSAGES,
   type ChatRequestMessage,
   type ChatSource,
 } from "@/lib/chatClient";
@@ -185,14 +183,15 @@ const IsaacAISection = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [typingMessageId, setTypingMessageId] = useState<string | null>(null);
   const headingRef = useRef<HTMLDivElement | null>(null);
+  const paneRef = useRef<HTMLDivElement | null>(null);
   const requestIdRef = useRef(0);
   const messageListRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const pageScrollBeforeFocusRef = useRef(0);
   const focusRestoreTimersRef = useRef<number[]>([]);
   const headingInView = useInView(headingRef, { amount: 0.72, margin: "-80px" });
+  const paneInView = useInView(paneRef, { amount: 0.42, margin: "-120px" });
 
-  const userMessageCount = countUserMessages(messages);
   const limitReached = isChatLimitReached(messages);
   const hasConversation = messages.length > 0 || isLoading;
 
@@ -284,95 +283,110 @@ const IsaacAISection = () => {
           />
         </div>
 
-        <div className="site-corner group/ai relative isolate flex h-[340px] w-full max-w-2xl flex-col overflow-hidden border border-foreground/[0.08] bg-foreground/[0.035] text-left shadow-[0_18px_54px_rgba(0,0,0,0.18)] transition-all duration-500 ease-out hover:border-foreground/[0.12] focus-within:border-foreground/[0.16] focus-within:bg-foreground/[0.045] focus-within:shadow-[0_22px_62px_rgba(0,0,0,0.22)] md:h-[400px]">
+        <motion.div ref={paneRef} className="relative w-full max-w-2xl">
           <motion.div
-            className="pointer-events-none absolute inset-x-0 top-0 z-10 h-px bg-[linear-gradient(90deg,transparent,hsl(var(--highlight)/0.82),transparent)]"
-            animate={{ x: ["-55%", "55%"], opacity: [0.15, 0.9, 0.15] }}
-            transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+            className="site-corner pointer-events-none absolute -inset-5 bg-[radial-gradient(ellipse_at_center,hsl(var(--foreground)/0.2),hsl(var(--highlight)/0.12)_38%,transparent_72%)] blur-2xl"
+            initial={{ opacity: 0, scale: 0.82 }}
+            animate={{ opacity: paneInView ? 1 : 0, scale: paneInView ? 1 : 0.82 }}
+            transition={{ duration: 0.82, ease: EASE }}
           />
-          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,hsl(var(--highlight)/0.08),transparent_38%,hsl(var(--foreground)/0.05))] opacity-0 transition-opacity duration-500 group-hover/ai:opacity-100 group-focus-within/ai:opacity-100" />
-          <div
-            ref={messageListRef}
-            className={`relative z-10 flex min-h-0 flex-1 flex-col gap-4 px-4 pb-3 pt-4 scrollbar-hide md:px-5 md:pt-5 ${
-              hasConversation ? "overflow-y-auto overscroll-contain" : "overflow-y-visible overscroll-auto"
-            }`}
+          <motion.div
+            className="site-corner group/ai relative isolate flex h-[340px] w-full flex-col overflow-hidden border border-foreground/[0.08] bg-foreground/[0.035] text-left transition-all duration-500 ease-out hover:border-foreground/[0.12] focus-within:border-foreground/[0.16] focus-within:bg-foreground/[0.045] md:h-[400px]"
+            animate={{
+              boxShadow: paneInView
+                ? "0 22px 72px rgba(0,0,0,0.22)"
+                : "0 0 0 rgba(0,0,0,0)",
+            }}
+            transition={{ duration: 0.82, ease: EASE }}
           >
-            {messages.map((message) => (
-              <motion.div
-                key={message.id}
-                className={
-                  message.role === "user"
-                    ? "site-corner ml-auto max-w-[92%] border border-foreground/10 bg-foreground px-3.5 py-3 text-background shadow-[0_10px_28px_rgba(0,0,0,0.08)] md:max-w-[78%]"
-                    : "mr-auto max-w-[92%] py-1 md:max-w-[84%]"
-                }
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.38, ease: EASE }}
-              >
-                {message.role === "user" ? (
-                  <p className="whitespace-pre-line text-[14px] leading-relaxed md:text-[15px]">{message.content}</p>
-                ) : (
-                  <AssistantMessage message={message} active={typingMessageId === message.id} />
-                )}
-              </motion.div>
-            ))}
-
-            {isLoading ? (
-              <div className="mr-auto max-w-[84%]">
-                <TypingSignal />
-              </div>
-            ) : null}
-          </div>
-
-          <form
-            onSubmit={askAssistant}
-            className="relative z-10 flex min-h-[76px] items-end gap-3 border-t border-foreground/[0.07] bg-background/20 px-3 py-3 md:px-4"
-          >
-            <textarea
-              ref={textareaRef}
-              value={query}
-              onPointerDown={(event) => {
-                pageScrollBeforeFocusRef.current = window.scrollY;
-                if (document.activeElement !== textareaRef.current) {
-                  event.preventDefault();
-                  textareaRef.current?.focus({ preventScroll: true });
-                  restorePageScrollAfterFocus();
-                }
-              }}
-              onFocus={restorePageScrollAfterFocus}
-              onBlur={clearFocusRestoreTimers}
-              onChange={(event) => {
-                setQuery(event.target.value);
-                restorePageScrollAfterFocus();
-              }}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" && !event.shiftKey) {
-                  event.preventDefault();
-                  event.currentTarget.form?.requestSubmit();
-                }
-              }}
-              placeholder="Ask about my work"
-              rows={1}
-              disabled={limitReached}
-              aria-label={`Message ${Math.min(userMessageCount + 1, MAX_CHAT_USER_MESSAGES)} of ${MAX_CHAT_USER_MESSAGES}`}
-              className="site-corner max-h-32 min-h-11 min-w-0 flex-1 resize-none bg-foreground/[0.045] px-3.5 py-3 text-base leading-relaxed text-foreground outline-none transition-colors placeholder:text-foreground/36 focus:bg-foreground/[0.07]"
+            <motion.div
+              className="pointer-events-none absolute inset-x-0 top-0 z-10 h-px bg-[linear-gradient(90deg,transparent,hsl(var(--highlight)/0.82),transparent)]"
+              animate={{ x: ["-55%", "55%"], opacity: [0.15, 0.9, 0.15] }}
+              transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
             />
-            <span className="shrink-0 font-mono text-[9px] text-foreground/25" aria-hidden>
-              {userMessageCount}/{MAX_CHAT_USER_MESSAGES}
-            </span>
-            <motion.button
-              type="submit"
-              disabled={!query.trim() || isLoading || limitReached}
-              className="site-corner flex h-11 w-11 shrink-0 items-center justify-center bg-primary text-primary-foreground shadow-[0_10px_24px_rgba(18,24,14,0.24)] transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:bg-foreground/12 disabled:text-foreground/32 disabled:shadow-none"
-              whileHover={{ y: -2, scale: 1.04 }}
-              whileTap={{ y: 0, scale: 0.94 }}
-              transition={{ duration: 0.18, ease: EASE }}
-              aria-label="Ask Isaac AI"
+            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,hsl(var(--highlight)/0.08),transparent_38%,hsl(var(--foreground)/0.05))] opacity-0 transition-opacity duration-500 group-hover/ai:opacity-100 group-focus-within/ai:opacity-100" />
+            <div
+              ref={messageListRef}
+              className={`relative z-10 flex min-h-0 flex-1 flex-col gap-4 px-3 pb-2 pt-4 scrollbar-hide md:px-4 md:pt-5 ${
+                hasConversation ? "overflow-y-auto overscroll-contain" : "overflow-y-visible overscroll-auto"
+              }`}
             >
-              <ArrowUp className="h-4 w-4" strokeWidth={1.7} />
-            </motion.button>
-          </form>
-        </div>
+              {messages.map((message) => (
+                <motion.div
+                  key={message.id}
+                  className={
+                    message.role === "user"
+                      ? "site-corner ml-auto max-w-[92%] border border-foreground/10 bg-foreground px-3.5 py-3 text-background shadow-[0_10px_28px_rgba(0,0,0,0.08)] md:max-w-[78%]"
+                      : "mr-auto max-w-[92%] py-1 md:max-w-[84%]"
+                  }
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.38, ease: EASE }}
+                >
+                  {message.role === "user" ? (
+                    <p className="whitespace-pre-line text-[14px] leading-relaxed md:text-[15px]">{message.content}</p>
+                  ) : (
+                    <AssistantMessage message={message} active={typingMessageId === message.id} />
+                  )}
+                </motion.div>
+              ))}
+
+              {isLoading ? (
+                <div className="mr-auto max-w-[84%]">
+                  <TypingSignal />
+                </div>
+              ) : null}
+            </div>
+
+            <form
+              onSubmit={askAssistant}
+              className="relative z-10 shrink-0 px-3 pb-3 pt-2 md:px-4 md:pb-4"
+            >
+              <div className="site-corner relative flex min-h-11 w-full items-end bg-foreground/[0.045] transition-colors focus-within:bg-foreground/[0.07]">
+                <textarea
+                  ref={textareaRef}
+                  value={query}
+                  onPointerDown={(event) => {
+                    pageScrollBeforeFocusRef.current = window.scrollY;
+                    if (document.activeElement !== textareaRef.current) {
+                      event.preventDefault();
+                      textareaRef.current?.focus({ preventScroll: true });
+                      restorePageScrollAfterFocus();
+                    }
+                  }}
+                  onFocus={restorePageScrollAfterFocus}
+                  onBlur={clearFocusRestoreTimers}
+                  onChange={(event) => {
+                    setQuery(event.target.value);
+                    restorePageScrollAfterFocus();
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" && !event.shiftKey) {
+                      event.preventDefault();
+                      event.currentTarget.form?.requestSubmit();
+                    }
+                  }}
+                  placeholder="Ask about my work"
+                  rows={1}
+                  disabled={limitReached}
+                  aria-label="Ask Isaac AI"
+                  className="max-h-32 min-h-11 min-w-0 flex-1 resize-none bg-transparent py-3 pl-3.5 pr-14 text-base leading-relaxed text-foreground outline-none placeholder:text-foreground/36"
+                />
+                <motion.button
+                  type="submit"
+                  disabled={!query.trim() || isLoading || limitReached}
+                  className="absolute bottom-1.5 right-1.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-[calc(var(--site-corner-radius)-2px)] bg-primary text-primary-foreground shadow-[0_8px_18px_rgba(18,24,14,0.22)] transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:bg-foreground/12 disabled:text-foreground/32 disabled:shadow-none"
+                  whileHover={{ y: -1, scale: 1.03 }}
+                  whileTap={{ y: 0, scale: 0.94 }}
+                  transition={{ duration: 0.18, ease: EASE }}
+                  aria-label="Ask Isaac AI"
+                >
+                  <ArrowUp className="h-3.5 w-3.5" strokeWidth={1.7} />
+                </motion.button>
+              </div>
+            </form>
+          </motion.div>
+        </motion.div>
 
         <p className="mt-2.5 max-w-xl text-center text-[9px] italic leading-relaxed text-foreground/30 md:text-[10px]">
           This AI is trained on a body of my work and does not speak for me. It is a prototype. Report output issues{" "}

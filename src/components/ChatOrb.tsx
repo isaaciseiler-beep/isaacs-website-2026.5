@@ -6,7 +6,7 @@ import { scrollToPageSection } from "@/lib/scroll";
 
 const DOT_SIZE = 36;
 const DOT_BOTTOM = 20;
-const DOT_RIGHT = 20;
+const DOT_LEFT = 24;
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -65,9 +65,9 @@ const ChatOrb = () => {
           className="site-corner fixed z-[58] flex items-center justify-end overflow-hidden bg-[hsl(var(--highlight))] text-accent-foreground shadow-[0_10px_28px_rgba(0,0,0,0.22)]"
           style={{
             bottom: DOT_BOTTOM,
-            right: DOT_RIGHT,
+            left: DOT_LEFT,
             height: DOT_SIZE,
-            transformOrigin: "right center",
+            transformOrigin: "left center",
           }}
           initial={{ width: DOT_SIZE, scale: 0.84, opacity: 0 }}
           animate={{ width: expanded ? 188 : DOT_SIZE, scale: 1, opacity: 1 }}

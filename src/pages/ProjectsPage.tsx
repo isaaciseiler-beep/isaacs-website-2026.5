@@ -141,7 +141,7 @@ const ProjectsPage = () => {
 
   useEffect(() => {
     const root = document.documentElement;
-    const update = () => setIsLightTheme(root.classList.contains("light"));
+    const update = () => setIsLightTheme(!root.classList.contains("dark"));
     update();
     const observer = new MutationObserver(update);
     observer.observe(root, { attributes: true, attributeFilter: ["class"] });
@@ -213,7 +213,7 @@ const ProjectsPage = () => {
             className={`fixed left-[calc(env(safe-area-inset-left)+1.5rem)] z-50 flex h-8 w-8 items-center justify-center rounded-full backdrop-blur-xl transition-colors duration-300 ${
               isLightTheme
                 ? "bg-foreground/12 text-foreground hover:bg-foreground/18"
-                : "bg-white/16 text-[hsl(var(--background))] hover:bg-white/24"
+                : "bg-foreground/12 text-foreground hover:bg-foreground/18"
             }`}
             style={{ bottom: bottomOffset }}
             aria-label="Back to top"

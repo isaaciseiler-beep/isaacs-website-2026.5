@@ -37,7 +37,7 @@ const ResultCard = ({
     animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
     transition={{ delay: 0.05 + index * 0.035, duration: 0.46, ease: EASE }}
   >
-    <div className="site-corner relative aspect-[4/3] w-full overflow-hidden bg-[hsl(50_33%_7%)]">
+    <div className="site-corner relative aspect-[4/3] w-full overflow-hidden bg-[hsl(var(--image-scrim))]">
       {result.image ? (
         <img
           src={result.image}
@@ -46,9 +46,9 @@ const ResultCard = ({
           loading="lazy"
         />
       ) : null}
-      <div className="absolute inset-0 bg-[linear-gradient(to_top,hsl(50_33%_7%/0.94)_0%,hsl(50_33%_7%/0.66)_44%,hsl(68_100%_81%/0.10)_100%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_top,hsl(var(--image-scrim)/0.94)_0%,hsl(var(--image-scrim)/0.66)_44%,hsl(var(--highlight)/0.10)_100%)]" />
       <div className="absolute inset-x-0 bottom-0 p-3">
-        <p className="text-lg font-semibold leading-none tracking-tight text-[#f3f6ff] transition-colors duration-300 group-hover:text-[hsl(var(--highlight))]">
+        <p className="text-lg font-semibold leading-none tracking-tight text-white transition-colors duration-300 group-hover:text-[hsl(var(--highlight))]">
           {result.title}
         </p>
       </div>

@@ -82,7 +82,7 @@ const PhotoSection = () => {
 
       <div className="px-6 mt-6">
         <Link to="/photos" className="block w-full md:w-1/2">
-          <div className="site-corner homepage-cta group relative flex w-full cursor-pointer items-center justify-center bg-[hsl(50_33%_7%)] py-3 font-mono text-sm uppercase tracking-[0.2em] transition-colors duration-300 hover:bg-[hsl(50_33%_12%)]">
+          <div className="site-corner homepage-cta group relative flex w-full cursor-pointer items-center justify-center bg-primary py-3 font-mono text-sm uppercase tracking-[0.2em] transition-colors duration-300 hover:bg-accent">
             <span className="flex items-center justify-center">
               Full Portfolio
               <span className="inline-flex overflow-hidden max-w-0 group-hover:max-w-[2rem] opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">

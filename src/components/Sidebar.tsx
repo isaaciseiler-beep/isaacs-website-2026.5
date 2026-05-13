@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, Mail, Sun } from "lucide-react";
+import { ChevronRight, Mail, Moon, Sun } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { toast } from "sonner";
 import { useTheme } from "@/components/ThemeProvider";
 import SearchTrigger from "@/components/SearchOverlay";
 import { CONTACT_MAILTO, GITHUB_URL, LINKEDIN_URL, SUBSTACK_URL } from "@/lib/site";
@@ -12,14 +11,8 @@ import { useIsMobile } from "@/hooks/use-mobile";
 const EASE: [number, number, number, number] = [0.19, 1, 0.22, 1];
 const EASE_TEXT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-const SlimMoon = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-  </svg>
-);
-
 const themeOptions = [
-  { value: "dark" as const, label: "Dark", icon: SlimMoon },
+  { value: "dark" as const, label: "Dark", icon: Moon },
   { value: "light" as const, label: "Light", icon: Sun },
 ];
 
@@ -32,19 +25,15 @@ const ThemeSwitch = () => {
         return (
           <button
             key={opt.value}
-            onClick={() => {
-              if (opt.value === "dark") {
-                toast("Dark Mode coming soon");
-                return;
-              }
-              setTheme(opt.value);
-            }}
+            type="button"
+            onClick={() => setTheme(opt.value)}
             className={`site-corner flex h-10 w-10 items-center justify-center transition-colors duration-300 ${
-              active ? "bg-foreground text-background" : "bg-foreground/10 text-foreground hover:bg-foreground/20"
+              active ? "bg-primary text-primary-foreground" : "bg-foreground/10 text-foreground hover:bg-foreground/18"
             }`}
             aria-label={opt.label}
+            aria-pressed={active}
           >
-            <opt.icon className="w-4 h-4" />
+            <opt.icon className="w-4 h-4" strokeWidth={1.65} />
           </button>
         );
       })}

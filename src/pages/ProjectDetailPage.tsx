@@ -152,7 +152,7 @@ const ProjectDetailPage = () => {
             className="back-projects-button group relative mb-8 inline-flex items-center justify-center overflow-hidden rounded-full bg-foreground px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.2em] cursor-pointer"
           >
             <span
-              className="absolute inset-0 bg-[hsl(50_33%_12%)] origin-right scale-x-0 group-hover:scale-x-100 transition-transform duration-700"
+              className="absolute inset-0 origin-right scale-x-0 bg-primary/90 transition-transform duration-700 group-hover:scale-x-100"
               style={{ transitionTimingFunction: "cubic-bezier(0.22,1,0.36,1)" }}
             />
             <span className="back-projects-button-label relative z-10 flex items-center transition-colors duration-500">

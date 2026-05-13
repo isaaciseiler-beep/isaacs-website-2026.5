@@ -87,7 +87,7 @@ const NewsSection = () => {
                       loading="lazy"
                     />
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[hsl(50_33%_7%/0.94)] via-[hsl(50_33%_7%/0.48)] to-transparent" />
+                  <div className="absolute inset-0 bg-[linear-gradient(to_top,hsl(var(--image-scrim)/0.94)_0%,hsl(var(--image-scrim)/0.48)_48%,transparent_100%)]" />
                   <div className="absolute inset-x-0 bottom-0 p-5">
                     <div className="mb-4 flex h-[30px] items-center">
                       <img

@@ -382,7 +382,7 @@ const InspirationBoard = () => {
                   transition={{ duration: 0.3, ease: EASE }}
                   onClick={() => scrollCarousel("left")}
                   className="absolute left-2 top-1/2 -translate-y-1/2 z-20"
-                  style={{ color: "hsl(50 33% 7%)" }}
+                  style={{ color: "hsl(var(--foreground))" }}
                   whileHover={{ x: -3 }}
                   whileTap={{ scale: 0.85 }}
                   aria-label="Scroll left"
@@ -401,7 +401,7 @@ const InspirationBoard = () => {
                   transition={{ duration: 0.3, ease: EASE }}
                   onClick={() => scrollCarousel("right")}
                   className="absolute right-2 top-1/2 -translate-y-1/2 z-20"
-                  style={{ color: "hsl(50 33% 7%)" }}
+                  style={{ color: "hsl(var(--foreground))" }}
                   whileHover={{ x: 3 }}
                   whileTap={{ scale: 0.85 }}
                   aria-label="Scroll right"

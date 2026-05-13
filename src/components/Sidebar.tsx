@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { useTheme } from "@/components/ThemeProvider";
 import SearchTrigger from "@/components/SearchOverlay";
 import { CONTACT_MAILTO, GITHUB_URL, LINKEDIN_URL, SUBSTACK_URL } from "@/lib/site";
+import { scrollToPageSection } from "@/lib/scroll";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const EASE: [number, number, number, number] = [0.19, 1, 0.22, 1];
@@ -126,12 +127,10 @@ const Sidebar = ({ open, onToggle, onClose, onSearchOpen, activeSection, showTog
       if (location.pathname !== "/") {
         navigate("/");
         setTimeout(() => {
-          const el = document.getElementById(item.scrollTo!);
-          if (el) el.scrollIntoView({ behavior: "smooth" });
+          scrollToPageSection(item.scrollTo!);
         }, 100);
       } else {
-        const el = document.getElementById(item.scrollTo);
-        if (el) el.scrollIntoView({ behavior: "smooth" });
+        scrollToPageSection(item.scrollTo);
       }
     }
     if (item.href) navigate(item.href);
@@ -206,7 +205,7 @@ const Sidebar = ({ open, onToggle, onClose, onSearchOpen, activeSection, showTog
                       <motion.div
                         initial={{ opacity: 0, y: 12, filter: "blur(6px)" }}
                         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                        exit={{ opacity: 0, y: 8, filter: "blur(4px)" }}
+                        exit={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                         transition={{ delay: 0.08 + idx * 0.045, duration: 0.62, ease: EASE }}
                         className="flex items-center gap-2"
                       >
@@ -244,7 +243,7 @@ const Sidebar = ({ open, onToggle, onClose, onSearchOpen, activeSection, showTog
                             className="overflow-hidden"
                             initial={{ height: 0, opacity: 0 }}
                             animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
+                            exit={{ height: "auto", opacity: 1 }}
                             transition={{ duration: 0.42, ease: EASE_TEXT }}
                           >
                             {item.children?.map((child) => {
@@ -255,7 +254,7 @@ const Sidebar = ({ open, onToggle, onClose, onSearchOpen, activeSection, showTog
                                   key={child.id}
                                   initial={{ opacity: 0, y: 8, filter: "blur(4px)" }}
                                   animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                                  exit={{ opacity: 0, y: 6, filter: "blur(3px)" }}
+                                  exit={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                                   transition={{ delay: 0.03 + childIdx * 0.025, duration: 0.5, ease: EASE }}
                                   onClick={() => handleChildClick(child)}
                                   className={`block py-1.5 pl-6 text-left text-[28px] font-medium leading-none transition-colors duration-300 origin-left md:pl-4 md:text-sm md:leading-normal ${
@@ -283,7 +282,7 @@ const Sidebar = ({ open, onToggle, onClose, onSearchOpen, activeSection, showTog
               className="flex items-start justify-between gap-8 md:block"
               initial={{ opacity: 0, y: 16, scale: 0.94, filter: "blur(6px)" }}
               animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-              exit={{ opacity: 0, y: 12, scale: 0.96, filter: "blur(4px)" }}
+              exit={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
               transition={{ delay: 0.2, duration: 0.62, ease: EASE, filter: { duration: 0.66, delay: 0.24 } }}
             >
               <div>

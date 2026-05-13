@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useLocation } from "react-router-dom";
 import HeroSection from "@/components/HeroSection";
 import ProjectsSection from "@/components/ProjectsSection";
 import NewsSection from "@/components/NewsSection";
@@ -12,12 +13,14 @@ import ParallaxSection from "@/components/ParallaxSection";
 import Sidebar, { sitemapItems } from "@/components/Sidebar";
 import SiteHeader from "@/components/SiteHeader";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { scrollToPageSection } from "@/lib/scroll";
 
 const Index = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("hero");
   const isMobile = useIsMobile();
+  const location = useLocation();
 
   const handleSidebarToggle = () => {
     setSearchOpen(false);
@@ -48,6 +51,19 @@ const Index = () => {
 
     return () => observer.disconnect();
   }, []);
+
+  useEffect(() => {
+    const sectionId = location.hash.replace("#", "");
+    if (!sectionId) return;
+
+    const timers = [80, 360, 760].map((delay) =>
+      window.setTimeout(() => scrollToPageSection(sectionId), delay),
+    );
+
+    return () => {
+      timers.forEach((timer) => window.clearTimeout(timer));
+    };
+  }, [location.hash]);
 
   return (
     <div className="relative">

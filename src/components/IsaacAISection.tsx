@@ -25,14 +25,31 @@ const IsaacAISection = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const requestIdRef = useRef(0);
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const messageListRef = useRef<HTMLDivElement | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const pageScrollBeforeFocusRef = useRef(0);
+  const focusRestoreTimersRef = useRef<number[]>([]);
 
   const userMessageCount = countUserMessages(messages);
   const limitReached = isChatLimitReached(messages);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    const list = messageListRef.current;
+    if (!list) return;
+    list.scrollTo({ top: list.scrollHeight, behavior: "smooth" });
   }, [messages, isLoading]);
+
+  const clearFocusRestoreTimers = () => {
+    focusRestoreTimersRef.current.forEach((timer) => window.clearTimeout(timer));
+    focusRestoreTimersRef.current = [];
+  };
+
+  const restorePageScrollAfterFocus = () => {
+    clearFocusRestoreTimers();
+    const restore = () => window.scrollTo(0, pageScrollBeforeFocusRef.current);
+    window.requestAnimationFrame(restore);
+    focusRestoreTimersRef.current = [40, 120, 240, 420, 700].map((delay) => window.setTimeout(restore, delay));
+  };
 
   const askAssistant = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -88,52 +105,30 @@ const IsaacAISection = () => {
           Isaac AI
         </p>
 
-        <div className="flex h-[340px] w-full max-w-2xl flex-col bg-foreground/[0.035] text-left shadow-[0_0_70px_rgba(0,0,0,0.18)] transition-all duration-500 ease-out focus-within:bg-foreground/[0.045] md:h-[400px]">
-          <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 pb-3 pt-4 md:px-5 md:pt-5">
+        <div className="flex h-[340px] w-full max-w-2xl flex-col overflow-hidden rounded-[8px] border border-foreground/[0.08] bg-foreground/[0.035] text-left shadow-[0_24px_80px_rgba(0,0,0,0.22)] transition-all duration-500 ease-out focus-within:border-foreground/[0.14] focus-within:bg-foreground/[0.045] md:h-[400px]">
+          <div
+            ref={messageListRef}
+            className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain px-4 pb-3 pt-4 scrollbar-hide md:px-5 md:pt-5"
+          >
             {messages.map((message) => (
               <motion.div
                 key={message.id}
-                className={`max-w-[92%] px-3.5 py-3 ${
+                className={`max-w-[92%] rounded-[8px] px-3.5 py-3 shadow-[0_10px_28px_rgba(0,0,0,0.08)] ${
                   message.role === "user"
-                    ? "ml-auto bg-foreground/[0.08] text-foreground/75 md:max-w-[78%]"
-                    : "mr-auto bg-background/45 text-foreground/72 md:max-w-[84%]"
+                    ? "ml-auto bg-foreground text-background md:max-w-[78%]"
+                    : "mr-auto border border-foreground/[0.07] bg-background/55 text-foreground/78 md:max-w-[84%]"
                 }`}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.38, ease: EASE }}
               >
                 <p className="whitespace-pre-line text-[14px] leading-relaxed md:text-[15px]">{message.content}</p>
-
-                {message.role === "assistant" && message.sources?.length ? (
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {message.sources.slice(0, 4).map((source) =>
-                      source.url ? (
-                        <a
-                          key={source.id}
-                          href={source.url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="max-w-full truncate bg-foreground/[0.055] px-2.5 py-1.5 text-[10px] text-foreground/45 transition-colors hover:bg-foreground/[0.09] hover:text-foreground/65"
-                        >
-                          {source.title}
-                        </a>
-                      ) : (
-                        <span
-                          key={source.id}
-                          className="max-w-full truncate bg-foreground/[0.055] px-2.5 py-1.5 text-[10px] text-foreground/35"
-                        >
-                          {source.title}
-                        </span>
-                      ),
-                    )}
-                  </div>
-                ) : null}
               </motion.div>
             ))}
 
             {isLoading ? (
               <motion.div
-                className="mr-auto max-w-[84%] bg-background/45 px-3.5 py-3"
+                className="mr-auto max-w-[84%] rounded-[8px] border border-foreground/[0.07] bg-background/55 px-3.5 py-3"
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.38, ease: EASE }}
@@ -142,24 +137,37 @@ const IsaacAISection = () => {
                   {[0, 1, 2].map((dot) => (
                     <motion.span
                       key={dot}
-                      className="block h-1 w-1 bg-foreground/35"
-                      animate={{ opacity: [0.25, 1, 0.25] }}
+                      className="block h-1.5 w-1.5 rounded-full bg-foreground/45"
+                      animate={{ opacity: [0.25, 1, 0.25], y: [0, -2, 0] }}
                       transition={{ duration: 1, repeat: Infinity, delay: dot * 0.16 }}
                     />
                   ))}
                 </div>
               </motion.div>
             ) : null}
-            <div ref={messagesEndRef} />
           </div>
 
           <form
             onSubmit={askAssistant}
-            className="flex min-h-[70px] items-end gap-3 px-4 py-3 md:px-5"
+            className="flex min-h-[76px] items-end gap-3 border-t border-foreground/[0.07] bg-background/20 px-3 py-3 md:px-4"
           >
             <textarea
+              ref={textareaRef}
               value={query}
-              onChange={(event) => setQuery(event.target.value)}
+              onPointerDown={(event) => {
+                pageScrollBeforeFocusRef.current = window.scrollY;
+                if (document.activeElement !== textareaRef.current) {
+                  event.preventDefault();
+                  textareaRef.current?.focus({ preventScroll: true });
+                  restorePageScrollAfterFocus();
+                }
+              }}
+              onFocus={restorePageScrollAfterFocus}
+              onBlur={clearFocusRestoreTimers}
+              onChange={(event) => {
+                setQuery(event.target.value);
+                restorePageScrollAfterFocus();
+              }}
               onKeyDown={(event) => {
                 if (event.key === "Enter" && !event.shiftKey) {
                   event.preventDefault();
@@ -170,7 +178,7 @@ const IsaacAISection = () => {
               rows={1}
               disabled={limitReached}
               aria-label={`Message ${Math.min(userMessageCount + 1, MAX_CHAT_USER_MESSAGES)} of ${MAX_CHAT_USER_MESSAGES}`}
-              className="max-h-32 min-h-11 min-w-0 flex-1 resize-none bg-transparent py-3 text-sm leading-relaxed text-foreground outline-none placeholder:text-foreground/32 md:text-base"
+              className="max-h-32 min-h-11 min-w-0 flex-1 resize-none rounded-[8px] bg-foreground/[0.045] px-3.5 py-3 text-base leading-relaxed text-foreground outline-none transition-colors placeholder:text-foreground/36 focus:bg-foreground/[0.07]"
             />
             <span className="shrink-0 font-mono text-[9px] text-foreground/25" aria-hidden>
               {userMessageCount}/{MAX_CHAT_USER_MESSAGES}
@@ -178,7 +186,7 @@ const IsaacAISection = () => {
             <motion.button
               type="submit"
               disabled={!query.trim() || isLoading || limitReached}
-              className="flex h-11 w-11 shrink-0 items-center justify-center bg-[hsl(50_33%_7%)] text-white shadow-[0_10px_24px_rgba(18,24,14,0.24)] transition-colors hover:bg-[hsl(50_33%_12%)] disabled:pointer-events-none disabled:bg-foreground/12 disabled:text-foreground/32 disabled:shadow-none"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[8px] bg-[hsl(50_33%_7%)] text-white shadow-[0_10px_24px_rgba(18,24,14,0.24)] transition-colors hover:bg-[hsl(50_33%_12%)] disabled:pointer-events-none disabled:bg-foreground/12 disabled:text-foreground/32 disabled:shadow-none"
               whileHover={{ y: -2, scale: 1.04 }}
               whileTap={{ y: 0, scale: 0.94 }}
               transition={{ duration: 0.18, ease: EASE }}

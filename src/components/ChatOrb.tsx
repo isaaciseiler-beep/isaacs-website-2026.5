@@ -1,336 +1,99 @@
-import { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUp } from "lucide-react";
-import { hasSearchResults, searchSite } from "@/lib/searchIndex";
-import { askSiteAssistant, isChatLimitReached, MAX_CHAT_USER_MESSAGES } from "@/lib/chatClient";
-
-interface Message {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-}
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowUpRight } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { scrollToPageSection } from "@/lib/scroll";
 
 const DOT_SIZE = 36;
 const DOT_BOTTOM = 20;
 const DOT_RIGHT = 20;
 
-const fastSlowTransition = {
-  type: "spring" as const,
-  stiffness: 400,
-  damping: 32,
-  mass: 0.6,
-};
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 const ChatOrb = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
-  const [mode, setMode] = useState<"search" | "ai">("search");
-  const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [visible, setVisible] = useState(false);
   const [bottomOffset, setBottomOffset] = useState(DOT_BOTTOM);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const lastScrollY = useRef(0);
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  // Show orb after scrolling, and clamp to footer top
   useEffect(() => {
     const handleScroll = () => {
-      setIsVisible(window.scrollY > 10);
+      setVisible(window.scrollY > 10);
 
       const footer = document.getElementById("footer");
-      if (footer) {
-        const footerTop = footer.getBoundingClientRect().top;
-        const windowH = window.innerHeight;
-        if (footerTop < windowH) {
-          setBottomOffset(windowH - footerTop + DOT_BOTTOM);
-        } else {
-          setBottomOffset(DOT_BOTTOM);
-        }
+      if (!footer) {
+        setBottomOffset(DOT_BOTTOM);
+        return;
       }
+
+      const footerTop = footer.getBoundingClientRect().top;
+      const windowHeight = window.innerHeight;
+      setBottomOffset(footerTop < windowHeight ? windowHeight - footerTop + DOT_BOTTOM : DOT_BOTTOM);
     };
-    window.addEventListener("scroll", handleScroll, { passive: true });
+
     handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
+    };
   }, []);
 
-  // Collapse on scroll while open
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleScroll = () => {
-      if (Math.abs(window.scrollY - lastScrollY.current) > 2) {
-        setIsOpen(false);
-      }
-      lastScrollY.current = window.scrollY;
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (isOpen && inputRef.current) {
-      setTimeout(() => inputRef.current?.focus(), 300);
-    }
-    lastScrollY.current = window.scrollY;
-  }, [isOpen]);
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  const handleSend = async () => {
-    if (!input.trim()) return;
-    if (mode === "ai" && isChatLimitReached(messages)) return;
-
-    const userMsg: Message = { id: Date.now().toString(), role: "user", content: input.trim() };
-    const nextMessages = [...messages, userMsg];
-    setMessages(nextMessages);
-    setInput("");
-    setIsLoading(true);
-
-    if (mode === "search") {
-      const groups = searchSite(userMsg.content, 3);
-      const content = hasSearchResults(groups)
-        ? groups
-            .filter((group) => group.results.length)
-            .map((group) => `${group.label}: ${group.results.map((result) => result.title).join(", ")}`)
-            .join("\n")
-        : "No strong matches.";
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: (Date.now() + 1).toString(),
-          role: "assistant",
-          content,
-        },
-      ]);
-      setIsLoading(false);
+  const scrollToIsaacAI = () => {
+    if (location.pathname === "/") {
+      scrollToPageSection("isaac-ai");
       return;
     }
 
-    try {
-      const data = await askSiteAssistant(nextMessages.map(({ role, content }) => ({ role, content })));
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: (Date.now() + 1).toString(),
-          role: "assistant",
-          content: data.message || "The AI assistant is temporarily unavailable. Please try again shortly.",
-        },
-      ]);
-    } catch (error) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: (Date.now() + 1).toString(),
-          role: "assistant",
-          content: error instanceof Error ? error.message : "The AI assistant is temporarily unavailable. Please try again shortly.",
-        },
-      ]);
-    } finally {
-      setIsLoading(false);
-    }
+    navigate("/#isaac-ai");
   };
 
-  const softShadow = "0 6px 20px -6px rgba(0,0,0,0.35), 0 2px 6px rgba(0,0,0,0.18)";
+  const handleClick = () => {
+    if (!expanded) {
+      setExpanded(true);
+      return;
+    }
 
-  if (!isVisible && !isOpen) return null;
+    scrollToIsaacAI();
+  };
 
   return (
-    <>
-      {/* Closed: circle */}
-      <AnimatePresence>
-        {!isOpen && isVisible && (
-          <motion.button
-            className="fixed z-[60] flex items-center justify-center rounded-full"
-            style={{
-              bottom: bottomOffset,
-              right: DOT_RIGHT,
-              width: DOT_SIZE,
-              height: DOT_SIZE,
-              background: "hsl(var(--highlight))",
-              boxShadow: softShadow,
-            }}
-            onClick={() => setIsOpen(true)}
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: [1, 1.12, 1], opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
-            transition={{
-              opacity: { duration: 0.3 },
-              scale: { duration: 2.2, repeat: Infinity, ease: "easeInOut" },
-            }}
-            whileHover={{ scale: 1.18 }}
-            aria-label="Open chat"
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Open: morphs from circle */}
-      <AnimatePresence>
-        {isOpen && (
-          <>
-            <motion.div
-              className="fixed inset-0 z-[55]"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsOpen(false)}
-            />
-
-            <motion.div
-              className="fixed z-[60] flex flex-col items-stretch overflow-hidden"
-              style={{
-                bottom: bottomOffset,
-                right: DOT_RIGHT,
-                transformOrigin: "bottom right",
-              filter: "none",
-              }}
-              initial={{
-                width: DOT_SIZE,
-                height: DOT_SIZE,
-                borderRadius: DOT_SIZE / 2,
-                opacity: 0.8,
-              }}
-              animate={{
-                width: "min(80vw, 896px)",
-                height: "auto",
-                borderRadius: 0,
-                opacity: 1,
-              }}
-              exit={{
-                width: DOT_SIZE,
-                height: DOT_SIZE,
-                borderRadius: DOT_SIZE / 2,
-                opacity: 0,
-              }}
-              transition={fastSlowTransition}
-            >
-              {/* Conversation area */}
-              <AnimatePresence>
-                {messages.length > 0 && (
-                  <motion.div
-                    className="mb-2 h-[260px] w-full overflow-y-auto scrollbar-hide"
-                    style={{
-                      borderRadius: 24,
-                      background: "hsl(var(--background) / 0.35)",
-                      backdropFilter: "blur(40px)",
-                      WebkitBackdropFilter: "blur(40px)",
-                      boxShadow: "none",
-                    }}
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 260 }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={fastSlowTransition}
-                  >
-                    <div className="px-5 py-4 space-y-3">
-                      {messages.map((msg) => (
-                        <div
-                          key={msg.id}
-                          className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-                        >
-                          <p
-                            className={`text-xs leading-relaxed max-w-[85%] ${
-                              msg.role === "user"
-                                ? "text-foreground/90"
-                                : "text-foreground/60"
-                            }`}
-                          >
-                            {msg.content}
-                          </p>
-                        </div>
-                      ))}
-                      {isLoading && (
-                        <div className="flex justify-start">
-                          <div className="flex gap-1">
-                            {[0, 1, 2].map((i) => (
-                              <motion.div
-                                key={i}
-                                className="w-1 h-1 rounded-full bg-foreground/30"
-                                animate={{ opacity: [0.3, 1, 0.3] }}
-                                transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                      <div ref={messagesEndRef} />
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* Input pill */}
-              <div
-                className="w-full flex items-center gap-2 px-4"
-                style={{ borderRadius: 100, background: "hsl(var(--highlight))", boxShadow: "none", height: DOT_SIZE }}
-              >
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                  placeholder={mode === "ai" ? "Ask me anything…" : "Search my work…"}
-                  disabled={mode === "ai" && isChatLimitReached(messages)}
-                  className="flex-1 bg-transparent text-xs text-background placeholder:text-background/25 outline-none min-w-0"
-                />
-                <AnimatePresence>
-                  {mode === "ai" && input.trim() && !isChatLimitReached(messages) && (
-                    <motion.button
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      exit={{ scale: 0 }}
-                      onClick={handleSend}
-                      className="w-6 h-6 rounded-full bg-background flex items-center justify-center hover:opacity-80 transition-opacity shrink-0"
-                    >
-                      <ArrowUp className="w-3 h-3 text-foreground" />
-                    </motion.button>
-                  )}
-                </AnimatePresence>
-              </div>
-
-              {/* Mode buttons */}
-              <div className="w-full flex items-center justify-between mt-2.5 px-1">
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => setMode("search")}
-                    className={`pill-button !px-4 !py-1.5 !text-[10px] ${
-                      mode === "search" ? "opacity-100" : "opacity-30 hover:opacity-50"
-                    }`}
-                  >
-                    Search
-                  </button>
-                  <button
-                    onClick={() => setMode("ai")}
-                    className={`pill-button !px-4 !py-1.5 !text-[10px] ${
-                      mode === "ai" ? "opacity-100" : "opacity-30 hover:opacity-50"
-                    }`}
-                  >
-                    AI
-                  </button>
-                </div>
-                <AnimatePresence>
-                  {mode === "ai" && (
-                    <motion.p
-                      className="text-foreground/20"
-                      style={{ fontSize: 8 }}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      Grounded in public knowledge. May be inaccurate.
-                      {" "}
-                      {Math.min(messages.filter((message) => message.role === "user").length, MAX_CHAT_USER_MESSAGES)}/{MAX_CHAT_USER_MESSAGES}
-                    </motion.p>
-                  )}
-                </AnimatePresence>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-    </>
+    <AnimatePresence>
+      {visible ? (
+        <motion.button
+          type="button"
+          onClick={handleClick}
+          className="fixed z-[58] flex items-center justify-end overflow-hidden rounded-full bg-[hsl(var(--highlight))] text-[hsl(50_33%_7%)] shadow-[0_10px_28px_rgba(0,0,0,0.22)]"
+          style={{
+            bottom: bottomOffset,
+            right: DOT_RIGHT,
+            height: DOT_SIZE,
+            transformOrigin: "right center",
+          }}
+          initial={{ width: DOT_SIZE, scale: 0.84, opacity: 0 }}
+          animate={{ width: expanded ? 188 : DOT_SIZE, scale: 1, opacity: 1 }}
+          exit={{ width: DOT_SIZE, scale: 0.84, opacity: 0 }}
+          transition={{ duration: 0.46, ease: EASE }}
+          whileHover={{ scale: 1.04 }}
+          whileTap={{ scale: 0.96 }}
+          aria-label={expanded ? "Go to Isaac AI" : "Chat with Isaac AI"}
+        >
+          <motion.span
+            className="min-w-0 flex-1 whitespace-nowrap pl-4 pr-2 text-left text-xs font-semibold leading-none"
+            animate={{ opacity: expanded ? 1 : 0, x: expanded ? 0 : 8 }}
+            transition={{ duration: 0.24, ease: EASE }}
+            aria-hidden={!expanded}
+          >
+            Chat with Isaac AI
+          </motion.span>
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center">
+            <ArrowUpRight className="h-4 w-4" strokeWidth={1.7} />
+          </span>
+        </motion.button>
+      ) : null}
+    </AnimatePresence>
   );
 };
 

@@ -48,7 +48,6 @@ const ResultCard = ({
       ) : null}
       <div className="absolute inset-0 bg-[linear-gradient(to_top,hsl(50_33%_7%/0.94)_0%,hsl(50_33%_7%/0.66)_44%,hsl(68_100%_81%/0.10)_100%)]" />
       <div className="absolute inset-x-0 bottom-0 p-3">
-        <p className="mb-1 font-mono text-[9px] uppercase tracking-[0.24em] text-white/42">{result.subtitle}</p>
         <p className="text-lg font-semibold leading-none tracking-tight text-[#f3f6ff] transition-colors duration-300 group-hover:text-[hsl(var(--highlight))]">
           {result.title}
         </p>
@@ -61,48 +60,28 @@ const ResultCard = ({
   </motion.button>
 );
 
-export const SearchPanel = ({ open, onClose }: { open: boolean; onClose: () => void }) => {
-  const [query, setQuery] = useState("");
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  const navigate = useNavigate();
+interface SearchPanelProps {
+  groups: ReturnType<typeof searchSite>;
+  hasQuery: boolean;
+  hasResults: boolean;
+  onClose: () => void;
+  onSelect: (result: SearchResult) => void;
+  open: boolean;
+}
+
+export const SearchPanel = ({ groups, hasQuery, hasResults, onClose, onSelect, open }: SearchPanelProps) => {
   const isMobile = useIsMobile();
-  const groups = useMemo(() => searchSite(query, 5), [query]);
-  const trimmedQuery = query.trim();
-  const hasQuery = trimmedQuery.length > 0;
-  const hasResults = hasSearchResults(groups);
-  const firstResult = groups.find((group) => group.results.length)?.results[0];
 
   useEffect(() => {
     if (!open) return;
-    const timer = window.setTimeout(() => inputRef.current?.focus(), 180);
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
     };
     window.addEventListener("keydown", onKeyDown);
     return () => {
-      window.clearTimeout(timer);
       window.removeEventListener("keydown", onKeyDown);
     };
   }, [open, onClose]);
-
-  useEffect(() => {
-    if (!open) {
-      setQuery("");
-    }
-  }, [open]);
-
-  const handleSelect = (result: SearchResult) => {
-    onClose();
-    if (result.external) {
-      window.open(result.href, "_blank", "noopener,noreferrer");
-      return;
-    }
-    navigate(result.href);
-  };
-
-  const handleEnter = () => {
-    if (firstResult) handleSelect(firstResult);
-  };
 
   return (
     <AnimatePresence>
@@ -111,43 +90,14 @@ export const SearchPanel = ({ open, onClose }: { open: boolean; onClose: () => v
           <motion.div
             role="dialog"
             aria-label="Search"
-            className="site-sidebar-panel fixed inset-y-0 right-0 z-[85] isolate flex h-[100dvh] w-screen transform-gpu flex-col px-6 pb-[calc(env(safe-area-inset-bottom)+2rem)] pt-20 text-foreground will-change-transform md:w-[var(--site-panel-width)] md:py-20"
+            className="site-sidebar-panel fixed inset-y-0 right-0 z-[85] isolate flex h-[100dvh] w-screen transform-gpu flex-col px-6 pb-0 pt-20 text-foreground will-change-transform md:w-[var(--site-panel-width)] md:py-20 md:pb-0"
             initial={{ x: isMobile ? "100%" : 240 }}
             animate={{ x: 0, opacity: 1, filter: "blur(0px)" }}
             exit={{ x: isMobile ? "100%" : 240 }}
             transition={{ duration: 0.56, ease: EASE_TEXT }}
           >
-            <div className="flex min-h-9 shrink-0 items-center justify-end gap-2 md:min-h-[25px]">
-              <button
-                type="button"
-                onClick={onClose}
-                className="flex h-9 w-9 shrink-0 items-center justify-center text-foreground/35 transition-colors duration-200 hover:text-foreground md:h-[25px] md:w-[25px]"
-                aria-label="Close search"
-              >
-                <X className="h-5 w-5 md:h-3.5 md:w-3.5" strokeWidth={1.5} />
-              </button>
-              <motion.div
-                className="flex min-w-0 flex-1 origin-right items-center justify-end gap-2 overflow-hidden"
-                initial={{ width: 25, opacity: 0 }}
-                animate={{ width: "100%", opacity: 1 }}
-                exit={{ width: 25, opacity: 0 }}
-                transition={{ duration: 0.58, ease: EASE }}
-              >
-                <input
-                  ref={inputRef}
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter") handleEnter();
-                  }}
-                  placeholder="Search"
-                  className="min-w-0 flex-1 bg-transparent text-right text-[28px] font-medium leading-none text-foreground outline-none placeholder:text-foreground/30 md:text-sm md:leading-normal"
-                />
-                <Search className="h-5 w-5 shrink-0 text-foreground/45 md:h-3.5 md:w-3.5" strokeWidth={1.5} />
-              </motion.div>
-            </div>
-
-            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-4 pt-12 scrollbar-hide md:pt-14">
+            <div className="pointer-events-none absolute inset-x-0 top-20 z-10 h-12 bg-[linear-gradient(to_bottom,hsl(var(--background))_0%,hsl(var(--background)/0.82)_34%,hsl(var(--background)/0)_100%)] md:top-20" />
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-0 pt-5 scrollbar-hide md:pt-8">
               {!hasQuery ? null : (
                 <div>
                   {hasResults ? (
@@ -155,17 +105,14 @@ export const SearchPanel = ({ open, onClose }: { open: boolean; onClose: () => v
                       group.results.length ? (
                         <motion.section
                           key={group.category}
-                          className="pb-8 pt-5 first:pt-0"
+                          className="pb-5 pt-4 first:pt-0 last:pb-0"
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.58, ease: EASE, delay: 0.05 }}
                         >
-                          <div className="mb-3">
-                            <h2 className="font-mono text-[10px] uppercase tracking-[0.26em] text-foreground/45">{group.label}</h2>
-                          </div>
                           <div className="space-y-5">
                             {group.results.map((result, resultIndex) => (
-                              <ResultCard key={result.id} index={resultIndex} result={result} onSelect={handleSelect} />
+                              <ResultCard key={result.id} index={resultIndex} result={result} onSelect={onSelect} />
                             ))}
                           </div>
                         </motion.section>
@@ -197,8 +144,16 @@ const SearchTrigger = ({
   onOpenChange,
 }: SearchTriggerProps) => {
   const [internalOpen, setInternalOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const navigate = useNavigate();
   const isControlled = typeof open === "boolean";
   const panelOpen = isControlled ? open : internalOpen;
+  const groups = useMemo(() => searchSite(query, 5), [query]);
+  const trimmedQuery = query.trim();
+  const hasQuery = trimmedQuery.length > 0;
+  const hasResults = hasSearchResults(groups);
+  const firstResult = groups.find((group) => group.results.length)?.results[0];
 
   const setOpen = (nextOpen: boolean) => {
     if (!isControlled) setInternalOpen(nextOpen);
@@ -211,7 +166,29 @@ const SearchTrigger = ({
     setOpen(true);
   };
 
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setOpen(false);
+    setQuery("");
+  };
+
+  const handleSelect = (result: SearchResult) => {
+    handleClose();
+    if (result.external) {
+      window.open(result.href, "_blank", "noopener,noreferrer");
+      return;
+    }
+    navigate(result.href);
+  };
+
+  const handleEnter = () => {
+    if (firstResult) handleSelect(firstResult);
+  };
+
+  useEffect(() => {
+    if (!panelOpen || variant !== "header") return;
+    const timer = window.setTimeout(() => inputRef.current?.focus(), 160);
+    return () => window.clearTimeout(timer);
+  }, [panelOpen, variant]);
 
   return (
     <>
@@ -224,18 +201,68 @@ const SearchTrigger = ({
           <Search className="h-5 w-5 md:h-3.5 md:w-3.5" strokeWidth={1.5} />
           <span>Search</span>
         </button>
-      ) : !panelOpen ? (
-        <button
-          type="button"
-          onClick={handleOpen}
-          className={`site-nav-toggle-xray fixed right-6 top-4 z-[60] flex h-[25px] w-[25px] items-center justify-center transition-opacity duration-200 hover:opacity-70 ${className ?? ""}`}
-          style={style}
-          aria-label="Search"
-        >
-          <Search className="h-3.5 w-3.5" strokeWidth={1.65} />
-        </button>
+      ) : (
+        <AnimatePresence initial={false} mode="wait">
+          {!panelOpen ? (
+            <motion.button
+              key="search-button"
+              type="button"
+              onClick={handleOpen}
+              className={`site-nav-toggle-xray fixed right-6 top-4 z-[60] flex h-[25px] w-[25px] items-center justify-center transition-opacity duration-200 hover:opacity-70 ${className ?? ""}`}
+              style={style}
+              aria-label="Search"
+              initial={{ opacity: 1 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 1 }}
+              transition={{ duration: 0.18, ease: EASE }}
+            >
+              <Search className="h-3.5 w-3.5" strokeWidth={1.65} />
+            </motion.button>
+          ) : (
+            <motion.form
+              key="search-input"
+              onSubmit={(event) => {
+                event.preventDefault();
+                handleEnter();
+              }}
+              className={`site-header-search fixed right-6 top-4 z-[95] flex h-[25px] origin-right items-center gap-2 overflow-hidden ${className ?? ""}`}
+              style={style}
+              initial={{ width: 25 }}
+              animate={{ width: "min(22rem, calc(100vw - 8.5rem))" }}
+              exit={{ width: 25 }}
+              transition={{ duration: 0.58, ease: EASE }}
+            >
+              <Search className="h-3.5 w-3.5 shrink-0" strokeWidth={1.65} />
+              <input
+                ref={inputRef}
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search"
+                aria-label="Search query"
+                className="min-w-0 flex-1 bg-transparent text-right text-base font-medium leading-none text-inherit outline-none placeholder:text-current/35 md:text-sm"
+              />
+              <button
+                type="button"
+                onClick={handleClose}
+                className="flex h-[25px] w-[25px] shrink-0 items-center justify-center text-current/55 transition-opacity duration-200 hover:opacity-80"
+                aria-label="Close search"
+              >
+                <X className="h-3.5 w-3.5" strokeWidth={1.65} />
+              </button>
+            </motion.form>
+          )}
+        </AnimatePresence>
+      )}
+      {renderPanel ? (
+        <SearchPanel
+          groups={groups}
+          hasQuery={hasQuery}
+          hasResults={hasResults}
+          onClose={handleClose}
+          onSelect={handleSelect}
+          open={panelOpen}
+        />
       ) : null}
-      {renderPanel ? <SearchPanel open={panelOpen} onClose={handleClose} /> : null}
     </>
   );
 };

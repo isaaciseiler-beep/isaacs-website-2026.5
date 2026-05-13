@@ -11,6 +11,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const EASE_TEXT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const FLOAT_BOTTOM = 20;
+const BACK_TO_TOP_SCROLL_THRESHOLD = 72;
 
 const useCenteredInFrame = <T extends HTMLElement>(enabled: boolean) => {
   const ref = useRef<T | null>(null);
@@ -73,7 +74,6 @@ const ProjectCard = ({ project, index, isMobile, revealImmediately, onOpen }: Pr
           alt={project.title}
           loading={index < 4 ? "eager" : "lazy"}
           decoding="async"
-          fetchPriority={index < 2 ? "high" : "auto"}
           className="h-full w-full object-cover grayscale transition-all duration-500 md:group-hover:grayscale-0"
           animate={isMobile ? { filter: isColor ? "grayscale(0%)" : "grayscale(100%)" } : undefined}
           transition={{ duration: 0.6, ease: EASE }}
@@ -121,7 +121,7 @@ const ProjectsPage = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      setShowBackToTop(window.scrollY > window.innerHeight * 0.35);
+      setShowBackToTop(window.scrollY > BACK_TO_TOP_SCROLL_THRESHOLD);
 
       const footer = document.getElementById("footer");
       if (footer) {

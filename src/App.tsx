@@ -6,6 +6,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import ChatOrb from "@/components/ChatOrb";
 
 const Index = lazy(() => import("./pages/Index.tsx"));
 const PhotosPage = lazy(() => import("./pages/PhotosPage.tsx"));
@@ -61,6 +62,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <AnimatedRoutes />
+          <ChatOrb />
         </BrowserRouter>
       </TooltipProvider>
     </ThemeProvider>

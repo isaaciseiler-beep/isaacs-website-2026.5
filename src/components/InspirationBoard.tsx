@@ -356,31 +356,19 @@ const InspirationBoard = () => {
               style={{ scrollSnapType: "x mandatory", scrollPaddingLeft: 24 }}
             >
               {inspirationItems.map((item, i) => {
-              const baseW = 240;
-              const h = baseW / item.aspect;
-              return (
-                <motion.div
-                  key={item.id}
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-40px" }}
-                  transition={{ delay: i * 0.04, duration: 0.5, ease: EASE }}
-                  className="flex-shrink-0 cursor-pointer"
-                  style={{ width: baseW, height: h, scrollSnapAlign: "start" }}
-                  onClick={() => item.url && window.open(item.url, "_blank", "noopener,noreferrer")}
-                >
-                  {item.imageUrl ? (
-                    <img
-                      src={item.imageUrl}
-                      alt={item.title}
-                      className="w-full h-full object-contain grayscale hover:grayscale-0 transition-all duration-500"
-                      draggable={false}
-                    />
-                  ) : (
-                    renderCard(item)
-                  )}
-                </motion.div>
-              );
+                const baseW = 240;
+                const h = baseW / item.aspect;
+                return (
+                  <CarouselCard
+                    key={item.id}
+                    item={item}
+                    index={i}
+                    width={baseW}
+                    height={h}
+                    onOpen={() => item.url && window.open(item.url, "_blank", "noopener,noreferrer")}
+                    renderCard={renderCard}
+                  />
+                );
               })}
               <div className="flex-shrink-0 w-3" aria-hidden />
             </div>
@@ -472,6 +460,83 @@ const InspirationBoard = () => {
 };
 
 export default InspirationBoard;
+
+interface CarouselCardProps {
+  item: InspirationItem;
+  index: number;
+  width: number;
+  height: number;
+  onOpen: () => void;
+  renderCard: (item: InspirationItem) => React.ReactNode;
+}
+
+const CarouselCard = ({ item, index, width, height, onOpen, renderCard }: CarouselCardProps) => {
+  const rotX = useSpring(useMotionValue(0), { stiffness: 120, damping: 18, mass: 0.6 });
+  const rotY = useSpring(useMotionValue(0), { stiffness: 120, damping: 18, mass: 0.6 });
+  const [cornerHover, setCornerHover] = useState(false);
+
+  const isCorner = (e: React.PointerEvent<HTMLDivElement>) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    const nx = ((e.clientX - r.left) / r.width - 0.5) * 2;
+    const ny = ((e.clientY - r.top) / r.height - 0.5) * 2;
+    return Math.abs(nx) > 0.62 && Math.abs(ny) > 0.62;
+  };
+
+  const handleMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    setCornerHover(isCorner(e));
+    const r = e.currentTarget.getBoundingClientRect();
+    const nx = ((e.clientX - r.left) / r.width - 0.5) * 2;
+    const ny = ((e.clientY - r.top) / r.height - 0.5) * 2;
+    rotY.set(nx * 9);
+    rotX.set(-ny * 9);
+  };
+
+  const handleLeave = () => {
+    rotX.set(0);
+    rotY.set(0);
+    setCornerHover(false);
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ delay: index * 0.04, duration: 0.5, ease: EASE }}
+      className="flex-shrink-0 select-none"
+      style={{
+        width,
+        height,
+        scrollSnapAlign: "start",
+        cursor: cornerHover ? ROTATE_CURSOR : "pointer",
+        perspective: 800,
+      }}
+      onClick={onOpen}
+      onPointerMove={handleMove}
+      onPointerLeave={handleLeave}
+    >
+      <motion.div
+        className="h-full overflow-hidden"
+        style={{
+          rotateX: rotX,
+          rotateY: rotY,
+          transformStyle: "preserve-3d",
+        }}
+      >
+        {item.imageUrl ? (
+          <img
+            src={item.imageUrl}
+            alt={item.title}
+            className="h-full w-full object-contain grayscale transition-all duration-500 hover:grayscale-0"
+            draggable={false}
+          />
+        ) : (
+          renderCard(item)
+        )}
+      </motion.div>
+    </motion.div>
+  );
+};
 
 interface BoardCardProps {
   item: InspirationItem;
@@ -572,7 +637,7 @@ const BoardCard = ({ item, index, dragging, zIndex, cardOpacity, cardY, onPointe
       onPointerLeave={handleLeave}
     >
       <motion.div
-        className={`site-corner h-full overflow-hidden transition-shadow duration-300 ${item.transparent ? "" : "bg-background shadow-sm hover:shadow-md"}`}
+        className={`h-full overflow-hidden transition-shadow duration-300 ${item.transparent ? "" : "bg-background shadow-sm hover:shadow-md"}`}
         style={{
           rotateX: rotX,
           rotateY: rotY,

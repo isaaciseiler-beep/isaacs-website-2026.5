@@ -59,57 +59,57 @@ const NewsSection = () => {
       </div>
 
       <div className="relative">
-        <div
-          ref={scrollRef}
-          className="flex gap-[3px] overflow-x-auto scrollbar-hide px-6"
-          style={{ scrollSnapType: "x mandatory", scrollPaddingLeft: 24 }}
-        >
-          {newsItems.map((item, index) => (
-            <motion.a
-              key={item.id}
-              href={item.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="site-corner news-card group relative block flex-shrink-0 overflow-hidden bg-background"
-              style={{ width: "calc(40% - 2px)", scrollSnapAlign: "start", minWidth: 280 }}
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: "-20px" }}
-              transition={{ delay: index * 0.1, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <div className="relative aspect-[4/3] w-full overflow-hidden">
-                {item.imageUrl && (
-                  <img
-                    src={item.imageUrl}
-                    alt={item.title}
-                    className="absolute inset-0 h-full w-full object-cover grayscale transition-all duration-700 ease-out group-hover:scale-[1.02] group-hover:grayscale-0"
-                    loading="lazy"
-                  />
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-[hsl(50_33%_7%/0.94)] via-[hsl(50_33%_7%/0.48)] to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 p-5">
-                  <div className="mb-4 flex h-[30px] items-center">
+        <div className="site-corner mx-6 overflow-hidden">
+          <div
+            ref={scrollRef}
+            className="flex gap-[3px] overflow-x-auto scrollbar-hide"
+            style={{ scrollSnapType: "x mandatory" }}
+          >
+            {newsItems.map((item, index) => (
+              <motion.a
+                key={item.id}
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="news-card group relative block flex-shrink-0 overflow-hidden bg-background"
+                style={{ width: "calc(40% - 2px)", scrollSnapAlign: "start", minWidth: 280 }}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true, margin: "-20px" }}
+                transition={{ delay: index * 0.1, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <div className="relative aspect-[4/3] w-full overflow-hidden">
+                  {item.imageUrl && (
                     <img
-                      src={item.logoUrl}
-                      alt={item.logoAlt}
-                      className="h-full w-auto max-w-[120px] object-contain opacity-90 brightness-0 invert transition-opacity duration-200 group-hover:opacity-100"
+                      src={item.imageUrl}
+                      alt={item.title}
+                      className="absolute inset-0 h-full w-full object-cover grayscale transition-all duration-700 ease-out group-hover:scale-[1.02] group-hover:grayscale-0"
                       loading="lazy"
                     />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[hsl(50_33%_7%/0.94)] via-[hsl(50_33%_7%/0.48)] to-transparent" />
+                  <div className="absolute inset-x-0 bottom-0 p-5">
+                    <div className="mb-4 flex h-[30px] items-center">
+                      <img
+                        src={item.logoUrl}
+                        alt={item.logoAlt}
+                        className="h-full w-auto max-w-[120px] object-contain opacity-90 brightness-0 invert transition-opacity duration-200 group-hover:opacity-100"
+                        loading="lazy"
+                      />
+                    </div>
+                    <h3 className="news-card-title pr-8 text-base font-semibold leading-tight tracking-tight text-white transition-colors duration-200 md:text-lg">
+                      {item.title}
+                    </h3>
                   </div>
-                  <h3 className="news-card-title pr-8 text-base font-semibold leading-tight tracking-tight text-white transition-colors duration-200 md:text-lg">
-                    {item.title}
-                  </h3>
+                  <div className="absolute bottom-5 right-5">
+                    <span className="translate-x-[-4px] text-sm text-white/80 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:text-[hsl(var(--highlight))] group-hover:opacity-100">
+                      <ArrowUpRight className="h-4 w-4" />
+                    </span>
+                  </div>
                 </div>
-                <div className="absolute bottom-5 right-5">
-                  <span className="translate-x-[-4px] text-sm text-white/80 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:text-[hsl(var(--highlight))] group-hover:opacity-100">
-                    <ArrowUpRight className="h-4 w-4" />
-                  </span>
-                </div>
-              </div>
-            </motion.a>
-          ))}
-          {/* Spacer for right padding */}
-          <div className="flex-shrink-0 w-3" aria-hidden />
+              </motion.a>
+            ))}
+          </div>
         </div>
 
 

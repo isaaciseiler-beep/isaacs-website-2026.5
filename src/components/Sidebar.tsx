@@ -39,7 +39,7 @@ const ThemeSwitch = () => {
               }
               setTheme(opt.value);
             }}
-            className={`w-10 h-10 flex items-center justify-center transition-colors duration-300 ${
+            className={`site-corner flex h-10 w-10 items-center justify-center transition-colors duration-300 ${
               active ? "bg-foreground text-background" : "bg-foreground/10 text-foreground hover:bg-foreground/20"
             }`}
             aria-label={opt.label}
@@ -174,7 +174,7 @@ const Sidebar = ({ open, onToggle, onClose, onSearchOpen, activeSection, showTog
       {showToggle ? (
         <motion.button
           onClick={onToggle}
-          className="h-5 w-5 flex items-center justify-center text-foreground hover:text-foreground/60 transition-colors duration-200 relative z-[60]"
+          className="site-corner relative z-[60] flex h-5 w-5 items-center justify-center text-foreground transition-colors duration-200 hover:text-foreground/60"
           aria-label="Toggle menu"
           animate={{ rotate: open ? 180 : 0 }}
           transition={{ duration: 0.3, ease: EASE_TEXT }}
@@ -225,7 +225,7 @@ const Sidebar = ({ open, onToggle, onClose, onSearchOpen, activeSection, showTog
                             aria-label={`${expanded ? "Collapse" : "Expand"} ${item.label} links`}
                             aria-expanded={expanded}
                             aria-controls={`sidebar-${item.id}-children`}
-                            className={`flex h-7 w-7 items-center justify-center transition-colors duration-300 md:h-5 md:w-5 ${
+                            className={`site-corner flex h-7 w-7 items-center justify-center transition-colors duration-300 md:h-5 md:w-5 ${
                               active ? "text-foreground" : "text-foreground/30 hover:text-foreground/60"
                             }`}
                             animate={{ rotate: expanded ? 90 : 0 }}
@@ -290,7 +290,7 @@ const Sidebar = ({ open, onToggle, onClose, onSearchOpen, activeSection, showTog
                 <div className="flex w-fit gap-2">
                   <button
                     onClick={() => { window.location.href = CONTACT_MAILTO; }}
-                    className="w-10 h-10 bg-foreground/10 hover:bg-foreground/20 text-foreground flex items-center justify-center transition-colors duration-300"
+                    className="site-corner flex h-10 w-10 items-center justify-center bg-foreground/10 text-foreground transition-colors duration-300 hover:bg-foreground/20"
                     aria-label="Contact"
                   >
                     <Mail className="w-4 h-4" />
@@ -299,7 +299,7 @@ const Sidebar = ({ open, onToggle, onClose, onSearchOpen, activeSection, showTog
                     <button
                       key={link.id}
                       onClick={() => handleSocialClick(link.href)}
-                      className="w-10 h-10 bg-foreground/10 hover:bg-foreground/20 text-foreground flex items-center justify-center transition-colors duration-300"
+                      className="site-corner flex h-10 w-10 items-center justify-center bg-foreground/10 text-foreground transition-colors duration-300 hover:bg-foreground/20"
                       aria-label={link.label}
                     >
                       {link.icon}

@@ -20,6 +20,7 @@ const SITE_CHUNKS: KnowledgeChunk[] = [
     source: "Website bio",
     content:
       "Isaac Seiler is a recent WashU graduate, Fulbright and Truman Scholar, and member of OpenAI's ChatGPT Lab. He has managed communications for a Member of Congress, published work with OpenAI, built a congressional office, founded a consultancy, and conducted international research on the social and material impacts of AI and the Internet. He is currently in the market for tech roles starting Summer 2026.",
+    url: "/#about",
   },
   {
     id: "state-ai-index",
@@ -27,6 +28,7 @@ const SITE_CHUNKS: KnowledgeChunk[] = [
     source: "Project",
     content:
       "A 2025 research project published with the Council of State Governments. Isaac built a public-information benchmark scoring all states and territories on generative AI adoption signals including employee guidance, training, sandboxes, pilots, governance structures, and transparency. The work included a 15-criteria GenAI Preparedness Score, composite scoring, state-by-state analysis, rankings, synopses, and a policy roadmap. Most states scored below 50/100 and only a small handful cleared 80.",
+    url: "/projects/artificial-intelligence-in-state-government-index",
   },
   {
     id: "congressional-office-report",
@@ -34,6 +36,7 @@ const SITE_CHUNKS: KnowledgeChunk[] = [
     source: "Project",
     content:
       "A 2025 work project capturing the systems, staffing, and benchmarks used to stand up a brand-new congressional office from zero. Isaac helped design internal systems, set priorities, define success, collect and verify office-wide metrics, summarize qualitative and quantitative wins, design the final report, and coordinate its release to media and stakeholders.",
+    url: "/projects/congressional-office-setup-100-day-report",
   },
   {
     id: "journalism-thesis",
@@ -41,6 +44,23 @@ const SITE_CHUNKS: KnowledgeChunk[] = [
     source: "Project",
     content:
       "A 2025 qualitative honors thesis on the structural decline of local journalism in Australia and its implications for democratic accountability, labor, and media policy. Isaac conducted 17 in-depth interviews with journalists, editors, newsroom owners, and industry experts, then handled literature review, recruitment, transcription verification, qualitative coding, and thematic analysis.",
+    url: "/projects/senior-thesis-local-journalism",
+  },
+  {
+    id: "stl-philanthropy",
+    title: "Raised $20k for Local St. Louis Organizations",
+    source: "Project",
+    content:
+      "A 2025 student-led philanthropy project through WashU's Philanthropy Lab. Isaac's team focused on immigrant and refugee support, evaluated St. Louis nonprofits, and contributed to a broader grantmaking process that moved real dollars to local organizations including Casa de Salud.",
+    url: "/projects/stl-immigrant-refugee-support-grant-process",
+  },
+  {
+    id: "ai-educator-workshop",
+    title: "Education Conference Presentation on AI Applications",
+    source: "Project",
+    content:
+      "A 2025 educator-facing AI literacy presentation translating AI concepts into classroom and planning applications. Isaac framed AI as practical support for planning, differentiation, feedback, and student exploration while keeping teacher judgment central.",
+    url: "/projects/ai-literacy-workshop-for-educators",
   },
   {
     id: "ev-analysis",
@@ -48,6 +68,7 @@ const SITE_CHUNKS: KnowledgeChunk[] = [
     source: "Project",
     content:
       "A 2024 GIS and quantitative analysis project examining EV infrastructure access and charger gaps. Isaac worked with spatial datasets covering population, infrastructure, and policy variables, focusing on data cleaning, spatial joins, statistical interpretation, maps, charts, and written analysis. Findings included weak relationships between charger proximity and income or race in the studied geographies, with regional and urban-rural charger gaps.",
+    url: "/projects/electric-vehicle-access-analysis",
   },
   {
     id: "campaign-consultancy",
@@ -55,7 +76,7 @@ const SITE_CHUNKS: KnowledgeChunk[] = [
     source: "Project",
     content:
       "A 2024 independent consultancy supporting local and federal candidates through campaign websites, digital strategy, and rapid-response communications. Isaac led digital and communications strategy for Allyson Damikolas for Tustin Unified School Board, including website strategy, social media messaging, content design, crisis communications, and campaign narrative positioning.",
-    url: "https://www.allysonfortustin.com/",
+    url: "/projects/communications-consultancy-supporting-local-candidates",
   },
   {
     id: "fulbright-chatgpt-lab",
@@ -63,7 +84,7 @@ const SITE_CHUNKS: KnowledgeChunk[] = [
     source: "Project",
     content:
       "A 2025 six-session educator lab with OpenAI/ChatGPT for Education support. Isaac founded and led the Fulbright Taiwan ChatGPT Lab, bringing Fulbright educators together to explore practical, responsible uses of ChatGPT in education. He facilitated six sessions, designed curriculum, and produced nine lightweight educator use cases summarized in a published ChatGPT for Education post.",
-    url: "https://edunewsletter.openai.com/p/top-chats-from-the-fulbright-taiwan",
+    url: "/projects/fulbright-focus-group-sponsored-by-openai",
   },
   {
     id: "political-reporting",
@@ -71,6 +92,7 @@ const SITE_CHUNKS: KnowledgeChunk[] = [
     source: "Project",
     content:
       "Student political reporting focused on protest, campus governance, elections, and institutional accountability. Isaac covered politics and power on campus, including suspended student protesters, racist text messages after the 2024 election, free speech and protest, climate anxiety, civic engagement, and university governance.",
+    url: "/projects/political-reporting-at-washu",
   },
   {
     id: "boehringer-rebrand",
@@ -78,7 +100,7 @@ const SITE_CHUNKS: KnowledgeChunk[] = [
     source: "Project",
     content:
       "A 2025 full rebrand and strategic redirect for Boehringer Cares. Isaac helped lead visual design and strategy, clarified the foundation's direction and narrative, contributed to a new website and identity, shipped more than 25 assets, built a newsletter system with an 80% open rate, and helped increase employee volunteering by 25% in 2025.",
-    url: "https://www.boehringer-ingelheim.com/us/boehringer-ingelheim-cares-foundation",
+    url: "/projects/boehringer-cares-foundation-rebrand-strategy-shift",
   },
   {
     id: "inn-index",
@@ -86,7 +108,7 @@ const SITE_CHUNKS: KnowledgeChunk[] = [
     source: "Project",
     content:
       "A large-scale nonprofit news research project involving data collection, survey synthesis, and stakeholder outreach. Isaac contributed to qualitative and quantitative components, collected and cleaned data, synthesized survey responses, and contacted respondents.",
-    url: "https://inn.org/research/inn-index/inn-index-2022/about-the-index/",
+    url: "/projects/2022-institute-for-nonprofit-news-index-survey",
   },
   {
     id: "meijer-reporting",
@@ -94,6 +116,7 @@ const SITE_CHUNKS: KnowledgeChunk[] = [
     source: "Project",
     content:
       "Early political reporting for The Calvin Chimes on then-Congressman Peter Meijer after his vote to impeach President Trump. Isaac conducted direct interviews and covered intra-party backlash, policy positions, and the risks facing a first-term member of Congress.",
+    url: "/projects/exclusive-interview-with-high-visibility-congressperson",
   },
   {
     id: "sustainable-development",
@@ -101,6 +124,103 @@ const SITE_CHUNKS: KnowledgeChunk[] = [
     source: "Project",
     content:
       "A 2024 project at Boehringer Ingelheim focused on health access policy, sustainable development strategy, communications, and operations. Isaac helped shape the narrative around health access, authored an internal report, and supported operations around the Sustainable Development Excellence program.",
+    url: "/projects/sustainable-development-health-access-report",
+  },
+  {
+    id: "news-openai-educator-lab",
+    title: "Conducted OpenAI-supported Education Focus Group",
+    source: "News",
+    content:
+      "A ChatGPT for Education news item about Isaac's OpenAI-supported Fulbright Taiwan educator lab, focused on practical ChatGPT use cases for educators.",
+    url: "/#news",
+  },
+  {
+    id: "news-truman-forbes",
+    title: "Featured 2024 Truman Scholars",
+    source: "News",
+    content:
+      "A Forbes news item featuring the 2024 Truman Scholars, including Isaac. Useful for recruiter questions about national recognition, public service, and scholarship credentials.",
+    url: "/#news",
+  },
+  {
+    id: "news-openai-product-feedback",
+    title: "Shared Early Product Feedback with OpenAI",
+    source: "News",
+    content:
+      "A site news item about Isaac sharing early product feedback with OpenAI through the ChatGPT Lab context. Use careful public phrasing and avoid claiming private details.",
+    url: "/#news",
+  },
+  {
+    id: "news-washu-truman",
+    title: "Won 2024 Truman Scholarship",
+    source: "News",
+    content:
+      "A Washington University news item about Isaac winning the 2024 Truman Scholarship, tied to public service, civil liberties, and academic recognition.",
+    url: "/#news",
+  },
+  {
+    id: "news-openai-100-chats",
+    title: "Contributed to 100 Chats Project with the ChatGPT Lab",
+    source: "News",
+    content:
+      "An OpenAI/ChatGPT news item about Isaac contributing to the 100 Chats project as part of ChatGPT Lab, showing practical student uses of ChatGPT.",
+    url: "/#news",
+  },
+  {
+    id: "news-rhodes-finalist",
+    title: "Named 2024 Rhodes Scholarship Finalist",
+    source: "News",
+    content:
+      "A Washington University news item about Isaac being named a 2024 Rhodes Scholarship finalist, relevant to academic distinction and public-interest work.",
+    url: "/#news",
+  },
+  {
+    id: "news-fulbright-taiwan",
+    title: "Won Fulbright Award to Taiwan",
+    source: "News",
+    content:
+      "A Washington University news item about Isaac earning a Fulbright award to Taiwan, relevant to education, cross-cultural work, and AI literacy programming.",
+    url: "/#news",
+  },
+  {
+    id: "news-openai-study-mode",
+    title: "Study Mode Spotlight on ChatGPT's Instagram",
+    source: "News",
+    content:
+      "An OpenAI social news item spotlighting Isaac in connection with Study Mode and student learning use cases.",
+    url: "/#news",
+  },
+  {
+    id: "news-openai-pulse",
+    title: "Testimonial Featured in ChatGPT Pulse Launch",
+    source: "News",
+    content:
+      "An OpenAI news item featuring Isaac's testimonial in the ChatGPT Pulse launch, relevant to proactive AI, planning workflows, and user feedback.",
+    url: "/#news",
+  },
+  {
+    id: "news-openai-browser-feedback",
+    title: "Shared Early Browser Product Feedback with OpenAI",
+    source: "News",
+    content:
+      "A site news item about Isaac sharing early browser product feedback with OpenAI. Keep wording careful and public.",
+    url: "/#news",
+  },
+  {
+    id: "news-photo-award",
+    title: "Won Award for Best College Newspaper Photography",
+    source: "News",
+    content:
+      "A Missouri College Media Awards news item about Isaac's student newspaper photography recognition.",
+    url: "/#news",
+  },
+  {
+    id: "news-washu-profile",
+    title: "University Profile",
+    source: "News",
+    content:
+      "A Washington University profile of Isaac covering his public-service interests, academic path, and recognitions.",
+    url: "/#news",
   },
 ];
 

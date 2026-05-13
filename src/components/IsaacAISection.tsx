@@ -18,12 +18,132 @@ interface ChatMessage extends ChatRequestMessage {
 }
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
+const TYPE_INTERVAL_MS = 14;
 
 const createMessageId = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
+const isExternalHref = (href: string) => /^https?:\/\//i.test(href);
+
+const isSafeHref = (href: string) =>
+  href.startsWith("/") || href.startsWith("#") || href.startsWith("mailto:") || isExternalHref(href);
+
+const renderInlineText = (text: string) => {
+  const nodes: (string | JSX.Element)[] = [];
+  const markdownLinkPattern = /\[([^\]]+)\]\(([^)\s]+)\)/g;
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = markdownLinkPattern.exec(text))) {
+    const [fullMatch, label, href] = match;
+    if (match.index > lastIndex) nodes.push(text.slice(lastIndex, match.index));
+
+    if (isSafeHref(href)) {
+      nodes.push(
+        <a
+          key={`${href}-${match.index}`}
+          href={href}
+          {...(isExternalHref(href) ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+          className="text-foreground underline decoration-foreground/20 underline-offset-4 transition-colors hover:decoration-foreground/60"
+        >
+          {label}
+        </a>,
+      );
+    } else {
+      nodes.push(label);
+    }
+
+    lastIndex = match.index + fullMatch.length;
+  }
+
+  if (lastIndex < text.length) nodes.push(text.slice(lastIndex));
+  return nodes;
+};
+
+const FormattedMessage = ({ text, cursor = false }: { text: string; cursor?: boolean }) => {
+  const lines = text.split("\n");
+
+  return (
+    <div className="space-y-2 text-[14px] leading-relaxed md:text-[15px]">
+      {lines.map((line, index) => {
+        const trimmed = line.trim();
+        const bulletText = trimmed.replace(/^([-*•]|\d+[.)])\s+/, "");
+        const isBullet = bulletText !== trimmed;
+        const showCursor = cursor && index === lines.length - 1;
+
+        if (!trimmed) return <div key={index} className="h-1" aria-hidden />;
+
+        if (isBullet) {
+          return (
+            <div key={index} className="flex gap-2.5">
+              <span className="mt-[0.62em] h-1 w-1 shrink-0 rounded-full bg-foreground/42" aria-hidden />
+              <span>
+                {renderInlineText(bulletText)}
+                {showCursor ? <span className="ml-0.5 inline-block h-4 w-px translate-y-0.5 animate-pulse bg-foreground/50" /> : null}
+              </span>
+            </div>
+          );
+        }
+
+        return (
+          <p key={index}>
+            {renderInlineText(trimmed)}
+            {showCursor ? <span className="ml-0.5 inline-block h-4 w-px translate-y-0.5 animate-pulse bg-foreground/50" /> : null}
+          </p>
+        );
+      })}
+    </div>
+  );
+};
+
+const AssistantMessage = ({ message, active }: { message: ChatMessage; active: boolean }) => {
+  const [visibleText, setVisibleText] = useState(active ? "" : message.content);
+  const isComplete = visibleText.length >= message.content.length;
+  const linkedSources = (message.sources || []).filter((source) => source.url).slice(0, 3);
+
+  useEffect(() => {
+    if (!active) {
+      setVisibleText(message.content);
+      return;
+    }
+
+    let index = 0;
+    const step = message.content.length > 420 ? 4 : message.content.length > 220 ? 2 : 1;
+
+    setVisibleText("");
+    const interval = window.setInterval(() => {
+      index = Math.min(index + step, message.content.length);
+      setVisibleText(message.content.slice(0, index));
+      if (index >= message.content.length) window.clearInterval(interval);
+    }, TYPE_INTERVAL_MS);
+
+    return () => window.clearInterval(interval);
+  }, [active, message.content]);
+
+  return (
+    <div className="mr-auto max-w-[92%] text-foreground/82 md:max-w-[84%]">
+      <FormattedMessage text={visibleText} cursor={active && !isComplete} />
+      {isComplete && linkedSources.length ? (
+        <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[9px] uppercase tracking-[0.16em] text-foreground/34">
+          <span>Related</span>
+          {linkedSources.map((source) => (
+            <a
+              key={`${source.id}-${source.url}`}
+              href={source.url}
+              {...(source.url && isExternalHref(source.url) ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+              className="normal-case tracking-normal text-foreground/54 underline decoration-foreground/12 underline-offset-4 transition-colors hover:text-foreground hover:decoration-foreground/45"
+            >
+              {source.title}
+            </a>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+};
+
 const TypingSignal = () => (
   <motion.div
-    className="relative h-9 w-[104px] overflow-hidden rounded-[8px] border border-foreground/[0.08] bg-background/60 px-3"
+    className="relative h-9 w-[104px] overflow-hidden px-3"
     initial={{ opacity: 0, y: 8 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.38, ease: EASE }}
@@ -38,7 +158,7 @@ const TypingSignal = () => (
       {[0, 1, 2].map((dot) => (
         <motion.span
           key={dot}
-          className="block h-2 w-2 rounded-[2px] bg-foreground/48 shadow-[0_0_18px_hsl(var(--highlight)/0.24)]"
+          className="block h-2 w-2 rounded-[2px] bg-foreground/54 shadow-[0_0_18px_hsl(var(--highlight)/0.2)]"
           animate={{
             opacity: [0.28, 1, 0.28],
             rotate: [0, 12, 0],
@@ -61,6 +181,7 @@ const IsaacAISection = () => {
   const [query, setQuery] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [typingMessageId, setTypingMessageId] = useState<string | null>(null);
   const headingRef = useRef<HTMLDivElement | null>(null);
   const requestIdRef = useRef(0);
   const messageListRef = useRef<HTMLDivElement | null>(null);
@@ -102,37 +223,42 @@ const IsaacAISection = () => {
     setMessages(nextMessages);
     setQuery("");
     setIsLoading(true);
+    setTypingMessageId(null);
 
     try {
       const data = await askSiteAssistant(nextMessages.map(({ role, content }) => ({ role, content })));
       if (requestIdRef.current !== requestId) return;
+      const assistantMessageId = createMessageId();
 
       setMessages((current) => [
         ...current,
         {
-          id: createMessageId(),
+          id: assistantMessageId,
           role: "assistant",
           content: data.message || "The AI assistant is temporarily unavailable. Please try again shortly.",
           sources: data.sources || [],
         },
       ]);
+      setTypingMessageId(assistantMessageId);
     } catch (error) {
       if (requestIdRef.current !== requestId) return;
+      const assistantMessageId = createMessageId();
       setMessages((current) => [
         ...current,
         {
-          id: createMessageId(),
+          id: assistantMessageId,
           role: "assistant",
           content: error instanceof Error ? error.message : "The AI assistant is temporarily unavailable. Please try again shortly.",
         },
       ]);
+      setTypingMessageId(assistantMessageId);
     } finally {
       if (requestIdRef.current === requestId) setIsLoading(false);
     }
   };
 
   return (
-    <section className="relative z-20 flex items-start px-6 pb-14 pt-12 md:pb-16 md:pt-16">
+    <section className="relative z-20 flex items-start px-6 pb-24 pt-12 md:pb-28 md:pt-16">
       <motion.div
         className="mx-auto flex w-full max-w-3xl flex-col items-center text-center"
         initial={{ opacity: 0, y: 18 }}
@@ -157,7 +283,7 @@ const IsaacAISection = () => {
           />
         </div>
 
-        <div className="group/ai relative isolate flex h-[340px] w-full max-w-2xl flex-col overflow-hidden rounded-[8px] border border-foreground/[0.08] bg-foreground/[0.035] text-left shadow-[0_24px_80px_rgba(0,0,0,0.22)] transition-all duration-500 ease-out hover:border-foreground/[0.12] focus-within:border-foreground/[0.16] focus-within:bg-foreground/[0.045] focus-within:shadow-[0_30px_96px_rgba(0,0,0,0.3)] md:h-[400px]">
+        <div className="site-corner group/ai relative isolate flex h-[340px] w-full max-w-2xl flex-col overflow-hidden border border-foreground/[0.08] bg-foreground/[0.035] text-left shadow-[0_18px_54px_rgba(0,0,0,0.18)] transition-all duration-500 ease-out hover:border-foreground/[0.12] focus-within:border-foreground/[0.16] focus-within:bg-foreground/[0.045] focus-within:shadow-[0_22px_62px_rgba(0,0,0,0.22)] md:h-[400px]">
           <motion.div
             className="pointer-events-none absolute inset-x-0 top-0 z-10 h-px bg-[linear-gradient(90deg,transparent,hsl(var(--highlight)/0.82),transparent)]"
             animate={{ x: ["-55%", "55%"], opacity: [0.15, 0.9, 0.15] }}
@@ -171,17 +297,20 @@ const IsaacAISection = () => {
             {messages.map((message) => (
               <motion.div
                 key={message.id}
-                className={`max-w-[92%] rounded-[8px] px-3.5 py-3 shadow-[0_10px_28px_rgba(0,0,0,0.08)] transition-colors duration-300 ${
+                className={
                   message.role === "user"
-                    ? "ml-auto bg-foreground text-background hover:bg-[hsl(var(--highlight))] md:max-w-[78%]"
-                    : "mr-auto border border-foreground/[0.07] bg-background/55 text-foreground/78 hover:border-foreground/[0.12] hover:bg-background/72 md:max-w-[84%]"
-                }`}
+                    ? "site-corner ml-auto max-w-[92%] border border-foreground/10 bg-foreground px-3.5 py-3 text-background shadow-[0_10px_28px_rgba(0,0,0,0.08)] md:max-w-[78%]"
+                    : "mr-auto max-w-[92%] py-1 md:max-w-[84%]"
+                }
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                whileHover={{ y: -1 }}
                 transition={{ duration: 0.38, ease: EASE }}
               >
-                <p className="whitespace-pre-line text-[14px] leading-relaxed md:text-[15px]">{message.content}</p>
+                {message.role === "user" ? (
+                  <p className="whitespace-pre-line text-[14px] leading-relaxed md:text-[15px]">{message.content}</p>
+                ) : (
+                  <AssistantMessage message={message} active={typingMessageId === message.id} />
+                )}
               </motion.div>
             ))}
 
@@ -223,7 +352,7 @@ const IsaacAISection = () => {
               rows={1}
               disabled={limitReached}
               aria-label={`Message ${Math.min(userMessageCount + 1, MAX_CHAT_USER_MESSAGES)} of ${MAX_CHAT_USER_MESSAGES}`}
-              className="max-h-32 min-h-11 min-w-0 flex-1 resize-none rounded-[8px] bg-foreground/[0.045] px-3.5 py-3 text-base leading-relaxed text-foreground outline-none transition-colors placeholder:text-foreground/36 focus:bg-foreground/[0.07]"
+              className="site-corner max-h-32 min-h-11 min-w-0 flex-1 resize-none bg-foreground/[0.045] px-3.5 py-3 text-base leading-relaxed text-foreground outline-none transition-colors placeholder:text-foreground/36 focus:bg-foreground/[0.07]"
             />
             <span className="shrink-0 font-mono text-[9px] text-foreground/25" aria-hidden>
               {userMessageCount}/{MAX_CHAT_USER_MESSAGES}
@@ -231,7 +360,7 @@ const IsaacAISection = () => {
             <motion.button
               type="submit"
               disabled={!query.trim() || isLoading || limitReached}
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[8px] bg-[hsl(50_33%_7%)] text-white shadow-[0_10px_24px_rgba(18,24,14,0.24)] transition-colors hover:bg-[hsl(50_33%_12%)] disabled:pointer-events-none disabled:bg-foreground/12 disabled:text-foreground/32 disabled:shadow-none"
+              className="site-corner flex h-11 w-11 shrink-0 items-center justify-center bg-[hsl(50_33%_7%)] text-white shadow-[0_10px_24px_rgba(18,24,14,0.24)] transition-colors hover:bg-[hsl(50_33%_12%)] disabled:pointer-events-none disabled:bg-foreground/12 disabled:text-foreground/32 disabled:shadow-none"
               whileHover={{ y: -2, scale: 1.04 }}
               whileTap={{ y: 0, scale: 0.94 }}
               transition={{ duration: 0.18, ease: EASE }}

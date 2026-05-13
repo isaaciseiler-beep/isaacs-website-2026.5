@@ -8,6 +8,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 
 const EASE: [number, number, number, number] = [0.19, 1, 0.22, 1];
 const EASE_TEXT: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const SEARCH_BAR_TRANSITION = { duration: 0.68, ease: EASE };
 
 interface SearchTriggerProps {
   variant?: "header" | "sidebar";
@@ -230,14 +231,16 @@ const SearchTrigger = ({
                 event.preventDefault();
                 handleEnter();
               }}
-              className={`site-header-search fixed right-6 top-4 z-[95] flex h-[25px] origin-right items-center gap-2 overflow-hidden ${className ?? ""}`}
+              className={`site-header-search fixed right-6 top-4 z-[95] flex h-[25px] origin-right items-center gap-2 overflow-hidden will-change-[width] ${className ?? ""}`}
               style={style}
               initial={{ width: 25 }}
               animate={{ width: expandedSearchWidth }}
               exit={{ width: 25 }}
-              transition={{ duration: 0.58, ease: EASE }}
+              transition={SEARCH_BAR_TRANSITION}
             >
-              <Search className="h-3.5 w-3.5 shrink-0" strokeWidth={1.65} />
+              <span className="flex h-[25px] w-[25px] shrink-0 items-center justify-center">
+                <Search className="h-3.5 w-3.5" strokeWidth={1.65} />
+              </span>
               <input
                 ref={inputRef}
                 value={query}

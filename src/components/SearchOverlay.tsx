@@ -150,6 +150,7 @@ const SearchTrigger = ({
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement | null>(null);
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const isControlled = typeof open === "boolean";
   const panelOpen = isControlled ? open : internalOpen;
   const groups = useMemo(() => searchSite(query, 5), [query]);

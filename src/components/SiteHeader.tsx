@@ -4,6 +4,7 @@ import { ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import Logo from "@/components/Logo";
 import SearchTrigger from "@/components/SearchOverlay";
+import { useTheme } from "@/components/ThemeProvider";
 
 const EASE_TEXT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -54,9 +55,11 @@ const backgroundAtPoint = (x: number, y: number, header: HTMLElement | null) => 
 const SiteHeader = ({ open, onToggle, searchOpen, onSearchOpen, onSearchClose }: SiteHeaderProps) => {
   const headerRef = useRef<HTMLDivElement | null>(null);
   const [ink, setInk] = useState("rgb(255 255 255)");
+  const { theme } = useTheme();
 
   useEffect(() => {
     let frame = 0;
+    const timers: number[] = [];
 
     const updateInk = () => {
       frame = 0;
@@ -81,15 +84,24 @@ const SiteHeader = ({ open, onToggle, searchOpen, onSearchOpen, onSearchClose }:
     };
 
     updateInk();
+    scheduleUpdate();
+    timers.push(window.setTimeout(scheduleUpdate, 80));
+    timers.push(window.setTimeout(scheduleUpdate, 220));
+
+    const observer = new MutationObserver(scheduleUpdate);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class", "style"] });
+
     window.addEventListener("scroll", scheduleUpdate, { passive: true });
     window.addEventListener("resize", scheduleUpdate);
 
     return () => {
       if (frame) window.cancelAnimationFrame(frame);
+      timers.forEach((timer) => window.clearTimeout(timer));
+      observer.disconnect();
       window.removeEventListener("scroll", scheduleUpdate);
       window.removeEventListener("resize", scheduleUpdate);
     };
-  }, []);
+  }, [theme]);
 
   return (
     <div

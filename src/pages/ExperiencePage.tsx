@@ -16,6 +16,26 @@ const EASE_TEXT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const RESUME_HREF = "/isaac-seiler-resume.pdf";
 const TIMELINE_STICKY_TOP = 112;
 const TIMELINE_HEADER_OFFSET = 66;
+const GLITCH_IN_INITIAL = {
+  opacity: 0,
+  x: -18,
+  y: 18,
+  skewX: -1.4,
+  filter: "blur(10px)",
+};
+const GLITCH_IN_VISIBLE = {
+  opacity: [0, 1, 1, 1],
+  x: [-18, 12, -3, 0],
+  y: [18, -5, 1, 0],
+  skewX: [-1.4, 0.85, -0.18, 0],
+  filter: ["blur(10px)", "blur(1px)", "blur(2px)", "blur(0px)"],
+};
+const glitchTransition = (delay = 0, duration = 0.62) => ({
+  delay,
+  duration,
+  times: [0, 0.22, 0.52, 1],
+  ease: EASE,
+});
 
 interface RelatedItem {
   id: string;
@@ -235,10 +255,10 @@ const ExperienceGroupSection = ({
         index === 0 ? "pt-0" : "border-t border-foreground/10"
       }`}
       data-experience-id={group.id}
-      initial={{ opacity: 0, y: 36, filter: "blur(8px)" }}
-      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      initial={GLITCH_IN_INITIAL}
+      whileInView={GLITCH_IN_VISIBLE}
       viewport={{ once: true, margin: "-80px" }}
-      transition={{ delay: Math.min(index * 0.04, 0.24), duration: 0.72, ease: EASE }}
+      transition={glitchTransition(Math.min(index * 0.035, 0.2), 0.68)}
     >
       <div>
         <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm font-medium text-foreground/54">
@@ -256,10 +276,10 @@ const ExperienceGroupSection = ({
           <div className="mt-5 grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(13rem,18rem)] md:items-start md:gap-8 xl:gap-10">
             <motion.div
               className="space-y-4"
-              initial={{ opacity: 0, y: 12, filter: "blur(6px)" }}
-              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              initial={GLITCH_IN_INITIAL}
+              whileInView={GLITCH_IN_VISIBLE}
               viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.42, ease: EASE_TEXT, delay: 0.05 }}
+              transition={glitchTransition(0.08, 0.56)}
             >
               {primaryEntry.paragraphs.map((paragraph) => (
                 <p key={paragraph} className="max-w-2xl text-[15px] leading-relaxed text-foreground/68 md:text-base">
@@ -270,18 +290,29 @@ const ExperienceGroupSection = ({
 
             <motion.div
               className="relative aspect-square w-full bg-foreground/5"
-              initial={{ opacity: 0.72, y: 10, filter: "blur(6px)" }}
-              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              initial={{ ...GLITCH_IN_INITIAL, x: 18, skewX: 1.4 }}
+              whileInView={{
+                ...GLITCH_IN_VISIBLE,
+                x: [18, -12, 3, 0],
+                skewX: [1.4, -0.85, 0.18, 0],
+              }}
               viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.5, ease: EASE }}
+              transition={glitchTransition(0.12, 0.64)}
             >
               <ExperienceImage src={group.image} className="h-full w-full" />
             </motion.div>
           </div>
         </section>
 
-        {secondaryEntries.map((entry) => (
-          <section key={entry.id} className="mt-9 border-t border-foreground/10 pt-8">
+        {secondaryEntries.map((entry, secondaryIndex) => (
+          <motion.section
+            key={entry.id}
+            className="mt-9 border-t border-foreground/10 pt-8"
+            initial={GLITCH_IN_INITIAL}
+            whileInView={GLITCH_IN_VISIBLE}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={glitchTransition(0.08 + secondaryIndex * 0.04, 0.58)}
+          >
             <AnimatedText
               text={entry.role}
               as="p"
@@ -301,7 +332,7 @@ const ExperienceGroupSection = ({
                 </p>
               ))}
             </motion.div>
-          </section>
+          </motion.section>
         ))}
 
         {related.length > 0 ? (
@@ -401,10 +432,10 @@ const ExperiencePage = () => {
           <section className="flex min-h-[calc(100svh-7rem)] flex-col justify-end px-6 pb-12 pt-16 md:pb-16">
             <motion.div
               className="pt-7 pb-4 md:grid md:grid-cols-[minmax(14rem,0.32fr)_minmax(0,1fr)] md:gap-10 md:pt-9 md:pb-5"
-              initial={{ opacity: 0, y: 24, filter: "blur(8px)" }}
-              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              initial={GLITCH_IN_INITIAL}
+              whileInView={GLITCH_IN_VISIBLE}
               viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.7, ease: EASE }}
+              transition={glitchTransition(0.08, 0.68)}
             >
               <div className="mb-5 md:mb-0">
                 <AnimatedText
@@ -416,10 +447,10 @@ const ExperiencePage = () => {
               </div>
               <motion.div
                 className="grid max-w-4xl gap-4 text-[15px] leading-relaxed text-foreground/68 md:text-base"
-                initial={{ opacity: 0, y: 12, filter: "blur(6px)" }}
-                whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                initial={GLITCH_IN_INITIAL}
+                whileInView={GLITCH_IN_VISIBLE}
                 viewport={{ once: true, margin: "-80px" }}
-                transition={{ duration: 0.42, ease: EASE_TEXT, delay: 0.1 }}
+                transition={glitchTransition(0.14, 0.56)}
               >
                 {experienceIntro.paragraphs.map((paragraph) => (
                   <p key={paragraph}>{paragraph}</p>
@@ -431,10 +462,10 @@ const ExperiencePage = () => {
               href={RESUME_HREF}
               download
               className="mt-5 block w-full min-w-0 shrink-0 md:mt-6 md:w-1/2"
-              initial={{ opacity: 0, y: 14 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={GLITCH_IN_INITIAL}
+              whileInView={GLITCH_IN_VISIBLE}
               viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.55, ease: EASE_TEXT }}
+              transition={glitchTransition(0.18, 0.56)}
             >
               <div className="site-corner homepage-cta group relative flex w-full cursor-pointer items-center justify-center bg-primary py-3 font-mono text-sm uppercase tracking-[0.2em] transition-colors duration-300 hover:bg-accent">
                 <span className="flex items-center justify-center">
@@ -452,10 +483,10 @@ const ExperiencePage = () => {
               <aside className="sticky top-28 hidden max-h-[calc(100svh-8rem)] self-start overflow-visible lg:block">
                 <motion.div
                   className="pt-[66px]"
-                  initial={{ opacity: 0, y: 12, filter: "blur(6px)" }}
-                  whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                  initial={GLITCH_IN_INITIAL}
+                  whileInView={GLITCH_IN_VISIBLE}
                   viewport={{ once: true, margin: "-80px" }}
-                  transition={{ duration: 0.42, ease: EASE_TEXT }}
+                  transition={glitchTransition(0.04, 0.58)}
                 >
                   <div className="relative">
                     <div className="absolute left-[5px] top-0 h-full w-px bg-foreground/10" />

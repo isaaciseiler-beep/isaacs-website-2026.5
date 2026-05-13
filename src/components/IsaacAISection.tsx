@@ -261,7 +261,7 @@ const IsaacAISection = () => {
   };
 
   return (
-    <section className="relative z-20 flex items-start px-6 pb-24 pt-12 md:pb-28 md:pt-16">
+    <section className="relative z-20 flex items-start px-6 pb-24 pt-16 md:pb-28 md:pt-20">
       <motion.div
         className="mx-auto flex w-full max-w-3xl flex-col items-center text-center"
         initial={{ opacity: 0, y: 18 }}
@@ -280,8 +280,6 @@ const IsaacAISection = () => {
             text="Ask away"
             as="p"
             className="relative text-center text-3xl font-semibold leading-none tracking-tight text-foreground md:text-5xl"
-            controlledVisible={headingInView}
-            once={false}
             delay={0.08}
           />
         </div>

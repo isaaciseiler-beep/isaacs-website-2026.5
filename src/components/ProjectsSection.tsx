@@ -219,13 +219,21 @@ const ProjectsSection = () => {
       </div>
 
       <div className="px-6 mt-6">
-        <div className="flex w-full gap-[3px] md:w-1/2">
+        <div className="flex w-full gap-[3px] overflow-hidden site-corner">
           {[
             { label: "Experience", href: "/experience" },
             { label: "Projects", href: "/projects" },
-          ].map((item) => (
-            <Link key={item.href} to={item.href} className="block min-w-0 flex-1">
-              <div className="site-corner homepage-cta group relative flex w-full cursor-pointer items-center justify-center bg-primary py-3 font-mono text-sm uppercase tracking-[0.2em] transition-colors duration-300 hover:bg-accent">
+          ].map((item, index) => (
+            <Link
+              key={item.href}
+              to={item.href}
+              className="work-cta-link group block min-w-0"
+            >
+              <div
+                className={`homepage-cta relative flex w-full cursor-pointer items-center justify-center bg-primary py-3 font-mono text-sm uppercase tracking-[0.2em] transition-colors duration-300 group-hover:bg-accent group-focus-visible:bg-accent ${
+                  index === 0 ? "rounded-r-none" : "rounded-l-none"
+                }`}
+              >
                 <span className="flex min-w-0 items-center justify-center">
                   <span className="truncate">{item.label}</span>
                   <span className="inline-flex max-w-0 overflow-hidden opacity-0 transition-all duration-300 ease-out group-hover:max-w-[2rem] group-hover:opacity-100">

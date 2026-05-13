@@ -1,11 +1,11 @@
 import { useRef, useState, useCallback, useEffect } from "react";
 import { motion, useScroll, useTransform, useSpring, useMotionValue, AnimatePresence } from "framer-motion";
-import type { MotionValue } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import SectionHeading from "@/components/SectionHeading";
 import { inspirationItems, type InspirationItem } from "@/lib/inspirationItems";
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
+const ITEM_REVEAL_EASE: [number, number, number, number] = [0.18, 1, 0.28, 1];
 
 // Approximate board width/height ratio (viewport-dependent; fine for initial layout)
 const BOARD_RATIO = 1.7;
@@ -64,6 +64,33 @@ const ROTATE_CURSOR_SVG = encodeURIComponent(
   `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"><path d="M17 8.5a5.5 5.5 0 1 0 1.5 4.5" fill="none" stroke="black" stroke-width="2.4" stroke-linecap="round"/><polyline points="18 5 18 9 14 9" fill="none" stroke="black" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`
 );
 const ROTATE_CURSOR = `url("data:image/svg+xml;utf8,${ROTATE_CURSOR_SVG}") 7 7, alias`;
+
+const glitchRevealInitial = (index: number) => ({
+  opacity: 0,
+  x: index % 2 === 0 ? -18 : 18,
+  y: 18,
+  scale: 0.94,
+  filter: "blur(12px)",
+});
+
+const glitchRevealVisible = (index: number) => {
+  const direction = index % 2 === 0 ? -1 : 1;
+
+  return {
+    opacity: [0, 1, 1],
+    x: [direction * 18, direction * -7, 0],
+    y: [18, -4, 0],
+    scale: [0.94, 1.025, 1],
+    filter: ["blur(12px)", "blur(1.5px)", "blur(0px)"],
+  };
+};
+
+const glitchRevealTransition = (index: number) => ({
+  delay: Math.min(index * 0.045, 0.45),
+  duration: 0.68,
+  times: [0, 0.34, 1],
+  ease: ITEM_REVEAL_EASE,
+});
 
 const InspirationBoard = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -126,8 +153,6 @@ const InspirationBoard = () => {
   const boardOpacity = useTransform(revealProgress, [0, 1], [0, 1]);
   const dotsOpacity = useTransform(revealProgress, [0, 0.55, 1], [0, 0.45, 1]);
   const dotsY = useTransform(revealProgress, [0, 1], [0, 0]);
-  const cardOpacity = useTransform(revealProgress, [0.1, 1], [0, 1]);
-  const cardY = useTransform(revealProgress, [0, 1], [0, 0]);
 
   const clampPosition = useCallback((x: number, y: number, w: number, aspect: number) => {
     if (!boardRef.current) return { x, y };
@@ -443,8 +468,6 @@ const InspirationBoard = () => {
                 index={i}
                 dragging={dragging === item.id}
                 zIndex={dragging === item.id ? 50 : i}
-                cardOpacity={cardOpacity}
-                cardY={cardY}
                 onPointerDown={e => handlePointerDown(e, item.id)}
                 onPointerUp={() => handlePointerUp(item.id)}
                 onRotate={updateRotation}
@@ -499,10 +522,10 @@ const CarouselCard = ({ item, index, width, height, onOpen, renderCard }: Carous
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-40px" }}
-      transition={{ delay: index * 0.04, duration: 0.5, ease: EASE }}
+      initial={glitchRevealInitial(index)}
+      whileInView={glitchRevealVisible(index)}
+      viewport={{ once: true, margin: "-40px", amount: 0.35 }}
+      transition={glitchRevealTransition(index)}
       className="flex-shrink-0 select-none"
       style={{
         width,
@@ -543,15 +566,13 @@ interface BoardCardProps {
   index: number;
   dragging: boolean;
   zIndex: number;
-  cardOpacity: MotionValue<number>;
-  cardY: MotionValue<number>;
   onPointerDown: (e: React.PointerEvent) => void;
   onPointerUp: () => void;
   onRotate: (id: number, rotate: number) => void;
   renderCard: (item: InspirationItem) => React.ReactNode;
 }
 
-const BoardCard = ({ item, index, dragging, zIndex, cardOpacity, cardY, onPointerDown, onPointerUp, onRotate, renderCard }: BoardCardProps) => {
+const BoardCard = ({ item, index, dragging, zIndex, onPointerDown, onPointerUp, onRotate, renderCard }: BoardCardProps) => {
   const rotX = useSpring(useMotionValue(0), { stiffness: 120, damping: 18, mass: 0.6 });
   const rotY = useSpring(useMotionValue(0), { stiffness: 120, damping: 18, mass: 0.6 });
   const [cornerHover, setCornerHover] = useState(false);
@@ -618,6 +639,9 @@ const BoardCard = ({ item, index, dragging, zIndex, cardOpacity, cardY, onPointe
   return (
     <motion.div
       className="absolute select-none"
+      initial={glitchRevealInitial(index)}
+      whileInView={glitchRevealVisible(index)}
+      viewport={{ once: true, margin: "-60px", amount: 0.22 }}
       style={{
         left: `${item.x}%`,
         top: `${item.y}%`,
@@ -626,11 +650,9 @@ const BoardCard = ({ item, index, dragging, zIndex, cardOpacity, cardY, onPointe
         zIndex,
         rotate: item.rotate,
         cursor,
-        opacity: cardOpacity,
-        y: cardY,
         perspective: 800,
       }}
-      transition={{ delay: 0.12 + index * 0.06, duration: 0.7, ease: EASE }}
+      transition={glitchRevealTransition(index)}
       onPointerDown={handleDown}
       onPointerUp={handleUp}
       onPointerMove={handleMove}

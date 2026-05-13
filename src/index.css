@@ -40,7 +40,7 @@
     --site-corner-radius: 8px;
     --radius: var(--site-corner-radius);
 
-    --sidebar-background: 214 31% 94%;
+    --sidebar-background: var(--background);
     --sidebar-foreground: 88 24% 8%;
     --sidebar-primary: 88 24% 8%;
     --sidebar-primary-foreground: 216 35% 97%;
@@ -81,7 +81,7 @@
     --highlight: 68 100% 81%;
     --image-scrim: 80 18% 6%;
 
-    --sidebar-background: 78 20% 5%;
+    --sidebar-background: var(--background);
     --sidebar-foreground: 216 42% 96%;
     --sidebar-primary: 216 42% 96%;
     --sidebar-primary-foreground: 78 20% 5%;
@@ -148,10 +148,24 @@
 
   .hero-kinetic-word {
     opacity: 0;
-    transform: translate3d(var(--hero-x), var(--hero-y), 0) rotate(var(--hero-r)) scale(0.86);
-    filter: blur(14px);
-    animation: hero-word-assemble 1.44s var(--hero-delay) cubic-bezier(0.16, 1, 0.3, 1) both;
+    transform: translate3d(var(--hero-x), var(--hero-y), 0) scale(0.98);
+    filter: blur(8px);
     will-change: transform, opacity, filter;
+  }
+
+  h1[data-ready="true"] .hero-kinetic-word {
+    animation: hero-word-assemble 2.52s var(--hero-delay) cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .work-cta-link {
+    flex: 1 1 0%;
+    transition: flex 500ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .work-cta-link:hover,
+  .work-cta-link:focus-visible {
+    flex: 3 1 0%;
+    outline: none;
   }
 
   .site-corner {
@@ -193,7 +207,7 @@
 
   .site-sidebar-panel {
     color: hsl(var(--sidebar-foreground));
-    background: hsl(var(--sidebar-background)) !important;
+    background: hsl(var(--background)) !important;
     mix-blend-mode: normal !important;
     opacity: 1;
     isolation: isolate;
@@ -390,7 +404,6 @@
 
   .news-card {
     background-color: hsl(var(--card) / 0.84);
-    border: 1px solid hsl(var(--border) / 0.72);
   }
   .news-card:hover .news-card-title {
     color: hsl(var(--highlight));
@@ -418,31 +431,94 @@
   .homepage-cta:hover * {
     color: hsl(var(--accent-foreground));
   }
+
+  .light .homepage-cta:hover {
+    background-color: hsl(50 33% 12%);
+  }
+
+  .light .homepage-cta:hover,
+  .light .homepage-cta:hover * {
+    color: hsl(var(--highlight));
+  }
+}
+
+.light .work-cta-link:hover .homepage-cta,
+.light .work-cta-link:focus-visible .homepage-cta {
+  background-color: hsl(50 33% 12%) !important;
+}
+
+.light .group\/pill:hover .get-in-touch-cta,
+.light .get-in-touch-cta:hover,
+.light .get-in-touch-cta:focus-visible {
+  background-color: hsl(50 33% 12%) !important;
+}
+
+.light .work-cta-link:hover .homepage-cta,
+.light .work-cta-link:hover .homepage-cta *,
+.light .work-cta-link:focus-visible .homepage-cta,
+.light .work-cta-link:focus-visible .homepage-cta * {
+  color: hsl(var(--highlight));
+}
+
+.light .group\/pill:hover .get-in-touch-cta,
+.light .group\/pill:hover .get-in-touch-cta *,
+.light .get-in-touch-cta:hover,
+.light .get-in-touch-cta:hover *,
+.light .get-in-touch-cta:focus-visible,
+.light .get-in-touch-cta:focus-visible * {
+  color: hsl(var(--highlight));
 }
 
 @keyframes hero-word-assemble {
   0% {
     opacity: 0;
-    transform: translate3d(var(--hero-x), var(--hero-y), 0) rotate(var(--hero-r)) scale(0.86);
-    filter: blur(14px);
+    transform: translate3d(var(--hero-x), var(--hero-y), 0) scale(0.98);
+    filter: blur(8px);
   }
 
-  18% {
+  16% {
     opacity: 1;
+    transform: translate3d(var(--hero-x), var(--hero-y), 0) scale(1);
+    filter: blur(0);
   }
 
-  62% {
-    filter: blur(1.5px);
+  44% {
+    opacity: 1;
+    transform: translate3d(var(--hero-x), var(--hero-y), 0) scale(1);
+    filter: blur(0);
+    animation-timing-function: cubic-bezier(0.64, 0, 0.24, 1);
+  }
+
+  58% {
+    opacity: 1;
+    transform: translate3d(calc(var(--hero-x) * 0.58 + var(--hero-correct-x)), calc(var(--hero-y) * 0.58), 0) scale(1.006);
+    filter: blur(0.85px);
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  74% {
+    opacity: 1;
+    transform: translate3d(calc(var(--hero-x) * 0.58 + var(--hero-correct-x)), calc(var(--hero-y) * 0.58), 0) scale(1.006);
+    filter: blur(0);
+    animation-timing-function: cubic-bezier(0.64, 0, 0.24, 1);
+  }
+
+  88% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: blur(0.45px);
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   100% {
     opacity: 1;
-    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+    transform: translate3d(0, 0, 0) scale(1);
     filter: blur(0);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  h1[data-ready="true"] .hero-kinetic-word,
   .hero-kinetic-word {
     animation: none;
     opacity: 1;

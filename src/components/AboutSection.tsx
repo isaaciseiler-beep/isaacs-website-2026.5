@@ -246,7 +246,7 @@ const AboutSection = () => {
               className="overflow-hidden"
             >
               <button
-                className="homepage-cta relative pointer-events-auto h-full w-full cursor-pointer overflow-hidden bg-primary transition-colors duration-300 group-hover/pill:bg-accent"
+                className="get-in-touch-cta homepage-cta relative pointer-events-auto h-full w-full cursor-pointer overflow-hidden bg-primary transition-colors duration-300 group-hover/pill:bg-accent"
                 style={{ borderRadius: "0 0 var(--site-corner-radius) var(--site-corner-radius)" }}
                 onClick={() => window.location.href = CONTACT_MAILTO}
               >

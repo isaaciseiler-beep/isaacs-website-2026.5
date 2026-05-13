@@ -13,7 +13,6 @@ const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const ChatOrb = () => {
   const [expanded, setExpanded] = useState(false);
   const [visible, setVisible] = useState(false);
-  const [bottomOffset, setBottomOffset] = useState(DOT_BOTTOM);
   const location = useLocation();
   const navigate = useNavigate();
   const disabled = location.pathname === "/photos" || location.pathname === "/photos/map";
@@ -21,25 +20,11 @@ const ChatOrb = () => {
   useEffect(() => {
     const handleScroll = () => {
       setVisible(window.scrollY > 10);
-
-      const footer = document.getElementById("footer");
-      if (!footer) {
-        setBottomOffset(DOT_BOTTOM);
-        return;
-      }
-
-      const footerTop = footer.getBoundingClientRect().top;
-      const windowHeight = window.innerHeight;
-      setBottomOffset(footerTop < windowHeight ? windowHeight - footerTop + DOT_BOTTOM : DOT_BOTTOM);
     };
 
     handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleScroll);
-    };
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   useEffect(() => {
@@ -79,7 +64,7 @@ const ChatOrb = () => {
           onClick={handleClick}
           className="site-corner fixed z-[58] flex items-center justify-end overflow-hidden bg-[hsl(var(--highlight))] text-accent-foreground shadow-[0_10px_28px_rgba(0,0,0,0.22)]"
           style={{
-            bottom: bottomOffset,
+            bottom: DOT_BOTTOM,
             right: DOT_RIGHT,
             height: DOT_SIZE,
             transformOrigin: "right center",

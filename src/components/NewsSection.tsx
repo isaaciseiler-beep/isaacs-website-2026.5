@@ -72,13 +72,13 @@ const NewsSection = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="news-card group relative block flex-shrink-0 overflow-hidden bg-background"
-                style={{ width: "calc(40% - 2px)", scrollSnapAlign: "start", minWidth: 280 }}
+                style={{ width: "clamp(232px, 25.2vw, 357px)", scrollSnapAlign: "start" }}
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true, margin: "-20px" }}
                 transition={{ delay: index * 0.1, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               >
-                <div className="relative aspect-[4/3] w-full overflow-hidden">
+                <div className="relative aspect-[9/16] w-full overflow-hidden">
                   {item.imageUrl && (
                     <img
                       src={item.imageUrl}
@@ -88,8 +88,8 @@ const NewsSection = () => {
                     />
                   )}
                   <div className="absolute inset-0 bg-[linear-gradient(to_top,hsl(var(--image-scrim)/0.94)_0%,hsl(var(--image-scrim)/0.48)_48%,transparent_100%)]" />
-                  <div className="absolute inset-x-0 bottom-0 p-5">
-                    <div className="mb-4 flex h-[30px] items-center">
+                  <div className="absolute inset-x-0 bottom-0 p-5 md:p-6">
+                    <div className="mb-4 flex h-[28px] items-center md:h-[32px]">
                       <img
                         src={item.logoUrl}
                         alt={item.logoAlt}
@@ -97,7 +97,7 @@ const NewsSection = () => {
                         loading="lazy"
                       />
                     </div>
-                    <h3 className="news-card-title pr-8 text-base font-semibold leading-tight tracking-tight text-white transition-colors duration-200 md:text-lg">
+                    <h3 className="news-card-title pr-8 text-[0.92rem] font-semibold leading-tight tracking-tight text-white transition-colors duration-200 md:text-[1.15rem]">
                       {item.title}
                     </h3>
                   </div>

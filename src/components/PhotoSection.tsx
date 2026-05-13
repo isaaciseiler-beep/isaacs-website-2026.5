@@ -57,7 +57,7 @@ const PhotoSection = () => {
       <div className="px-6">
         <div
           ref={previewRef}
-          className="site-corner group relative aspect-square w-full cursor-pointer overflow-hidden md:aspect-[3/1.365]"
+          className="site-corner group relative aspect-square w-full cursor-pointer overflow-hidden md:aspect-[3/1.966]"
           onMouseEnter={() => setHovering(true)}
           onMouseLeave={() => setHovering(false)}
           onClick={() => setPreviewIdx(activeIdx)}
@@ -81,16 +81,31 @@ const PhotoSection = () => {
       </div>
 
       <div className="px-6 mt-6">
-        <Link to="/photos" className="block w-full md:w-1/2">
-          <div className="site-corner homepage-cta group relative flex w-full cursor-pointer items-center justify-center bg-primary py-3 font-mono text-sm uppercase tracking-[0.2em] transition-colors duration-300 hover:bg-accent">
-            <span className="flex items-center justify-center">
-              Full Portfolio
-              <span className="inline-flex overflow-hidden max-w-0 group-hover:max-w-[2rem] opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">
-                <ArrowUpRight className="w-4 h-4 ml-2 shrink-0" strokeWidth={1.5} />
-              </span>
-            </span>
-          </div>
-        </Link>
+        <div className="flex w-full gap-[3px] overflow-hidden site-corner">
+          {[
+            { label: "Full Portfolio", href: "/photos" },
+            { label: "Photo Map", href: "/photos/map" },
+          ].map((item, index) => (
+            <Link
+              key={item.href}
+              to={item.href}
+              className="work-cta-link group block min-w-0"
+            >
+              <div
+                className={`homepage-cta relative flex w-full cursor-pointer items-center justify-center bg-primary py-3 font-mono text-sm uppercase tracking-[0.2em] transition-colors duration-300 group-hover:bg-accent group-focus-visible:bg-accent ${
+                  index === 0 ? "rounded-r-none" : "rounded-l-none"
+                }`}
+              >
+                <span className="flex min-w-0 items-center justify-center">
+                  <span className="truncate">{item.label}</span>
+                  <span className="inline-flex max-w-0 overflow-hidden opacity-0 transition-all duration-300 ease-out group-hover:max-w-[2rem] group-hover:opacity-100">
+                    <ArrowUpRight className="ml-2 h-4 w-4 shrink-0" strokeWidth={1.5} />
+                  </span>
+                </span>
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
 
       <PhotoPreview

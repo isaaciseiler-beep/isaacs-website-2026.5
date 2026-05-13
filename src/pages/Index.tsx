@@ -15,6 +15,16 @@ import SiteHeader from "@/components/SiteHeader";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { scrollToPageSection } from "@/lib/scroll";
 
+const HOME_INTRO_AUTO_SCROLL_KEY = "home-intro-auto-scroll-v2";
+const HOME_INTRO_AUTO_SCROLL_DELAY = 3408;
+const HOME_INTRO_AUTO_SCROLL_DURATION = 2200;
+const HEADER_SCROLL_OFFSET = 96;
+
+const easeIntroScroll = (progress: number) => {
+  if (progress < 0.5) return 4 * progress * progress * progress;
+  return 1 - Math.pow(-2 * progress + 2, 3) / 2;
+};
+
 const Index = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -62,6 +72,94 @@ const Index = () => {
 
     return () => {
       timers.forEach((timer) => window.clearTimeout(timer));
+    };
+  }, [location.hash]);
+
+  useEffect(() => {
+    if (location.hash || window.scrollY > 80) return;
+
+    try {
+      if (window.sessionStorage.getItem(HOME_INTRO_AUTO_SCROLL_KEY)) return;
+    } catch {
+      // Session storage can be unavailable in some privacy modes; the timer can still run once for this mount.
+    }
+
+    let cancelled = false;
+    let timer: number;
+    let frame = 0;
+
+    const markSeen = () => {
+      try {
+        window.sessionStorage.setItem(HOME_INTRO_AUTO_SCROLL_KEY, "true");
+      } catch {
+        // Ignore storage failures.
+      }
+    };
+
+    const removeIntentListeners = () => {
+      window.removeEventListener("wheel", cancelAutoScroll);
+      window.removeEventListener("touchmove", cancelAutoScroll);
+      window.removeEventListener("keydown", cancelAutoScroll);
+      window.removeEventListener("pointerdown", cancelAutoScroll);
+    };
+
+    const cancelAutoScroll = () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+      if (frame) window.cancelAnimationFrame(frame);
+      markSeen();
+      removeIntentListeners();
+    };
+
+    const autoScrollToWork = () => {
+      const target = document.getElementById("projects");
+      if (!target) return;
+
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const start = window.scrollY;
+      const end = Math.max(0, start + target.getBoundingClientRect().top - HEADER_SCROLL_OFFSET);
+
+      if (reduceMotion) {
+        window.scrollTo(0, end);
+        removeIntentListeners();
+        return;
+      }
+
+      const startedAt = performance.now();
+      const step = (now: number) => {
+        if (cancelled) return;
+
+        const progress = Math.min(1, (now - startedAt) / HOME_INTRO_AUTO_SCROLL_DURATION);
+        const eased = easeIntroScroll(progress);
+        window.scrollTo(0, start + (end - start) * eased);
+
+        if (progress < 1) {
+          frame = window.requestAnimationFrame(step);
+          return;
+        }
+
+        removeIntentListeners();
+      };
+
+      frame = window.requestAnimationFrame(step);
+    };
+
+    timer = window.setTimeout(() => {
+      if (cancelled) return;
+      markSeen();
+      autoScrollToWork();
+    }, HOME_INTRO_AUTO_SCROLL_DELAY);
+
+    window.addEventListener("wheel", cancelAutoScroll, { passive: true });
+    window.addEventListener("touchmove", cancelAutoScroll, { passive: true });
+    window.addEventListener("keydown", cancelAutoScroll);
+    window.addEventListener("pointerdown", cancelAutoScroll);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+      if (frame) window.cancelAnimationFrame(frame);
+      removeIntentListeners();
     };
   }, [location.hash]);
 

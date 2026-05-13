@@ -1,54 +1,163 @@
 import type { CSSProperties } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 
 const headlineLines = [
   [
-    { text: "Building", xRatio: 0.34, xMax: 500, yRatio: 0.42, yMax: 360, rotate: -7 },
-    { text: "at", xRatio: 0.12, xMax: 170, yRatio: 0.3, yMax: 260, rotate: 6 },
-    { text: "the", xRatio: 0.09, xMax: 140, yRatio: 0.45, yMax: 400, rotate: -4 },
+    { text: "Building", x: 0, y: "top", delay: 0 },
+    { text: "at", x: 1, y: "top", delay: 0.15 },
+    { text: "the", x: 2, y: "top", delay: 0.28 },
   ],
   [
-    { text: "intersection", xRatio: 0.08, xMax: 130, yRatio: 0.5, yMax: 430, rotate: 5 },
-    { text: "of", xRatio: 0.3, xMax: 430, yRatio: 0.36, yMax: 320, rotate: -8 },
-    { text: "AI", xRatio: -0.28, xMax: 300, yRatio: 0.43, yMax: 360, rotate: 7 },
+    { text: "intersection", x: 0, y: "middle", delay: 0.05 },
+    { text: "of", x: 1, y: "middle", delay: 0.18 },
+    { text: "AI", x: 2, y: "middle", delay: 0.25 },
   ],
   [
-    { text: "and", xRatio: 0.45, xMax: 540, yRatio: 0.33, yMax: 280, rotate: -6 },
-    { text: "society.", xRatio: 0.23, xMax: 320, yRatio: 0.48, yMax: 410, rotate: 4 },
+    { text: "and", x: 0, y: "bottom", delay: 0.1 },
+    { text: "society.", x: 2, y: "bottom", delay: 0.22 },
   ],
-];
+] as const;
 
-const getViewportSize = () => ({
-  width: typeof window === "undefined" ? 1024 : window.innerWidth,
-  height: typeof window === "undefined" ? 768 : window.innerHeight,
-});
+const SAFE_EDGE = 56;
+const HEADER_CLEARANCE = 104;
+const MIN_WORD_GAP = 28;
+
+type VerticalLane = "top" | "middle" | "bottom";
+
+type WordOffset = {
+  x: number;
+  y: number;
+};
+
+const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
+
+const viewportEdge = () => {
+  if (window.innerWidth < 390) return 18;
+  if (window.innerWidth < 768) return 24;
+  return SAFE_EDGE;
+};
+
+const targetLeftsForRow = (widths: number[]) => {
+  const edge = viewportEdge();
+
+  if (widths.length === 1) {
+    return [(window.innerWidth - widths[0]) / 2];
+  }
+
+  if (widths.length === 2) {
+    return [edge, window.innerWidth - widths[1] - edge];
+  }
+
+  const left = edge;
+  const right = window.innerWidth - widths[2] - edge;
+  const leftWordEnd = left + widths[0];
+  const gap = window.innerWidth < 390 ? 8 : window.innerWidth < 768 ? 12 : MIN_WORD_GAP;
+  const centeredMiddle = (window.innerWidth - widths[1]) / 2;
+  const minMiddle = leftWordEnd + gap;
+  const maxMiddle = right - widths[1] - gap;
+  const middle =
+    minMiddle <= maxMiddle
+      ? centeredMiddle >= minMiddle && centeredMiddle <= maxMiddle
+        ? centeredMiddle
+        : (minMiddle + maxMiddle) / 2
+      : clamp(centeredMiddle, edge, window.innerWidth - widths[1] - edge);
+
+  return [left, middle, right];
+};
+
+const targetTopFor = (lane: VerticalLane, height: number) => {
+  if (lane === "top") return HEADER_CLEARANCE;
+  if (lane === "bottom") return window.innerHeight - height - viewportEdge();
+  return (window.innerHeight - height) / 2;
+};
 
 const HeroSection = () => {
   const { scrollY } = useScroll();
   const textOpacity = useTransform(scrollY, [0, 400], [1, 0]);
-  const [viewport, setViewport] = useState(getViewportSize);
-  const assembledLines = useMemo(
-    () =>
-      headlineLines.map((line) =>
-        line.map((word) => ({
-          ...word,
-          x:
-            word.xRatio < 0
-              ? -Math.min(viewport.width * Math.abs(word.xRatio), word.xMax)
-              : Math.min(viewport.width * word.xRatio, word.xMax),
-          y: -Math.min(viewport.height * word.yRatio, word.yMax),
-        })),
-      ),
-    [viewport],
-  );
+  const wordRefs = useRef<Array<HTMLSpanElement | null>>([]);
+  const [wordOffsets, setWordOffsets] = useState<WordOffset[]>([]);
   let order = 0;
 
-  useEffect(() => {
-    const handleResize = () => setViewport(getViewportSize());
+  useLayoutEffect(() => {
+    const measure = () => {
+      const nextOffsets: WordOffset[] = [];
+      let wordIndex = 0;
+      const animatedElements = wordRefs.current.filter((element): element is HTMLSpanElement => Boolean(element));
+      const restoredStyles = animatedElements.map((element) => ({
+        element,
+        animation: element.style.animation,
+        filter: element.style.filter,
+        opacity: element.style.opacity,
+        transform: element.style.transform,
+      }));
 
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+      animatedElements.forEach((element) => {
+        element.style.animation = "none";
+        element.style.filter = "none";
+        element.style.opacity = "1";
+        element.style.transform = "none";
+      });
+
+      headlineLines.forEach((line) => {
+        const lineStartIndex = wordIndex;
+        const lineRects = line.map((_, lineWordIndex) => {
+          const element = wordRefs.current[lineStartIndex + lineWordIndex];
+          return element?.getBoundingClientRect() ?? null;
+        });
+        const targetLefts = targetLeftsForRow(lineRects.map((rect) => rect?.width ?? 0));
+
+        line.forEach((word, lineWordIndex) => {
+          const element = wordRefs.current[wordIndex];
+          if (element) {
+            const rect = lineRects[lineWordIndex] ?? element.getBoundingClientRect();
+            const edge = viewportEdge();
+            const targetLeft = clamp(
+              targetLefts[lineWordIndex],
+              edge,
+              window.innerWidth - rect.width - edge,
+            );
+            const targetTop = clamp(
+              targetTopFor(word.y, rect.height),
+              HEADER_CLEARANCE,
+              window.innerHeight - rect.height - edge,
+            );
+
+            nextOffsets[wordIndex] = {
+              x: targetLeft - rect.left,
+              y: targetTop - rect.top,
+            };
+          }
+          wordIndex += 1;
+        });
+      });
+
+      restoredStyles.forEach(({ element, animation, filter, opacity, transform }) => {
+        element.style.animation = animation;
+        element.style.filter = filter;
+        element.style.opacity = opacity;
+        element.style.transform = transform;
+      });
+
+      setWordOffsets(nextOffsets);
+    };
+
+    let disposed = false;
+    const measureWhenReady = () => {
+      if (!disposed) measure();
+    };
+
+    if (document.fonts) {
+      document.fonts.ready.then(measureWhenReady);
+    } else {
+      measure();
+    }
+
+    window.addEventListener("resize", measure);
+    return () => {
+      disposed = true;
+      window.removeEventListener("resize", measure);
+    };
   }, []);
 
   return (
@@ -60,10 +169,11 @@ const HeroSection = () => {
         style={{ opacity: textOpacity }}
       >
         <h1
-          className="max-w-6xl text-5xl font-semibold leading-[0.85] tracking-tighter text-foreground md:text-7xl lg:text-8xl"
+          className="max-w-6xl text-[clamp(2.2rem,10.8vw,3rem)] font-semibold leading-[0.85] tracking-tighter text-foreground sm:text-6xl md:text-7xl lg:text-8xl"
           aria-label="Building at the intersection of AI and society."
+          data-ready={wordOffsets.length > 0 ? "true" : "false"}
         >
-          {assembledLines.map((line, lineIndex) => (
+          {headlineLines.map((line, lineIndex) => (
             <span
               key={`hero-line-${lineIndex}`}
               className="block overflow-visible whitespace-nowrap"
@@ -71,17 +181,21 @@ const HeroSection = () => {
             >
               {line.map((word, wordIndex) => {
                 const animatedWord = { ...word, order: order++ };
+                const offsets = wordOffsets[animatedWord.order] ?? { x: 0, y: 0 };
                 const wordStyle = {
-                  "--hero-x": `${animatedWord.x}px`,
-                  "--hero-y": `${animatedWord.y}px`,
-                  "--hero-r": `${animatedWord.rotate}deg`,
-                  "--hero-delay": `${0.18 + animatedWord.order * 0.095}s`,
+                  "--hero-x": `${offsets.x}px`,
+                  "--hero-y": `${offsets.y}px`,
+                  "--hero-correct-x": `${offsets.x < 0 ? 7 : -7}px`,
+                  "--hero-delay": `${animatedWord.delay}s`,
                   marginRight: wordIndex === line.length - 1 ? 0 : "0.25em",
                 } as CSSProperties;
 
                 return (
                   <span
                     key={word.text}
+                    ref={(element) => {
+                      wordRefs.current[animatedWord.order] = element;
+                    }}
                     className="hero-kinetic-word inline-block origin-center"
                     style={wordStyle}
                   >

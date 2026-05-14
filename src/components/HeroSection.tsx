@@ -32,30 +32,28 @@ type WordOffset = {
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
 
-const viewportEdge = () => {
-  if (window.innerWidth < 390) return 18;
-  if (window.innerWidth < 768) return 24;
+const viewportEdge = (width = window.innerWidth) => {
+  if (width < 390) return 18;
+  if (width < 768) return 24;
   return SAFE_EDGE;
 };
 
-const viewportHeight = () => window.visualViewport?.height ?? window.innerHeight;
-
-const targetLeftsForRow = (widths: number[]) => {
-  const edge = viewportEdge();
+const targetLeftsForRow = (widths: number[], boundsWidth: number) => {
+  const edge = viewportEdge(boundsWidth);
 
   if (widths.length === 1) {
-    return [(window.innerWidth - widths[0]) / 2];
+    return [(boundsWidth - widths[0]) / 2];
   }
 
   if (widths.length === 2) {
-    return [edge, window.innerWidth - widths[1] - edge];
+    return [edge, boundsWidth - widths[1] - edge];
   }
 
   const left = edge;
-  const right = window.innerWidth - widths[2] - edge;
+  const right = boundsWidth - widths[2] - edge;
   const leftWordEnd = left + widths[0];
-  const gap = window.innerWidth < 390 ? 8 : window.innerWidth < 768 ? 12 : MIN_WORD_GAP;
-  const centeredMiddle = (window.innerWidth - widths[1]) / 2;
+  const gap = boundsWidth < 390 ? 8 : boundsWidth < 768 ? 12 : MIN_WORD_GAP;
+  const centeredMiddle = (boundsWidth - widths[1]) / 2;
   const minMiddle = leftWordEnd + gap;
   const maxMiddle = right - widths[1] - gap;
   const middle =
@@ -63,27 +61,50 @@ const targetLeftsForRow = (widths: number[]) => {
       ? centeredMiddle >= minMiddle && centeredMiddle <= maxMiddle
         ? centeredMiddle
         : (minMiddle + maxMiddle) / 2
-      : clamp(centeredMiddle, edge, window.innerWidth - widths[1] - edge);
+      : clamp(centeredMiddle, edge, boundsWidth - widths[1] - edge);
 
   return [left, middle, right];
 };
 
-const targetTopFor = (lane: VerticalLane, height: number) => {
-  const headerClearance = window.innerWidth < 768 ? 92 : HEADER_CLEARANCE;
+const targetTopFor = (lane: VerticalLane, height: number, boundsWidth: number, boundsHeight: number) => {
+  const headerClearance = boundsWidth < 768 ? 92 : HEADER_CLEARANCE;
   if (lane === "top") return headerClearance;
-  if (lane === "bottom") return viewportHeight() - height - viewportEdge();
-  return (viewportHeight() - height) / 2;
+  if (lane === "bottom") return boundsHeight - height - viewportEdge(boundsWidth);
+  return (boundsHeight - height) / 2;
+};
+
+const offsetsAreEqual = (a: WordOffset[], b: WordOffset[]) =>
+  a.length === b.length && a.every((offset, index) => {
+    const next = b[index];
+    return next && Math.abs(offset.x - next.x) < 0.5 && Math.abs(offset.y - next.y) < 0.5;
+  });
+
+const afterLayoutSettles = (callback: () => void) => {
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(callback);
+  });
 };
 
 const HeroSection = () => {
   const { scrollY } = useScroll();
   const textOpacity = useTransform(scrollY, [0, 400], [1, 0]);
+  const sectionRef = useRef<HTMLElement | null>(null);
   const wordRefs = useRef<Array<HTMLSpanElement | null>>([]);
+  const hasMeasuredRef = useRef(false);
+  const lastWindowWidthRef = useRef(0);
   const [wordOffsets, setWordOffsets] = useState<WordOffset[]>([]);
   let order = 0;
 
   useLayoutEffect(() => {
     const measure = () => {
+      const section = sectionRef.current;
+      if (!section) return;
+
+      const sectionRect = section.getBoundingClientRect();
+      const boundsWidth = sectionRect.width;
+      const boundsHeight = sectionRect.height;
+      if (!boundsWidth || !boundsHeight) return;
+
       const nextOffsets: WordOffset[] = [];
       let wordIndex = 0;
       const animatedElements = wordRefs.current.filter((element): element is HTMLSpanElement => Boolean(element));
@@ -108,28 +129,28 @@ const HeroSection = () => {
           const element = wordRefs.current[lineStartIndex + lineWordIndex];
           return element?.getBoundingClientRect() ?? null;
         });
-        const targetLefts = targetLeftsForRow(lineRects.map((rect) => rect?.width ?? 0));
+        const targetLefts = targetLeftsForRow(lineRects.map((rect) => rect?.width ?? 0), boundsWidth);
 
         line.forEach((word, lineWordIndex) => {
           const element = wordRefs.current[wordIndex];
           if (element) {
             const rect = lineRects[lineWordIndex] ?? element.getBoundingClientRect();
-            const edge = viewportEdge();
+            const edge = viewportEdge(boundsWidth);
             const targetLeft = clamp(
               targetLefts[lineWordIndex],
               edge,
-              window.innerWidth - rect.width - edge,
+              boundsWidth - rect.width - edge,
             );
-            const headerClearance = window.innerWidth < 768 ? 92 : HEADER_CLEARANCE;
+            const headerClearance = boundsWidth < 768 ? 92 : HEADER_CLEARANCE;
             const targetTop = clamp(
-              targetTopFor(word.y, rect.height),
+              targetTopFor(word.y, rect.height, boundsWidth, boundsHeight),
               headerClearance,
-              viewportHeight() - rect.height - edge,
+              boundsHeight - rect.height - edge,
             );
 
             nextOffsets[wordIndex] = {
-              x: targetLeft - rect.left,
-              y: targetTop - rect.top,
+              x: sectionRect.left + targetLeft - rect.left,
+              y: sectionRect.top + targetTop - rect.top,
             };
           }
           wordIndex += 1;
@@ -143,33 +164,44 @@ const HeroSection = () => {
         element.style.transform = transform;
       });
 
-      setWordOffsets(nextOffsets);
+      hasMeasuredRef.current = true;
+      lastWindowWidthRef.current = window.innerWidth;
+      setWordOffsets((current) => (offsetsAreEqual(current, nextOffsets) ? current : nextOffsets));
     };
 
     let disposed = false;
+    let fallbackTimer = 0;
     const measureWhenReady = () => {
-      if (!disposed) measure();
+      if (!disposed) afterLayoutSettles(measure);
     };
 
     if (document.fonts) {
-      document.fonts.ready.then(measureWhenReady);
+      document.fonts.ready.then(() => {
+        if (!hasMeasuredRef.current) measureWhenReady();
+      });
+      fallbackTimer = window.setTimeout(() => {
+        if (!hasMeasuredRef.current) measureWhenReady();
+      }, 1200);
     } else {
-      measure();
+      measureWhenReady();
     }
-    const fallbackTimers = [80, 240, 520].map((delay) => window.setTimeout(measureWhenReady, delay));
 
-    window.addEventListener("resize", measure);
-    window.visualViewport?.addEventListener("resize", measure);
+    const handleResize = () => {
+      if (Math.abs(window.innerWidth - lastWindowWidthRef.current) > 4) {
+        measureWhenReady();
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
     return () => {
       disposed = true;
-      fallbackTimers.forEach((timer) => window.clearTimeout(timer));
-      window.removeEventListener("resize", measure);
-      window.visualViewport?.removeEventListener("resize", measure);
+      window.clearTimeout(fallbackTimer);
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
   return (
-    <section className="relative flex h-[100svh] min-h-[100svh] items-end overflow-hidden">
+    <section ref={sectionRef} className="relative flex h-[100svh] min-h-[100svh] items-end overflow-hidden">
       <div className="absolute inset-0 bg-background" />
 
       <motion.div

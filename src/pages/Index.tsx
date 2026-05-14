@@ -18,6 +18,7 @@ import { scrollToPageSection } from "@/lib/scroll";
 const HOME_INTRO_AUTO_SCROLL_DELAY = 3408;
 const HOME_INTRO_AUTO_SCROLL_DURATION = 2200;
 const HEADER_SCROLL_OFFSET = 96;
+const WORK_AUTO_SCROLL_OFFSET = 118;
 const WORK_SCROLL_CONTENT_SELECTOR = "[data-work-scroll-content]";
 
 const easeIntroScroll = (progress: number) => {
@@ -134,22 +135,29 @@ const Index = () => {
 
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const start = window.scrollY;
-      const workContent = target.querySelector<HTMLElement>(WORK_SCROLL_CONTENT_SELECTOR) ?? target;
-      const contentRect = workContent.getBoundingClientRect();
-      const viewportCenter = window.innerHeight / 2;
-      const centeredEnd = start + contentRect.top + contentRect.height / 2 - viewportCenter;
-      const topAlignedEnd = start + contentRect.top - HEADER_SCROLL_OFFSET;
-      const end = Math.max(
-        0,
-        contentRect.height > window.innerHeight - HEADER_SCROLL_OFFSET
-          ? topAlignedEnd
-          : centeredEnd,
-      );
+      const workScrollOffset = window.innerWidth >= 768 ? WORK_AUTO_SCROLL_OFFSET : HEADER_SCROLL_OFFSET;
+      const getWorkScrollTop = () => {
+        const workContent = target.querySelector<HTMLElement>(WORK_SCROLL_CONTENT_SELECTOR) ?? target;
+        const contentRect = workContent.getBoundingClientRect();
+        return Math.max(0, window.scrollY + contentRect.top - workScrollOffset);
+      };
+      const end = getWorkScrollTop();
+
+      const settleWorkScrollPosition = (attempt = 0) => {
+        const refinedEnd = getWorkScrollTop();
+        if (Math.abs(refinedEnd - window.scrollY) <= 2 || attempt >= 4) {
+          waitForPostAutoIntent();
+          return;
+        }
+
+        window.scrollTo(0, refinedEnd);
+        window.requestAnimationFrame(() => settleWorkScrollPosition(attempt + 1));
+      };
 
       if (reduceMotion) {
         window.scrollTo(0, end);
         removeIntentListeners();
-        waitForPostAutoIntent();
+        settleWorkScrollPosition();
         return;
       }
 
@@ -167,7 +175,7 @@ const Index = () => {
         }
 
         removeIntentListeners();
-        waitForPostAutoIntent();
+        settleWorkScrollPosition();
       };
 
       frame = window.requestAnimationFrame(step);

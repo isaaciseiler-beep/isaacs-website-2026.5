@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { useLayoutEffect, useRef, useState } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 const headlineLines = [
   [
@@ -92,24 +92,9 @@ const afterLayoutSettles = (callback: () => void) => {
 };
 
 const MobileHeroText = () => {
-  const reduceMotion = useReducedMotion();
-  const [isAssembling, setIsAssembling] = useState(false);
-
-  useEffect(() => {
-    if (reduceMotion) return;
-
-    const timer = window.setTimeout(() => setIsAssembling(true), 420);
-    return () => window.clearTimeout(timer);
-  }, [reduceMotion]);
-
   return (
     <>
-      <div
-        className="mobile-hero-stage md:hidden"
-        aria-hidden="true"
-        data-assembling={isAssembling ? "true" : "false"}
-        data-reduced-motion={reduceMotion ? "true" : "false"}
-      >
+      <div className="mobile-hero-stage md:hidden" aria-hidden="true">
         {headlineLines.map((line, lineIndex) => (
           <div key={`mobile-hero-lane-${lineIndex}`} className={mobileLaneClasses[lineIndex]}>
             <span>{line.map((word) => word.text).join(" ")}</span>
@@ -120,8 +105,6 @@ const MobileHeroText = () => {
       <h1
         className="mobile-hero-final md:hidden"
         aria-label="Building at the intersection of AI and society."
-        data-assembling={isAssembling ? "true" : "false"}
-        data-reduced-motion={reduceMotion ? "true" : "false"}
       >
         {headlineLines.map((line, lineIndex) => (
           <span key={`mobile-hero-final-line-${lineIndex}`} className="block whitespace-nowrap">

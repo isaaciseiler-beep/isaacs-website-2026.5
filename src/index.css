@@ -174,7 +174,7 @@
     line-height: 0.86;
     letter-spacing: -0.03em;
     color: hsl(var(--foreground));
-    will-change: transform, opacity;
+    --mobile-hero-drop: 1rem;
   }
 
   .mobile-hero-lane-top {
@@ -191,9 +191,24 @@
   }
 
   .mobile-hero-lane span {
+    display: block;
     white-space: nowrap;
     opacity: 1;
     transform: translateY(0);
+    will-change: transform, opacity, filter;
+    animation: mobile-hero-lane-out 1.42s 0.78s cubic-bezier(0.55, 0, 0.2, 1) both;
+  }
+
+  .mobile-hero-lane-top span {
+    --mobile-hero-drop: calc(100svh - 18rem);
+  }
+
+  .mobile-hero-lane-middle span {
+    --mobile-hero-drop: calc(50svh - 6.4rem);
+  }
+
+  .mobile-hero-lane-bottom span {
+    --mobile-hero-drop: 1rem;
   }
 
   .mobile-hero-lane-top,
@@ -216,24 +231,8 @@
     color: hsl(var(--foreground));
     opacity: 0;
     transform: translateY(1.25rem);
-    will-change: transform, opacity;
-  }
-
-  .mobile-hero-stage[data-assembling="true"] .mobile-hero-lane span {
-    animation: mobile-hero-lane-out 2.72s cubic-bezier(0.55, 0, 0.2, 1) both;
-  }
-
-  .mobile-hero-final[data-assembling="true"] {
-    animation: mobile-hero-final-in 2.72s cubic-bezier(0.55, 0, 0.2, 1) both;
-  }
-
-  .mobile-hero-stage[data-reduced-motion="true"] {
-    display: none;
-  }
-
-  .mobile-hero-final[data-reduced-motion="true"] {
-    opacity: 1;
-    transform: none;
+    will-change: transform, opacity, filter;
+    animation: mobile-hero-final-in 1.22s 1.18s cubic-bezier(0.55, 0, 0.2, 1) both;
   }
 
   .work-cta-link {
@@ -648,29 +647,38 @@
 
 @keyframes mobile-hero-lane-out {
   0%,
-  48% {
+  16% {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
+    filter: blur(0);
   }
 
-  72%,
+  72% {
+    opacity: 0.9;
+    transform: translate3d(0, var(--mobile-hero-drop), 0);
+    filter: blur(0);
+  }
+
   100% {
     opacity: 0;
-    transform: translateY(3.25rem);
+    transform: translate3d(0, calc(var(--mobile-hero-drop) + 0.75rem), 0);
+    filter: blur(5px);
   }
 }
 
 @keyframes mobile-hero-final-in {
   0%,
-  70% {
+  22% {
     opacity: 0;
-    transform: translateY(1.25rem);
+    transform: translate3d(0, 1.25rem, 0);
+    filter: blur(6px);
   }
 
-  92%,
+  72%,
   100% {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
+    filter: blur(0);
   }
 }
 
@@ -684,12 +692,16 @@
   }
 
   .mobile-hero-lane {
+    animation: none;
     display: none;
   }
 
+  .mobile-hero-lane span,
   .mobile-hero-final {
+    animation: none;
     opacity: 1;
     transform: none;
+    filter: none;
   }
 }
 

@@ -179,7 +179,10 @@ const Sidebar = ({ open, onToggle, onClose, onSearchOpen, activeSection, showTog
       ) : null}
 
       <motion.nav
-        className="site-sidebar-panel fixed inset-y-0 left-0 z-[45] isolate flex h-[100dvh] w-screen transform-gpu flex-col overflow-y-auto overscroll-contain px-6 pb-[calc(env(safe-area-inset-bottom)+2rem)] pt-20 will-change-transform md:w-[var(--site-panel-width)] md:justify-between md:py-20"
+        className={`site-sidebar-panel fixed inset-y-0 left-0 z-[45] isolate flex h-[100dvh] w-screen transform-gpu flex-col overflow-y-auto overscroll-contain px-6 pb-[calc(env(safe-area-inset-bottom)+2rem)] pt-20 will-change-transform md:w-[var(--site-panel-width)] md:justify-between md:py-20 ${
+          open ? "pointer-events-auto" : "pointer-events-none"
+        }`}
+        initial={false}
         animate={{ x: open ? 0 : isMobile ? "-100%" : -240 }}
         transition={{ duration: 0.56, ease: EASE_TEXT }}
       >

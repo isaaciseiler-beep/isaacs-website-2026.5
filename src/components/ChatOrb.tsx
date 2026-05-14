@@ -8,7 +8,6 @@ const DOT_SIZE = 40;
 const DOT_BOTTOM = 20;
 const DOT_LEFT = 24;
 const EXPANDED_WIDTH = 184;
-const SIDEBAR_DEPLOY_MS = 560;
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -16,7 +15,6 @@ const ChatOrb = () => {
   const [expanded, setExpanded] = useState(false);
   const [visible, setVisible] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarReady, setSidebarReady] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const disabled = location.pathname === "/photos" || location.pathname === "/photos/map";
@@ -52,16 +50,6 @@ const ChatOrb = () => {
     return () => window.removeEventListener("site-sidebar-state", handleSidebarState);
   }, []);
 
-  useEffect(() => {
-    if (!sidebarOpen) {
-      setSidebarReady(false);
-      return;
-    }
-
-    const timer = window.setTimeout(() => setSidebarReady(true), SIDEBAR_DEPLOY_MS);
-    return () => window.clearTimeout(timer);
-  }, [sidebarOpen]);
-
   const scrollToIsaacAI = () => {
     if (location.pathname === "/") {
       scrollToPageSection("isaac-ai");
@@ -80,7 +68,7 @@ const ChatOrb = () => {
     scrollToIsaacAI();
   };
 
-  const shouldRender = !disabled && (visible || sidebarOpen) && (!sidebarOpen || sidebarReady);
+  const shouldRender = !disabled && (visible || sidebarOpen);
 
   return (
     <AnimatePresence>
@@ -89,6 +77,7 @@ const ChatOrb = () => {
           type="button"
           onClick={handleClick}
           className="chat-orb site-corner fixed z-[58] flex items-center justify-end overflow-hidden text-accent-foreground shadow-[0_10px_28px_rgba(0,0,0,0.22)]"
+          data-expanded={expanded}
           style={{
             bottom: DOT_BOTTOM,
             left: DOT_LEFT,

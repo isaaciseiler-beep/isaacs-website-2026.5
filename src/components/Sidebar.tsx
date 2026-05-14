@@ -32,7 +32,7 @@ const ThemeSwitch = () => {
   return (
     <div
       ref={switchRef}
-      className="site-corner relative grid h-10 w-[184px] grid-cols-3 overflow-hidden bg-foreground/10 p-1 shadow-[inset_0_0_0_1px_hsl(var(--foreground)/0.07)]"
+      className="theme-switch site-corner relative grid h-10 w-[184px] grid-cols-3 overflow-hidden bg-foreground/10 p-1 shadow-[inset_0_0_0_1px_hsl(var(--foreground)/0.07)]"
       role="radiogroup"
       aria-label="Appearance"
       onPointerDown={(event) => {
@@ -46,7 +46,7 @@ const ThemeSwitch = () => {
     >
       <motion.span
         aria-hidden="true"
-        className="site-corner absolute bottom-1 top-1 bg-primary shadow-[0_10px_26px_hsl(var(--foreground)/0.16)]"
+        className="theme-switch-thumb site-corner absolute bottom-1 top-1 bg-primary shadow-[0_10px_26px_hsl(var(--foreground)/0.16)]"
         initial={false}
         animate={{ x: `${activeIndex * 100}%` }}
         transition={{ duration: 0.42, ease: EASE_TEXT }}

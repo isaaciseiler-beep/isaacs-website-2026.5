@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useLayoutEffect } from "react";
 import { motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
 import HeroSection from "@/components/HeroSection";
@@ -44,6 +44,19 @@ const Index = () => {
     setSearchOpen(true);
   };
 
+  useLayoutEffect(() => {
+    if (location.hash) return;
+    if (!window.matchMedia("(max-width: 767px)").matches) return;
+
+    const previousScrollRestoration = window.history.scrollRestoration;
+    window.history.scrollRestoration = "manual";
+    window.scrollTo(0, 0);
+
+    return () => {
+      window.history.scrollRestoration = previousScrollRestoration;
+    };
+  }, [location.hash]);
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -78,6 +91,11 @@ const Index = () => {
   }, [location.hash]);
 
   useEffect(() => {
+    if (isMobile) {
+      setAboutRevealEnabled(true);
+      return;
+    }
+
     if (location.hash || window.scrollY > 80) {
       setAboutRevealEnabled(true);
       return;
@@ -198,7 +216,7 @@ const Index = () => {
       removeIntentListeners();
       removePostAutoIntentListeners();
     };
-  }, [location.hash]);
+  }, [isMobile, location.hash]);
 
   return (
     <div className="relative">

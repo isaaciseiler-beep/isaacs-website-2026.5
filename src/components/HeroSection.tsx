@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
-import { useLayoutEffect, useRef, useState } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 
 const headlineLines = [
   [
@@ -89,6 +89,52 @@ const afterLayoutSettles = (callback: () => void) => {
   window.requestAnimationFrame(() => {
     window.requestAnimationFrame(callback);
   });
+};
+
+const MobileHeroText = () => {
+  const reduceMotion = useReducedMotion();
+  const [isAssembling, setIsAssembling] = useState(false);
+
+  useEffect(() => {
+    if (reduceMotion) return;
+
+    const timer = window.setTimeout(() => setIsAssembling(true), 420);
+    return () => window.clearTimeout(timer);
+  }, [reduceMotion]);
+
+  return (
+    <>
+      <div
+        className="mobile-hero-stage md:hidden"
+        aria-hidden="true"
+        data-assembling={isAssembling ? "true" : "false"}
+        data-reduced-motion={reduceMotion ? "true" : "false"}
+      >
+        {headlineLines.map((line, lineIndex) => (
+          <div key={`mobile-hero-lane-${lineIndex}`} className={mobileLaneClasses[lineIndex]}>
+            <span>{line.map((word) => word.text).join(" ")}</span>
+          </div>
+        ))}
+      </div>
+
+      <h1
+        className="mobile-hero-final md:hidden"
+        aria-label="Building at the intersection of AI and society."
+        data-assembling={isAssembling ? "true" : "false"}
+        data-reduced-motion={reduceMotion ? "true" : "false"}
+      >
+        {headlineLines.map((line, lineIndex) => (
+          <span key={`mobile-hero-final-line-${lineIndex}`} className="block whitespace-nowrap">
+            {line.map((word, wordIndex) => (
+              <span key={word.text} style={{ marginRight: wordIndex === line.length - 1 ? 0 : "0.25em" }}>
+                {word.text}
+              </span>
+            ))}
+          </span>
+        ))}
+      </h1>
+    </>
+  );
 };
 
 const HeroSection = () => {
@@ -214,28 +260,7 @@ const HeroSection = () => {
         className="absolute inset-x-0 bottom-0 top-20 z-10 flex items-end overflow-hidden px-6 pb-[calc(env(safe-area-inset-bottom)+3.5rem)] md:top-24 md:pb-6"
         style={{ opacity: textOpacity }}
       >
-        <div className="mobile-hero-stage md:hidden" aria-hidden="true">
-          {headlineLines.map((line, lineIndex) => (
-            <div key={`mobile-hero-lane-${lineIndex}`} className={mobileLaneClasses[lineIndex]}>
-              <span>{line.map((word) => word.text).join(" ")}</span>
-            </div>
-          ))}
-        </div>
-
-        <h1
-          className="mobile-hero-final md:hidden"
-          aria-label="Building at the intersection of AI and society."
-        >
-          {headlineLines.map((line, lineIndex) => (
-            <span key={`mobile-hero-final-line-${lineIndex}`} className="block whitespace-nowrap">
-              {line.map((word, wordIndex) => (
-                <span key={word.text} style={{ marginRight: wordIndex === line.length - 1 ? 0 : "0.25em" }}>
-                  {word.text}
-                </span>
-              ))}
-            </span>
-          ))}
-        </h1>
+        <MobileHeroText />
 
         <h1
           className="hidden max-w-6xl text-[clamp(2.2rem,10.8vw,3rem)] font-semibold leading-[0.85] tracking-tighter text-foreground md:block md:text-7xl lg:text-8xl"

@@ -174,7 +174,6 @@
     line-height: 0.86;
     letter-spacing: -0.03em;
     color: hsl(var(--foreground));
-    animation: mobile-hero-lane-out 2.72s cubic-bezier(0.55, 0, 0.2, 1) both;
     will-change: transform, opacity;
   }
 
@@ -185,7 +184,6 @@
   .mobile-hero-lane-middle {
     top: 50%;
     transform: translateY(-50%);
-    animation-name: mobile-hero-middle-out;
   }
 
   .mobile-hero-lane-bottom {
@@ -194,6 +192,8 @@
 
   .mobile-hero-lane span {
     white-space: nowrap;
+    opacity: 1;
+    transform: translateY(0);
   }
 
   .mobile-hero-lane-top,
@@ -215,9 +215,25 @@
     letter-spacing: -0.03em;
     color: hsl(var(--foreground));
     opacity: 0;
-    transform: translateY(0.7rem);
-    animation: mobile-hero-final-in 2.72s cubic-bezier(0.55, 0, 0.2, 1) both;
+    transform: translateY(1.25rem);
     will-change: transform, opacity;
+  }
+
+  .mobile-hero-stage[data-assembling="true"] .mobile-hero-lane span {
+    animation: mobile-hero-lane-out 2.72s cubic-bezier(0.55, 0, 0.2, 1) both;
+  }
+
+  .mobile-hero-final[data-assembling="true"] {
+    animation: mobile-hero-final-in 2.72s cubic-bezier(0.55, 0, 0.2, 1) both;
+  }
+
+  .mobile-hero-stage[data-reduced-motion="true"] {
+    display: none;
+  }
+
+  .mobile-hero-final[data-reduced-motion="true"] {
+    opacity: 1;
+    transform: none;
   }
 
   .work-cta-link {
@@ -637,47 +653,21 @@
     transform: translateY(0);
   }
 
-  64% {
-    opacity: 0;
-    transform: translateY(3.25rem);
-  }
-
+  72%,
   100% {
     opacity: 0;
     transform: translateY(3.25rem);
-  }
-}
-
-@keyframes mobile-hero-middle-out {
-  0%,
-  48% {
-    opacity: 1;
-    transform: translateY(-50%);
-  }
-
-  64% {
-    opacity: 0;
-    transform: translateY(calc(-50% + 3.25rem));
-  }
-
-  100% {
-    opacity: 0;
-    transform: translateY(calc(-50% + 3.25rem));
   }
 }
 
 @keyframes mobile-hero-final-in {
   0%,
-  68% {
+  70% {
     opacity: 0;
     transform: translateY(1.25rem);
   }
 
-  88% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
+  92%,
   100% {
     opacity: 1;
     transform: translateY(0);
@@ -698,7 +688,6 @@
   }
 
   .mobile-hero-final {
-    animation: none;
     opacity: 1;
     transform: none;
   }

@@ -6,7 +6,6 @@ import { useTheme } from "@/components/ThemeProvider";
 import SearchTrigger from "@/components/SearchOverlay";
 import { CONTACT_MAILTO, GITHUB_URL, LINKEDIN_URL, SUBSTACK_URL } from "@/lib/site";
 import { scrollToPageSection } from "@/lib/scroll";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 const EASE: [number, number, number, number] = [0.19, 1, 0.22, 1];
 const EASE_TEXT: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -93,7 +92,6 @@ interface SidebarProps {
 const Sidebar = ({ open, onToggle, onClose, onSearchOpen, activeSection, showToggle = true }: SidebarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const isMobile = useIsMobile();
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
   const isOnPhotos = location.pathname.startsWith("/photos");
   const isOnProjects = location.pathname.startsWith("/projects");
@@ -182,8 +180,8 @@ const Sidebar = ({ open, onToggle, onClose, onSearchOpen, activeSection, showTog
         className={`site-sidebar-panel fixed inset-y-0 left-0 z-[45] isolate flex h-[100dvh] w-screen transform-gpu flex-col overflow-y-auto overscroll-contain px-6 pb-[calc(env(safe-area-inset-bottom)+2rem)] pt-20 will-change-transform md:w-[var(--site-panel-width)] md:justify-between md:py-20 ${
           open ? "pointer-events-auto" : "pointer-events-none"
         }`}
-        initial={false}
-        animate={{ x: open ? 0 : isMobile ? "-100%" : -240 }}
+        initial={{ x: open ? 0 : "-100%" }}
+        animate={{ x: open ? 0 : "-100%" }}
         transition={{ duration: 0.56, ease: EASE_TEXT }}
       >
         <AnimatePresence>

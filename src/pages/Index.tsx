@@ -102,7 +102,6 @@ const Index = () => {
     }
 
     let cancelled = false;
-    let timer: number;
     let frame = 0;
     let awaitingPostAutoIntent = false;
 
@@ -199,7 +198,7 @@ const Index = () => {
       frame = window.requestAnimationFrame(step);
     };
 
-    timer = window.setTimeout(() => {
+    const timer = window.setTimeout(() => {
       if (cancelled) return;
       autoScrollToWork();
     }, HOME_INTRO_AUTO_SCROLL_DELAY);

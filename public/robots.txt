@@ -1,66 +1,82 @@
 User-agent: GPTBot
 Allow: /
 Disallow: /fulbrightmap
+Disallow: /api/
 
 User-agent: OAI-SearchBot
 Allow: /
 Disallow: /fulbrightmap
+Disallow: /api/
 
 User-agent: ChatGPT-User
 Allow: /
 Disallow: /fulbrightmap
+Disallow: /api/
 
 User-agent: ClaudeBot
 Allow: /
 Disallow: /fulbrightmap
+Disallow: /api/
 
 User-agent: Claude-SearchBot
 Allow: /
 Disallow: /fulbrightmap
+Disallow: /api/
 
 User-agent: Claude-User
 Allow: /
 Disallow: /fulbrightmap
+Disallow: /api/
 
 User-agent: Google-Extended
 Allow: /
 Disallow: /fulbrightmap
+Disallow: /api/
 
 User-agent: GoogleOther
 Allow: /
 Disallow: /fulbrightmap
+Disallow: /api/
 
 User-agent: GoogleOther-Image
 Allow: /
 Disallow: /fulbrightmap
+Disallow: /api/
 
 User-agent: Googlebot
 Allow: /
 Disallow: /fulbrightmap
+Disallow: /api/
 
 User-agent: Googlebot-Image
 Allow: /
 Disallow: /fulbrightmap
+Disallow: /api/
 
 User-agent: Bingbot
 Allow: /
 Disallow: /fulbrightmap
+Disallow: /api/
 
 User-agent: PerplexityBot
 Allow: /
 Disallow: /fulbrightmap
+Disallow: /api/
 
 User-agent: Perplexity-User
 Allow: /
 Disallow: /fulbrightmap
+Disallow: /api/
 
 User-agent: Applebot
 Allow: /
 Disallow: /fulbrightmap
+Disallow: /api/
 
 User-agent: Applebot-Extended
 Allow: /
 Disallow: /fulbrightmap
+Disallow: /api/
 
 User-agent: *
 Allow: /
@@ -68,4 +84,5 @@ Disallow: /fulbrightmap
 Disallow: /api/
 
 Sitemap: https://isaacseiler.xyz/sitemap.xml
+Sitemap: https://isaacseiler.xyz/image-sitemap.xml
 Host: https://isaacseiler.xyz

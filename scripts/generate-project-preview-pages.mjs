@@ -12,6 +12,7 @@ import {
   priorityImages,
   projectPriorityOrder,
   projectSeo,
+  redirectTargets,
   topLevelPages,
 } from "./seo-data.mjs";
 
@@ -251,16 +252,6 @@ const textList = (values) =>
     .flat()
     .filter((value) => typeof value === "string" && value.trim())
     .map((value) => value.trim());
-
-const sectionText = (project) =>
-  textList(
-    (project.sections ?? []).flatMap((section) => [
-      section.heading,
-      ...(section.paragraphs ?? []),
-      ...(section.bullets ?? []),
-      ...((section.links ?? []).map((link) => link.label)),
-    ]),
-  );
 
 const sectionLinks = (project) =>
   (project.sections ?? [])
@@ -542,6 +533,19 @@ const insertJsonLd = (html, data) =>
     `    <script type="application/ld+json">${JSON.stringify(data)}</script>\n  </head>`,
   );
 
+const removeSeoPrimaryImagePreload = (html) =>
+  html.replace(/\s*<link rel="preload" as="image" href="[^"]+"[^>]*data-seo-primary-image="true" ?\/?>/g, "");
+
+const primaryImagePreload = (image) => {
+  const parsed = new URL(image.url, SITE_URL);
+  const href = parsed.origin === SITE_URL ? parsed.pathname : parsed.toString();
+  const crossorigin = parsed.origin === SITE_URL ? "" : ' crossorigin="anonymous"';
+  return `    <link rel="preload" as="image" href="${escapeHtml(href)}" fetchpriority="high"${crossorigin} data-seo-primary-image="true" />\n`;
+};
+
+const insertPrimaryImagePreload = (html, image) =>
+  removeSeoPrimaryImagePreload(html).replace("</head>", `${primaryImagePreload(image)}  </head>`);
+
 const applyHead = (html, route) => {
   const image = normalizeImage(route.image, `${route.navTitle ?? route.title} preview image`);
   let nextHtml = removeJsonLd(html);
@@ -564,6 +568,7 @@ const applyHead = (html, route) => {
   nextHtml = setMeta(nextHtml, 'name="twitter:image"', image.url);
   nextHtml = setMeta(nextHtml, 'name="twitter:image:alt"', image.alt);
   nextHtml = setMeta(nextHtml, 'name="robots"', route.robots ?? "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1");
+  nextHtml = insertPrimaryImagePreload(nextHtml, image);
   return insertJsonLd(nextHtml, route.structuredData);
 };
 
@@ -579,7 +584,7 @@ const renderPriorityImages = () => `
           .map(
             (image) => `
         <figure>
-          <a href="${escapeHtml(image.page)}"><img src="${escapeHtml(new URL(image.url).pathname)}" alt="${escapeHtml(image.alt)}" width="${image.width}" height="${image.height}" /></a>
+          <a href="${escapeHtml(image.page)}"><img src="${escapeHtml(htmlImageSrc(image.url))}" alt="${escapeHtml(image.alt)}" width="${image.width}" height="${image.height}" loading="${image.position === 1 ? "eager" : "lazy"}" decoding="async" fetchpriority="${image.position === 1 ? "high" : "auto"}" /></a>
           <figcaption>${escapeHtml(image.caption)}</figcaption>
         </figure>`,
           )
@@ -589,7 +594,7 @@ const renderPriorityImages = () => `
 const renderProjectSummary = (project) => `
         <article>
           <h3><a href="${escapeHtml(projectLinkPath(project))}">${escapeHtml(project.title)}</a></h3>
-          <img src="${escapeHtml(htmlImageSrc(project.seoImage.url))}" alt="${escapeHtml(project.seoImage.alt)}" width="${project.seoImage.width}" height="${project.seoImage.height}" />
+          <img src="${escapeHtml(htmlImageSrc(project.seoImage.url))}" alt="${escapeHtml(project.seoImage.alt)}" width="${project.seoImage.width}" height="${project.seoImage.height}" loading="lazy" decoding="async" />
           <p>${escapeHtml(project.seoDescription)}</p>
         </article>`;
 
@@ -633,7 +638,7 @@ const renderProjectFallback = (project) => `
       <article>
         <h1>${escapeHtml(project.title)}</h1>
         <p>${escapeHtml(project.seoDescription)}</p>
-        <img src="${escapeHtml(htmlImageSrc(project.seoImage.url))}" alt="${escapeHtml(project.seoImage.alt)}" width="${project.seoImage.width}" height="${project.seoImage.height}" />
+        <img src="${escapeHtml(htmlImageSrc(project.seoImage.url))}" alt="${escapeHtml(project.seoImage.alt)}" width="${project.seoImage.width}" height="${project.seoImage.height}" loading="eager" decoding="async" fetchpriority="high" />
         ${(project.sections ?? [])
           .map(
             (section) => `
@@ -762,8 +767,45 @@ const sitemapXml = () => {
 `;
 };
 
+const imageSitemapXml = () => {
+  const entries = new Map();
+  const addEntry = (entry) => {
+    if (!entries.has(entry.loc)) entries.set(entry.loc, entry);
+  };
+
+  priorityImageObjects.forEach((image) => {
+    addEntry({
+      loc: image.pageUrl,
+      changefreq: "weekly",
+      priority: image.position === 1 ? "1.0" : "0.90",
+      images: [image],
+    });
+  });
+
+  enrichedProjects.forEach((project) => {
+    addEntry({
+      loc: projectUrl(project),
+      changefreq: "monthly",
+      priority: project.id === "fulbright-focus-group-sponsored-by-openai" ? "0.92" : "0.76",
+      images: [
+        {
+          ...project.seoImage,
+          title: project.title,
+          caption: project.seoDescription,
+        },
+      ],
+    });
+  });
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">${Array.from(entries.values()).map(urlEntry).join("")}
+</urlset>
+`;
+};
+
 const robotsTxt = () => `${aiCrawlerAgents
-  .map((agent) => `User-agent: ${agent}\nAllow: /\nDisallow: /fulbrightmap\n`)
+  .map((agent) => `User-agent: ${agent}\nAllow: /\nDisallow: /fulbrightmap\nDisallow: /api/\n`)
   .join("\n")}
 User-agent: *
 Allow: /
@@ -771,6 +813,7 @@ Disallow: /fulbrightmap
 Disallow: /api/
 
 Sitemap: ${SITE_URL}/sitemap.xml
+Sitemap: ${SITE_URL}/image-sitemap.xml
 Host: ${SITE_URL}
 `;
 
@@ -800,6 +843,12 @@ OpenAI ChatGPT Lab, ChatGPT for Education, OpenAI for Education, Fulbright Taiwa
 
 ${priorityImageObjects
   .map((image) => `- ${image.position}. [${image.title}](${image.url}) on [${image.pageUrl}](${image.pageUrl}): ${image.caption}`)
+  .join("\n")}
+
+## High-Intent Shortcut URLs
+
+${redirectTargets
+  .map((redirect) => `- [${SITE_URL}${redirect.source}](${SITE_URL}${redirect.source}) -> [${SITE_URL}${redirect.destination}](${SITE_URL}${redirect.destination})`)
   .join("\n")}
 `;
 
@@ -840,6 +889,12 @@ ${links ? `Links:\n${links}` : ""}`;
 ${priorityImageObjects
   .map((image) => `${image.position}. ${image.title}\n   URL: ${image.url}\n   Page: ${image.pageUrl}\n   Alt: ${image.alt}\n   Caption: ${image.caption}`)
   .join("\n")}
+
+## High-Intent Shortcut URLs
+
+${redirectTargets
+  .map((redirect) => `- ${SITE_URL}${redirect.source} redirects permanently to ${SITE_URL}${redirect.destination}`)
+  .join("\n")}
 `;
 
 const writeGeneratedPublicFile = (relativePath, content) => {
@@ -855,6 +910,7 @@ const writeGeneratedPublicFile = (relativePath, content) => {
 };
 
 writeGeneratedPublicFile("sitemap.xml", sitemapXml());
+writeGeneratedPublicFile("image-sitemap.xml", imageSitemapXml());
 writeGeneratedPublicFile("robots.txt", robotsTxt());
 writeGeneratedPublicFile("llms.txt", llmsTxt());
 writeGeneratedPublicFile("llms-full.txt", llmsFullTxt());

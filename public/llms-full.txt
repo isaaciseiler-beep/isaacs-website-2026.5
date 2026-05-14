@@ -216,3 +216,15 @@ Links:
    Page: https://isaacseiler.xyz/projects/electric-vehicle-access-analysis
    Alt: Electric Vehicle Charging Access Analysis project preview
    Caption: GIS analysis of electric vehicle charging access, infrastructure, and transportation equity.
+
+## High-Intent Shortcut URLs
+
+- https://isaacseiler.xyz/chatgpt-lab redirects permanently to https://isaacseiler.xyz/projects/fulbright-focus-group-sponsored-by-openai
+- https://isaacseiler.xyz/fulbright-chatgpt-lab redirects permanently to https://isaacseiler.xyz/projects/fulbright-focus-group-sponsored-by-openai
+- https://isaacseiler.xyz/openai-education redirects permanently to https://isaacseiler.xyz/projects/fulbright-focus-group-sponsored-by-openai
+- https://isaacseiler.xyz/chatgpt-for-education redirects permanently to https://isaacseiler.xyz/projects/fulbright-focus-group-sponsored-by-openai
+- https://isaacseiler.xyz/ai-state-government-index redirects permanently to https://isaacseiler.xyz/projects/artificial-intelligence-in-state-government-index
+- https://isaacseiler.xyz/ai-government-index redirects permanently to https://isaacseiler.xyz/projects/artificial-intelligence-in-state-government-index
+- https://isaacseiler.xyz/ai-journalism-research redirects permanently to https://isaacseiler.xyz/projects/senior-thesis-local-journalism
+- https://isaacseiler.xyz/resume redirects permanently to https://isaacseiler.xyz/experience
+- https://isaacseiler.xyz/work redirects permanently to https://isaacseiler.xyz/projects

@@ -32,6 +32,53 @@
       ]
     }
   ],
+  "redirects": [
+    {
+      "source": "/chatgpt-lab",
+      "destination": "/projects/fulbright-focus-group-sponsored-by-openai",
+      "permanent": true
+    },
+    {
+      "source": "/fulbright-chatgpt-lab",
+      "destination": "/projects/fulbright-focus-group-sponsored-by-openai",
+      "permanent": true
+    },
+    {
+      "source": "/openai-education",
+      "destination": "/projects/fulbright-focus-group-sponsored-by-openai",
+      "permanent": true
+    },
+    {
+      "source": "/chatgpt-for-education",
+      "destination": "/projects/fulbright-focus-group-sponsored-by-openai",
+      "permanent": true
+    },
+    {
+      "source": "/ai-state-government-index",
+      "destination": "/projects/artificial-intelligence-in-state-government-index",
+      "permanent": true
+    },
+    {
+      "source": "/ai-government-index",
+      "destination": "/projects/artificial-intelligence-in-state-government-index",
+      "permanent": true
+    },
+    {
+      "source": "/ai-journalism-research",
+      "destination": "/projects/senior-thesis-local-journalism",
+      "permanent": true
+    },
+    {
+      "source": "/resume",
+      "destination": "/experience",
+      "permanent": true
+    },
+    {
+      "source": "/work",
+      "destination": "/projects",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/fulbrightmap",

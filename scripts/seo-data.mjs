@@ -428,6 +428,45 @@ export const projectPriorityOrder = [
   "first-personal-website",
 ];
 
+export const redirectTargets = [
+  {
+    source: "/chatgpt-lab",
+    destination: "/projects/fulbright-focus-group-sponsored-by-openai",
+  },
+  {
+    source: "/fulbright-chatgpt-lab",
+    destination: "/projects/fulbright-focus-group-sponsored-by-openai",
+  },
+  {
+    source: "/openai-education",
+    destination: "/projects/fulbright-focus-group-sponsored-by-openai",
+  },
+  {
+    source: "/chatgpt-for-education",
+    destination: "/projects/fulbright-focus-group-sponsored-by-openai",
+  },
+  {
+    source: "/ai-state-government-index",
+    destination: "/projects/artificial-intelligence-in-state-government-index",
+  },
+  {
+    source: "/ai-government-index",
+    destination: "/projects/artificial-intelligence-in-state-government-index",
+  },
+  {
+    source: "/ai-journalism-research",
+    destination: "/projects/senior-thesis-local-journalism",
+  },
+  {
+    source: "/resume",
+    destination: "/experience",
+  },
+  {
+    source: "/work",
+    destination: "/projects",
+  },
+];
+
 export const aiCrawlerAgents = [
   "GPTBot",
   "OAI-SearchBot",

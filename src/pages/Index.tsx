@@ -162,7 +162,7 @@ const Index = () => {
 
       const settleWorkScrollPosition = (attempt = 0) => {
         const refinedEnd = getWorkScrollTop();
-        if (Math.abs(refinedEnd - window.scrollY) <= 2 || attempt >= 4) {
+        if (Math.abs(refinedEnd - window.scrollY) <= 2 || refinedEnd < window.scrollY || attempt >= 4) {
           waitForPostAutoIntent();
           return;
         }

@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, Mail, Moon, Sun } from "lucide-react";
+import { ChevronRight, Laptop, Mail, Moon, Sun } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useTheme } from "@/components/ThemeProvider";
+import { useTheme, type Theme } from "@/components/ThemeProvider";
 import SearchTrigger from "@/components/SearchOverlay";
 import { CONTACT_MAILTO, GITHUB_URL, LINKEDIN_URL, SUBSTACK_URL } from "@/lib/site";
 import { scrollToPageSection } from "@/lib/scroll";
@@ -13,24 +13,58 @@ const EASE_TEXT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const themeOptions = [
   { value: "dark" as const, label: "Dark", icon: Moon },
   { value: "light" as const, label: "Light", icon: Sun },
+  { value: "system" as const, label: "System", icon: Laptop },
 ];
 
 const ThemeSwitch = () => {
   const { theme, setTheme } = useTheme();
+  const switchRef = useRef<HTMLDivElement | null>(null);
+  const activeIndex = Math.max(0, themeOptions.findIndex((opt) => opt.value === theme));
+
+  const setThemeFromPointer = (clientX: number) => {
+    const rect = switchRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    const index = Math.min(2, Math.max(0, Math.floor(((clientX - rect.left) / rect.width) * themeOptions.length)));
+    setTheme(themeOptions[index].value);
+  };
+
   return (
-    <div className="flex items-center gap-2">
+    <div
+      ref={switchRef}
+      className="site-corner relative grid h-10 w-[184px] grid-cols-3 overflow-hidden bg-foreground/10 p-1 shadow-[inset_0_0_0_1px_hsl(var(--foreground)/0.07)]"
+      role="radiogroup"
+      aria-label="Appearance"
+      onPointerDown={(event) => {
+        event.currentTarget.setPointerCapture(event.pointerId);
+        setThemeFromPointer(event.clientX);
+      }}
+      onPointerMove={(event) => {
+        if (event.buttons !== 1) return;
+        setThemeFromPointer(event.clientX);
+      }}
+    >
+      <motion.span
+        aria-hidden="true"
+        className="site-corner absolute bottom-1 top-1 bg-primary shadow-[0_10px_26px_hsl(var(--foreground)/0.16)]"
+        initial={false}
+        animate={{ x: `${activeIndex * 100}%` }}
+        transition={{ duration: 0.42, ease: EASE_TEXT }}
+        style={{ left: 4, width: "calc((100% - 8px) / 3)" }}
+      />
       {themeOptions.map((opt) => {
         const active = theme === opt.value;
         return (
           <button
             key={opt.value}
             type="button"
-            onClick={() => setTheme(opt.value)}
-            className={`site-corner flex h-10 w-10 items-center justify-center transition-colors duration-300 ${
-              active ? "bg-primary text-primary-foreground" : "bg-foreground/10 text-foreground hover:bg-foreground/18"
+            role="radio"
+            onClick={() => setTheme(opt.value as Theme)}
+            className={`relative z-10 flex items-center justify-center transition-colors duration-300 ${
+              active ? "text-primary-foreground" : "text-foreground/55 hover:text-foreground"
             }`}
             aria-label={opt.label}
-            aria-pressed={active}
+            aria-checked={active}
           >
             <opt.icon className="w-4 h-4" strokeWidth={1.65} />
           </button>
@@ -99,6 +133,10 @@ const Sidebar = ({ open, onToggle, onClose, onSearchOpen, activeSection, showTog
   const isOnCredentials = location.pathname.startsWith("/credentials");
 
   useEffect(() => {
+    window.dispatchEvent(new CustomEvent("site-sidebar-state", { detail: { open } }));
+  }, [open]);
+
+  useEffect(() => {
     const activeParents = sitemapItems.reduce<Record<string, boolean>>((acc, item) => {
       if (item.children?.some((child) => location.pathname === child.href)) {
         acc[item.id] = true;
@@ -107,7 +145,10 @@ const Sidebar = ({ open, onToggle, onClose, onSearchOpen, activeSection, showTog
     }, {});
 
     if (Object.keys(activeParents).length) {
-      setExpandedItems((current) => ({ ...current, ...activeParents }));
+      const [activeParent] = Object.keys(activeParents);
+      if (activeParent) {
+        setExpandedItems({ [activeParent]: true });
+      }
     }
   }, [location.pathname]);
 
@@ -137,7 +178,7 @@ const Sidebar = ({ open, onToggle, onClose, onSearchOpen, activeSection, showTog
   };
 
   const toggleChildren = (id: string) => {
-    setExpandedItems((current) => ({ ...current, [id]: !current[id] }));
+    setExpandedItems((current) => (current[id] ? {} : { [id]: true }));
   };
 
   const isItemActive = (item: SitemapItem) => {
@@ -197,10 +238,26 @@ const Sidebar = ({ open, onToggle, onClose, onSearchOpen, activeSection, showTog
                   return (
                     <div key={item.id}>
                       <motion.div
-                        initial={{ opacity: 0, y: 12, filter: "blur(6px)" }}
-                        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                        exit={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                        transition={{ delay: 0.08 + idx * 0.045, duration: 0.62, ease: EASE }}
+                        initial="hidden"
+                        animate="shown"
+                        exit="hiddenExit"
+                        variants={{
+                          hidden: { opacity: 0, y: 14, scale: 0.985, filter: "blur(7px)" },
+                          shown: {
+                            opacity: 1,
+                            y: 0,
+                            scale: 1,
+                            filter: "blur(0px)",
+                            transition: { delay: 0.08 + idx * 0.034, duration: 0.5, ease: EASE },
+                          },
+                          hiddenExit: {
+                            opacity: 0,
+                            y: -8,
+                            scale: 0.985,
+                            filter: "blur(5px)",
+                            transition: { duration: 0.28, ease: EASE_TEXT },
+                          },
+                        }}
                         className="flex items-center gap-2"
                       >
                         <button
@@ -235,21 +292,20 @@ const Sidebar = ({ open, onToggle, onClose, onSearchOpen, activeSection, showTog
                           <motion.div
                             id={`sidebar-${item.id}-children`}
                             className="overflow-hidden"
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: "auto", opacity: 1 }}
-                            transition={{ duration: 0.42, ease: EASE_TEXT }}
+                            initial={{ height: 0, opacity: 0, y: -4 }}
+                            animate={{ height: "auto", opacity: 1, y: 0 }}
+                            exit={{ height: 0, opacity: 0, y: -5 }}
+                            transition={{ duration: 0.44, ease: EASE_TEXT }}
                           >
                             {item.children?.map((child) => {
-                              const childIdx = flatIndex++;
                               const childActive = isChildActive(child);
                               return (
                                 <motion.button
                                   key={child.id}
                                   initial={{ opacity: 0, y: 8, filter: "blur(4px)" }}
                                   animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                                  exit={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                                  transition={{ delay: 0.03 + childIdx * 0.025, duration: 0.5, ease: EASE }}
+                                  exit={{ opacity: 0, y: -6, filter: "blur(4px)" }}
+                                  transition={{ duration: 0.34, ease: EASE }}
                                   onClick={() => handleChildClick(child)}
                                   className={`block py-1.5 pl-6 text-left text-[28px] font-medium leading-none transition-colors duration-300 origin-left md:pl-4 md:text-sm md:leading-normal ${
                                     childActive ? "text-foreground" : "text-foreground/30 hover:text-foreground/60"
@@ -274,10 +330,26 @@ const Sidebar = ({ open, onToggle, onClose, onSearchOpen, activeSection, showTog
           {open && (
             <motion.div
               className="flex items-start justify-between gap-8 md:block"
-              initial={{ opacity: 0, y: 16, scale: 0.94, filter: "blur(6px)" }}
-              animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-              exit={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-              transition={{ delay: 0.2, duration: 0.62, ease: EASE, filter: { duration: 0.66, delay: 0.24 } }}
+              initial="hidden"
+              animate="shown"
+              exit="hiddenExit"
+              variants={{
+                hidden: { opacity: 0, y: 16, scale: 0.94, filter: "blur(6px)" },
+                shown: {
+                  opacity: 1,
+                  y: 0,
+                  scale: 1,
+                  filter: "blur(0px)",
+                  transition: { delay: 0.2, duration: 0.62, ease: EASE, filter: { duration: 0.66, delay: 0.24 } },
+                },
+                hiddenExit: {
+                  opacity: 0,
+                  y: 10,
+                  scale: 0.97,
+                  filter: "blur(5px)",
+                  transition: { duration: 0.3, ease: EASE_TEXT },
+                },
+              }}
             >
               <div>
                 <p className="mono-text mb-3">Get in Touch</p>
@@ -293,7 +365,7 @@ const Sidebar = ({ open, onToggle, onClose, onSearchOpen, activeSection, showTog
                     <button
                       key={link.id}
                       onClick={() => handleSocialClick(link.href)}
-                      className="site-corner flex h-10 w-10 items-center justify-center bg-foreground/10 text-foreground transition-colors duration-300 hover:bg-foreground/20"
+                      className="site-corner sidebar-social-button flex h-10 w-10 items-center justify-center bg-foreground/10 text-foreground transition-colors duration-300 hover:bg-foreground/20"
                       aria-label={link.label}
                     >
                       {link.icon}

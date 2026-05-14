@@ -14,7 +14,7 @@ const PhotoMapPage = lazy(() => import("./pages/PhotoMapPage.tsx"));
 const ProjectsPage = lazy(() => import("./pages/ProjectsPage.tsx"));
 const ProjectDetailPage = lazy(() => import("./pages/ProjectDetailPage.tsx"));
 const ExperiencePage = lazy(() => import("./pages/ExperiencePage.tsx"));
-const CredentialsPage = lazy(() => import("./pages/CredentialsPage.tsx"));
+const ExperienceGamePage = lazy(() => import("./pages/ExperienceGamePage.tsx"));
 const FulbrightMapPage = lazy(() => import("./pages/FulbrightMapPage.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
@@ -46,7 +46,7 @@ const AnimatedRoutes = () => {
             <Route path="/projects" element={<ProjectsPage />} />
             <Route path="/projects/:id" element={<ProjectDetailPage />} />
             <Route path="/experience" element={<ExperiencePage />} />
-            <Route path="/credentials" element={<CredentialsPage />} />
+            <Route path="/experience/arcade" element={<ExperienceGamePage />} />
             <Route path="/fulbrightmap" element={<FulbrightMapPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
@@ -54,6 +54,16 @@ const AnimatedRoutes = () => {
       </motion.div>
     </AnimatePresence>
   );
+};
+
+const ChatOrbGate = () => {
+  const location = useLocation();
+
+  if (location.pathname === "/experience/arcade") {
+    return null;
+  }
+
+  return <ChatOrb />;
 };
 
 const App = () => (
@@ -64,7 +74,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <AnimatedRoutes />
-          <ChatOrb />
+          <ChatOrbGate />
         </BrowserRouter>
       </TooltipProvider>
     </ThemeProvider>

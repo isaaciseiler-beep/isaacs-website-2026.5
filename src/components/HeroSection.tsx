@@ -263,7 +263,7 @@ const HeroSection = () => {
                   "--hero-x": `${offsets.x}px`,
                   "--hero-y": `${offsets.y}px`,
                   "--hero-correct-x": `${offsets.x < 0 ? 7 : -7}px`,
-                  "--hero-delay": `${animatedWord.delay}s`,
+                  "--hero-delay": "0s",
                   marginRight: wordIndex === line.length - 1 ? 0 : "0.25em",
                 } as CSSProperties;
 

@@ -195,7 +195,7 @@ const projectMetadata: Record<string, { date: string; topics: string[]; tags: st
   "fulbright-focus-group-sponsored-by-openai": {
     date: "2025",
     topics: ["education", "OpenAI", "Fulbright", "ChatGPT Lab", "teacher training"],
-    tags: ["Taiwan", "focus group", "classroom use cases", "lesson planning", "educators", "Substack"],
+    tags: ["Taiwan", "OpenAI for Education", "ChatGPT for Education", "ChatGPT Lab x Fulbright Taiwan", "focus group", "classroom use cases", "lesson planning", "educators", "Substack"],
   },
   "political-reporting-at-washu": {
     date: "2024",

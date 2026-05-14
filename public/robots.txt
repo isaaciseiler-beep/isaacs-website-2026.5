@@ -1,5 +1,71 @@
+User-agent: GPTBot
+Allow: /
+Disallow: /fulbrightmap
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /fulbrightmap
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /fulbrightmap
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /fulbrightmap
+
+User-agent: Claude-SearchBot
+Allow: /
+Disallow: /fulbrightmap
+
+User-agent: Claude-User
+Allow: /
+Disallow: /fulbrightmap
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /fulbrightmap
+
+User-agent: GoogleOther
+Allow: /
+Disallow: /fulbrightmap
+
+User-agent: GoogleOther-Image
+Allow: /
+Disallow: /fulbrightmap
+
+User-agent: Googlebot
+Allow: /
+Disallow: /fulbrightmap
+
+User-agent: Googlebot-Image
+Allow: /
+Disallow: /fulbrightmap
+
+User-agent: Bingbot
+Allow: /
+Disallow: /fulbrightmap
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /fulbrightmap
+
+User-agent: Perplexity-User
+Allow: /
+Disallow: /fulbrightmap
+
+User-agent: Applebot
+Allow: /
+Disallow: /fulbrightmap
+
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /fulbrightmap
+
 User-agent: *
 Allow: /
 Disallow: /fulbrightmap
+Disallow: /api/
+
 Sitemap: https://isaacseiler.xyz/sitemap.xml
 Host: https://isaacseiler.xyz

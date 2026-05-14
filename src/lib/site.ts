@@ -1,7 +1,7 @@
 export const SITE_URL = "https://isaacseiler.xyz";
 export const SITE_NAME = "Isaac Seiler";
 export const SITE_DESCRIPTION =
-  "Isaac Seiler is a recent graduate of Washington University in St. Louis, Fulbright Scholar, and Truman Scholar.";
+  "Isaac Seiler is a Fulbright Scholar, Truman Scholar, and OpenAI ChatGPT Lab member working across AI education, public technology, journalism, communications, and research.";
 export const PREVIEW_IMAGE_URL =
   "https://isaacseiler.xyz/webpreview-linkedin.png";
 export const PREVIEW_IMAGE_URLS = [PREVIEW_IMAGE_URL];

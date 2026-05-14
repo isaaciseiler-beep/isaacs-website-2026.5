@@ -715,8 +715,8 @@ export const projectItems: ProjectItem[] = [
 ];
 
 export const featuredProjectIds = [
+  "fulbright-focus-group-sponsored-by-openai",
   "artificial-intelligence-in-state-government-index",
   "congressional-office-setup-100-day-report",
   "senior-thesis-local-journalism",
-  "electric-vehicle-access-analysis",
 ];

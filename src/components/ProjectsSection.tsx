@@ -67,7 +67,7 @@ const FeaturedProjectCard = ({
   const card = (
     <motion.div
       ref={mobileCardRef}
-      className="group relative h-[clamp(11rem,36vw,14rem)] min-h-0 cursor-pointer overflow-hidden bg-background md:h-full md:flex-[1_1_0%]"
+      className="group relative aspect-[4/3] h-auto cursor-pointer overflow-hidden bg-background md:aspect-auto md:h-full md:min-h-0 md:flex-[1_1_0%]"
       style={{ minWidth: 0 }}
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
@@ -141,7 +141,7 @@ const FeaturedProjectCard = ({
 
   if (!isDesktop) {
     return (
-      <Link to={`/projects/${project.id}`} className="block min-h-0">
+      <Link to={`/projects/${project.id}`} className="block">
         {card}
       </Link>
     );
@@ -178,13 +178,13 @@ const ProjectsSection = () => {
   }, [projects]);
 
   return (
-    <section data-work-scroll-content className="flex flex-col py-0 md:h-[calc(100svh-9.75rem)] md:min-h-[420px]">
+    <section data-work-scroll-content className="flex h-auto flex-col py-0 md:h-[calc(100svh-9.75rem)] md:min-h-[420px]">
       <div className="mb-5 shrink-0 px-6 md:mb-6">
         <SectionHeading className="mb-0">Work</SectionHeading>
       </div>
 
       <div
-        className="site-corner mx-6 flex min-h-0 flex-col overflow-hidden md:h-auto md:flex-1 md:flex-row"
+        className="site-corner mx-6 flex flex-col overflow-hidden md:h-auto md:min-h-0 md:flex-1 md:flex-row"
         style={{ gap: GAP }}
         onMouseLeave={() => setActiveIndex(null)}
       >

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowUpRight, FileText } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import Sidebar from "@/components/Sidebar";
 import SiteHeader from "@/components/SiteHeader";
@@ -40,19 +40,19 @@ const metrics = [
 const strengths = [
   {
     title: "Translation",
-    text: "Moving between technical ideas, public institutions, and ordinary users without losing the human stakes.",
+    text: "I can sit with technical material, institutional constraints, and ordinary users, then turn the whole thing into language people can act on.",
   },
   {
     title: "Writing judgment",
-    text: "Writing for voters, reporters, executives, educators, students, and product teams with the same standard for clarity.",
+    text: "I write for voters, reporters, executives, educators, students, and product teams with the same bias toward clarity, accuracy, and taste.",
   },
   {
     title: "Operating rhythm",
-    text: "Turning loose goals into workflows, benchmarks, partner lists, launch feedback, newsletters, and shipped work.",
+    text: "I turn loose goals into workflows, benchmarks, partner lists, launch feedback, newsletters, and shipped work without needing much hand-holding.",
   },
   {
     title: "Fast learning",
-    text: "Learning quickly, testing honestly, and making new tools useful without pretending to be finished.",
+    text: "I learn quickly, test honestly, and make new tools useful early, while staying candid about what is proven, what is guessed, and what still needs reps.",
   },
 ];
 
@@ -90,9 +90,9 @@ const evidence = [
 ];
 
 const fit = [
-  "AI product, education, policy, or adoption work",
-  "GTM, comms, or launch work that needs judgment",
-  "Ops or strategy roles that reward writing and follow-through",
+  "AI product, education, policy, or adoption work.",
+  "GTM, comms, or launch work that needs judgment.",
+  "Ops or strategy roles that reward writing and follow-through.",
 ];
 
 const recognitions = ["Fulbright Scholar", "Truman Scholar", "Rhodes finalist", "OpenAI ChatGPT Lab"];
@@ -113,9 +113,49 @@ const Label = ({ children }: { children: React.ReactNode }) => (
   <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-foreground/42">{children}</p>
 );
 
+const CredentialCtas = ({ compact = false }: { compact?: boolean }) => {
+  const items = [
+    { label: "Resume", href: RESUME_HREF, download: true },
+    { label: "Experience", href: "/experience" },
+  ];
+
+  const ctaContent = (label: string, index: number) => (
+    <div
+      className={`homepage-cta relative flex w-full cursor-pointer items-center justify-center bg-primary font-mono uppercase transition-colors duration-300 group-hover:bg-accent group-focus-visible:bg-accent ${
+        compact ? "py-2.5 text-[10px] tracking-[0.16em]" : "py-3 text-sm tracking-[0.2em]"
+      } ${index === 0 ? "rounded-r-none" : "rounded-l-none"}`}
+    >
+      <span className="flex min-w-0 items-center justify-center">
+        <span className="truncate">{label}</span>
+        <span className="inline-flex max-w-0 overflow-hidden opacity-0 transition-all duration-300 ease-out group-hover:max-w-[2rem] group-hover:opacity-100 group-focus-visible:max-w-[2rem] group-focus-visible:opacity-100">
+          <ArrowUpRight className="ml-2 h-4 w-4 shrink-0" strokeWidth={1.5} />
+        </span>
+      </span>
+    </div>
+  );
+
+  return (
+    <div className="flex w-full gap-[3px] overflow-hidden site-corner">
+      {items.map((item, index) =>
+        item.download ? (
+          <a key={item.href} href={item.href} download className="work-cta-link group block min-w-0">
+            {ctaContent(item.label, index)}
+          </a>
+        ) : (
+          <Link key={item.href} to={item.href} className="work-cta-link group block min-w-0">
+            {ctaContent(item.label, index)}
+          </Link>
+        ),
+      )}
+    </div>
+  );
+};
+
 const CredentialsPage = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [activeStrength, setActiveStrength] = useState(0);
+  const [activeEvidence, setActiveEvidence] = useState(0);
   const isMobile = useIsMobile();
 
   const handleSidebarToggle = () => {
@@ -161,8 +201,7 @@ const CredentialsPage = () => {
           >
             <Panel className="p-4 [@media(max-height:760px)]:p-3">
               <div>
-                <Label>Credentials</Label>
-                <h1 className="mt-3 text-[2rem] font-semibold leading-[0.94] tracking-tight text-foreground [@media(max-height:760px)]:mt-2 [@media(max-height:760px)]:text-[1.55rem]">
+                <h1 className="pb-2 text-[2rem] font-semibold leading-[1.05] tracking-tight text-foreground [@media(max-height:760px)]:text-[1.55rem]">
                   I help new technology make sense to real people.
                 </h1>
                 <p className="mt-3 text-[12px] leading-snug text-foreground/64 [@media(max-height:760px)]:mt-2 [@media(max-height:760px)]:text-[10px]">
@@ -192,39 +231,25 @@ const CredentialsPage = () => {
             </Panel>
 
             <Panel className="p-4 [@media(max-height:760px)]:p-3">
-              <Label>Proof</Label>
+              <Label>Evidence</Label>
               <div className="mt-2 divide-y divide-foreground/10 [@media(max-height:760px)]:mt-1.5">
                 {mobileEvidence.map((item) => (
-                  <p key={item} className="py-2 text-[11px] font-medium leading-tight text-foreground/70 first:pt-0 last:pb-0 [@media(max-height:760px)]:py-1.5 [@media(max-height:760px)]:text-[10px]">
+                  <motion.p variants={panelVariants} key={item} className="py-2 text-[11px] font-medium leading-tight text-foreground/70 first:pt-0 last:pb-0 [@media(max-height:760px)]:py-1.5 [@media(max-height:760px)]:text-[10px]">
                     {item}
-                  </p>
+                  </motion.p>
                 ))}
               </div>
             </Panel>
 
-            <div className="grid min-h-0 grid-cols-[minmax(0,1fr)_5.8rem_5.8rem] gap-3 [@media(max-height:760px)]:gap-2">
-              <Panel className="p-3 [@media(max-height:760px)]:p-2.5">
-                <Label>Best fit</Label>
+            <Panel className="grid min-h-0 grid-rows-[minmax(0,1fr)_auto] p-3 [@media(max-height:760px)]:p-2.5">
+              <div className="min-h-0">
+                <Label>Searching for</Label>
                 <p className="mt-2 text-[12px] font-medium leading-tight text-foreground/76 [@media(max-height:760px)]:mt-1.5 [@media(max-height:760px)]:text-[10.5px]">
                   AI adoption, product/GTM feedback, strategy, comms, and ops roles.
                 </p>
-              </Panel>
-              <a
-                href={RESUME_HREF}
-                download
-                className="site-corner flex min-h-0 flex-col justify-between bg-primary p-3 text-primary-foreground transition-colors hover:bg-accent hover:text-accent-foreground [@media(max-height:760px)]:p-2.5"
-              >
-                <FileText className="h-4 w-4" strokeWidth={1.6} />
-                <span className="font-mono text-[9px] uppercase tracking-[0.14em]">Resume</span>
-              </a>
-              <Link
-                to="/experience"
-                className="site-corner flex min-h-0 flex-col justify-between border border-foreground/10 bg-foreground/[0.035] p-3 text-foreground transition-colors hover:bg-foreground/10 [@media(max-height:760px)]:p-2.5"
-              >
-                <ArrowUpRight className="h-4 w-4" strokeWidth={1.6} />
-                <span className="font-mono text-[9px] uppercase tracking-[0.14em]">History</span>
-              </Link>
-            </div>
+              </div>
+              <CredentialCtas compact />
+            </Panel>
           </motion.div>
 
           <motion.div
@@ -235,14 +260,7 @@ const CredentialsPage = () => {
           >
             <Panel className="grid min-h-0 grid-rows-[auto_minmax(0,1fr)_auto] gap-4 p-6 [@media(max-height:760px)]:gap-3 [@media(max-height:760px)]:p-5">
               <div>
-                <div className="flex items-start justify-between gap-4">
-                  <Label>Credentials</Label>
-                  <span className="text-[10px] uppercase tracking-[0.18em] text-foreground/42">
-                    Summer 26
-                  </span>
-                </div>
-
-                <h1 className="mt-3 max-w-3xl text-[clamp(2.2rem,4.5vw,5rem)] font-semibold leading-[0.94] tracking-tight text-foreground [@media(max-height:760px)]:text-[clamp(2rem,4vw,4.35rem)]">
+                <h1 className="max-w-3xl pb-2 text-[clamp(2.2rem,4.5vw,5rem)] font-semibold leading-[1.05] tracking-tight text-foreground [@media(max-height:760px)]:text-[clamp(2rem,4vw,4.35rem)]">
                   I help new technology make sense to real people.
                 </h1>
 
@@ -251,19 +269,44 @@ const CredentialsPage = () => {
                 </p>
               </div>
 
-              <div className="min-h-0">
+              <div className="grid min-h-0 grid-rows-[auto_minmax(0,1fr)] gap-2">
                 <Label>Strengths</Label>
-                <div className="mt-2 divide-y divide-foreground/10">
-                  {strengths.map((item) => (
-                    <div key={item.title} className="grid gap-4 py-2.5 first:pt-0 md:grid-cols-[7.5rem_minmax(0,1fr)] [@media(max-height:760px)]:py-2">
-                      <h2 className="text-sm font-semibold tracking-tight text-foreground">{item.title}</h2>
-                      <p className="text-[12px] leading-snug text-foreground/60 [@media(max-height:760px)]:hidden">{item.text}</p>
-                    </div>
-                  ))}
+                <div className="flex min-h-0 flex-col overflow-hidden" onMouseLeave={() => setActiveStrength(0)}>
+                  {strengths.map((item, index) => {
+                    const isActive = activeStrength === index;
+
+                    return (
+                      <motion.article
+                        variants={panelVariants}
+                        key={item.title}
+                        tabIndex={0}
+                        onMouseEnter={() => setActiveStrength(index)}
+                        onClick={() => setActiveStrength(index)}
+                        onFocus={() => setActiveStrength(index)}
+                        animate={{ flex: isActive ? 1.45 : 0.78 }}
+                        transition={{ duration: 0.82, ease: EASE_TEXT }}
+                        className="grid min-h-0 cursor-default gap-4 overflow-hidden border-t border-foreground/10 py-2.5 first:border-t-0 first:pt-0 md:grid-cols-[7.5rem_minmax(0,1fr)] [@media(max-height:760px)]:py-2"
+                      >
+                        <h2 className="text-sm font-semibold tracking-tight text-foreground">{item.title}</h2>
+                        <motion.p
+                          animate={{
+                            height: isActive ? "auto" : 0,
+                            opacity: isActive ? 1 : 0,
+                            y: isActive ? 0 : 4,
+                            filter: "blur(0px)",
+                          }}
+                          transition={{ duration: 0.42, ease: EASE_TEXT }}
+                          className="min-h-0 overflow-hidden text-[12px] leading-snug text-foreground/64 [@media(max-height:760px)]:text-[10.5px]"
+                        >
+                          {item.text}
+                        </motion.p>
+                      </motion.article>
+                    );
+                  })}
                 </div>
               </div>
 
-              <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-end">
+              <div className="space-y-3">
                 <div className="flex flex-wrap gap-2 [@media(max-height:760px)]:hidden">
                   {recognitions.map((item) => (
                     <span key={item} className="site-corner border border-foreground/10 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.14em] text-foreground/60">
@@ -272,23 +315,7 @@ const CredentialsPage = () => {
                   ))}
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <a
-                    href={RESUME_HREF}
-                    download
-                    className="site-corner flex h-16 w-28 flex-col justify-between bg-primary p-3 text-primary-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
-                  >
-                    <FileText className="h-4 w-4" strokeWidth={1.6} />
-                    <span className="font-mono text-[9px] uppercase tracking-[0.14em]">Resume</span>
-                  </a>
-                  <Link
-                    to="/experience"
-                    className="site-corner flex h-16 w-28 flex-col justify-between border border-foreground/10 bg-foreground/[0.035] p-3 text-foreground transition-colors hover:bg-foreground/10"
-                  >
-                    <ArrowUpRight className="h-4 w-4" strokeWidth={1.6} />
-                    <span className="font-mono text-[9px] uppercase tracking-[0.14em]">History</span>
-                  </Link>
-                </div>
+                <CredentialCtas />
               </div>
             </Panel>
 
@@ -312,21 +339,46 @@ const CredentialsPage = () => {
                     <Label>Evidence</Label>
                   </div>
 
-                  <div className="min-h-0 divide-y divide-foreground/10 overflow-hidden">
-                    {evidence.map((item) => (
-                      <motion.article variants={panelVariants} key={`${item.org}-${item.role}`} className="grid min-h-0 gap-2 px-4 py-3 md:grid-cols-[8.25rem_8.5rem_minmax(0,1fr)] md:gap-4 [@media(max-height:760px)]:px-3 [@media(max-height:760px)]:py-2">
-                        <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-foreground/44 [@media(max-height:760px)]:text-[9px]">{item.org}</p>
-                        <h2 className="text-sm font-semibold leading-tight tracking-tight text-foreground [@media(max-height:760px)]:text-[13px]">{item.role}</h2>
-                        <p className="text-[12px] leading-snug text-foreground/62 md:text-[13px] [@media(max-height:760px)]:text-[11px]">{item.proof}</p>
-                      </motion.article>
-                    ))}
+                  <div className="flex h-full min-h-0 flex-col overflow-hidden" onMouseLeave={() => setActiveEvidence(0)}>
+                    {evidence.map((item, index) => {
+                      const isActive = activeEvidence === index;
+
+                      return (
+                        <motion.article
+                          variants={panelVariants}
+                          key={`${item.org}-${item.role}`}
+                          tabIndex={0}
+                          onMouseEnter={() => setActiveEvidence(index)}
+                          onClick={() => setActiveEvidence(index)}
+                          onFocus={() => setActiveEvidence(index)}
+                          animate={{ flex: isActive ? 1.64 : 0.82 }}
+                          transition={{ duration: 0.9, ease: EASE_TEXT }}
+                          className="grid min-h-0 cursor-default gap-2 overflow-hidden border-t border-foreground/10 px-4 py-2.5 first:border-t-0 md:grid-cols-[8.25rem_8.5rem_minmax(0,1fr)] md:gap-4 [@media(max-height:760px)]:px-3 [@media(max-height:760px)]:py-2"
+                        >
+                          <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-foreground/44 [@media(max-height:760px)]:text-[9px]">{item.org}</p>
+                          <h2 className="text-sm font-semibold leading-tight tracking-tight text-foreground [@media(max-height:760px)]:text-[13px]">{item.role}</h2>
+                          <motion.p
+                            animate={{
+                              height: isActive ? "auto" : 0,
+                              opacity: isActive ? 1 : 0,
+                              y: isActive ? 0 : 5,
+                              filter: "blur(0px)",
+                            }}
+                            transition={{ duration: 0.42, ease: EASE_TEXT }}
+                            className="min-h-0 overflow-hidden text-[12px] leading-snug text-foreground/62 md:text-[13px] [@media(max-height:760px)]:text-[10.8px]"
+                          >
+                            {item.proof}
+                          </motion.p>
+                        </motion.article>
+                      );
+                    })}
                   </div>
                 </div>
               </Panel>
 
               <Panel className="p-4 [@media(max-height:760px)]:p-3">
                 <div className="grid gap-3 md:grid-cols-[8rem_minmax(0,1fr)] md:items-start">
-                  <Label>Best fit</Label>
+                  <Label>Searching for</Label>
                   <div className="grid gap-2 md:grid-cols-3">
                     {fit.map((item) => (
                       <p key={item} className="text-[12px] font-medium leading-snug text-foreground/72">

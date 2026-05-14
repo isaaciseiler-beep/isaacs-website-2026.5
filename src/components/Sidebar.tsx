@@ -52,6 +52,7 @@ interface SitemapItem {
 export const sitemapItems: SitemapItem[] = [
   { id: "hero", label: "Home", scrollTo: "hero" },
   { id: "projects", label: "Work", scrollTo: "projects", children: [
+    { id: "credentials", label: "Credentials", href: "/credentials" },
     { id: "experience", label: "Experience", href: "/experience" },
     { id: "project-archive", label: "Projects", href: "/projects" },
   ]},
@@ -97,6 +98,7 @@ const Sidebar = ({ open, onToggle, onClose, onSearchOpen, activeSection, showTog
   const isOnPhotos = location.pathname.startsWith("/photos");
   const isOnProjects = location.pathname.startsWith("/projects");
   const isOnExperience = location.pathname.startsWith("/experience");
+  const isOnCredentials = location.pathname.startsWith("/credentials");
 
   useEffect(() => {
     const activeParents = sitemapItems.reduce<Record<string, boolean>>((acc, item) => {
@@ -144,6 +146,7 @@ const Sidebar = ({ open, onToggle, onClose, onSearchOpen, activeSection, showTog
     if (isOnPhotos && item.id === "photos") return true;
     if (isOnProjects && item.id === "projects") return true;
     if (isOnExperience && item.id === "projects") return true;
+    if (isOnCredentials && item.id === "projects") return true;
     if (activeSection && activeSection === item.id) return true;
     return false;
   };
@@ -151,6 +154,7 @@ const Sidebar = ({ open, onToggle, onClose, onSearchOpen, activeSection, showTog
   const isChildActive = (child: { id: string; href: string }) => {
     if (location.pathname === "/photos/map" && child.id === "photo-map") return true;
     if (location.pathname === "/photos" && child.id === "portfolio") return true;
+    if (isOnCredentials && child.id === "credentials") return true;
     if (isOnExperience && child.id === "experience") return true;
     if (isOnProjects && child.id === "project-archive") return true;
     return location.pathname === child.href;

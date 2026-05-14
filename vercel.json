@@ -81,10 +81,6 @@
   ],
   "rewrites": [
     {
-      "source": "/404",
-      "destination": "/index.html"
-    },
-    {
       "source": "/fulbrightmap",
       "destination": "/index.html"
     }

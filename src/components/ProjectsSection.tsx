@@ -20,22 +20,23 @@ const useCenteredInFrame = <T extends HTMLElement>(enabled: boolean) => {
       return;
     }
 
-    const update = () => {
-      const el = ref.current;
-      if (!el) return;
-      const rect = el.getBoundingClientRect();
-      const viewportCenter = window.innerHeight / 2;
-      const elementCenter = rect.top + rect.height / 2;
-      const activeRange = Math.min(window.innerHeight * 0.18, rect.height * 0.45);
-      setIsCentered(Math.abs(elementCenter - viewportCenter) <= activeRange);
-    };
+    const el = ref.current;
+    if (!el || !("IntersectionObserver" in window)) return;
 
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const nextCentered = Boolean(entry?.isIntersecting);
+        setIsCentered((current) => (current === nextCentered ? current : nextCentered));
+      },
+      {
+        rootMargin: "-38% 0px -38% 0px",
+        threshold: 0,
+      },
+    );
+
+    observer.observe(el);
     return () => {
-      window.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
+      observer.disconnect();
     };
   }, [enabled]);
 
@@ -67,50 +68,54 @@ const FeaturedProjectCard = ({
   const card = (
     <motion.div
       ref={mobileCardRef}
-      className="group relative aspect-[4/3] h-auto cursor-pointer overflow-hidden bg-background md:aspect-auto md:h-full md:min-h-0 md:flex-[1_1_0%]"
-      style={{ minWidth: 0 }}
+      className="group relative aspect-[4/3] h-auto cursor-pointer overflow-hidden bg-background transition-[flex] duration-700 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none md:aspect-auto md:h-full md:min-h-0 md:flex-[1_1_0%]"
+      style={{
+        minWidth: 0,
+        contain: "layout paint",
+        flex: isDesktop ? (isActive ? "5.8 1 0%" : hasActive ? "0.9 1 0%" : "1 1 0%") : undefined,
+      }}
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true, margin: "-80px" }}
-      animate={isDesktop ? { flex: isActive ? 5.8 : hasActive ? 0.9 : 1 } : {}}
       transition={{
         opacity: { duration: 0.55, ease, delay: index * 0.12 },
-        flex: { duration: 1.08, ease: EXPAND_EASE },
       }}
       onMouseEnter={() => isDesktop && onActivate(index)}
       onClick={() => isDesktop && onOpen(index)}
     >
-      <motion.img
+      <img
         src={project.image}
         alt={project.title}
         loading="eager"
         decoding="async"
-        className="absolute inset-0 w-full h-full object-cover"
-        animate={{
-          filter: isImageActive ? "grayscale(0%) brightness(1)" : "grayscale(100%) brightness(0.7)",
-        }}
-        transition={{ duration: 0.85, ease }}
+        className={`absolute inset-0 h-full w-full object-cover transform-gpu transition-transform duration-700 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] ${
+          isImageActive ? "scale-[1.025]" : "scale-100"
+        }`}
       />
 
-      <motion.div
-        className="pointer-events-none absolute -inset-x-px -bottom-1 top-0"
+      <div
+        className={`pointer-events-none absolute inset-0 bg-black transition-opacity duration-500 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] ${
+          isImageActive ? "opacity-0" : "opacity-35"
+        }`}
+      />
+
+      <div
+        className={`pointer-events-none absolute -inset-x-px -bottom-1 top-0 transition-opacity duration-700 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] ${
+          isActive ? "opacity-100" : "opacity-0"
+        }`}
         style={{
           background:
             "linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.76) 18%, rgba(0,0,0,0.34) 52%, transparent 76%)",
         }}
-        animate={{ opacity: isActive ? 1 : 0 }}
-        transition={{ duration: 0.72, ease: EXPAND_EASE }}
       />
 
-      <motion.div
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-10 overflow-hidden p-5 md:p-7"
-        animate={{
-          opacity: isActive ? 1 : 0,
-          y: isActive ? 0 : 14,
-          filter: isActive ? "blur(0px)" : "blur(3px)",
-          clipPath: isActive ? "inset(0% 0% 0% 0%)" : "inset(18% 0% 0% 0%)",
+      <div
+        className={`pointer-events-none absolute inset-x-0 bottom-0 z-10 overflow-hidden p-5 transition-[opacity,transform] duration-500 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] md:p-7 ${
+          isActive ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"
+        }`}
+        style={{
+          transitionDelay: isActive ? "80ms" : "0ms",
         }}
-        transition={{ duration: 0.64, ease: EXPAND_EASE, delay: isActive ? 0.08 : 0 }}
       >
         <h3 className="mb-2 text-xl font-semibold leading-[0.95] tracking-tighter text-white md:text-3xl">
           {project.title}
@@ -135,7 +140,7 @@ const FeaturedProjectCard = ({
             </motion.span>
           </span>
         )}
-      </motion.div>
+      </div>
     </motion.div>
   );
 

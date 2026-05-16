@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { useSearchParams } from "react-router-dom";
 import Footer from "@/components/Footer";
 import Sidebar from "@/components/Sidebar";
 import SiteHeader from "@/components/SiteHeader";
 import PhotoPreview from "@/components/PhotoPreview";
+import { preloadImage, preloadImages, scheduleImagePreloads } from "@/lib/imagePreload";
 import { albums, albumPhotoFiles, albumPhotos, coverFor, type Album, type Continent } from "@/lib/photoAlbums";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -22,22 +23,30 @@ const featuredPhotos = {
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const EASE_TEXT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-// Eager preload covers + hero picks only (avoid 100+ image flood)
-if (typeof window !== "undefined") {
-  const preload = [
-    ...albums.map(coverFor),
-    featuredPhotos.hero, featuredPhotos.pairLeft, featuredPhotos.pairRight,
-    featuredPhotos.overlap, featuredPhotos.bottom,
-  ];
-  preload.forEach((src) => { const img = new Image(); img.src = src; });
-}
-
 const AlbumCover = ({ album, onClick }: { album: Album; onClick: () => void }) => {
   const [hovering, setHovering] = useState(false);
   const [flashIdx, setFlashIdx] = useState(-1);
+  const [decodedSrcs, setDecodedSrcs] = useState<Set<string>>(() => new Set([coverFor(album)]));
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const photos = albumPhotos(album);
-  const photoCount = photos.length;
+  const photos = useMemo(() => albumPhotos(album), [album]);
+  const readyHoverPhotos = photos.filter((src) => decodedSrcs.has(src));
+  const photoCount = readyHoverPhotos.length;
+
+  useEffect(() => {
+    if (!hovering) return;
+
+    photos.slice(0, 4).forEach((src) => {
+      void preloadImage(src, { decode: true, fetchPriority: "high" }).then((loaded) => {
+        if (!loaded) return;
+        setDecodedSrcs((current) => {
+          if (current.has(src)) return current;
+          const next = new Set(current);
+          next.add(src);
+          return next;
+        });
+      });
+    });
+  }, [hovering, photos]);
 
   useEffect(() => {
     if (hovering && photoCount > 0) {
@@ -60,9 +69,8 @@ const AlbumCover = ({ album, onClick }: { album: Album; onClick: () => void }) =
   }, [hovering, photoCount]);
 
   const cover = coverFor(album);
-  const allSrcs = [cover, ...photos];
-  const uniqueSrcs = [...new Set(allSrcs)];
-  const activeImage = flashIdx >= 0 ? photos[flashIdx] : cover;
+  const uniqueSrcs = [...new Set([cover, ...readyHoverPhotos])];
+  const activeImage = flashIdx >= 0 ? readyHoverPhotos[flashIdx] ?? cover : cover;
 
   return (
     <div
@@ -84,6 +92,8 @@ const AlbumCover = ({ album, onClick }: { album: Album; onClick: () => void }) =
               transition: "opacity 150ms ease-out, filter 500ms ease-out",
             }}
             loading="eager"
+            decoding="async"
+            fetchpriority="auto"
           />
         ))}
       </div>
@@ -117,7 +127,7 @@ const FeaturedHero = () => {
           transition={{ duration: 0.6, ease: EASE }}
           className="aspect-[4/3] overflow-hidden mb-[3px]"
         >
-          <img src={featuredPhotos.hero} alt="" className="w-full h-full object-cover" />
+          <img src={featuredPhotos.hero} alt="" className="w-full h-full object-cover" loading="eager" decoding="async" fetchpriority="high" />
         </motion.div>
 
         {/* Row 2: pair of 4:3 */}
@@ -127,14 +137,14 @@ const FeaturedHero = () => {
             transition={{ duration: 0.6, ease: EASE, delay: 0.08 }}
             className="aspect-[4/3] overflow-hidden"
           >
-            <img src={featuredPhotos.pairLeft} alt="" className="w-full h-full object-cover" />
+            <img src={featuredPhotos.pairLeft} alt="" className="w-full h-full object-cover" loading="eager" decoding="async" fetchpriority="high" />
           </motion.div>
           <motion.div
             {...fade}
             transition={{ duration: 0.6, ease: EASE, delay: 0.14 }}
             className="aspect-[4/3] overflow-hidden"
           >
-            <img src={featuredPhotos.pairRight} alt="" className="w-full h-full object-cover" />
+            <img src={featuredPhotos.pairRight} alt="" className="w-full h-full object-cover" loading="eager" decoding="async" fetchpriority="high" />
           </motion.div>
         </div>
 
@@ -145,7 +155,7 @@ const FeaturedHero = () => {
             transition={{ duration: 0.6, ease: EASE, delay: 0.2 }}
             className="aspect-[4/3] overflow-hidden"
           >
-            <img src={featuredPhotos.bottom} alt="" className="w-full h-full object-cover" />
+            <img src={featuredPhotos.bottom} alt="" className="w-full h-full object-cover" loading="eager" decoding="async" fetchpriority="high" />
           </motion.div>
           {/* Floating 70%-scale 4:3 sitting between row 2 and row 3, right-aligned with buffer */}
           <motion.div
@@ -159,7 +169,7 @@ const FeaturedHero = () => {
               transform: "translateY(-50%)",
             }}
           >
-            <img src={featuredPhotos.overlap} alt="" className="w-full h-full object-cover" />
+            <img src={featuredPhotos.overlap} alt="" className="w-full h-full object-cover" loading="eager" decoding="async" fetchpriority="high" />
           </motion.div>
         </div>
       </div>
@@ -212,6 +222,30 @@ const PhotosPage = () => {
   };
 
   const previewImages = currentAlbum ? albumPhotos(currentAlbum) : [];
+
+  useEffect(() => {
+    const featured = [
+      featuredPhotos.hero,
+      featuredPhotos.pairLeft,
+      featuredPhotos.pairRight,
+      featuredPhotos.overlap,
+      featuredPhotos.bottom,
+    ];
+
+    void preloadImages([...featured, ...albums.map(coverFor)], {
+      decode: true,
+      fetchPriority: "high",
+      linkPreload: true,
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!currentAlbum) return;
+    scheduleImagePreloads(albumPhotos(currentAlbum), {
+      decode: true,
+      fetchPriority: "low",
+    });
+  }, [currentAlbum]);
 
   const handleSidebarToggle = () => {
     setSearchOpen(false);
@@ -321,7 +355,14 @@ const PhotosPage = () => {
                               onClick={() => setPreviewIdx(row.startIdx + pi)}
                             >
                               <div className="aspect-[4/3] overflow-hidden">
-                                <img src={photo} alt="" loading="lazy" className="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-700 ease-out" />
+                                <img
+                                  src={photo}
+                                  alt=""
+                                  loading={row.startIdx + pi < 4 ? "eager" : "lazy"}
+                                  decoding="async"
+                                  fetchpriority={row.startIdx + pi < 4 ? "high" : "auto"}
+                                  className="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-700 ease-out"
+                                />
                               </div>
                             </motion.div>
                           ))}
@@ -340,7 +381,14 @@ const PhotosPage = () => {
                         onClick={() => setPreviewIdx(row.startIdx)}
                       >
                         <div className="aspect-[4/3] overflow-hidden">
-                          <img src={photo} alt="" loading="lazy" className="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-700 ease-out" />
+                          <img
+                            src={photo}
+                            alt=""
+                            loading={row.startIdx < 4 ? "eager" : "lazy"}
+                            decoding="async"
+                            fetchpriority={row.startIdx < 4 ? "high" : "auto"}
+                            className="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-700 ease-out"
+                          />
                         </div>
                       </motion.div>
                     );

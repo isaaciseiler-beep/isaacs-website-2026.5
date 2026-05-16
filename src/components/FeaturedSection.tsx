@@ -104,7 +104,7 @@ const FeaturedSection = () => {
                 className="w-full h-full object-cover"
                 loading={i === 0 ? "eager" : "lazy"}
                 decoding="async"
-                fetchPriority={i === 0 ? "high" : "auto"}
+                fetchpriority={i === 0 ? "high" : "auto"}
               />
               <div
                 className="absolute bottom-0 left-0 right-0 p-4"

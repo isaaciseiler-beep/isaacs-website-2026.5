@@ -4,6 +4,7 @@ import { ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import ProjectModal from "@/components/ProjectModal";
 import SectionHeading from "@/components/SectionHeading";
+import { preloadImages } from "@/lib/imagePreload";
 import { featuredProjectIds, projectItems, type ProjectItem } from "@/lib/siteContent";
 
 const GAP = 3;
@@ -175,10 +176,10 @@ const ProjectsSection = () => {
   );
 
   useEffect(() => {
-    projects.forEach((project) => {
-      const image = new Image();
-      image.decoding = "async";
-      image.src = project.image;
+    void preloadImages(projects.map((project) => project.image), {
+      decode: true,
+      fetchPriority: "high",
+      linkPreload: true,
     });
   }, [projects]);
 

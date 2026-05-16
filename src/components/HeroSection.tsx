@@ -19,12 +19,6 @@ const headlineLines = [
   ],
 ] as const;
 
-const mobileLaneClasses = [
-  "mobile-hero-lane mobile-hero-lane-top",
-  "mobile-hero-lane mobile-hero-lane-middle",
-  "mobile-hero-lane mobile-hero-lane-bottom",
-] as const;
-
 const SAFE_EDGE = 56;
 const HEADER_CLEARANCE = 104;
 const MIN_WORD_GAP = 28;
@@ -91,36 +85,11 @@ const afterLayoutSettles = (callback: () => void) => {
   });
 };
 
-const MobileHeroText = () => {
-  return (
-    <>
-      <div className="mobile-hero-stage md:hidden" aria-hidden="true">
-        {headlineLines.map((line, lineIndex) => (
-          <div key={`mobile-hero-lane-${lineIndex}`} className={mobileLaneClasses[lineIndex]}>
-            <span>{line.map((word) => word.text).join(" ")}</span>
-          </div>
-        ))}
-      </div>
+interface HeroSectionProps {
+  playIntro?: boolean;
+}
 
-      <h1
-        className="mobile-hero-final md:hidden"
-        aria-label="Building at the intersection of AI and society."
-      >
-        {headlineLines.map((line, lineIndex) => (
-          <span key={`mobile-hero-final-line-${lineIndex}`} className="block whitespace-nowrap">
-            {line.map((word, wordIndex) => (
-              <span key={word.text} style={{ marginRight: wordIndex === line.length - 1 ? 0 : "0.25em" }}>
-                {word.text}
-              </span>
-            ))}
-          </span>
-        ))}
-      </h1>
-    </>
-  );
-};
-
-const HeroSection = () => {
+const HeroSection = ({ playIntro = false }: HeroSectionProps) => {
   const { scrollY } = useScroll();
   const textOpacity = useTransform(scrollY, [0, 400], [1, 0]);
   const sectionRef = useRef<HTMLElement | null>(null);
@@ -131,6 +100,12 @@ const HeroSection = () => {
   let order = 0;
 
   useLayoutEffect(() => {
+    if (!playIntro) {
+      hasMeasuredRef.current = false;
+      setWordOffsets([]);
+      return;
+    }
+
     const measure = () => {
       const section = sectionRef.current;
       if (!section) return;
@@ -233,7 +208,7 @@ const HeroSection = () => {
       window.clearTimeout(fallbackTimer);
       window.removeEventListener("resize", handleResize);
     };
-  }, []);
+  }, [playIntro]);
 
   return (
     <section ref={sectionRef} className="relative flex h-[100svh] min-h-[100svh] items-end overflow-hidden">
@@ -243,12 +218,11 @@ const HeroSection = () => {
         className="absolute inset-x-0 bottom-0 top-20 z-10 flex items-end overflow-hidden px-6 pb-[calc(env(safe-area-inset-bottom)+3.5rem)] md:top-24 md:pb-6"
         style={{ opacity: textOpacity }}
       >
-        <MobileHeroText />
-
         <h1
-          className="hidden max-w-6xl text-[clamp(2.2rem,10.8vw,3rem)] font-semibold leading-[0.85] tracking-tighter text-foreground md:block md:text-7xl lg:text-8xl"
+          className="block w-full max-w-[34rem] text-[clamp(2rem,10vw,2.7rem)] font-semibold leading-[0.85] tracking-tighter text-foreground md:max-w-6xl md:text-7xl lg:text-8xl"
           aria-label="Building at the intersection of AI and society."
-          data-ready={wordOffsets.length > 0 ? "true" : "false"}
+          data-intro={playIntro ? "play" : "skip"}
+          data-ready={playIntro && wordOffsets.length > 0 ? "true" : "false"}
         >
           {headlineLines.map((line, lineIndex) => (
             <span

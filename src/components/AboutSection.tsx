@@ -213,7 +213,9 @@ const AboutSection = ({ revealEnabled = true }: AboutSectionProps) => {
                 src={headshotUrl}
                 alt="Portrait"
                 className="h-full w-full object-cover grayscale transition-[filter] duration-700 group-hover/headshot:grayscale-0"
-                loading="lazy"
+                loading="eager"
+                decoding="async"
+                fetchpriority="high"
               />
             </motion.div>
           </motion.div>

@@ -254,7 +254,15 @@ const InspirationBoard = () => {
     if (item.imageUrl) {
       return (
         <div className="group relative w-full h-full overflow-hidden flex items-center justify-center">
-          <img src={item.imageUrl} alt={item.title} className={`w-full h-full ${item.transparent ? "object-contain" : "object-cover"} grayscale group-hover:grayscale-0 transition-all duration-500`} draggable={false} />
+          <img
+            src={item.imageUrl}
+            alt={item.title}
+            className={`w-full h-full ${item.transparent ? "object-contain" : "object-cover"} grayscale group-hover:grayscale-0 transition-all duration-500`}
+            draggable={false}
+            loading="eager"
+            decoding="async"
+            fetchpriority="low"
+          />
         </div>
       );
     }
@@ -563,6 +571,9 @@ const CarouselCard = ({ item, index, width, height, onOpen, renderCard }: Carous
             alt={item.title}
             className="h-full w-full object-contain grayscale transition-all duration-500 hover:grayscale-0"
             draggable={false}
+            loading="eager"
+            decoding="async"
+            fetchpriority="low"
           />
         ) : (
           renderCard(item)

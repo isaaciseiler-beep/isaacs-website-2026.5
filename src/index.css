@@ -147,92 +147,20 @@
   }
 
   .hero-kinetic-word {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: none;
+  }
+
+  h1[data-intro="play"] .hero-kinetic-word {
     opacity: 0;
     transform: translate3d(var(--hero-x), var(--hero-y), 0) scale(0.98);
     filter: blur(8px);
     will-change: transform, opacity, filter;
   }
 
-  h1[data-ready="true"] .hero-kinetic-word {
-    animation: hero-word-assemble 2.52s var(--hero-delay) cubic-bezier(0.55, 0, 0.2, 1) both;
-  }
-
-  .mobile-hero-stage {
-    position: absolute;
-    inset: 0 1.125rem calc(env(safe-area-inset-bottom) + 3.25rem);
-    overflow: hidden;
-    pointer-events: none;
-  }
-
-  .mobile-hero-lane {
-    position: absolute;
-    left: 0;
-    right: 0;
-    display: flex;
-    font-size: clamp(1.9rem, 8.8vw, 2.45rem);
-    font-weight: 600;
-    line-height: 0.86;
-    letter-spacing: -0.03em;
-    color: hsl(var(--foreground));
-    --mobile-hero-drop: 1rem;
-  }
-
-  .mobile-hero-lane-top {
-    top: 4.5rem;
-  }
-
-  .mobile-hero-lane-middle {
-    top: 50%;
-    transform: translateY(-50%);
-  }
-
-  .mobile-hero-lane-bottom {
-    bottom: 0;
-  }
-
-  .mobile-hero-lane span {
-    display: block;
-    white-space: nowrap;
-    opacity: 1;
-    transform: translateY(0);
-    will-change: transform, opacity, filter;
-    animation: mobile-hero-lane-out 1.42s 0.78s cubic-bezier(0.55, 0, 0.2, 1) both;
-  }
-
-  .mobile-hero-lane-top span {
-    --mobile-hero-drop: calc(100svh - 18rem);
-  }
-
-  .mobile-hero-lane-middle span {
-    --mobile-hero-drop: calc(50svh - 6.4rem);
-  }
-
-  .mobile-hero-lane-bottom span {
-    --mobile-hero-drop: 1rem;
-  }
-
-  .mobile-hero-lane-top,
-  .mobile-hero-lane-middle {
-    justify-content: flex-start;
-  }
-
-  .mobile-hero-lane-bottom {
-    justify-content: flex-end;
-  }
-
-  .mobile-hero-final {
-    position: relative;
-    z-index: 1;
-    width: min(100%, 34rem);
-    font-size: clamp(2rem, 10vw, 2.7rem);
-    font-weight: 600;
-    line-height: 0.86;
-    letter-spacing: -0.03em;
-    color: hsl(var(--foreground));
-    opacity: 0;
-    transform: translateY(1.25rem);
-    will-change: transform, opacity, filter;
-    animation: mobile-hero-final-in 1.22s 1.18s cubic-bezier(0.55, 0, 0.2, 1) both;
+  h1[data-intro="play"][data-ready="true"] .hero-kinetic-word {
+    animation: hero-word-assemble 2.34s var(--hero-delay) cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
   .work-cta-link {
@@ -806,86 +734,20 @@
     filter: blur(8px);
   }
 
-  16% {
+  14% {
     opacity: 1;
-    transform: translate3d(var(--hero-x), var(--hero-y), 0) scale(1);
-    filter: blur(0);
-  }
-
-  44% {
-    opacity: 1;
-    transform: translate3d(var(--hero-x), var(--hero-y), 0) scale(1);
-    filter: blur(0);
-    animation-timing-function: cubic-bezier(0.72, 0, 0.24, 1);
-  }
-
-  58% {
-    opacity: 1;
-    transform: translate3d(calc(var(--hero-x) * 0.58), calc(var(--hero-y) * 0.58), 0) scale(1);
-    filter: blur(0.65px);
-    animation-timing-function: cubic-bezier(0.72, 0, 0.24, 1);
-  }
-
-  74% {
-    opacity: 1;
-    transform: translate3d(calc(var(--hero-x) * 0.58), calc(var(--hero-y) * 0.58), 0) scale(1);
-    filter: blur(0);
-    animation-timing-function: cubic-bezier(0.72, 0, 0.24, 1);
-  }
-
-  88% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
-    filter: blur(0);
-    animation-timing-function: cubic-bezier(0.72, 0, 0.24, 1);
+    filter: blur(2px);
   }
 
   100% {
     opacity: 1;
     transform: translate3d(0, 0, 0) scale(1);
-    filter: blur(0);
-  }
-}
-
-@keyframes mobile-hero-lane-out {
-  0%,
-  16% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-    filter: blur(0);
-  }
-
-  72% {
-    opacity: 0.9;
-    transform: translate3d(0, var(--mobile-hero-drop), 0);
-    filter: blur(0);
-  }
-
-  100% {
-    opacity: 0;
-    transform: translate3d(0, calc(var(--mobile-hero-drop) + 0.75rem), 0);
-    filter: blur(5px);
-  }
-}
-
-@keyframes mobile-hero-final-in {
-  0%,
-  22% {
-    opacity: 0;
-    transform: translate3d(0, 1.25rem, 0);
-    filter: blur(6px);
-  }
-
-  72%,
-  100% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
     filter: blur(0);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  h1[data-ready="true"] .hero-kinetic-word,
+  h1[data-intro="play"][data-ready="true"] .hero-kinetic-word,
   .hero-kinetic-word {
     animation: none;
     opacity: 1;
@@ -893,18 +755,6 @@
     filter: none;
   }
 
-  .mobile-hero-lane {
-    animation: none;
-    display: none;
-  }
-
-  .mobile-hero-lane span,
-  .mobile-hero-final {
-    animation: none;
-    opacity: 1;
-    transform: none;
-    filter: none;
-  }
 }
 
 .fulbright-pin-popup .mapboxgl-popup-content {

@@ -1,10 +1,11 @@
 import { useRef, useState, useEffect } from "react";
-import { motion, useInView } from "framer-motion";
+import { useInView, useReducedMotion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import SectionHeading from "@/components/SectionHeading";
 import PhotoPreview from "@/components/PhotoPreview";
 import { albums, coverFor } from "@/lib/photoAlbums";
+import { preloadImages } from "@/lib/imagePreload";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const photos = albums.map((a, i) => ({
@@ -13,8 +14,6 @@ const photos = albums.map((a, i) => ({
   image: coverFor(a),
 }));
 
-photos.forEach((p) => { const img = new Image(); img.src = p.image; });
-
 const PhotoSection = () => {
   const [previewIdx, setPreviewIdx] = useState<number | null>(null);
   const [hovering, setHovering] = useState(false);
@@ -22,30 +21,39 @@ const PhotoSection = () => {
   const previewRef = useRef<HTMLDivElement | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isMobile = useIsMobile();
+  const prefersReducedMotion = useReducedMotion();
   const isPreviewInView = useInView(previewRef, { amount: 0.55 });
-  const shouldFlipPhotos = isMobile ? isPreviewInView : hovering;
+  const shouldFlipPhotos = !prefersReducedMotion && (isMobile ? isPreviewInView : hovering);
+
+  useEffect(() => {
+    void preloadImages(photos.map((photo) => photo.image), {
+      decode: true,
+      fetchPriority: "high",
+      linkPreload: true,
+    });
+  }, []);
 
   useEffect(() => {
     if (!shouldFlipPhotos) {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
       return;
     }
     let tick = 0;
-    let i = activeIdx;
     const schedule = () => {
-      // staggered cadence: slow start, accelerate, then ease out
       const cadence = [520, 380, 260, 200, 170, 160, 170, 200, 260, 340, 420, 500];
       const delay = cadence[tick % cadence.length];
       timeoutRef.current = setTimeout(() => {
-        i = (i + 1) % photos.length;
-        setActiveIdx(i);
-        tick++;
+        setActiveIdx((current) => (current + 1) % photos.length);
+        tick += 1;
         schedule();
       }, delay);
     };
     schedule();
-    return () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    };
   }, [shouldFlipPhotos]);
 
   return (
@@ -75,6 +83,8 @@ const PhotoSection = () => {
                 transition: "opacity 140ms ease-out, filter 600ms ease-out, transform 900ms cubic-bezier(0.16,1,0.3,1)",
               }}
               loading="eager"
+              decoding="async"
+              fetchpriority={idx < 4 ? "high" : "auto"}
             />
           ))}
         </div>

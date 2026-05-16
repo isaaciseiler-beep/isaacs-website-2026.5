@@ -68,7 +68,14 @@ const ProjectModal = ({ projects, currentIndex, onClose, onNavigate }: ProjectMo
 
             <div className="min-h-0">
               <div className="relative min-h-[220px] overflow-hidden">
-                <img src={project.image} alt={project.title} className="h-full w-full object-cover grayscale" />
+                <img
+                  src={project.image}
+                  alt={project.title}
+                  className="h-full w-full object-cover grayscale"
+                  loading="eager"
+                  decoding="async"
+                  fetchpriority="high"
+                />
                 <div
                   className="absolute inset-0"
                   style={{

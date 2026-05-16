@@ -84,7 +84,9 @@ const NewsSection = () => {
                       src={item.imageUrl}
                       alt={item.title}
                       className="absolute inset-0 h-full w-full object-cover grayscale transition-all duration-700 ease-out group-hover:scale-[1.02] group-hover:grayscale-0"
-                      loading="lazy"
+                      loading="eager"
+                      decoding="async"
+                      fetchpriority={index < 4 ? "high" : "low"}
                     />
                   )}
                   <div className="absolute inset-0 bg-[linear-gradient(to_top,hsl(var(--image-scrim)/0.94)_0%,hsl(var(--image-scrim)/0.48)_48%,transparent_100%)]" />
@@ -94,7 +96,9 @@ const NewsSection = () => {
                         src={item.logoUrl}
                         alt={item.logoAlt}
                         className="h-full w-auto max-w-[120px] object-contain opacity-90 brightness-0 invert transition-opacity duration-200 group-hover:opacity-100"
-                        loading="lazy"
+                        loading="eager"
+                        decoding="async"
+                        fetchpriority="low"
                       />
                     </div>
                     <h3 className="news-card-title pr-8 text-[0.92rem] font-semibold leading-tight tracking-tight text-white transition-colors duration-200 md:text-[1.15rem]">

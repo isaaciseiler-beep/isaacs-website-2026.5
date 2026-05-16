@@ -12,14 +12,20 @@ import Footer from "@/components/Footer";
 import ParallaxSection from "@/components/ParallaxSection";
 import Sidebar, { sitemapItems } from "@/components/Sidebar";
 import SiteHeader from "@/components/SiteHeader";
+import headshotUrl from "@/assets/headshot.jpg";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { preloadImages, scheduleImagePreloads } from "@/lib/imagePreload";
+import { inspirationItems } from "@/lib/inspirationItems";
+import { albums, coverFor } from "@/lib/photoAlbums";
 import { scrollToPageSection } from "@/lib/scroll";
+import { featuredProjectIds, newsItems, projectItems } from "@/lib/siteContent";
 
 const HOME_INTRO_AUTO_SCROLL_DELAY = 3408;
 const HOME_INTRO_AUTO_SCROLL_DURATION = 2200;
 const HEADER_SCROLL_OFFSET = 96;
 const WORK_AUTO_SCROLL_OFFSET = 118;
 const WORK_SCROLL_CONTENT_SELECTOR = "[data-work-scroll-content]";
+const HOME_INTRO_STORAGE_KEY = "pixel-canvas-home-intro-seen";
 
 const easeIntroScroll = (progress: number) => {
   if (progress < 0.5) return 4 * progress * progress * progress;
@@ -31,6 +37,19 @@ const Index = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("hero");
   const [aboutRevealEnabled, setAboutRevealEnabled] = useState(false);
+  const [playHomeIntro] = useState(() => {
+    if (typeof window === "undefined") return false;
+
+    try {
+      const hasSeenIntro = window.sessionStorage.getItem(HOME_INTRO_STORAGE_KEY) === "true";
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const shouldPlay = !hasSeenIntro && !window.location.hash && !reduceMotion;
+      window.sessionStorage.setItem(HOME_INTRO_STORAGE_KEY, "true");
+      return shouldPlay;
+    } catch {
+      return !window.location.hash;
+    }
+  });
   const isMobile = useIsMobile();
   const location = useLocation();
 
@@ -56,6 +75,25 @@ const Index = () => {
       window.history.scrollRestoration = previousScrollRestoration;
     };
   }, [location.hash]);
+
+  useEffect(() => {
+    const featuredProjectImages = featuredProjectIds
+      .map((id) => projectItems.find((project) => project.id === id)?.image)
+      .filter((image): image is string => Boolean(image));
+    const photoCovers = albums.map(coverFor);
+    const newsAssets = newsItems.flatMap((item) => [item.imageUrl, item.logoUrl]).filter((src): src is string => Boolean(src));
+    const inspirationAssets = inspirationItems.map((item) => item.imageUrl).filter((src): src is string => Boolean(src));
+
+    void preloadImages([headshotUrl, ...featuredProjectImages.slice(0, 4), ...photoCovers.slice(0, 4)], {
+      decode: true,
+      fetchPriority: "high",
+      linkPreload: true,
+    });
+    scheduleImagePreloads([...photoCovers.slice(4), ...newsAssets, ...inspirationAssets, ...featuredProjectImages.slice(4)], {
+      decode: true,
+      fetchPriority: "low",
+    });
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -91,6 +129,11 @@ const Index = () => {
   }, [location.hash]);
 
   useEffect(() => {
+    if (!playHomeIntro) {
+      setAboutRevealEnabled(true);
+      return;
+    }
+
     if (isMobile) {
       setAboutRevealEnabled(true);
       return;
@@ -215,7 +258,7 @@ const Index = () => {
       removeIntentListeners();
       removePostAutoIntentListeners();
     };
-  }, [isMobile, location.hash]);
+  }, [isMobile, location.hash, playHomeIntro]);
 
   return (
     <div className="relative">
@@ -242,7 +285,7 @@ const Index = () => {
         transition={{ duration: 0.56, ease: [0.22, 1, 0.36, 1] }}
       >
         <main>
-          <div id="hero"><HeroSection /></div>
+          <div id="hero"><HeroSection playIntro={playHomeIntro} /></div>
           <ParallaxSection id="projects" offset={70}><ProjectsSection /></ParallaxSection>
           <ParallaxSection id="about" offset={60}><AboutSection revealEnabled={aboutRevealEnabled} /></ParallaxSection>
           <ParallaxSection id="news" offset={55}><NewsSection /></ParallaxSection>

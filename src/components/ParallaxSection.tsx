@@ -1,5 +1,5 @@
 import { useRef, ReactNode } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 
 interface ParallaxSectionProps {
   children: ReactNode;
@@ -11,6 +11,7 @@ interface ParallaxSectionProps {
 
 const ParallaxSection = ({ children, offset = 60, className, id, clip = true }: ParallaxSectionProps) => {
   const ref = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = useReducedMotion();
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"],
@@ -20,7 +21,7 @@ const ParallaxSection = ({ children, offset = 60, className, id, clip = true }: 
 
   return (
     <div ref={ref} id={id} className={className} style={clip ? { overflow: "hidden" } : undefined}>
-      <motion.div style={{ y }}>
+      <motion.div style={prefersReducedMotion ? undefined : { y }}>
         {children}
       </motion.div>
     </div>

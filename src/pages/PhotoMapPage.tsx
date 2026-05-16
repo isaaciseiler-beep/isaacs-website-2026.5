@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRight, RotateCcw } from "lucide-react";
@@ -198,6 +198,7 @@ const PhotoMapPage = () => {
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markerEntriesRef = useRef<Map<string, MarkerEntry>>(new Map());
   const mapLoadedRef = useRef(false);
+  const selectedLocationOffsetRef = useRef<() => [number, number]>(() => [0, 0]);
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -211,17 +212,22 @@ const PhotoMapPage = () => {
     [activeEntryId],
   );
 
-  const selectedLocationOffset = () => {
+  const selectedLocationOffset = useCallback(() => {
     if (isMobile) return [0, -(MOBILE_PANEL_HEIGHT / 2)] as [number, number];
 
     return [-(DESKTOP_PANEL_WIDTH + DESKTOP_PANEL_GUTTER * 2) / 2, 0] as [number, number];
-  };
+  }, [isMobile]);
+
+  useEffect(() => {
+    selectedLocationOffsetRef.current = selectedLocationOffset;
+  }, [selectedLocationOffset]);
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current || !mapboxToken) return;
 
     mapboxgl.accessToken = mapboxToken;
     const initialView = defaultMapView(isMobile);
+    const markerEntries = markerEntriesRef.current;
     const map = new mapboxgl.Map({
       container: containerRef.current,
       style: MONOCHROME_MAP_STYLE,
@@ -257,8 +263,8 @@ const PhotoMapPage = () => {
     map.on("click", () => setActiveEntryId(null));
 
     return () => {
-      markerEntriesRef.current.forEach(({ marker }) => marker.remove());
-      markerEntriesRef.current.clear();
+      markerEntries.forEach(({ marker }) => marker.remove());
+      markerEntries.clear();
       map.remove();
       mapRef.current = null;
       mapLoadedRef.current = false;
@@ -343,7 +349,7 @@ const PhotoMapPage = () => {
         map.easeTo({
           center: entry.coordinates as LngLatLike,
           zoom: Math.max(map.getZoom(), 3.25),
-          offset: selectedLocationOffset(),
+          offset: selectedLocationOffsetRef.current(),
           duration: 980,
           easing: (t) => 1 - Math.pow(1 - t, 4),
           essential: true,

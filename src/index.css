@@ -152,15 +152,48 @@
     filter: none;
   }
 
-  h1[data-intro="play"] .hero-kinetic-word {
-    opacity: 0;
-    transform: translate3d(var(--hero-x), var(--hero-y), 0) scale(0.98);
-    filter: blur(8px);
+  .hero-cursor-trail {
+    cursor: default;
+    touch-action: pan-y;
+  }
+
+  .hero-cursor-trail-item {
+    position: absolute;
+    overflow: visible;
+    background: hsl(var(--background));
+    pointer-events: none;
+    user-select: none;
     will-change: transform, opacity, filter;
   }
 
+  .hero-cursor-trail-item img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  h1[data-intro="play"] .hero-kinetic-word {
+    opacity: 1;
+    transform: translate3d(var(--hero-x), var(--hero-y), 0) scale(0.98);
+    filter: none;
+    will-change: transform, opacity;
+  }
+
   h1[data-intro="play"][data-ready="true"] .hero-kinetic-word {
-    animation: hero-word-assemble 2.34s var(--hero-delay) cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: hero-word-assemble 2.08s var(--hero-delay) cubic-bezier(0.14, 0.92, 0.18, 1) both;
+  }
+
+  .home-intro-overlay {
+    isolation: isolate;
+    pointer-events: auto;
+  }
+
+  .home-intro-mask {
+    display: block;
+    transform: translateZ(0);
   }
 
   .work-cta-link {
@@ -729,30 +762,34 @@
 
 @keyframes hero-word-assemble {
   0% {
-    opacity: 0;
+    opacity: 1;
     transform: translate3d(var(--hero-x), var(--hero-y), 0) scale(0.98);
-    filter: blur(8px);
   }
 
-  14% {
+  62% {
     opacity: 1;
-    filter: blur(2px);
+    transform: translate3d(var(--hero-correct-x), 0, 0) scale(1.008);
   }
 
   100% {
     opacity: 1;
     transform: translate3d(0, 0, 0) scale(1);
-    filter: blur(0);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  h1[data-intro="play"],
+  h1[data-intro="play"][data-ready="true"],
   h1[data-intro="play"][data-ready="true"] .hero-kinetic-word,
   .hero-kinetic-word {
     animation: none;
     opacity: 1;
     transform: none;
     filter: none;
+  }
+
+  .home-intro-overlay {
+    display: none;
   }
 
 }

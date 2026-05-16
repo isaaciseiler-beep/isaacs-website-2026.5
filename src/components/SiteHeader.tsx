@@ -170,16 +170,17 @@ const SiteHeader = ({ open, onToggle, searchOpen, onSearchOpen, onSearchClose }:
       const header = headerRef.current;
       if (!header) return;
 
-      setHeaderInk(inkForRect(header.getBoundingClientRect(), header));
+      const nextHeaderInk = inkForRect(header.getBoundingClientRect(), header);
+      setHeaderInk((current) => (current === nextHeaderInk ? current : nextHeaderInk));
 
       const searchControl = document.querySelector<HTMLElement>(
         ".site-header-search, button[aria-label='Search']",
       );
-      if (searchControl) {
-        setSearchInk(inkForRect(searchControl.getBoundingClientRect(), header));
-      } else {
-        setSearchInk(inkForRect(new DOMRect(window.innerWidth - 49, 16, 25, 25), header));
-      }
+      const nextSearchInk = searchControl
+        ? inkForRect(searchControl.getBoundingClientRect(), header)
+        : inkForRect(new DOMRect(window.innerWidth - 49, 16, 25, 25), header);
+
+      setSearchInk((current) => (current === nextSearchInk ? current : nextSearchInk));
     };
 
     const scheduleUpdate = () => {
@@ -189,24 +190,28 @@ const SiteHeader = ({ open, onToggle, searchOpen, onSearchOpen, onSearchClose }:
 
     updateInk();
     scheduleUpdate();
-    timers.push(window.setTimeout(scheduleUpdate, 80));
-    timers.push(window.setTimeout(scheduleUpdate, 220));
-    timers.push(window.setInterval(scheduleUpdate, 180));
+    [80, 220, 520, 1000].forEach((delay) => {
+      timers.push(window.setTimeout(scheduleUpdate, delay));
+    });
 
     const observer = new MutationObserver(scheduleUpdate);
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class", "style"] });
 
     window.addEventListener("scroll", scheduleUpdate, { passive: true });
-    window.addEventListener("pointermove", scheduleUpdate, { passive: true });
     window.addEventListener("resize", scheduleUpdate);
+    window.addEventListener("load", scheduleUpdate, true);
+    document.addEventListener("animationend", scheduleUpdate, true);
+    document.addEventListener("transitionend", scheduleUpdate, true);
 
     return () => {
       if (frame) window.cancelAnimationFrame(frame);
       timers.forEach((timer) => window.clearTimeout(timer));
       observer.disconnect();
       window.removeEventListener("scroll", scheduleUpdate);
-      window.removeEventListener("pointermove", scheduleUpdate);
       window.removeEventListener("resize", scheduleUpdate);
+      window.removeEventListener("load", scheduleUpdate, true);
+      document.removeEventListener("animationend", scheduleUpdate, true);
+      document.removeEventListener("transitionend", scheduleUpdate, true);
     };
   }, [theme]);
 

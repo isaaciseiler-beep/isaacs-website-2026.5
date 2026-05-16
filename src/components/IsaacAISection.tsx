@@ -1,11 +1,13 @@
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 import { ArrowUp } from "lucide-react";
 import AnimatedText from "@/components/AnimatedText";
 import { CONTACT_EMAIL } from "@/lib/site";
 import {
   askSiteAssistant,
+  countUserMessages,
   isChatLimitReached,
+  MAX_CHAT_USER_MESSAGES,
   type ChatRequestMessage,
   type ChatSource,
 } from "@/lib/chatClient";
@@ -182,11 +184,14 @@ const IsaacAISection = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [typingMessageId, setTypingMessageId] = useState<string | null>(null);
+  const [inputFocused, setInputFocused] = useState(false);
+  const [keyboardSpacer, setKeyboardSpacer] = useState(0);
   const headingRef = useRef<HTMLDivElement | null>(null);
   const paneRef = useRef<HTMLDivElement | null>(null);
   const requestIdRef = useRef(0);
   const messageListRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const inputPillRef = useRef<HTMLDivElement | null>(null);
   const pageScrollBeforeFocusRef = useRef(0);
   const focusRestoreTimersRef = useRef<number[]>([]);
   const headingInView = useInView(headingRef, { amount: 0.72, margin: "-80px" });
@@ -194,6 +199,14 @@ const IsaacAISection = () => {
 
   const limitReached = isChatLimitReached(messages);
   const hasConversation = messages.length > 0 || isLoading;
+  const userMessageCount = countUserMessages(messages);
+  const nextMessageNumber = Math.min(userMessageCount + 1, MAX_CHAT_USER_MESSAGES);
+  const inputLabel = `Message ${nextMessageNumber} of ${MAX_CHAT_USER_MESSAGES}`;
+
+  const isMobileInputViewport = useCallback(
+    () => window.matchMedia("(max-width: 767px), (pointer: coarse)").matches,
+    [],
+  );
 
   useEffect(() => {
     const list = messageListRef.current;
@@ -201,10 +214,10 @@ const IsaacAISection = () => {
     list.scrollTo({ top: list.scrollHeight, behavior: "smooth" });
   }, [messages, isLoading]);
 
-  const clearFocusRestoreTimers = () => {
+  const clearFocusRestoreTimers = useCallback(() => {
     focusRestoreTimersRef.current.forEach((timer) => window.clearTimeout(timer));
     focusRestoreTimersRef.current = [];
-  };
+  }, []);
 
   const restorePageScrollAfterFocus = () => {
     clearFocusRestoreTimers();
@@ -212,6 +225,55 @@ const IsaacAISection = () => {
     window.requestAnimationFrame(restore);
     focusRestoreTimersRef.current = [40, 120, 240, 420, 700].map((delay) => window.setTimeout(restore, delay));
   };
+
+  const moveInputAboveKeyboard = useCallback(() => {
+    const inputPill = inputPillRef.current;
+    if (!inputPill) return;
+
+    const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+    const rect = inputPill.getBoundingClientRect();
+    const buffer = 14;
+    const safeBottom = viewportHeight - buffer;
+    const safeTop = buffer;
+
+    if (rect.bottom > safeBottom) {
+      window.scrollBy({ top: rect.bottom - safeBottom, behavior: "smooth" });
+    } else if (rect.top < safeTop) {
+      window.scrollBy({ top: rect.top - safeTop, behavior: "smooth" });
+    }
+  }, []);
+
+  const scheduleInputVisibilityCheck = useCallback(() => {
+    clearFocusRestoreTimers();
+    focusRestoreTimersRef.current = [120, 320, 620].map((delay) =>
+      window.setTimeout(moveInputAboveKeyboard, delay),
+    );
+  }, [clearFocusRestoreTimers, moveInputAboveKeyboard]);
+
+  useEffect(() => {
+    if (!inputFocused || !isMobileInputViewport()) {
+      setKeyboardSpacer(0);
+      return;
+    }
+
+    const updateInputPosition = () => {
+      const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+      const keyboardHeight = Math.max(0, window.innerHeight - viewportHeight);
+      setKeyboardSpacer(Math.min(keyboardHeight, 420));
+      scheduleInputVisibilityCheck();
+    };
+
+    updateInputPosition();
+    window.visualViewport?.addEventListener("resize", updateInputPosition);
+    window.visualViewport?.addEventListener("scroll", updateInputPosition);
+    window.addEventListener("resize", updateInputPosition);
+
+    return () => {
+      window.visualViewport?.removeEventListener("resize", updateInputPosition);
+      window.visualViewport?.removeEventListener("scroll", updateInputPosition);
+      window.removeEventListener("resize", updateInputPosition);
+    };
+  }, [inputFocused, isMobileInputViewport, scheduleInputVisibilityCheck]);
 
   const askAssistant = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -342,23 +404,44 @@ const IsaacAISection = () => {
               onSubmit={askAssistant}
               className="relative z-10 shrink-0 px-3 pb-3 pt-2 md:px-4 md:pb-4"
             >
-              <div className="site-corner relative flex min-h-11 w-full items-center bg-foreground/[0.045] transition-colors focus-within:bg-foreground/[0.07]">
+              <div
+                ref={inputPillRef}
+                className="site-corner relative flex min-h-11 w-full items-center bg-foreground/[0.045] transition-colors focus-within:bg-foreground/[0.07]"
+              >
+                <span className="pointer-events-none absolute right-12 top-1.5 z-10 font-mono text-[8px] leading-none text-foreground/34">
+                  {userMessageCount}/{MAX_CHAT_USER_MESSAGES}
+                </span>
                 <textarea
                   ref={textareaRef}
                   value={query}
                   onPointerDown={(event) => {
                     pageScrollBeforeFocusRef.current = window.scrollY;
-                    if (document.activeElement !== textareaRef.current) {
+                    if (!isMobileInputViewport() && document.activeElement !== textareaRef.current) {
                       event.preventDefault();
                       textareaRef.current?.focus({ preventScroll: true });
                       restorePageScrollAfterFocus();
                     }
                   }}
-                  onFocus={restorePageScrollAfterFocus}
-                  onBlur={clearFocusRestoreTimers}
+                  onFocus={() => {
+                    setInputFocused(true);
+                    if (isMobileInputViewport()) {
+                      scheduleInputVisibilityCheck();
+                    } else {
+                      restorePageScrollAfterFocus();
+                    }
+                  }}
+                  onBlur={() => {
+                    setInputFocused(false);
+                    setKeyboardSpacer(0);
+                    clearFocusRestoreTimers();
+                  }}
                   onChange={(event) => {
                     setQuery(event.target.value);
-                    restorePageScrollAfterFocus();
+                    if (isMobileInputViewport()) {
+                      scheduleInputVisibilityCheck();
+                    } else {
+                      restorePageScrollAfterFocus();
+                    }
                   }}
                   onKeyDown={(event) => {
                     if (event.key === "Enter" && !event.shiftKey) {
@@ -369,15 +452,13 @@ const IsaacAISection = () => {
                   placeholder="Ask about my work"
                   rows={1}
                   disabled={limitReached}
-                  aria-label="Ask Isaac AI"
-                  className="max-h-32 min-h-11 min-w-0 flex-1 resize-none bg-transparent py-3 pl-3.5 pr-14 text-base leading-relaxed text-foreground outline-none placeholder:text-foreground/36"
+                  aria-label={inputLabel}
+                  className="max-h-32 min-h-11 min-w-0 flex-1 resize-none bg-transparent py-3 pl-3.5 pr-20 text-base leading-relaxed text-foreground outline-none placeholder:text-foreground/36"
                 />
                 <motion.button
                   type="submit"
                   disabled={!query.trim() || isLoading || limitReached}
-                  className="absolute right-1.5 top-1/2 flex h-8 w-8 shrink-0 -translate-y-1/2 items-center justify-center rounded-[calc(var(--site-corner-radius)-2px)] bg-primary text-primary-foreground shadow-[0_8px_18px_rgba(18,24,14,0.22)] transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:bg-foreground/12 disabled:text-foreground/32 disabled:shadow-none"
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.94 }}
+                  className="absolute bottom-1.5 right-1.5 top-1.5 flex aspect-square shrink-0 items-center justify-center rounded-[calc(var(--site-corner-radius)-2px)] bg-primary text-primary-foreground shadow-[0_8px_18px_rgba(18,24,14,0.22)] transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:bg-foreground/12 disabled:text-foreground/32 disabled:shadow-none"
                   transition={{ duration: 0.18, ease: EASE }}
                   aria-label="Ask Isaac AI"
                 >
@@ -398,6 +479,11 @@ const IsaacAISection = () => {
           </a>
           .
         </p>
+        <div
+          aria-hidden="true"
+          className="md:hidden"
+          style={{ height: inputFocused ? keyboardSpacer : 0 }}
+        />
       </motion.div>
     </section>
   );

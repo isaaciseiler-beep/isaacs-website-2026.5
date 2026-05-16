@@ -1,6 +1,10 @@
-import type { CSSProperties } from "react";
-import { useLayoutEffect, useRef, useState } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+import headshotUrl from "@/assets/headshot.jpg";
+import { albums, albumPhotos } from "@/lib/photoAlbums";
+import { scheduleImagePreloads } from "@/lib/imagePreload";
+import { projectItems } from "@/lib/siteContent";
 
 const headlineLines = [
   [
@@ -22,12 +26,36 @@ const headlineLines = [
 const SAFE_EDGE = 56;
 const HEADER_CLEARANCE = 104;
 const MIN_WORD_GAP = 28;
+const HERO_TEXT_ANIMATION_MS = 2400;
+const TRAIL_ENABLE_BUFFER_MS = 140;
+const TRAIL_MAX_ITEMS = 10;
+const TRAIL_LIFETIME_MS = 2100;
+const TRAIL_SPAWN_DISTANCE = 92;
+const TRAIL_SPAWN_INTERVAL_MS = 140;
+const TRAIL_SIDE_GUTTER = 18;
+const TRAIL_BOTTOM_GUTTER = 72;
+const FALLBACK_IMAGE_ASPECT = 4 / 3;
 
 type VerticalLane = "top" | "middle" | "bottom";
 
 type WordOffset = {
   x: number;
   y: number;
+};
+
+type TrailItem = {
+  id: number;
+  src: string;
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+};
+
+type ImageMetric = {
+  width: number;
+  height: number;
+  aspect: number;
 };
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
@@ -85,11 +113,209 @@ const afterLayoutSettles = (callback: () => void) => {
   });
 };
 
+const allWebsiteImages = [
+  headshotUrl,
+  ...projectItems.map((project) => project.image),
+  ...albums.flatMap(albumPhotos),
+].filter((src): src is string => Boolean(src));
+
+const trailImages = [...new Set(allWebsiteImages)];
+
+const shuffleImages = (images: string[]) => {
+  const shuffled = [...images];
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    const randomIndex = Math.floor(Math.random() * (index + 1));
+    [shuffled[index], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[index]];
+  }
+  return shuffled;
+};
+
+const distanceBetween = (a: { x: number; y: number }, b: { x: number; y: number }) => {
+  const x = a.x - b.x;
+  const y = a.y - b.y;
+  return Math.sqrt(x * x + y * y);
+};
+
+const loadImageMetric = (src: string, metrics: Map<string, ImageMetric>) => {
+  if (metrics.has(src)) return;
+
+  const image = new Image();
+  image.decoding = "async";
+  image.onload = () => {
+    if (!image.naturalWidth || !image.naturalHeight) return;
+
+    metrics.set(src, {
+      width: image.naturalWidth,
+      height: image.naturalHeight,
+      aspect: image.naturalWidth / image.naturalHeight,
+    });
+  };
+  image.src = src;
+};
+
+const CursorImageTrail = ({ enabled }: { enabled: boolean }) => {
+  const [items, setItems] = useState<TrailItem[]>([]);
+  const layerRef = useRef<HTMLDivElement | null>(null);
+  const lastPointRef = useRef<{ x: number; y: number } | null>(null);
+  const lastSpawnAtRef = useRef(0);
+  const nextIdRef = useRef(0);
+  const imageIndexRef = useRef(0);
+  const removalTimersRef = useRef<number[]>([]);
+  const imageMetricsRef = useRef<Map<string, ImageMetric>>(new Map());
+
+  const shuffledImages = useMemo(() => {
+    return shuffleImages(trailImages);
+  }, []);
+
+  useEffect(() => {
+    scheduleImagePreloads(shuffledImages, {
+      decode: true,
+      fetchPriority: "low",
+    });
+    shuffledImages.forEach((src) => loadImageMetric(src, imageMetricsRef.current));
+  }, [shuffledImages]);
+
+  useEffect(() => {
+    return () => {
+      removalTimersRef.current.forEach((timer) => window.clearTimeout(timer));
+      removalTimersRef.current = [];
+    };
+  }, []);
+
+  useEffect(() => {
+    if (enabled) return;
+
+    lastPointRef.current = null;
+    setItems([]);
+  }, [enabled]);
+
+  const spawnImage = (event: ReactPointerEvent<HTMLDivElement>, force = false) => {
+    if (!enabled || !layerRef.current || shuffledImages.length === 0) return;
+
+    const rect = layerRef.current.getBoundingClientRect();
+    if (
+      event.clientX < rect.left ||
+      event.clientX > rect.right ||
+      event.clientY < rect.top ||
+      event.clientY > rect.bottom
+    ) {
+      return;
+    }
+
+    const nextPoint = {
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top,
+    };
+    const now = performance.now();
+    const lastPoint = lastPointRef.current;
+    const farEnough = !lastPoint || distanceBetween(nextPoint, lastPoint) >= TRAIL_SPAWN_DISTANCE;
+    const restedEnough = now - lastSpawnAtRef.current >= TRAIL_SPAWN_INTERVAL_MS;
+
+    if (!force && (!farEnough || !restedEnough)) return;
+
+    const id = nextIdRef.current + 1;
+    nextIdRef.current = id;
+    let imageIndex = imageIndexRef.current % shuffledImages.length;
+    let src = shuffledImages[imageIndex];
+    let metric = imageMetricsRef.current.get(src);
+
+    for (let attempt = 0; attempt < shuffledImages.length && !metric; attempt += 1) {
+      imageIndexRef.current += 1;
+      imageIndex = imageIndexRef.current % shuffledImages.length;
+      src = shuffledImages[imageIndex];
+      metric = imageMetricsRef.current.get(src);
+    }
+
+    imageIndexRef.current += 1;
+
+    const isNarrow = rect.width < 768;
+    const baseWidth = clamp(rect.width * (isNarrow ? 0.37 : 0.155), isNarrow ? 116 : 154, isNarrow ? 178 : 238);
+    const width = baseWidth * (0.94 + ((id * 11) % 15) / 100);
+    const aspect = metric?.aspect ?? FALLBACK_IMAGE_ASPECT;
+    const height = width / aspect;
+    const offsetX = ((id * 31) % 28) - 14;
+    const offsetY = ((id * 43) % 22) - 11;
+    const sideGutter = isNarrow ? 10 : TRAIL_SIDE_GUTTER;
+    const bottomGutter = isNarrow ? 94 : TRAIL_BOTTOM_GUTTER;
+    const topGutter = isNarrow ? 88 : 64;
+    const maxLeft = Math.max(sideGutter, rect.width - width - sideGutter);
+    const maxTop = Math.max(topGutter, rect.height - height - bottomGutter);
+    const left = clamp(nextPoint.x - width / 2 + offsetX, sideGutter, maxLeft);
+    const top = clamp(nextPoint.y - height / 2 + offsetY, topGutter, maxTop);
+    const item: TrailItem = {
+      id,
+      src,
+      left,
+      top,
+      width,
+      height,
+    };
+
+    lastPointRef.current = nextPoint;
+    lastSpawnAtRef.current = now;
+    setItems((current) => [...current.slice(-TRAIL_MAX_ITEMS + 1), item]);
+
+    const removalTimer = window.setTimeout(() => {
+      setItems((current) => current.filter((currentItem) => currentItem.id !== id));
+    }, TRAIL_LIFETIME_MS);
+    removalTimersRef.current.push(removalTimer);
+  };
+
+  const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!enabled || event.button !== 0) return;
+
+    spawnImage(event, true);
+  };
+
+  const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    spawnImage(event);
+  };
+
+  return (
+    <div
+      ref={layerRef}
+      className="hero-cursor-trail absolute inset-0 z-40"
+      aria-hidden="true"
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerCancel={() => {
+        lastPointRef.current = null;
+      }}
+      onPointerLeave={() => {
+        lastPointRef.current = null;
+      }}
+    >
+      <AnimatePresence>
+        {items.map((item) => (
+          <motion.div
+            key={item.id}
+            className="hero-cursor-trail-item"
+            initial={{ opacity: 0, scale: 0.86, y: 10, filter: "blur(6px)" }}
+            animate={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
+            exit={{ opacity: 0, scale: 0.98, y: -6, filter: "blur(4px)" }}
+            transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
+            style={{
+              left: item.left,
+              top: item.top,
+              width: item.width,
+              height: item.height,
+              zIndex: item.id,
+            }}
+          >
+            <img src={item.src} alt="" draggable={false} />
+          </motion.div>
+        ))}
+      </AnimatePresence>
+    </div>
+  );
+};
+
 interface HeroSectionProps {
   playIntro?: boolean;
+  introReady?: boolean;
 }
 
-const HeroSection = ({ playIntro = false }: HeroSectionProps) => {
+const HeroSection = ({ playIntro = false, introReady = true }: HeroSectionProps) => {
   const { scrollY } = useScroll();
   const textOpacity = useTransform(scrollY, [0, 400], [1, 0]);
   const sectionRef = useRef<HTMLElement | null>(null);
@@ -97,7 +323,24 @@ const HeroSection = ({ playIntro = false }: HeroSectionProps) => {
   const hasMeasuredRef = useRef(false);
   const lastWindowWidthRef = useRef(0);
   const [wordOffsets, setWordOffsets] = useState<WordOffset[]>([]);
+  const [trailEnabled, setTrailEnabled] = useState(() => !playIntro);
   let order = 0;
+
+  useEffect(() => {
+    if (!playIntro) {
+      setTrailEnabled(true);
+      return;
+    }
+
+    setTrailEnabled(false);
+    if (!introReady) return;
+
+    const timer = window.setTimeout(() => {
+      setTrailEnabled(true);
+    }, HERO_TEXT_ANIMATION_MS + TRAIL_ENABLE_BUFFER_MS);
+
+    return () => window.clearTimeout(timer);
+  }, [introReady, playIntro]);
 
   useLayoutEffect(() => {
     if (!playIntro) {
@@ -185,15 +428,19 @@ const HeroSection = ({ playIntro = false }: HeroSectionProps) => {
       if (!disposed) afterLayoutSettles(measure);
     };
 
+    measureWhenReady();
+
     if (document.fonts) {
       document.fonts.ready.then(() => {
-        if (!hasMeasuredRef.current) measureWhenReady();
+        measureWhenReady();
       });
       fallbackTimer = window.setTimeout(() => {
         if (!hasMeasuredRef.current) measureWhenReady();
       }, 1200);
     } else {
-      measureWhenReady();
+      fallbackTimer = window.setTimeout(() => {
+        if (!hasMeasuredRef.current) measureWhenReady();
+      }, 180);
     }
 
     const handleResize = () => {
@@ -213,16 +460,17 @@ const HeroSection = ({ playIntro = false }: HeroSectionProps) => {
   return (
     <section ref={sectionRef} className="relative flex h-[100svh] min-h-[100svh] items-end overflow-hidden">
       <div className="absolute inset-0 bg-background" />
+      <CursorImageTrail enabled={trailEnabled} />
 
       <motion.div
-        className="absolute inset-x-0 bottom-0 top-20 z-10 flex items-end overflow-hidden px-6 pb-[calc(env(safe-area-inset-bottom)+3.5rem)] md:top-24 md:pb-6"
+        className="pointer-events-none absolute inset-x-0 bottom-0 top-20 z-30 flex items-end overflow-hidden px-6 pb-[calc(env(safe-area-inset-bottom)+3.5rem)] md:top-24 md:pb-6"
         style={{ opacity: textOpacity }}
       >
         <h1
           className="block w-full max-w-[34rem] text-[clamp(2rem,10vw,2.7rem)] font-semibold leading-[0.85] tracking-tighter text-foreground md:max-w-6xl md:text-7xl lg:text-8xl"
           aria-label="Building at the intersection of AI and society."
           data-intro={playIntro ? "play" : "skip"}
-          data-ready={playIntro && wordOffsets.length > 0 ? "true" : "false"}
+          data-ready={playIntro && introReady && wordOffsets.length > 0 ? "true" : "false"}
         >
           {headlineLines.map((line, lineIndex) => (
             <span

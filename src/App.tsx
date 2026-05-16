@@ -13,6 +13,7 @@ const PhotosPage = lazy(() => import("./pages/PhotosPage.tsx"));
 const PhotoMapPage = lazy(() => import("./pages/PhotoMapPage.tsx"));
 const ProjectsPage = lazy(() => import("./pages/ProjectsPage.tsx"));
 const ProjectDetailPage = lazy(() => import("./pages/ProjectDetailPage.tsx"));
+const CredentialsPage = lazy(() => import("./pages/CredentialsPage.tsx"));
 const ExperiencePage = lazy(() => import("./pages/ExperiencePage.tsx"));
 const ExperienceGamePage = lazy(() => import("./pages/ExperienceGamePage.tsx"));
 const FulbrightMapPage = lazy(() => import("./pages/FulbrightMapPage.tsx"));
@@ -45,6 +46,7 @@ const AnimatedRoutes = () => {
             <Route path="/photos/map" element={<PhotoMapPage />} />
             <Route path="/projects" element={<ProjectsPage />} />
             <Route path="/projects/:id" element={<ProjectDetailPage />} />
+            <Route path="/credentials" element={<CredentialsPage />} />
             <Route path="/experience" element={<ExperiencePage />} />
             <Route path="/experience/arcade" element={<ExperienceGamePage />} />
             <Route path="/fulbrightmap" element={<FulbrightMapPage />} />

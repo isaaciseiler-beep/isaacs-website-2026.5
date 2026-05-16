@@ -6,9 +6,9 @@ const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const EASE_REVEAL: [number, number, number, number] = [0.19, 1, 0.22, 1];
 const FRAME_REVEAL_DELAY = 1.24;
 const FRAME_REVEAL_DURATION = 1.34;
-const MOBILE_INTRO_DURATION_MS = 1620;
-const MOBILE_FRAME_REVEAL_DELAY = 0.48;
-const MOBILE_FRAME_REVEAL_DURATION = 0.82;
+const MOBILE_INTRO_DURATION_MS = 1380;
+const MOBILE_FRAME_REVEAL_DELAY = 0.34;
+const MOBILE_FRAME_REVEAL_DURATION = 0.66;
 const OVERLAY_COLOR = "#f2ff9e";
 const CLOSED_FRAME_RADIUS = 8;
 const OPEN_FRAME_RADIUS = 0;
@@ -74,6 +74,7 @@ const HomeIntroSequence = ({ play, onComplete }: HomeIntroSequenceProps) => {
   const frameRevealDuration = isMobileViewport ? MOBILE_FRAME_REVEAL_DURATION : FRAME_REVEAL_DURATION;
 
   useLayoutEffect(() => {
+    (window as Window & { __homeIntroPreboot?: boolean }).__homeIntroPreboot = false;
     document.documentElement.classList.remove("home-intro-preboot");
   }, []);
 

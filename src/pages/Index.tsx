@@ -6,13 +6,9 @@ import HomeIntroSequence from "@/components/HomeIntroSequence";
 import ParallaxSection from "@/components/ParallaxSection";
 import Sidebar, { sitemapItems } from "@/components/Sidebar";
 import SiteHeader from "@/components/SiteHeader";
-import headshotUrl from "@/assets/headshot.jpg";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { preloadImages, scheduleImagePreloads } from "@/lib/imagePreload";
-import { inspirationItems } from "@/lib/inspirationItems";
-import { albums, coverFor } from "@/lib/photoAlbums";
 import { HEADER_SCROLL_OFFSET, scrollToPageSection } from "@/lib/scroll";
-import { featuredProjectIds, newsItems, projectItems } from "@/lib/siteContent";
 
 const ProjectsSection = lazy(() => import("@/components/ProjectsSection"));
 const NewsSection = lazy(() => import("@/components/NewsSection"));
@@ -26,6 +22,7 @@ const HOME_INTRO_PREBOOT_CLASS = "home-intro-preboot";
 
 type IntroWindow = Window & {
   __homeIntroPreboot?: boolean;
+  __homeIntroShouldPlay?: boolean;
 };
 
 const trackedSectionIds = sitemapItems
@@ -46,10 +43,11 @@ const Index = () => {
       const shouldPlay =
         !window.location.hash &&
         !reduceMotion &&
-        (introWindow.__homeIntroPreboot === true ||
+        (introWindow.__homeIntroShouldPlay === true ||
+          introWindow.__homeIntroPreboot === true ||
           document.documentElement.classList.contains(HOME_INTRO_PREBOOT_CLASS));
 
-      introWindow.__homeIntroPreboot = false;
+      introWindow.__homeIntroShouldPlay = false;
       return shouldPlay;
     } catch {
       return document.documentElement.classList.contains(HOME_INTRO_PREBOOT_CLASS);
@@ -77,6 +75,7 @@ const Index = () => {
   useLayoutEffect(() => {
     if (playHomeIntro) return;
 
+    (window as IntroWindow).__homeIntroPreboot = false;
     document.documentElement.classList.remove(HOME_INTRO_PREBOOT_CLASS);
   }, [playHomeIntro]);
 
@@ -97,30 +96,53 @@ const Index = () => {
     const isMobileViewport = window.matchMedia("(max-width: 767px)").matches;
     if (isMobileViewport && playHomeIntro && !homeIntroComplete) return;
 
-    const featuredProjectImages = featuredProjectIds
-      .map((id) => projectItems.find((project) => project.id === id)?.image)
-      .filter((image): image is string => Boolean(image));
-    const photoCovers = albums.map(coverFor);
-    const newsAssets = newsItems.flatMap((item) => [item.imageUrl, item.logoUrl]).filter((src): src is string => Boolean(src));
-    const inspirationAssets = inspirationItems.map((item) => item.imageUrl).filter((src): src is string => Boolean(src));
+    let disposed = false;
 
-    if (isMobileViewport) {
-      scheduleImagePreloads([headshotUrl, ...featuredProjectImages.slice(0, 2), ...photoCovers.slice(0, 2)], {
+    const preloadHomepageImages = async () => {
+      const [
+        headshotModule,
+        { inspirationItems },
+        { albums, coverFor },
+        { featuredProjectIds, newsItems, projectItems },
+      ] = await Promise.all([
+        import("@/assets/headshot.jpg"),
+        import("@/lib/inspirationItems"),
+        import("@/lib/photoAlbums"),
+        import("@/lib/siteContent"),
+      ]);
+      if (disposed) return;
+
+      const headshotUrl = headshotModule.default;
+      const featuredProjectImages = featuredProjectIds
+        .map((id) => projectItems.find((project) => project.id === id)?.image)
+        .filter((image): image is string => Boolean(image));
+      const photoCovers = albums.map(coverFor);
+      const newsAssets = newsItems.flatMap((item) => [item.imageUrl, item.logoUrl]).filter((src): src is string => Boolean(src));
+      const inspirationAssets = inspirationItems.map((item) => item.imageUrl).filter((src): src is string => Boolean(src));
+
+      if (isMobileViewport) {
+        scheduleImagePreloads([headshotUrl, ...featuredProjectImages.slice(0, 2), ...photoCovers.slice(0, 2)], {
+          decode: true,
+          fetchPriority: "low",
+        });
+      } else {
+        void preloadImages([headshotUrl, ...featuredProjectImages.slice(0, 4), ...photoCovers.slice(0, 4)], {
+          decode: true,
+          fetchPriority: "high",
+          linkPreload: true,
+        });
+      }
+
+      scheduleImagePreloads([...photoCovers.slice(isMobileViewport ? 2 : 4), ...newsAssets, ...inspirationAssets, ...featuredProjectImages.slice(isMobileViewport ? 2 : 4)], {
         decode: true,
         fetchPriority: "low",
       });
-    } else {
-      void preloadImages([headshotUrl, ...featuredProjectImages.slice(0, 4), ...photoCovers.slice(0, 4)], {
-        decode: true,
-        fetchPriority: "high",
-        linkPreload: true,
-      });
-    }
+    };
 
-    scheduleImagePreloads([...photoCovers.slice(isMobileViewport ? 2 : 4), ...newsAssets, ...inspirationAssets, ...featuredProjectImages.slice(isMobileViewport ? 2 : 4)], {
-      decode: true,
-      fetchPriority: "low",
-    });
+    void preloadHomepageImages();
+    return () => {
+      disposed = true;
+    };
   }, [homeIntroComplete, playHomeIntro]);
 
   useEffect(() => {

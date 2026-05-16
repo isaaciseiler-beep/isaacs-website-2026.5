@@ -1,10 +1,6 @@
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
-import headshotUrl from "@/assets/headshot.jpg";
-import { albums, albumPhotos } from "@/lib/photoAlbums";
-import { scheduleImagePreloads } from "@/lib/imagePreload";
-import { projectItems } from "@/lib/siteContent";
 
 const headlineLines = [
   [
@@ -113,14 +109,6 @@ const afterLayoutSettles = (callback: () => void) => {
   });
 };
 
-const allWebsiteImages = [
-  headshotUrl,
-  ...projectItems.map((project) => project.image),
-  ...albums.flatMap(albumPhotos),
-].filter((src): src is string => Boolean(src));
-
-const trailImages = [...new Set(allWebsiteImages)];
-
 const shuffleImages = (images: string[]) => {
   const shuffled = [...images];
   for (let index = shuffled.length - 1; index > 0; index -= 1) {
@@ -162,18 +150,47 @@ const CursorImageTrail = ({ enabled }: { enabled: boolean }) => {
   const imageIndexRef = useRef(0);
   const removalTimersRef = useRef<number[]>([]);
   const imageMetricsRef = useRef<Map<string, ImageMetric>>(new Map());
-
-  const shuffledImages = useMemo(() => {
-    return shuffleImages(trailImages);
-  }, []);
+  const [shuffledImages, setShuffledImages] = useState<string[]>([]);
 
   useEffect(() => {
-    scheduleImagePreloads(shuffledImages, {
-      decode: true,
-      fetchPriority: "low",
-    });
-    shuffledImages.forEach((src) => loadImageMetric(src, imageMetricsRef.current));
-  }, [shuffledImages]);
+    if (!enabled) return;
+
+    let disposed = false;
+
+    const loadTrailImages = async () => {
+      const [
+        headshotModule,
+        { albums, albumPhotos },
+        { scheduleImagePreloads },
+        { projectItems },
+      ] = await Promise.all([
+        import("@/assets/headshot.jpg"),
+        import("@/lib/photoAlbums"),
+        import("@/lib/imagePreload"),
+        import("@/lib/siteContent"),
+      ]);
+      if (disposed) return;
+
+      const images = [
+        headshotModule.default,
+        ...projectItems.map((project) => project.image),
+        ...albums.flatMap(albumPhotos),
+      ].filter((src): src is string => Boolean(src));
+      const nextImages = shuffleImages([...new Set(images)]);
+
+      setShuffledImages(nextImages);
+      scheduleImagePreloads(nextImages, {
+        decode: true,
+        fetchPriority: "low",
+      });
+      nextImages.forEach((src) => loadImageMetric(src, imageMetricsRef.current));
+    };
+
+    void loadTrailImages();
+    return () => {
+      disposed = true;
+    };
+  }, [enabled]);
 
   useEffect(() => {
     return () => {

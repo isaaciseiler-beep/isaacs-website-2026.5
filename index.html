@@ -33,7 +33,7 @@
         const isHome = window.location.pathname === "/" || window.location.pathname === "";
         const canRunApp = window.location.protocol === "http:" || window.location.protocol === "https:";
         const isMobileViewport = window.matchMedia("(max-width: 767px)").matches;
-        const prebootTimeout = isMobileViewport ? 1900 : 3600;
+        const prebootTimeout = isMobileViewport ? 1600 : 3600;
 
         try {
           const shouldPlayIntro =
@@ -43,6 +43,7 @@
             !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
           if (shouldPlayIntro) {
+            window.__homeIntroShouldPlay = true;
             window.__homeIntroPreboot = true;
             document.documentElement.classList.add("home-intro-preboot");
             window.setTimeout(() => {
@@ -54,6 +55,7 @@
           }
         } catch {
           if (canRunApp && isHome && !window.location.hash) {
+            window.__homeIntroShouldPlay = true;
             window.__homeIntroPreboot = true;
             document.documentElement.classList.add("home-intro-preboot");
             window.setTimeout(() => {

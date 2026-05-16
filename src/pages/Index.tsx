@@ -1,14 +1,7 @@
-import { useCallback, useState, useEffect, useLayoutEffect } from "react";
+import { Suspense, lazy, useCallback, useState, useEffect, useLayoutEffect } from "react";
 import { motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
 import HeroSection from "@/components/HeroSection";
-import ProjectsSection from "@/components/ProjectsSection";
-import NewsSection from "@/components/NewsSection";
-import PhotoSection from "@/components/PhotoSection";
-import InspirationBoard from "@/components/InspirationBoard";
-import IsaacAISection from "@/components/IsaacAISection";
-import AboutSection from "@/components/AboutSection";
-import Footer from "@/components/Footer";
 import HomeIntroSequence from "@/components/HomeIntroSequence";
 import ParallaxSection from "@/components/ParallaxSection";
 import Sidebar, { sitemapItems } from "@/components/Sidebar";
@@ -18,10 +11,26 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { preloadImages, scheduleImagePreloads } from "@/lib/imagePreload";
 import { inspirationItems } from "@/lib/inspirationItems";
 import { albums, coverFor } from "@/lib/photoAlbums";
-import { scrollToPageSection } from "@/lib/scroll";
+import { HEADER_SCROLL_OFFSET, scrollToPageSection } from "@/lib/scroll";
 import { featuredProjectIds, newsItems, projectItems } from "@/lib/siteContent";
 
-const HOME_INTRO_STORAGE_KEY = "pixel-canvas-home-intro-seen-v7";
+const ProjectsSection = lazy(() => import("@/components/ProjectsSection"));
+const NewsSection = lazy(() => import("@/components/NewsSection"));
+const PhotoSection = lazy(() => import("@/components/PhotoSection"));
+const InspirationBoard = lazy(() => import("@/components/InspirationBoard"));
+const IsaacAISection = lazy(() => import("@/components/IsaacAISection"));
+const AboutSection = lazy(() => import("@/components/AboutSection"));
+const Footer = lazy(() => import("@/components/Footer"));
+
+const HOME_INTRO_PREBOOT_CLASS = "home-intro-preboot";
+
+type IntroWindow = Window & {
+  __homeIntroPreboot?: boolean;
+};
+
+const trackedSectionIds = sitemapItems
+  .map((item) => item.scrollTo)
+  .filter((sectionId): sectionId is string => Boolean(sectionId));
 
 const Index = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -32,18 +41,24 @@ const Index = () => {
     if (typeof window === "undefined") return false;
 
     try {
-      const hasSeenIntro = window.sessionStorage.getItem(HOME_INTRO_STORAGE_KEY) === "true";
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const shouldPlay = !hasSeenIntro && !window.location.hash && !reduceMotion;
-      window.sessionStorage.setItem(HOME_INTRO_STORAGE_KEY, "true");
+      const introWindow = window as IntroWindow;
+      const shouldPlay =
+        !window.location.hash &&
+        !reduceMotion &&
+        (introWindow.__homeIntroPreboot === true ||
+          document.documentElement.classList.contains(HOME_INTRO_PREBOOT_CLASS));
+
+      introWindow.__homeIntroPreboot = false;
       return shouldPlay;
     } catch {
-      return !window.location.hash;
+      return document.documentElement.classList.contains(HOME_INTRO_PREBOOT_CLASS);
     }
   });
   const [homeIntroComplete, setHomeIntroComplete] = useState(() => !playHomeIntro);
   const isMobile = useIsMobile();
   const location = useLocation();
+  const renderDeferredSections = !playHomeIntro || homeIntroComplete;
 
   const handleSidebarToggle = () => {
     setSearchOpen(false);
@@ -62,7 +77,7 @@ const Index = () => {
   useLayoutEffect(() => {
     if (playHomeIntro) return;
 
-    document.documentElement.classList.remove("home-intro-preboot");
+    document.documentElement.classList.remove(HOME_INTRO_PREBOOT_CLASS);
   }, [playHomeIntro]);
 
   useLayoutEffect(() => {
@@ -79,6 +94,9 @@ const Index = () => {
   }, [location.hash]);
 
   useEffect(() => {
+    const isMobileViewport = window.matchMedia("(max-width: 767px)").matches;
+    if (isMobileViewport && playHomeIntro && !homeIntroComplete) return;
+
     const featuredProjectImages = featuredProjectIds
       .map((id) => projectItems.find((project) => project.id === id)?.image)
       .filter((image): image is string => Boolean(image));
@@ -86,35 +104,74 @@ const Index = () => {
     const newsAssets = newsItems.flatMap((item) => [item.imageUrl, item.logoUrl]).filter((src): src is string => Boolean(src));
     const inspirationAssets = inspirationItems.map((item) => item.imageUrl).filter((src): src is string => Boolean(src));
 
-    void preloadImages([headshotUrl, ...featuredProjectImages.slice(0, 4), ...photoCovers.slice(0, 4)], {
-      decode: true,
-      fetchPriority: "high",
-      linkPreload: true,
-    });
-    scheduleImagePreloads([...photoCovers.slice(4), ...newsAssets, ...inspirationAssets, ...featuredProjectImages.slice(4)], {
+    if (isMobileViewport) {
+      scheduleImagePreloads([headshotUrl, ...featuredProjectImages.slice(0, 2), ...photoCovers.slice(0, 2)], {
+        decode: true,
+        fetchPriority: "low",
+      });
+    } else {
+      void preloadImages([headshotUrl, ...featuredProjectImages.slice(0, 4), ...photoCovers.slice(0, 4)], {
+        decode: true,
+        fetchPriority: "high",
+        linkPreload: true,
+      });
+    }
+
+    scheduleImagePreloads([...photoCovers.slice(isMobileViewport ? 2 : 4), ...newsAssets, ...inspirationAssets, ...featuredProjectImages.slice(isMobileViewport ? 2 : 4)], {
       decode: true,
       fetchPriority: "low",
     });
-  }, []);
+  }, [homeIntroComplete, playHomeIntro]);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-          }
-        });
-      },
-      { threshold: 0.3 }
-    );
+    let frame = 0;
 
-    sitemapItems.forEach((item) => {
-      const el = document.getElementById(item.id);
-      if (el) observer.observe(el);
-    });
+    const updateActiveSection = () => {
+      frame = 0;
 
-    return () => observer.disconnect();
+      const activationLine = HEADER_SCROLL_OFFSET + Math.min(window.innerHeight * 0.38, 340);
+      let nextSection = trackedSectionIds[0] ?? "hero";
+      let bestScore = Number.POSITIVE_INFINITY;
+
+      trackedSectionIds.forEach((sectionId) => {
+        const element = document.getElementById(sectionId);
+        if (!element) return;
+
+        const rect = element.getBoundingClientRect();
+        const distanceOutside =
+          activationLine < rect.top
+            ? rect.top - activationLine
+            : activationLine > rect.bottom
+              ? activationLine - rect.bottom
+              : 0;
+        const centerDistance = Math.abs(rect.top + rect.height / 2 - activationLine);
+        const score = distanceOutside * window.innerHeight + centerDistance;
+
+        if (score < bestScore) {
+          bestScore = score;
+          nextSection = sectionId;
+        }
+      });
+
+      setActiveSection((current) => (current === nextSection ? current : nextSection));
+    };
+
+    const scheduleUpdate = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(updateActiveSection);
+    };
+
+    updateActiveSection();
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    window.addEventListener("resize", scheduleUpdate);
+    window.addEventListener("load", scheduleUpdate);
+
+    return () => {
+      if (frame) window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", scheduleUpdate);
+      window.removeEventListener("resize", scheduleUpdate);
+      window.removeEventListener("load", scheduleUpdate);
+    };
   }, []);
 
   useEffect(() => {
@@ -162,15 +219,19 @@ const Index = () => {
       >
         <main>
           <div id="hero"><HeroSection playIntro={playHomeIntro} introReady={homeIntroComplete} /></div>
-          <ParallaxSection id="projects" offset={70}><ProjectsSection /></ParallaxSection>
-          <ParallaxSection id="about" offset={60}><AboutSection revealEnabled={aboutRevealEnabled} /></ParallaxSection>
-          <ParallaxSection id="news" offset={55}><NewsSection /></ParallaxSection>
-          <ParallaxSection id="photos" offset={80}><PhotoSection /></ParallaxSection>
-          <div id="inspiration">
-            <ParallaxSection offset={55} clip={false}><InspirationBoard /></ParallaxSection>
-          </div>
-          <ParallaxSection id="isaac-ai" offset={28} clip={false}><IsaacAISection /></ParallaxSection>
-          <Footer />
+          {renderDeferredSections ? (
+            <Suspense fallback={null}>
+              <ParallaxSection id="projects" offset={70}><ProjectsSection /></ParallaxSection>
+              <ParallaxSection id="about" offset={60}><AboutSection revealEnabled={aboutRevealEnabled} /></ParallaxSection>
+              <ParallaxSection id="news" offset={55}><NewsSection /></ParallaxSection>
+              <ParallaxSection id="photos" offset={80}><PhotoSection /></ParallaxSection>
+              <div id="inspiration">
+                <ParallaxSection offset={55} clip={false}><InspirationBoard /></ParallaxSection>
+              </div>
+              <ParallaxSection id="isaac-ai" offset={28} clip={false}><IsaacAISection /></ParallaxSection>
+              <Footer />
+            </Suspense>
+          ) : null}
         </main>
       </motion.div>
 

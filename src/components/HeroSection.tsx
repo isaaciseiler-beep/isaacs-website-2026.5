@@ -324,9 +324,24 @@ const HeroSection = ({ playIntro = false, introReady = true }: HeroSectionProps)
   const lastWindowWidthRef = useRef(0);
   const [wordOffsets, setWordOffsets] = useState<WordOffset[]>([]);
   const [trailEnabled, setTrailEnabled] = useState(() => !playIntro);
+  const [supportsPointerTrail, setSupportsPointerTrail] = useState(false);
   let order = 0;
 
   useEffect(() => {
+    const media = window.matchMedia("(min-width: 768px) and (hover: hover) and (pointer: fine)");
+    const update = () => setSupportsPointerTrail(media.matches);
+
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
+
+  useEffect(() => {
+    if (!supportsPointerTrail) {
+      setTrailEnabled(false);
+      return;
+    }
+
     if (!playIntro) {
       setTrailEnabled(true);
       return;
@@ -340,7 +355,7 @@ const HeroSection = ({ playIntro = false, introReady = true }: HeroSectionProps)
     }, HERO_TEXT_ANIMATION_MS + TRAIL_ENABLE_BUFFER_MS);
 
     return () => window.clearTimeout(timer);
-  }, [introReady, playIntro]);
+  }, [introReady, playIntro, supportsPointerTrail]);
 
   useLayoutEffect(() => {
     if (!playIntro) {
@@ -460,7 +475,7 @@ const HeroSection = ({ playIntro = false, introReady = true }: HeroSectionProps)
   return (
     <section ref={sectionRef} className="relative flex h-[100svh] min-h-[100svh] items-end overflow-hidden">
       <div className="absolute inset-0 bg-background" />
-      <CursorImageTrail enabled={trailEnabled} />
+      {supportsPointerTrail ? <CursorImageTrail enabled={trailEnabled} /> : null}
 
       <motion.div
         className="pointer-events-none absolute inset-x-0 bottom-0 top-20 z-30 flex items-end overflow-hidden px-6 pb-[calc(env(safe-area-inset-bottom)+3.5rem)] md:top-24 md:pb-6"
@@ -470,7 +485,7 @@ const HeroSection = ({ playIntro = false, introReady = true }: HeroSectionProps)
           className="block w-full max-w-[34rem] text-[clamp(2rem,10vw,2.7rem)] font-semibold leading-[0.85] tracking-tighter text-foreground md:max-w-6xl md:text-7xl lg:text-8xl"
           aria-label="Building at the intersection of AI and society."
           data-intro={playIntro ? "play" : "skip"}
-          data-ready={playIntro && introReady && wordOffsets.length > 0 ? "true" : "false"}
+          data-ready={playIntro && introReady ? "true" : "false"}
         >
           {headlineLines.map((line, lineIndex) => (
             <span

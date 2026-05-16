@@ -408,7 +408,7 @@ const IsaacAISection = () => {
                 ref={inputPillRef}
                 className="site-corner relative flex min-h-11 w-full items-center bg-foreground/[0.045] transition-colors focus-within:bg-foreground/[0.07]"
               >
-                <span className="pointer-events-none absolute right-12 top-1.5 z-10 font-mono text-[8px] leading-none text-foreground/34">
+                <span className="pointer-events-none absolute right-12 top-1.5 z-10 hidden font-mono text-[8px] leading-none text-foreground/34 md:block">
                   {userMessageCount}/{MAX_CHAT_USER_MESSAGES}
                 </span>
                 <textarea
@@ -453,7 +453,7 @@ const IsaacAISection = () => {
                   rows={1}
                   disabled={limitReached}
                   aria-label={inputLabel}
-                  className="max-h-32 min-h-11 min-w-0 flex-1 resize-none bg-transparent py-3 pl-3.5 pr-20 text-base leading-relaxed text-foreground outline-none placeholder:text-foreground/36"
+                  className="max-h-32 min-h-11 min-w-0 flex-1 resize-none bg-transparent py-3 pl-3.5 pr-14 text-base leading-relaxed text-foreground outline-none placeholder:text-foreground/36 md:pr-20"
                 />
                 <motion.button
                   type="submit"

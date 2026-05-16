@@ -30,22 +30,38 @@
     <link rel="manifest" href="/site.webmanifest" />
     <script>
       (() => {
-        const introKey = "pixel-canvas-home-intro-seen-v7";
         const isHome = window.location.pathname === "/" || window.location.pathname === "";
+        const canRunApp = window.location.protocol === "http:" || window.location.protocol === "https:";
+        const isMobileViewport = window.matchMedia("(max-width: 767px)").matches;
+        const prebootTimeout = isMobileViewport ? 1900 : 3600;
 
         try {
           const shouldPlayIntro =
+            canRunApp &&
             isHome &&
             !window.location.hash &&
-            window.sessionStorage.getItem(introKey) !== "true" &&
             !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
           if (shouldPlayIntro) {
+            window.__homeIntroPreboot = true;
             document.documentElement.classList.add("home-intro-preboot");
+            window.setTimeout(() => {
+              if (window.__homeIntroPreboot) {
+                window.__homeIntroPreboot = false;
+                document.documentElement.classList.remove("home-intro-preboot");
+              }
+            }, prebootTimeout);
           }
         } catch {
-          if (isHome && !window.location.hash) {
+          if (canRunApp && isHome && !window.location.hash) {
+            window.__homeIntroPreboot = true;
             document.documentElement.classList.add("home-intro-preboot");
+            window.setTimeout(() => {
+              if (window.__homeIntroPreboot) {
+                window.__homeIntroPreboot = false;
+                document.documentElement.classList.remove("home-intro-preboot");
+              }
+            }, prebootTimeout);
           }
         }
       })();
@@ -60,9 +76,31 @@
         content: "";
         position: fixed;
         inset: 0;
-        z-index: 2147483647;
+        z-index: 2147483646;
         background: #f2ff9e;
         pointer-events: none;
+      }
+
+      html.home-intro-preboot body::after {
+        content: "IIS";
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        z-index: 2147483647;
+        color: #15170c;
+        font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 13px;
+        font-weight: 400;
+        letter-spacing: 0.05em;
+        line-height: 1;
+        transform: translate3d(-50%, -50%, 0);
+        pointer-events: none;
+      }
+
+      @media (min-width: 768px) {
+        html.home-intro-preboot body::after {
+          content: none;
+        }
       }
     </style>
 

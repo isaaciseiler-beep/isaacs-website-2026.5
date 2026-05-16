@@ -116,6 +116,11 @@ const AboutSection = ({ revealEnabled = true }: AboutSectionProps) => {
   });
 
   const imgY = useTransform(scrollYProgress, [0, 1], [40, -40]);
+  const headshotFilter = useTransform(
+    scrollYProgress,
+    [0.08, 0.28, 0.66, 0.9],
+    ["grayscale(1)", "grayscale(0)", "grayscale(0)", "grayscale(1)"],
+  );
 
   const handleHeadshotMove = (event: React.PointerEvent<HTMLDivElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
@@ -209,10 +214,11 @@ const AboutSection = ({ revealEnabled = true }: AboutSectionProps) => {
                 transformStyle: "preserve-3d",
               }}
             >
-              <img
+              <motion.img
                 src={headshotUrl}
                 alt="Portrait"
-                className="h-full w-full object-cover grayscale transition-[filter] duration-700 group-hover/headshot:grayscale-0"
+                className="h-full w-full object-cover"
+                style={{ filter: headshotFilter }}
                 loading="eager"
                 decoding="async"
                 fetchpriority="high"

@@ -6,6 +6,9 @@ const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const EASE_REVEAL: [number, number, number, number] = [0.19, 1, 0.22, 1];
 const FRAME_REVEAL_DELAY = 1.24;
 const FRAME_REVEAL_DURATION = 1.34;
+const MOBILE_INTRO_DURATION_MS = 1620;
+const MOBILE_FRAME_REVEAL_DELAY = 0.48;
+const MOBILE_FRAME_REVEAL_DURATION = 0.82;
 const OVERLAY_COLOR = "#f2ff9e";
 const CLOSED_FRAME_RADIUS = 8;
 const OPEN_FRAME_RADIUS = 0;
@@ -65,6 +68,10 @@ const HomeIntroSequence = ({ play, onComplete }: HomeIntroSequenceProps) => {
     if (typeof window === "undefined") return { width: 1, height: 1 };
     return getViewportSize();
   });
+  const isMobileViewport = viewport.width < 768;
+  const introDurationMs = isMobileViewport ? MOBILE_INTRO_DURATION_MS : INTRO_DURATION_MS;
+  const frameRevealDelay = isMobileViewport ? MOBILE_FRAME_REVEAL_DELAY : FRAME_REVEAL_DELAY;
+  const frameRevealDuration = isMobileViewport ? MOBILE_FRAME_REVEAL_DURATION : FRAME_REVEAL_DURATION;
 
   useLayoutEffect(() => {
     document.documentElement.classList.remove("home-intro-preboot");
@@ -106,14 +113,14 @@ const HomeIntroSequence = ({ play, onComplete }: HomeIntroSequenceProps) => {
       return;
     }
 
-    const openTimer = window.setTimeout(() => setOpening(true), 160);
-    const doneTimer = window.setTimeout(onComplete, INTRO_DURATION_MS);
+    const openTimer = window.setTimeout(() => setOpening(true), isMobileViewport ? 90 : 160);
+    const doneTimer = window.setTimeout(onComplete, introDurationMs);
 
     return () => {
       window.clearTimeout(openTimer);
       window.clearTimeout(doneTimer);
     };
-  }, [onComplete, play]);
+  }, [introDurationMs, isMobileViewport, onComplete, play]);
 
   useEffect(() => {
     if (!play) return;
@@ -163,7 +170,7 @@ const HomeIntroSequence = ({ play, onComplete }: HomeIntroSequenceProps) => {
                   fill="black"
                   initial={closedAperture}
                   animate={opening ? openAperture : closedAperture}
-                  transition={{ duration: FRAME_REVEAL_DURATION, delay: FRAME_REVEAL_DELAY, ease: EASE_REVEAL }}
+                  transition={{ duration: frameRevealDuration, delay: frameRevealDelay, ease: EASE_REVEAL }}
                 />
               </mask>
             </defs>
@@ -179,8 +186,8 @@ const HomeIntroSequence = ({ play, onComplete }: HomeIntroSequenceProps) => {
                 scale: opening ? [1, 1.025, 1.08] : 1,
               }}
               transition={{
-                opacity: { duration: 0.5, delay: FRAME_REVEAL_DELAY - 0.02, ease: EASE_REVEAL },
-                scale: { duration: 1.06, delay: 0.62, times: [0, 0.42, 1], ease: EASE_REVEAL },
+                opacity: { duration: 0.5, delay: frameRevealDelay - 0.02, ease: EASE_REVEAL },
+                scale: { duration: isMobileViewport ? 0.92 : 1.06, delay: isMobileViewport ? 0.48 : 0.62, times: [0, 0.42, 1], ease: EASE_REVEAL },
               }}
             >
               <IntroLogoText opening={opening} />

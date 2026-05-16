@@ -2,17 +2,18 @@ import { Suspense, lazy } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import Index from "./pages/Index.tsx";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import ChatOrb from "@/components/ChatOrb";
 
-const Index = lazy(() => import("./pages/Index.tsx"));
 const PhotosPage = lazy(() => import("./pages/PhotosPage.tsx"));
 const PhotoMapPage = lazy(() => import("./pages/PhotoMapPage.tsx"));
 const ProjectsPage = lazy(() => import("./pages/ProjectsPage.tsx"));
 const ProjectDetailPage = lazy(() => import("./pages/ProjectDetailPage.tsx"));
+const AIStateGovernmentIndexPage = lazy(() => import("./pages/AIStateGovernmentIndexPage.tsx"));
 const CredentialsPage = lazy(() => import("./pages/CredentialsPage.tsx"));
 const ExperiencePage = lazy(() => import("./pages/ExperiencePage.tsx"));
 const ExperienceGamePage = lazy(() => import("./pages/ExperienceGamePage.tsx"));
@@ -45,6 +46,7 @@ const AnimatedRoutes = () => {
             <Route path="/photos" element={<PhotosPage />} />
             <Route path="/photos/map" element={<PhotoMapPage />} />
             <Route path="/projects" element={<ProjectsPage />} />
+            <Route path="/projects/artificial-intelligence-in-state-government-index" element={<AIStateGovernmentIndexPage />} />
             <Route path="/projects/:id" element={<ProjectDetailPage />} />
             <Route path="/credentials" element={<CredentialsPage />} />
             <Route path="/experience" element={<ExperiencePage />} />

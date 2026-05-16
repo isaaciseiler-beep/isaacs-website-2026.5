@@ -18,43 +18,56 @@ const PhotoSection = () => {
   const [previewIdx, setPreviewIdx] = useState<number | null>(null);
   const [hovering, setHovering] = useState(false);
   const [activeIdx, setActiveIdx] = useState(0);
+  const [hasAutoplayed, setHasAutoplayed] = useState(false);
+  const [isCycling, setIsCycling] = useState(false);
   const previewRef = useRef<HTMLDivElement | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isMobile = useIsMobile();
   const prefersReducedMotion = useReducedMotion();
   const isPreviewInView = useInView(previewRef, { amount: 0.55 });
-  const shouldFlipPhotos = !prefersReducedMotion && (isMobile ? isPreviewInView : hovering);
+  const shouldFlipPhotos = !prefersReducedMotion && (isCycling || (!isMobile && hovering));
 
   useEffect(() => {
-    void preloadImages(photos.map((photo) => photo.image), {
-      decode: true,
-      fetchPriority: "high",
-      linkPreload: true,
+    const isMobileViewport = window.matchMedia("(max-width: 767px)").matches;
+    void preloadImages(photos.slice(0, isMobileViewport ? 2 : photos.length).map((photo) => photo.image), {
+      decode: !isMobileViewport,
+      fetchPriority: isMobileViewport ? "low" : "high",
+      linkPreload: !isMobileViewport,
     });
   }, []);
 
   useEffect(() => {
-    if (!shouldFlipPhotos) {
+    if (prefersReducedMotion || hasAutoplayed || !isPreviewInView) {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
+      setIsCycling(false);
       return;
     }
+
     let tick = 0;
+    setIsCycling(true);
     const schedule = () => {
       const cadence = [520, 380, 260, 200, 170, 160, 170, 200, 260, 340, 420, 500];
       const delay = cadence[tick % cadence.length];
       timeoutRef.current = setTimeout(() => {
-        setActiveIdx((current) => (current + 1) % photos.length);
+        setActiveIdx((tick + 1) % photos.length);
         tick += 1;
+        if (tick >= photos.length) {
+          setHasAutoplayed(true);
+          setIsCycling(false);
+          timeoutRef.current = null;
+          return;
+        }
         schedule();
       }, delay);
     };
+
     schedule();
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     };
-  }, [shouldFlipPhotos]);
+  }, [hasAutoplayed, isPreviewInView, prefersReducedMotion]);
 
   return (
     <section className="flex h-[calc(100svh-9.75rem)] min-h-[420px] flex-col py-0">

@@ -182,6 +182,10 @@
     will-change: transform, opacity;
   }
 
+  h1[data-intro="play"][data-ready="false"] .hero-kinetic-word {
+    visibility: hidden;
+  }
+
   h1[data-intro="play"][data-ready="true"] .hero-kinetic-word {
     animation: hero-word-assemble 2.08s var(--hero-delay) cubic-bezier(0.14, 0.92, 0.18, 1) both;
   }

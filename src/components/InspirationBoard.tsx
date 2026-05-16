@@ -1,5 +1,5 @@
 import { useRef, useState, useCallback, useEffect } from "react";
-import { motion, useScroll, useTransform, useSpring, useMotionValue, AnimatePresence } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring, useMotionValue, AnimatePresence, useInView } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import SectionHeading from "@/components/SectionHeading";
 import { inspirationItems, type InspirationItem } from "@/lib/inspirationItems";
@@ -114,12 +114,27 @@ const InspirationBoard = () => {
   const carouselRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
+  const [activeCarouselIndex, setActiveCarouselIndex] = useState(0);
+  const [mobileColorReady, setMobileColorReady] = useState(false);
+  const mobileCarouselInView = useInView(carouselRef, { amount: 0.58, margin: "-72px 0px -120px 0px" });
 
   const checkCarouselScroll = useCallback(() => {
     const el = carouselRef.current;
     if (!el) return;
     setCanScrollLeft(el.scrollLeft > 2);
     setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 2);
+
+    const carouselCenter = el.getBoundingClientRect().left + el.clientWidth / 2;
+    const cards = Array.from(el.querySelectorAll<HTMLElement>("[data-inspiration-carousel-card]"));
+    const nearest = cards.reduce(
+      (closest, card, index) => {
+        const rect = card.getBoundingClientRect();
+        const distance = Math.abs(rect.left + rect.width / 2 - carouselCenter);
+        return distance < closest.distance ? { index, distance } : closest;
+      },
+      { index: 0, distance: Number.POSITIVE_INFINITY },
+    );
+    setActiveCarouselIndex(nearest.index);
   }, []);
 
   useEffect(() => {
@@ -134,6 +149,16 @@ const InspirationBoard = () => {
       window.removeEventListener("resize", checkCarouselScroll);
     };
   }, [isMobile, checkCarouselScroll]);
+
+  useEffect(() => {
+    if (!isMobile || !mobileCarouselInView) {
+      setMobileColorReady(false);
+      return;
+    }
+
+    const timer = window.setTimeout(() => setMobileColorReady(true), 360);
+    return () => window.clearTimeout(timer);
+  }, [isMobile, mobileCarouselInView]);
 
   const scrollCarousel = (dir: "left" | "right") => {
     const el = carouselRef.current;
@@ -259,7 +284,7 @@ const InspirationBoard = () => {
             alt={item.title}
             className={`w-full h-full ${item.transparent ? "object-contain" : "object-cover"} grayscale group-hover:grayscale-0 transition-all duration-500`}
             draggable={false}
-            loading="eager"
+            loading={isMobile ? "lazy" : "eager"}
             decoding="async"
             fetchpriority="low"
           />
@@ -409,6 +434,7 @@ const InspirationBoard = () => {
                     index={i}
                     width={baseW}
                     height={h}
+                    activeColor={mobileColorReady && activeCarouselIndex === i}
                     onOpen={() => item.url && window.open(item.url, "_blank", "noopener,noreferrer")}
                     renderCard={renderCard}
                   />
@@ -508,11 +534,12 @@ interface CarouselCardProps {
   index: number;
   width: number;
   height: number;
+  activeColor: boolean;
   onOpen: () => void;
   renderCard: (item: InspirationItem) => React.ReactNode;
 }
 
-const CarouselCard = ({ item, index, width, height, onOpen, renderCard }: CarouselCardProps) => {
+const CarouselCard = ({ item, index, width, height, activeColor, onOpen, renderCard }: CarouselCardProps) => {
   const rotX = useSpring(useMotionValue(0), { stiffness: 120, damping: 18, mass: 0.6 });
   const rotY = useSpring(useMotionValue(0), { stiffness: 120, damping: 18, mass: 0.6 });
   const [cornerHover, setCornerHover] = useState(false);
@@ -541,6 +568,7 @@ const CarouselCard = ({ item, index, width, height, onOpen, renderCard }: Carous
 
   return (
     <motion.div
+      data-inspiration-carousel-card
       initial={carouselRevealInitial}
       whileInView={carouselRevealVisible}
       viewport={{ once: true, margin: "-40px", amount: 0.35 }}
@@ -569,9 +597,11 @@ const CarouselCard = ({ item, index, width, height, onOpen, renderCard }: Carous
           <img
             src={item.imageUrl}
             alt={item.title}
-            className="h-full w-full object-contain grayscale transition-all duration-500 hover:grayscale-0"
+            className={`h-full w-full object-contain transition-all duration-500 ${
+              activeColor ? "grayscale-0" : "grayscale"
+            }`}
             draggable={false}
-            loading="eager"
+            loading="lazy"
             decoding="async"
             fetchpriority="low"
           />

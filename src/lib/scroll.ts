@@ -1,4 +1,4 @@
-const HEADER_SCROLL_OFFSET = 56;
+export const HEADER_SCROLL_OFFSET = 56;
 
 const anchorForSection = (id: string) => {
   const target = document.getElementById(id);

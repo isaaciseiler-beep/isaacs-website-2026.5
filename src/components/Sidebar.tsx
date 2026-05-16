@@ -163,12 +163,10 @@ const Sidebar = ({ open, onToggle, onClose, onSearchOpen, activeSection, showTog
       }
     }
     if (item.href) navigate(item.href);
-    if (item.scrollTo) onClose?.();
   };
 
   const handleChildClick = (child: { href: string }) => {
     navigate(child.href);
-    onClose?.();
   };
 
   const handleSocialClick = (href: string) => {

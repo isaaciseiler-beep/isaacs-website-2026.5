@@ -20,7 +20,7 @@ const ParallaxSection = ({ children, offset = 60, className, id, clip = true }: 
   const y = useTransform(scrollYProgress, [0, 0.16, 0.84, 1], [offset, offset * 0.05, -offset * 0.05, -offset]);
 
   return (
-    <div ref={ref} id={id} className={`relative ${className ?? ""}`} style={clip ? { overflow: "hidden" } : undefined}>
+    <div ref={ref} id={id} className={className} style={clip ? { overflow: "hidden" } : undefined}>
       <motion.div style={prefersReducedMotion ? undefined : { y }}>
         {children}
       </motion.div>

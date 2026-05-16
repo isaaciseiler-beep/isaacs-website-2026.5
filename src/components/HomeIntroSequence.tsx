@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 const INTRO_DURATION_MS = 2940;
@@ -65,6 +65,10 @@ const HomeIntroSequence = ({ play, onComplete }: HomeIntroSequenceProps) => {
     if (typeof window === "undefined") return { width: 1, height: 1 };
     return getViewportSize();
   });
+
+  useLayoutEffect(() => {
+    document.documentElement.classList.remove("home-intro-preboot");
+  }, []);
 
   const closedFrame = useMemo(
     () => ({

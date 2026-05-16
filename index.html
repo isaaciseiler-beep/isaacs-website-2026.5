@@ -28,6 +28,43 @@
     <link rel="icon" type="image/svg+xml" href="/icon.svg" />
     <link rel="shortcut icon" href="/icon.svg" />
     <link rel="manifest" href="/site.webmanifest" />
+    <script>
+      (() => {
+        const introKey = "pixel-canvas-home-intro-seen-v7";
+        const isHome = window.location.pathname === "/" || window.location.pathname === "";
+
+        try {
+          const shouldPlayIntro =
+            isHome &&
+            !window.location.hash &&
+            window.sessionStorage.getItem(introKey) !== "true" &&
+            !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+          if (shouldPlayIntro) {
+            document.documentElement.classList.add("home-intro-preboot");
+          }
+        } catch {
+          if (isHome && !window.location.hash) {
+            document.documentElement.classList.add("home-intro-preboot");
+          }
+        }
+      })();
+    </script>
+    <style>
+      html.home-intro-preboot,
+      html.home-intro-preboot body {
+        background: #f2ff9e;
+      }
+
+      html.home-intro-preboot body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: 2147483647;
+        background: #f2ff9e;
+        pointer-events: none;
+      }
+    </style>
 
     <meta property="og:title" content="Isaac Seiler | AI, Public Technology, Communications, and Fulbright Work" />
     <meta property="og:description" content="Isaac Seiler is a Fulbright Scholar, Truman Scholar, and OpenAI ChatGPT Lab member working across AI education, public technology, journalism, communications, and research." />

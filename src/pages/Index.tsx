@@ -60,6 +60,12 @@ const Index = () => {
   }, []);
 
   useLayoutEffect(() => {
+    if (playHomeIntro) return;
+
+    document.documentElement.classList.remove("home-intro-preboot");
+  }, [playHomeIntro]);
+
+  useLayoutEffect(() => {
     if (location.hash) return;
     if (!window.matchMedia("(max-width: 767px)").matches) return;
 

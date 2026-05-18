@@ -1,19 +1,15 @@
-import { useEffect, useMemo, useState } from "react";
-import { motion } from "framer-motion";
+import { type ReactNode, type RefObject, useEffect, useMemo, useRef, useState } from "react";
+import { motion, useInView, useScroll, useTransform } from "framer-motion";
 import {
   ArrowLeft,
   ArrowUpRight,
-  BarChart3,
   Bot,
   CheckCircle2,
   Database,
   Filter,
-  Landmark,
-  LineChart,
   Search,
   ShieldCheck,
   SlidersHorizontal,
-  Sparkles,
   Users,
 } from "lucide-react";
 import {
@@ -21,13 +17,14 @@ import {
   BarChart,
   CartesianGrid,
   Cell,
-  LabelList,
+  ReferenceLine,
   ResponsiveContainer,
   Scatter,
   ScatterChart,
   Tooltip,
   XAxis,
   YAxis,
+  ZAxis,
 } from "recharts";
 import { useNavigate } from "react-router-dom";
 import Footer from "@/components/Footer";
@@ -38,94 +35,36 @@ import {
   aiIndexCriteria,
   aiIndexSources,
   aiIndexStates,
-  type AiIndexCriterionKey,
   type AiIndexParty,
   type AiIndexRegion,
   type AiIndexState,
 } from "@/lib/aiStateGovIndex";
 
 const EASE_TEXT: [number, number, number, number] = [0.22, 1, 0.36, 1];
-
-const partyLabels: Record<AiIndexParty, string> = {
-  D: "Democratic executive",
-  R: "Republican executive",
-};
+const HERO_IMAGE = "https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev/utahstatecap.avif";
+const LAST_UPDATED_LABEL = "Last updated August 2025";
 
 const regionOrder: AiIndexRegion[] = ["East", "South", "Midwest", "West"];
 const partyOrder: AiIndexParty[] = ["D", "R"];
+const partyLabels: Record<AiIndexParty, string> = {
+  D: "Democratic",
+  R: "Republican",
+};
 
 const criterionCategoryColor: Record<string, string> = {
-  "GenAI Adoption": "#1c7c74",
-  "Government Infrastructure": "#b75d2a",
-  "Employee Policy": "#5856a6",
+  "GenAI Adoption": "hsl(var(--foreground))",
+  "Government Infrastructure": "hsl(var(--muted-foreground))",
+  "Employee Policy": "hsl(342 25% 34%)",
 };
 
 const scoreBands = [
-  { label: "Excellent", min: 80, max: 100, color: "#0f766e" },
-  { label: "Above average", min: 60, max: 79.999, color: "#3b82a0" },
-  { label: "Average", min: 40, max: 59.999, color: "#b9831f" },
-  { label: "Below average", min: 20, max: 39.999, color: "#c75a2b" },
-  { label: "Poor", min: 0, max: 19.999, color: "#8f2d56" },
+  { label: "Excellent", min: 80, max: 100, color: "hsl(var(--foreground))" },
+  { label: "Above average", min: 60, max: 79.999, color: "hsl(var(--muted-foreground))" },
+  { label: "Average", min: 40, max: 59.999, color: "hsl(47 42% 38%)" },
+  { label: "Below average", min: 20, max: 39.999, color: "hsl(16 42% 42%)" },
+  { label: "Poor", min: 0, max: 19.999, color: "hsl(342 25% 34%)" },
 ];
-
-const stateAbbreviations: Record<string, string> = {
-  Alabama: "AL",
-  Alaska: "AK",
-  "American Samoa": "AS",
-  Arizona: "AZ",
-  Arkansas: "AR",
-  California: "CA",
-  Colorado: "CO",
-  Connecticut: "CT",
-  Delaware: "DE",
-  "District of Columbia": "DC",
-  Florida: "FL",
-  Georgia: "GA",
-  Guam: "GU",
-  Hawaii: "HI",
-  Idaho: "ID",
-  Illinois: "IL",
-  Indiana: "IN",
-  Iowa: "IA",
-  Kansas: "KS",
-  Kentucky: "KY",
-  Louisiana: "LA",
-  Maine: "ME",
-  Maryland: "MD",
-  Massachusetts: "MA",
-  Michigan: "MI",
-  Minnesota: "MN",
-  Mississippi: "MS",
-  Missouri: "MO",
-  Montana: "MT",
-  Nebraska: "NE",
-  Nevada: "NV",
-  "New Hampshire": "NH",
-  "New Jersey": "NJ",
-  "New Mexico": "NM",
-  "New York": "NY",
-  "North Carolina": "NC",
-  "North Dakota": "ND",
-  "Northern Marina Islands": "MP",
-  Ohio: "OH",
-  Oklahoma: "OK",
-  Oregon: "OR",
-  Pennsylvania: "PA",
-  "Puerto Rico": "PR",
-  "Rhode Island": "RI",
-  "South Carolina": "SC",
-  "South Dakota": "SD",
-  Tennessee: "TN",
-  Texas: "TX",
-  Utah: "UT",
-  Vermont: "VT",
-  Virginia: "VA",
-  "Virgin Islands": "VI",
-  Washington: "WA",
-  "West Virginia": "WV",
-  Wisconsin: "WI",
-  Wyoming: "WY",
-};
+const TOP_PERFORMER_GREEN = "hsl(var(--foreground))";
 
 type RankedState = AiIndexState & { rank: number };
 
@@ -134,6 +73,11 @@ const percent = (count: number, total: number) => Math.round((count / total) * 1
 const round = (value: number, digits = 0) => Number(value.toFixed(digits));
 const formatNumber = (value: number) => new Intl.NumberFormat("en-US").format(value);
 const formatMoney = (value: number) => `$${round(value, 1)}B`;
+const median = (values: number[]) => {
+  const sorted = [...values].sort((a, b) => a - b);
+  const midpoint = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 0 ? (sorted[midpoint - 1] + sorted[midpoint]) / 2 : sorted[midpoint];
+};
 
 const getBand = (score: number) => scoreBands.find((band) => score >= band.min && score <= band.max) ?? scoreBands[4];
 
@@ -150,22 +94,86 @@ const StatPanel = ({
   label,
   value,
   detail,
-  icon: Icon,
+  delay = 0,
 }: {
   label: string;
   value: string;
   detail: string;
-  icon: typeof Database;
+  delay?: number;
 }) => (
-  <div className="site-corner border border-foreground/10 bg-background/85 p-4 shadow-sm">
-    <div className="mb-4 flex items-center justify-between">
-      <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-foreground/50">{label}</span>
-      <Icon className="h-4 w-4 text-foreground/45" strokeWidth={1.5} />
+  <motion.div
+    className="site-corner bg-card p-4 shadow-sm"
+    initial={{ opacity: 0, y: 18, filter: "blur(6px)" }}
+    whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+    viewport={{ once: true, amount: 0.35 }}
+    transition={{ duration: 0.54, ease: EASE_TEXT, delay }}
+  >
+    <div className="mb-4">
+      <span className="text-sm font-medium text-foreground/66">{label}</span>
     </div>
     <div className="text-3xl font-semibold tracking-tight text-foreground">{value}</div>
     <p className="mt-2 text-xs leading-relaxed text-foreground/55">{detail}</p>
-  </div>
+  </motion.div>
 );
+
+const TextReveal = ({
+  children,
+  className = "",
+  delay = 0,
+}: {
+  children: ReactNode;
+  className?: string;
+  delay?: number;
+}) => (
+  <motion.div
+    className={className}
+    initial={{ opacity: 0, y: 18, filter: "blur(7px)" }}
+    whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+    viewport={{ once: true, amount: 0.42 }}
+    transition={{ duration: 0.7, ease: EASE_TEXT, delay }}
+  >
+    {children}
+  </motion.div>
+);
+
+const RevealSection = ({
+  children,
+  className,
+  scrollContainerRef,
+}: {
+  children: ReactNode;
+  className?: string;
+  scrollContainerRef?: RefObject<HTMLElement | null>;
+}) => {
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    container: scrollContainerRef,
+    offset: ["start end", "end start"],
+  });
+  const contentY = useTransform(scrollYProgress, [0, 1], [18, -18]);
+  const washY = useTransform(scrollYProgress, [0, 1], [64, -64]);
+
+  return (
+    <motion.section
+      ref={sectionRef}
+      className={`relative overflow-hidden ${className ?? ""}`}
+      initial={{ opacity: 0, y: 34, filter: "blur(10px)" }}
+      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      viewport={{ once: true, amount: 0.18 }}
+      transition={{ duration: 0.72, ease: EASE_TEXT }}
+    >
+      <motion.div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-[radial-gradient(ellipse_at_center,hsl(var(--foreground)/0.045),transparent_68%)]"
+        style={{ y: washY }}
+      />
+      <motion.div className="relative z-10" style={{ y: contentY }}>
+        {children}
+      </motion.div>
+    </motion.section>
+  );
+};
 
 const FilterButton = ({
   active,
@@ -179,22 +187,68 @@ const FilterButton = ({
   <button
     type="button"
     onClick={onClick}
-    className={`site-corner inline-flex h-9 items-center justify-center border px-3 font-mono text-[10px] uppercase tracking-[0.16em] transition-colors ${
+    className={`site-corner inline-flex h-9 items-center justify-center border px-3 text-sm font-medium transition-colors ${
       active
         ? "border-foreground bg-foreground text-background"
-        : "border-foreground/12 bg-background/70 text-foreground/62 hover:border-foreground/35 hover:text-foreground"
+        : "border-foreground/12 bg-background text-foreground/62 hover:border-foreground/35 hover:text-foreground"
     }`}
   >
     {children}
   </button>
 );
 
+const ChartReveal = ({
+  children,
+  className = "",
+  delay = 0,
+  minHeight,
+  reveal = "fade",
+  scrollContainerRef,
+}: {
+  children: ReactNode;
+  className?: string;
+  delay?: number;
+  minHeight?: number;
+  reveal?: "fade" | "left";
+  scrollContainerRef?: RefObject<HTMLElement | null>;
+}) => {
+  const revealRef = useRef<HTMLDivElement | null>(null);
+  const inView = useInView(revealRef, { amount: 0.7, once: true, root: scrollContainerRef });
+  const [hasEntered, setHasEntered] = useState(false);
+
+  useEffect(() => {
+    if (inView) {
+      setHasEntered(true);
+    }
+  }, [inView]);
+
+  return (
+    <motion.div
+      ref={revealRef}
+      className={className}
+      style={{ minHeight }}
+      initial={{ opacity: 0, y: 24, filter: "blur(8px)" }}
+      animate={hasEntered ? { opacity: 1, y: 0, filter: "blur(0px)" } : undefined}
+      transition={{ duration: 0.72, ease: EASE_TEXT, delay }}
+    >
+      <motion.div
+        className="h-full"
+        initial={reveal === "left" ? { clipPath: "inset(0 100% 0 0)" } : undefined}
+        animate={hasEntered && reveal === "left" ? { clipPath: "inset(0 0% 0 0)" } : undefined}
+        transition={{ duration: 0.95, ease: EASE_TEXT, delay: delay + 0.08 }}
+      >
+        {hasEntered ? children : null}
+      </motion.div>
+    </motion.div>
+  );
+};
+
 const DashboardTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
 
   return (
-    <div className="site-corner border border-foreground/10 bg-background px-3 py-2 text-xs shadow-xl">
-      <div className="font-mono uppercase tracking-[0.18em] text-foreground/50">{label ?? payload[0]?.payload?.state}</div>
+    <div className="site-corner bg-background px-3 py-2 text-xs shadow-xl">
+      <div className="font-medium text-foreground/65">{label ?? payload[0]?.payload?.state}</div>
       {payload.map((item: any) => (
         <div key={item.name ?? item.dataKey} className="mt-1 flex items-center gap-2 text-foreground/70">
           <span className="h-2 w-2 rounded-full" style={{ backgroundColor: item.color }} />
@@ -207,6 +261,80 @@ const DashboardTooltip = ({ active, payload, label }: any) => {
   );
 };
 
+const TopPerformersVisual = ({ states }: { states: RankedState[] }) => {
+  return (
+    <div className="relative overflow-hidden rounded-[6px] bg-card p-5 sm:p-6">
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold tracking-tight text-foreground">Top AI performers across governments</h2>
+        <p className="mt-1 text-sm font-medium text-foreground/55">Composite score, top five</p>
+      </div>
+
+      <div className="grid gap-3">
+        {states.map((state, index) => {
+          const score = round(state.compositeScore, 1);
+          const scoreColor = index === 0 ? "hsl(var(--background))" : TOP_PERFORMER_GREEN;
+
+          return (
+            <motion.div
+              key={state.state}
+              className="relative min-h-[72px] overflow-hidden rounded-[6px] bg-background sm:min-h-[82px]"
+              initial={{ opacity: 0, filter: "blur(5px)" }}
+              animate={{ opacity: 1, filter: "blur(0px)" }}
+              transition={{ duration: 0.42, ease: EASE_TEXT, delay: index * 0.05 }}
+            >
+              <motion.div
+                className="absolute inset-y-0 left-0 origin-left bg-foreground"
+                style={{ width: `${score}%`, backgroundColor: TOP_PERFORMER_GREEN }}
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ duration: 0.82, ease: EASE_TEXT, delay: 0.1 + index * 0.06 }}
+              />
+              <motion.div
+                className="relative z-10 flex h-full min-h-[72px] items-center justify-between gap-3 px-3 py-3 text-background sm:min-h-[82px] sm:gap-4 sm:px-5"
+                initial={{ opacity: 0, x: -12 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.48, ease: EASE_TEXT, delay: 0.72 + index * 0.06 }}
+              >
+                <div className="min-w-0">
+                  <p className="text-xs font-medium text-background/62">#{state.rank}</p>
+                  <h3 className="truncate text-lg font-semibold tracking-tight sm:text-2xl">{state.state}</h3>
+                </div>
+                <motion.p
+                  className="shrink-0 text-xl font-semibold tracking-tight tabular-nums sm:text-2xl"
+                  style={{ color: scoreColor }}
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.42, ease: EASE_TEXT, delay: 0.9 + index * 0.06 }}
+                >
+                  {score}
+                </motion.p>
+              </motion.div>
+            </motion.div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+const ResourceTooltip = ({ active, payload }: any) => {
+  if (!active || !payload?.length) return null;
+
+  const state = payload[0]?.payload;
+  if (!state) return null;
+
+  return (
+    <div className="site-corner bg-background px-3 py-2 text-xs shadow-xl">
+      <div className="font-medium text-foreground/70">{state.state}</div>
+      <div className="mt-2 grid gap-1 text-foreground/62">
+        <span>Composite: {round(state.composite, 1)}</span>
+        <span>Budget: {formatMoney(state.budget)}</span>
+        <span>Workforce: {formatNumber(state.workforce)}</span>
+      </div>
+    </div>
+  );
+};
+
 const AIStateGovernmentIndexPage = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
@@ -214,8 +342,8 @@ const AIStateGovernmentIndexPage = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [selectedRegion, setSelectedRegion] = useState<AiIndexRegion | "All">("All");
   const [selectedParty, setSelectedParty] = useState<AiIndexParty | "All">("All");
-  const [selectedCriterion, setSelectedCriterion] = useState<AiIndexCriterionKey | "All">("All");
   const [query, setQuery] = useState("");
+  const pageScrollRef = useRef<HTMLDivElement | null>(null);
   const rankedStates = useMemo<RankedState[]>(
     () =>
       [...aiIndexStates]
@@ -236,18 +364,20 @@ const AIStateGovernmentIndexPage = () => {
       rankedStates.filter((state) => {
         const matchesRegion = selectedRegion === "All" || state.region === selectedRegion;
         const matchesParty = selectedParty === "All" || state.party === selectedParty;
-        const matchesCriterion = selectedCriterion === "All" || state.criteria[selectedCriterion] > 0;
         const matchesQuery = state.state.toLowerCase().includes(query.trim().toLowerCase());
-        return matchesRegion && matchesParty && matchesCriterion && matchesQuery;
+        return matchesRegion && matchesParty && matchesQuery;
       }),
-    [query, rankedStates, selectedCriterion, selectedParty, selectedRegion],
+    [query, rankedStates, selectedParty, selectedRegion],
   );
 
   const meanComposite = average(aiIndexStates.map((state) => state.compositeScore));
-  const medianComposite = [...aiIndexStates].sort((a, b) => a.compositeScore - b.compositeScore)[Math.floor(aiIndexStates.length / 2)]
-    .compositeScore;
+  const medianComposite = median(aiIndexStates.map((state) => state.compositeScore));
+  const medianBudget = median(aiIndexStates.map((state) => state.budgetBillions));
   const statesAbove80 = aiIndexStates.filter((state) => state.compositeScore >= 80).length;
   const statesBelow50 = aiIndexStates.filter((state) => state.compositeScore < 50).length;
+  const topStates = rankedStates.slice(0, 5);
+  const leanLeader = rankedStates.find((state) => state.budgetBillions <= 15) ?? rankedStates[0];
+  const largeBudgetBelow50 = aiIndexStates.filter((state) => state.budgetBillions >= 50 && state.compositeScore < 50).length;
   const guidancePercent = percent(aiIndexStates.filter((state) => state.criteria.guidance > 0).length, aiIndexStates.length);
   const trainingPercent = percent(aiIndexStates.filter((state) => state.criteria.training > 0).length, aiIndexStates.length);
   const enterprisePercent = percent(aiIndexStates.filter((state) => state.criteria.enterprisePilot > 0).length, aiIndexStates.length);
@@ -259,36 +389,6 @@ const AIStateGovernmentIndexPage = () => {
     fill: criterionCategoryColor[category],
   }));
 
-  const regionData = regionOrder.map((region) => {
-    const states = aiIndexStates.filter((state) => state.region === region);
-    return {
-      region,
-      average: round(average(states.map((state) => state.compositeScore)), 1),
-      preparedness: round(average(states.map((state) => state.preparednessScore)), 1),
-      count: states.length,
-    };
-  });
-
-  const partyData = partyOrder.map((party) => {
-    const states = aiIndexStates.filter((state) => state.party === party);
-    return {
-      party,
-      label: party,
-      average: round(average(states.map((state) => state.compositeScore)), 1),
-      count: states.length,
-    };
-  });
-
-  const criterionData = aiIndexCriteria.map((criterion) => {
-    const count = aiIndexStates.filter((state) => state.criteria[criterion.key] > 0).length;
-    return {
-      ...criterion,
-      count,
-      percent: percent(count, aiIndexStates.length),
-      fill: criterionCategoryColor[criterion.category],
-    };
-  });
-
   const bandData = scoreBands.map((band) => ({
     ...band,
     count: aiIndexStates.filter((state) => state.compositeScore >= band.min && state.compositeScore <= band.max).length,
@@ -297,10 +397,12 @@ const AIStateGovernmentIndexPage = () => {
   const scatterData = aiIndexStates.map((state) => ({
     state: state.state,
     budget: state.budgetBillions,
+    logBudget: Math.log10(state.budgetBillions),
     composite: round(state.compositeScore, 1),
     party: state.party,
     region: state.region,
     workforce: state.workforce,
+    rank: rankedStates.find((rankedState) => rankedState.state === state.state)?.rank ?? 0,
   }));
 
   const handleSidebarToggle = () => {
@@ -314,7 +416,11 @@ const AIStateGovernmentIndexPage = () => {
   };
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-[#f6f4ec] text-[#11140f] dark:bg-background dark:text-foreground">
+    <div
+      data-ai-index-page
+      ref={pageScrollRef}
+      className="relative h-[100svh] overflow-y-auto overflow-x-hidden bg-background text-foreground"
+    >
       <Sidebar
         open={sidebarOpen}
         onToggle={handleSidebarToggle}
@@ -342,95 +448,120 @@ const AIStateGovernmentIndexPage = () => {
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           transition={{ duration: 0.62, ease: EASE_TEXT, delay: 0.08 }}
         >
-          <section className="relative min-h-[92svh] overflow-hidden border-b border-foreground/10 px-5 pt-28 sm:px-8">
-            <div className="absolute inset-x-0 top-0 h-32 bg-[#1c7c74]" />
-            <div className="absolute bottom-0 left-0 h-1/3 w-full bg-[#d8e9df]" />
-            <div className="relative mx-auto grid max-w-7xl gap-10 lg:grid-cols-[minmax(0,1fr)_460px] lg:items-end">
-              <div className="pb-10 lg:pb-20">
-                <button
-                  type="button"
-                  onClick={() => navigate("/projects")}
-                  className="group mb-10 inline-flex items-center gap-2 rounded-full bg-foreground px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-background transition-colors hover:bg-[#1c7c74]"
+          <section className="relative bg-background">
+            <div className="sticky top-0 z-0 h-[75svh] overflow-hidden">
+              <motion.img
+                src={HERO_IMAGE}
+                alt="Utah state capitol building"
+                className="absolute inset-0 h-full w-full object-cover"
+                initial={{ scale: 1.04, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 1.1, ease: EASE_TEXT }}
+              />
+              <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(8,12,8,0.1)_0%,rgba(8,12,8,0.16)_34%,rgba(8,12,8,0.86)_100%)]" />
+              <p className="absolute bottom-3 right-4 z-20 text-[11px] leading-none text-white/62 sm:right-6">
+                Utah state capitol building. Credit: Lonely Planet
+              </p>
+              <div className="absolute inset-x-0 top-0 z-10 px-5 pt-28 sm:px-8">
+                <div className="mx-auto max-w-7xl">
+                  <button
+                    type="button"
+                    onClick={() => navigate("/projects")}
+                    className="back-projects-button group relative inline-flex cursor-pointer items-center justify-center overflow-hidden rounded-full bg-foreground px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-background"
+                  >
+                    <span
+                      className="absolute inset-0 origin-right scale-x-0 bg-primary/90 transition-transform duration-700 group-hover:scale-x-100"
+                      style={{ transitionTimingFunction: "cubic-bezier(0.22,1,0.36,1)" }}
+                    />
+                    <span className="back-projects-button-label relative z-10 flex items-center transition-colors duration-500">
+                      <span
+                        className="inline-flex max-w-0 overflow-hidden opacity-0 transition-all duration-500 group-hover:max-w-[1.5rem] group-hover:opacity-100"
+                        style={{ transitionTimingFunction: "cubic-bezier(0.22,1,0.36,1)" }}
+                      >
+                        <ArrowLeft className="mr-1.5 h-3 w-3 shrink-0" strokeWidth={1.5} />
+                      </span>
+                      All Projects
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <motion.div
+                className="absolute inset-x-0 bottom-0 z-10 px-5 pb-10 text-white sm:px-8 sm:pb-14"
+                initial={{ opacity: 0, y: 28, filter: "blur(8px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                transition={{ duration: 0.78, ease: EASE_TEXT, delay: 0.18 }}
+              >
+                <div className="mx-auto max-w-7xl">
+                  <h1 className="max-w-5xl text-5xl font-semibold leading-[0.95] tracking-tight sm:text-7xl lg:text-8xl">
+                    The state GenAI gap is now measurable.
+                  </h1>
+                  <p className="mt-6 w-full text-lg leading-relaxed text-white/78 sm:text-xl">
+                    Generative AI is already changing how work gets done. This benchmark asks a narrower question:
+                    which state and territory governments are actually preparing their own operations for it?
+                  </p>
+                </div>
+              </motion.div>
+            </div>
+
+            <div className="relative z-20 bg-background px-5 py-10 sm:px-8 lg:py-14">
+              <div className="mx-auto grid max-w-7xl gap-10">
+                <TextReveal>
+                  <div className="space-y-5">
+                    <p className="w-full text-xl leading-relaxed text-foreground/72 sm:text-2xl">
+                      This index translates the GenAI hype cycle into a public-evidence benchmark for state and
+                      territory governments: who has guidance, training, pilots, governance structures, public roadmaps,
+                      and enough transparency for constituents to see what is actually happening.
+                    </p>
+                    <p className="w-full text-base leading-relaxed text-foreground/58">
+                      Built from 15 criteria and 20 possible raw preparedness points, the composite score keeps public
+                      evidence at the center while accounting for the very different resource levels of state and
+                      territory governments.
+                    </p>
+                  </div>
+                </TextReveal>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 36, scale: 0.98 }}
+                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                  viewport={{ once: true, amount: 0.25 }}
+                  transition={{ duration: 0.78, ease: EASE_TEXT, delay: 0.1 }}
                 >
-                  <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.5} />
-                  All projects
-                </button>
-
-                <div className="mb-5 flex flex-wrap gap-2">
-                  <span className="site-corner bg-[#f7c948] px-3 py-1 font-mono text-[10px] uppercase tracking-[0.22em] text-[#17140b]">
-                    Council of State Governments
-                  </span>
-                  <span className="site-corner border border-foreground/15 bg-background/70 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.22em] text-foreground/60">
-                    2025 public evidence benchmark
-                  </span>
-                </div>
-
-                <h1 className="max-w-5xl text-5xl font-semibold leading-[0.95] tracking-tight text-foreground sm:text-7xl lg:text-8xl">
-                  The state GenAI gap is now measurable.
-                </h1>
-                <p className="mt-7 max-w-3xl text-lg leading-relaxed text-foreground/68 sm:text-xl">
-                  I rebuilt the AI in State Government Index as a data-first interactive article: 56 governments,
-                  15 public-evidence criteria, and a live view of which states are building real capacity versus
-                  only talking about it.
-                </p>
-              </div>
-
-              <div className="site-corner mb-8 border border-foreground/10 bg-background/85 p-5 shadow-2xl lg:mb-20">
-                <div className="mb-5 flex items-center justify-between">
-                  <div>
-                    <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-foreground/45">Top state</p>
-                    <h2 className="mt-1 text-3xl font-semibold tracking-tight">Maryland</h2>
-                  </div>
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#1c7c74] text-xl font-semibold text-white">
-                    100
-                  </div>
-                </div>
-                <ResponsiveContainer width="100%" height={240}>
-                  <BarChart data={rankedStates.slice(0, 8)} layout="vertical" margin={{ left: 8, right: 22, top: 4, bottom: 4 }}>
-                    <XAxis type="number" domain={[0, 100]} hide />
-                    <YAxis dataKey="state" type="category" width={108} tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "currentColor" }} />
-                    <Tooltip content={<DashboardTooltip />} cursor={{ fill: "rgba(17,20,15,0.06)" }} />
-                    <Bar dataKey="compositeScore" name="Composite score" radius={[0, 6, 6, 0]}>
-                      {rankedStates.slice(0, 8).map((state) => (
-                        <Cell key={state.state} fill={getScoreColor(state.compositeScore)} />
-                      ))}
-                      <LabelList dataKey="compositeScore" position="right" formatter={(value: number) => round(value)} className="fill-foreground text-[10px]" />
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
+                  <ChartReveal minHeight={500} scrollContainerRef={pageScrollRef}>
+                    <TopPerformersVisual states={topStates} />
+                  </ChartReveal>
+                </motion.div>
               </div>
             </div>
           </section>
 
-          <section className="border-b border-foreground/10 bg-background px-5 py-8 sm:px-8">
+          <RevealSection className="bg-background px-5 py-8 sm:px-8" scrollContainerRef={pageScrollRef}>
             <div className="mx-auto grid max-w-7xl gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              <StatPanel label="Governments scored" value="56" detail="50 states, five territories, and DC." icon={Database} />
-              <StatPanel label="Median score" value={`${round(medianComposite)}/100`} detail={`Mean composite score: ${round(meanComposite, 1)}.`} icon={BarChart3} />
-              <StatPanel label="Above 80" value={`${statesAbove80}`} detail="Only a small top tier clears the excellent band." icon={Sparkles} />
-              <StatPanel label="Below 50" value={`${statesBelow50}`} detail="More than half sit below the midpoint." icon={LineChart} />
+              <StatPanel label="Governments scored" value="56" detail="50 states, five territories, and DC." />
+              <StatPanel label="Median score" value={`${round(medianComposite)}/100`} detail={`Mean composite score: ${round(meanComposite, 1)}.`} />
+              <StatPanel label="Above 80" value={`${statesAbove80}`} detail="Only a small top tier clears the excellent band." />
+              <StatPanel label="Below 50" value={`${statesBelow50}`} detail="Most governments are still early." />
             </div>
-          </section>
+          </RevealSection>
 
-          <section className="bg-[#11140f] px-5 py-16 text-white sm:px-8">
+          <RevealSection className="bg-background px-5 py-16 sm:px-8" scrollContainerRef={pageScrollRef}>
             <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[360px_minmax(0,1fr)]">
               <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-white/45">Live explorer</p>
-                <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">Find the signal in the rankings.</h2>
-                <p className="mt-4 text-sm leading-relaxed text-white/62">
-                  Filter by region, executive party control, or a specific public-evidence criterion. Click any state to
-                  inspect how its composite score breaks into adoption, infrastructure, and employee policy.
+                <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">The benchmark only counts what governments make visible.</h2>
+                <p className="mt-4 text-sm leading-relaxed text-foreground/62">
+                  The goal was not to score press-release enthusiasm. Each row is grounded in publicly available
+                  evidence of GenAI adoption, infrastructure, and employee resources inside executive-branch government.
                 </p>
               </div>
 
               <div className="space-y-4">
-                <div className="site-corner border border-white/12 bg-white/[0.04] p-4">
-                  <div className="mb-4 flex items-center gap-2 text-white/70">
+                <div className="site-corner bg-card p-4">
+                  <div className="mb-4 flex items-center gap-2 text-foreground/70">
                     <Filter className="h-4 w-4" strokeWidth={1.5} />
-                    <span className="font-mono text-[10px] uppercase tracking-[0.24em]">Filters</span>
+                    <span className="text-sm font-medium">Filters</span>
                   </div>
                   <div className="grid gap-4 lg:grid-cols-[1fr_1fr]">
                     <div className="space-y-2">
-                      <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/40">Region</span>
+                      <span className="text-sm font-medium text-foreground/50">Region</span>
                       <div className="flex flex-wrap gap-2">
                         <FilterButton active={selectedRegion === "All"} onClick={() => setSelectedRegion("All")}>All</FilterButton>
                         {regionOrder.map((region) => (
@@ -442,48 +573,36 @@ const AIStateGovernmentIndexPage = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/40">Executive control</span>
+                      <span className="text-sm font-medium text-foreground/50">Executive control</span>
                       <div className="flex flex-wrap gap-2">
                         <FilterButton active={selectedParty === "All"} onClick={() => setSelectedParty("All")}>All</FilterButton>
                         {partyOrder.map((party) => (
                           <FilterButton key={party} active={selectedParty === party} onClick={() => setSelectedParty(party)}>
-                            {party}
+                            {partyLabels[party]}
                           </FilterButton>
                         ))}
                       </div>
                     </div>
                   </div>
 
-                  <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_280px]">
-                    <label className="site-corner flex h-11 items-center gap-3 border border-white/12 bg-black/20 px-3 text-white/70">
+                  <div className="mt-4">
+                    <label className="site-corner flex h-11 items-center gap-3 bg-background px-3 text-foreground/70">
                       <Search className="h-4 w-4" strokeWidth={1.5} />
                       <input
                         value={query}
                         onChange={(event) => setQuery(event.target.value)}
                         placeholder="Search state or territory"
-                        className="h-full flex-1 bg-transparent text-sm text-white outline-none placeholder:text-white/35"
+                        className="h-full flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-foreground/35"
                       />
                     </label>
-                    <select
-                      value={selectedCriterion}
-                      onChange={(event) => setSelectedCriterion(event.target.value as AiIndexCriterionKey | "All")}
-                      className="site-corner h-11 border border-white/12 bg-black/20 px-3 font-mono text-[11px] uppercase tracking-[0.14em] text-white outline-none"
-                    >
-                      <option value="All">Any criterion</option>
-                      {aiIndexCriteria.map((criterion) => (
-                        <option key={criterion.key} value={criterion.key}>
-                          Has {criterion.label}
-                        </option>
-                      ))}
-                    </select>
                   </div>
                 </div>
 
                 <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_330px]">
-                  <div className="site-corner max-h-[560px] overflow-auto border border-white/12 bg-white/[0.04]">
+                  <div className="site-corner max-h-[560px] overflow-auto bg-card">
                     <table className="w-full min-w-[680px] text-left">
-                      <thead className="sticky top-0 bg-[#11140f] text-white/45">
-                        <tr className="border-b border-white/10 font-mono text-[10px] uppercase tracking-[0.18em]">
+                      <thead className="sticky top-0 bg-card text-foreground/45">
+                        <tr className="border-b border-foreground/10 text-xs font-medium">
                           <th className="px-4 py-3">Rank</th>
                           <th className="px-4 py-3">Government</th>
                           <th className="px-4 py-3">Region</th>
@@ -497,47 +616,47 @@ const AIStateGovernmentIndexPage = () => {
                           <tr
                             key={state.state}
                             onClick={() => setSelectedStateName(state.state)}
-                            className={`cursor-pointer border-b border-white/8 text-sm transition-colors hover:bg-white/[0.07] ${
-                              selectedState.state === state.state ? "bg-white/[0.1]" : ""
+                            className={`cursor-pointer border-b border-foreground/10 text-sm transition-colors hover:bg-foreground/[0.04] ${
+                              selectedState.state === state.state ? "bg-foreground/[0.06]" : ""
                             }`}
                           >
-                            <td className="px-4 py-3 font-mono text-white/45">#{state.rank}</td>
-                            <td className="px-4 py-3 font-medium text-white">{state.state}</td>
-                            <td className="px-4 py-3 text-white/58">{state.region}</td>
-                            <td className="px-4 py-3 text-white/58">{state.party}</td>
-                            <td className="px-4 py-3 text-right font-mono text-white">{round(state.compositeScore, 1)}</td>
-                            <td className="px-4 py-3 text-right font-mono text-white/62">{state.preparednessScore}</td>
+                            <td className="px-4 py-3 font-mono text-foreground/45">#{state.rank}</td>
+                            <td className="px-4 py-3 font-medium text-foreground">{state.state}</td>
+                            <td className="px-4 py-3 text-foreground/58">{state.region}</td>
+                            <td className="px-4 py-3 text-foreground/58">{partyLabels[state.party]}</td>
+                            <td className="px-4 py-3 text-right font-mono text-foreground">{round(state.compositeScore, 1)}</td>
+                            <td className="px-4 py-3 text-right font-mono text-foreground/62">{state.preparednessScore}</td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
                   </div>
 
-                  <div className="site-corner border border-white/12 bg-white/[0.05] p-5">
+                  <div className="site-corner bg-card p-5">
                     <div className="mb-4 flex items-start justify-between gap-4">
                       <div>
-                        <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-white/42">Selected</p>
+                        <p className="text-sm font-medium text-foreground/50">Selected government</p>
                         <h3 className="mt-1 text-3xl font-semibold tracking-tight">{selectedState.state}</h3>
                       </div>
-                      <span className="site-corner bg-white px-2 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-[#11140f]">
+                      <span className="site-corner bg-foreground px-2 py-1 text-xs font-medium text-background">
                         #{selectedState.rank}
                       </span>
                     </div>
                     <div className="mb-5 grid grid-cols-2 gap-2">
-                      <div className="site-corner bg-black/20 p-3">
-                        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/38">Composite</p>
+                      <div className="site-corner bg-background p-3">
+                        <p className="text-sm font-medium text-foreground/45">Composite</p>
                         <p className="mt-1 text-2xl font-semibold">{round(selectedState.compositeScore, 1)}</p>
                       </div>
-                      <div className="site-corner bg-black/20 p-3">
-                        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/38">Raw score</p>
+                      <div className="site-corner bg-background p-3">
+                        <p className="text-sm font-medium text-foreground/45">Raw score</p>
                         <p className="mt-1 text-2xl font-semibold">{selectedState.preparednessScore}</p>
                       </div>
-                      <div className="site-corner bg-black/20 p-3">
-                        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/38">Budget</p>
+                      <div className="site-corner bg-background p-3">
+                        <p className="text-sm font-medium text-foreground/45">Budget</p>
                         <p className="mt-1 text-2xl font-semibold">{formatMoney(selectedState.budgetBillions)}</p>
                       </div>
-                      <div className="site-corner bg-black/20 p-3">
-                        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/38">Workforce</p>
+                      <div className="site-corner bg-background p-3">
+                        <p className="text-sm font-medium text-foreground/45">Workforce</p>
                         <p className="mt-1 text-2xl font-semibold">{formatNumber(selectedState.workforce)}</p>
                       </div>
                     </div>
@@ -547,14 +666,16 @@ const AIStateGovernmentIndexPage = () => {
                         const value = round(categoryScore(selectedState, category.category));
                         return (
                           <div key={category.category}>
-                            <div className="mb-1 flex justify-between font-mono text-[10px] uppercase tracking-[0.16em] text-white/45">
+                            <div className="mb-1 flex justify-between text-xs font-medium text-foreground/50">
                               <span>{category.category}</span>
                               <span>{value}%</span>
-                            </div>
-                            <div className="h-2 overflow-hidden rounded-full bg-white/10">
-                              <div className="h-full rounded-full" style={{ width: `${value}%`, backgroundColor: category.fill }} />
-                            </div>
                           </div>
+                          <div className="h-2 overflow-hidden rounded-full bg-foreground/10">
+                              {value > 0 ? (
+                                <div className="h-full rounded-full" style={{ width: `${value}%`, backgroundColor: category.fill }} />
+                              ) : null}
+                          </div>
+                        </div>
                         );
                       })}
                     </div>
@@ -562,249 +683,238 @@ const AIStateGovernmentIndexPage = () => {
                 </div>
               </div>
             </div>
-          </section>
+          </RevealSection>
 
-          <section className="bg-background px-5 py-16 sm:px-8">
+          <RevealSection className="bg-background px-5 py-16 sm:px-8" scrollContainerRef={pageScrollRef}>
             <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(360px,0.9fr)]">
               <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-foreground/45">Score distribution</p>
-                <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-5xl">The index is top-heavy, then drops fast.</h2>
-                <p className="mt-4 max-w-2xl text-sm leading-relaxed text-foreground/62">
-                  Composite scoring keeps the preparedness score as the main signal, then adjusts for government
-                  resources. The result still rewards states with visible implementation, not just size.
+                <h2 className="text-3xl font-semibold tracking-tight sm:text-5xl">A few governments are ahead. Most are still building the basics.</h2>
+                <p className="mt-4 w-full text-sm leading-relaxed text-foreground/62">
+                  The pattern is uneven but legible: leadership clusters around states with clear implementation,
+                  public strategy, employee resources, and enough transparency to verify what is actually happening.
                 </p>
-                <div className="mt-8 h-[360px]">
+                <ChartReveal className="mt-8 h-[360px]" minHeight={360} scrollContainerRef={pageScrollRef}>
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={rankedStates} margin={{ top: 20, right: 8, left: -28, bottom: 4 }}>
                       <CartesianGrid stroke="rgba(17,20,15,0.1)" vertical={false} />
                       <XAxis dataKey="state" hide />
                       <YAxis domain={[0, 100]} tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "currentColor" }} />
                       <Tooltip content={<DashboardTooltip />} cursor={{ fill: "rgba(17,20,15,0.06)" }} />
-                      <Bar dataKey="compositeScore" name="Composite score" radius={[5, 5, 0, 0]}>
+                      <Bar
+                        dataKey="compositeScore"
+                        name="Composite score"
+                        radius={[5, 5, 0, 0]}
+                        isAnimationActive
+                        animationBegin={0}
+                        animationDuration={900}
+                        animationEasing="ease-out"
+                      >
                         {rankedStates.map((state) => (
                           <Cell key={state.state} fill={getScoreColor(state.compositeScore)} />
                         ))}
                       </Bar>
                     </BarChart>
                   </ResponsiveContainer>
-                </div>
+                </ChartReveal>
               </div>
 
               <div className="grid content-start gap-3">
-                {bandData.map((band) => (
-                  <div key={band.label} className="site-corner border border-foreground/10 bg-[#f6f4ec] p-4 dark:bg-card">
+                {bandData.map((band, index) => (
+                  <motion.div
+                    key={band.label}
+                    className="site-corner bg-card p-4"
+                    initial={{ opacity: 0, x: -34, clipPath: "inset(0 100% 0 0)", filter: "blur(6px)" }}
+                    whileInView={{ opacity: 1, x: 0, clipPath: "inset(0 0% 0 0)", filter: "blur(0px)" }}
+                    viewport={{ once: true, amount: 0.7, root: pageScrollRef }}
+                    transition={{ duration: 0.72, ease: EASE_TEXT, delay: index * 0.05 }}
+                  >
                     <div className="mb-3 flex items-center justify-between">
-                      <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/50">{band.label}</span>
+                      <span className="text-sm font-medium text-foreground/62">{band.label}</span>
                       <span className="font-mono text-xs text-foreground/55">{band.min}-{Math.floor(band.max)}</span>
                     </div>
                     <div className="flex items-end justify-between gap-4">
-                      <div className="text-4xl font-semibold" style={{ color: band.color }}>
+                      <motion.div
+                        className="text-4xl font-semibold"
+                        style={{ color: band.color }}
+                        initial={{ opacity: 0, x: -10 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true, amount: 0.7, root: pageScrollRef }}
+                        transition={{ duration: 0.5, ease: EASE_TEXT, delay: 0.16 + index * 0.05 }}
+                      >
                         {band.count}
-                      </div>
+                      </motion.div>
                       <div className="h-2 flex-1 overflow-hidden rounded-full bg-foreground/10">
-                        <div className="h-full rounded-full" style={{ width: `${percent(band.count, aiIndexStates.length)}%`, backgroundColor: band.color }} />
+                        {band.count > 0 ? (
+                          <motion.div
+                            className="h-full origin-left rounded-full"
+                            style={{
+                              width: `${percent(band.count, aiIndexStates.length)}%`,
+                              backgroundColor: band.color,
+                            }}
+                            initial={{ scaleX: 0 }}
+                            whileInView={{ scaleX: 1 }}
+                            viewport={{ once: true, amount: 0.7, root: pageScrollRef }}
+                            transition={{ duration: 0.78, ease: EASE_TEXT, delay: 0.18 + index * 0.05 }}
+                          />
+                        ) : null}
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </div>
-          </section>
+          </RevealSection>
 
-          <section className="border-y border-foreground/10 bg-[#e7efe9] px-5 py-16 sm:px-8">
+          <RevealSection className="bg-background px-5 py-16 sm:px-8" scrollContainerRef={pageScrollRef}>
             <div className="mx-auto max-w-7xl">
               <div className="grid gap-8 lg:grid-cols-[420px_minmax(0,1fr)]">
                 <div>
-                  <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-foreground/45">Criteria adoption</p>
-                  <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-5xl">The missing pieces are practical, not abstract.</h2>
+                  <h2 className="text-3xl font-semibold tracking-tight sm:text-5xl">The missing pieces are practical, not abstract.</h2>
                   <p className="mt-4 text-sm leading-relaxed text-foreground/62">
                     Public guidance is relatively common. Training, action plans, permanent AI offices, and enterprise
                     pilots are much rarer. That is the core gap: governments are writing rules faster than they are
                     building repeatable capacity.
                   </p>
-                  <div className="mt-6 grid grid-cols-2 gap-3">
-                    <StatPanel label="Guidance" value={`${guidancePercent}%`} detail="Have public employee guidance." icon={ShieldCheck} />
-                    <StatPanel label="Training" value={`${trainingPercent}%`} detail="Show public employee training." icon={Users} />
-                    <StatPanel label="Roadmaps" value={`${roadmapPercent}%`} detail="Have a GenAI action plan." icon={SlidersHorizontal} />
-                    <StatPanel label="Pilots" value={`${enterprisePercent}%`} detail="Have public enterprise trials." icon={Bot} />
-                  </div>
                 </div>
-                <div className="site-corner border border-foreground/10 bg-background p-4">
-                  <ResponsiveContainer width="100%" height={520}>
-                    <BarChart data={criterionData} layout="vertical" margin={{ top: 8, right: 34, bottom: 8, left: 106 }}>
-                      <CartesianGrid stroke="rgba(17,20,15,0.1)" horizontal={false} />
-                      <XAxis type="number" domain={[0, 100]} tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "currentColor" }} />
-                      <YAxis dataKey="label" type="category" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "currentColor" }} width={112} />
-                      <Tooltip content={<DashboardTooltip />} cursor={{ fill: "rgba(17,20,15,0.05)" }} />
-                      <Bar dataKey="percent" name="Governments with evidence" radius={[0, 5, 5, 0]}>
-                        {criterionData.map((criterion) => (
-                          <Cell key={criterion.key} fill={criterion.fill} />
-                        ))}
-                        <LabelList dataKey="percent" position="right" formatter={(value: number) => `${value}%`} className="fill-foreground text-[10px]" />
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
+                <div className="grid grid-cols-2 gap-3">
+                  <StatPanel label="Guidance" value={`${guidancePercent}%`} detail="Have public employee guidance." />
+                  <StatPanel label="Training" value={`${trainingPercent}%`} detail="Show public employee training." />
+                  <StatPanel label="Roadmaps" value={`${roadmapPercent}%`} detail="Have a public GenAI action plan." />
+                  <StatPanel label="Pilots" value={`${enterprisePercent}%`} detail="Have public enterprise trials." />
                 </div>
               </div>
             </div>
-          </section>
+          </RevealSection>
 
-          <section className="bg-background px-5 py-16 sm:px-8">
-            <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-2">
-              <div className="site-corner border border-foreground/10 bg-[#f6f4ec] p-5 dark:bg-card">
-                <div className="mb-5 flex items-start justify-between gap-4">
-                  <div>
-                    <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-foreground/45">Regional pattern</p>
-                    <h2 className="mt-2 text-2xl font-semibold tracking-tight">East leads the average.</h2>
-                  </div>
-                  <Landmark className="h-5 w-5 text-foreground/45" strokeWidth={1.5} />
-                </div>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={regionData} margin={{ top: 18, right: 6, left: -26, bottom: 0 }}>
-                    <CartesianGrid stroke="rgba(17,20,15,0.1)" vertical={false} />
-                    <XAxis dataKey="region" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "currentColor" }} />
-                    <YAxis domain={[0, 70]} tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "currentColor" }} />
-                    <Tooltip content={<DashboardTooltip />} />
-                    <Bar dataKey="average" name="Average composite" radius={[5, 5, 0, 0]} fill="#1c7c74">
-                      <LabelList dataKey="average" position="top" formatter={(value: number) => round(value, 1)} className="fill-foreground text-[10px]" />
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-
-              <div className="site-corner border border-foreground/10 bg-[#f6f4ec] p-5 dark:bg-card">
-                <div className="mb-5 flex items-start justify-between gap-4">
-                  <div>
-                    <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-foreground/45">Party control</p>
-                    <h2 className="mt-2 text-2xl font-semibold tracking-tight">Executive control tracks with score, but does not explain all of it.</h2>
-                  </div>
-                  <Users className="h-5 w-5 text-foreground/45" strokeWidth={1.5} />
-                </div>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={partyData} margin={{ top: 18, right: 12, left: -26, bottom: 0 }}>
-                    <CartesianGrid stroke="rgba(17,20,15,0.1)" vertical={false} />
-                    <XAxis dataKey="label" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "currentColor" }} />
-                    <YAxis domain={[0, 70]} tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "currentColor" }} />
-                    <Tooltip content={<DashboardTooltip />} />
-                    <Bar dataKey="average" name="Average composite" radius={[5, 5, 0, 0]}>
-                      {partyData.map((party) => (
-                        <Cell key={party.party} fill={party.party === "D" ? "#3b82a0" : "#b75d2a"} />
-                      ))}
-                      <LabelList dataKey="average" position="top" formatter={(value: number) => round(value, 1)} className="fill-foreground text-[10px]" />
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-                <div className="mt-2 grid gap-2 text-xs text-foreground/58 sm:grid-cols-2">
-                  {partyData.map((party) => (
-                    <p key={party.party}>
-                      <span className="font-mono text-foreground/80">{party.party}</span> covers {party.count} governments in
-                      the dataset: {partyLabels[party.party]}.
-                    </p>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section className="bg-[#11140f] px-5 py-16 text-white sm:px-8">
+          <RevealSection className="bg-background px-5 py-16 sm:px-8" scrollContainerRef={pageScrollRef}>
             <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[390px_minmax(0,1fr)]">
               <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-white/45">Resources</p>
-                <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-5xl">Budget helps, but it is not destiny.</h2>
-                <p className="mt-4 text-sm leading-relaxed text-white/62">
-                  The composite model intentionally keeps preparedness as the majority signal while correcting for
-                  government resources. Smaller governments can still rank well when their public evidence is concrete.
+                <h2 className="text-3xl font-semibold tracking-tight sm:text-5xl">Resources matter. They do not decide the story.</h2>
+                <p className="mt-4 text-sm leading-relaxed text-foreground/62">
+                  The composite model keeps preparedness as the main signal while accounting for government resources.
+                  Smaller governments can still move quickly when the public evidence is concrete.
+                </p>
+                <div className="mt-6 grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+                  <div className="site-corner bg-card p-4">
+                    <p className="text-sm font-medium text-foreground/55">Median budget</p>
+                    <p className="mt-2 text-3xl font-semibold tracking-tight">{formatMoney(medianBudget)}</p>
+                    <p className="mt-1 text-xs leading-relaxed text-foreground/52">The chart uses a log scale so small governments stay visible.</p>
+                  </div>
+                  <div className="site-corner bg-card p-4">
+                    <p className="text-sm font-medium text-foreground/55">Best score under $15B</p>
+                    <p className="mt-2 text-3xl font-semibold tracking-tight">{round(leanLeader.compositeScore, 1)}</p>
+                    <p className="mt-1 text-xs leading-relaxed text-foreground/52">{leanLeader.state} shows that capacity is not only a size question.</p>
+                  </div>
+                  <div className="site-corner bg-card p-4">
+                    <p className="text-sm font-medium text-foreground/55">Large budgets below 50</p>
+                    <p className="mt-2 text-3xl font-semibold tracking-tight">{largeBudgetBelow50}</p>
+                    <p className="mt-1 text-xs leading-relaxed text-foreground/52">Scale helps only when it becomes public implementation.</p>
+                  </div>
+                </div>
+              </div>
+              <div className="site-corner bg-card p-5">
+                <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
+                  <div>
+                    <h3 className="text-xl font-semibold tracking-tight">Composite score by budget</h3>
+                    <p className="mt-1 text-sm text-foreground/56">Bubble size represents workforce. Color follows score band.</p>
+                  </div>
+                  <div className="flex max-w-xl flex-wrap items-center gap-x-3 gap-y-2 text-xs text-foreground/58">
+                    {scoreBands.map((band) => (
+                      <span key={band.label} className="inline-flex items-center gap-2">
+                        <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: band.color }} />
+                        {band.label}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <ChartReveal minHeight={420} reveal="left" scrollContainerRef={pageScrollRef}>
+                  <ResponsiveContainer width="100%" height={420}>
+                    <ScatterChart margin={{ top: 18, right: 18, bottom: 18, left: -8 }}>
+                      <CartesianGrid stroke="hsl(var(--foreground) / 0.1)" />
+                      <XAxis
+                        dataKey="logBudget"
+                        name="Budget"
+                        type="number"
+                        domain={[-1, 2.5]}
+                        ticks={[-1, 0, 1, 2]}
+                        tickFormatter={(value: number) => formatMoney(10 ** value)}
+                        tickLine={false}
+                        axisLine={false}
+                        tick={{ fontSize: 11, fill: "hsl(var(--foreground) / 0.55)" }}
+                      />
+                      <YAxis
+                        dataKey="composite"
+                        name="Composite score"
+                        type="number"
+                        domain={[0, 100]}
+                        tickLine={false}
+                        axisLine={false}
+                        tick={{ fontSize: 11, fill: "hsl(var(--foreground) / 0.55)" }}
+                      />
+                      <ZAxis dataKey="workforce" type="number" range={[48, 260]} />
+                      <ReferenceLine
+                        x={Math.log10(medianBudget)}
+                        stroke="hsl(var(--foreground) / 0.22)"
+                        strokeDasharray="4 4"
+                        label={{ value: "Median budget", fill: "hsl(var(--foreground) / 0.48)", fontSize: 11, position: "insideTopRight" }}
+                      />
+                      <ReferenceLine
+                        y={medianComposite}
+                        stroke="hsl(var(--foreground) / 0.22)"
+                        strokeDasharray="4 4"
+                        label={{ value: "Median score", fill: "hsl(var(--foreground) / 0.48)", fontSize: 11, position: "insideLeft" }}
+                      />
+                      <Tooltip content={<ResourceTooltip />} cursor={{ stroke: "hsl(var(--foreground) / 0.25)" }} />
+                      <Scatter
+                        data={scatterData}
+                        name="Governments"
+                        isAnimationActive
+                        animationBegin={80}
+                        animationDuration={850}
+                        animationEasing="ease-out"
+                      >
+                        {scatterData.map((state) => (
+                          <Cell
+                            key={state.state}
+                            fill={getScoreColor(state.composite)}
+                            fillOpacity={state.composite >= medianComposite ? 0.88 : 0.58}
+                            stroke="hsl(var(--background))"
+                            strokeWidth={1}
+                          />
+                        ))}
+                      </Scatter>
+                    </ScatterChart>
+                  </ResponsiveContainer>
+                </ChartReveal>
+                <p className="mt-3 text-xs leading-relaxed text-foreground/50">
+                  The strongest evidence sits above the horizontal median line. Points to the left are governments
+                  working with below-median budgets.
                 </p>
               </div>
-              <div className="site-corner border border-white/12 bg-white/[0.04] p-4">
-                <ResponsiveContainer width="100%" height={420}>
-                  <ScatterChart margin={{ top: 20, right: 24, bottom: 20, left: 0 }}>
-                    <CartesianGrid stroke="rgba(255,255,255,0.1)" />
-                    <XAxis
-                      dataKey="budget"
-                      name="Budget"
-                      type="number"
-                      tickLine={false}
-                      axisLine={false}
-                      tick={{ fontSize: 11, fill: "rgba(255,255,255,0.55)" }}
-                      label={{ value: "Budget, billions", position: "insideBottom", fill: "rgba(255,255,255,0.55)", fontSize: 11 }}
-                    />
-                    <YAxis
-                      dataKey="composite"
-                      name="Composite score"
-                      type="number"
-                      domain={[0, 100]}
-                      tickLine={false}
-                      axisLine={false}
-                      tick={{ fontSize: 11, fill: "rgba(255,255,255,0.55)" }}
-                    />
-                    <Tooltip content={<DashboardTooltip />} cursor={{ stroke: "rgba(255,255,255,0.25)" }} />
-                    <Scatter data={scatterData} name="Governments">
-                      {scatterData.map((state) => (
-                        <Cell key={state.state} fill={state.party === "D" ? "#7dd3fc" : "#f59e0b"} />
-                      ))}
-                    </Scatter>
-                  </ScatterChart>
-                </ResponsiveContainer>
-              </div>
             </div>
-          </section>
+          </RevealSection>
 
-          <section className="bg-background px-5 py-16 sm:px-8">
+          <RevealSection className="bg-background px-5 py-16 sm:px-8" scrollContainerRef={pageScrollRef}>
             <div className="mx-auto max-w-7xl">
-              <div className="grid gap-8 lg:grid-cols-[430px_minmax(0,1fr)]">
-                <div>
-                  <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-foreground/45">State tile view</p>
-                  <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-5xl">Every tile is a public evidence record.</h2>
-                  <p className="mt-4 text-sm leading-relaxed text-foreground/62">
-                    The dashboard below is deliberately not a winner-take-all leaderboard. It makes the whole landscape
-                    scannable, including territories and states where public evidence is sparse.
-                  </p>
-                </div>
-                <div className="grid grid-cols-4 gap-2 sm:grid-cols-7 lg:grid-cols-8">
-                  {rankedStates.map((state) => (
-                    <button
-                      key={state.state}
-                      type="button"
-                      title={`${state.state}: ${round(state.compositeScore, 1)}`}
-                      onClick={() => setSelectedStateName(state.state)}
-                      className={`site-corner aspect-square border p-2 text-left transition-transform hover:-translate-y-0.5 ${
-                        selectedState.state === state.state ? "border-foreground shadow-lg" : "border-foreground/10"
-                      }`}
-                      style={{ backgroundColor: getScoreColor(state.compositeScore), color: "#fff" }}
-                    >
-                      <span className="block font-mono text-[10px] text-white/70">#{state.rank}</span>
-                      <span className="block text-lg font-semibold leading-none">{stateAbbreviations[state.state] ?? state.state.slice(0, 2)}</span>
-                      <span className="mt-1 block font-mono text-[10px] text-white/80">{round(state.compositeScore)}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section className="border-y border-foreground/10 bg-[#f6f4ec] px-5 py-16 sm:px-8">
-            <div className="mx-auto max-w-7xl">
-              <div className="max-w-3xl">
-                <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-foreground/45">Roadmap</p>
-                <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-5xl">What the index says leaders should do next.</h2>
+              <div className="w-full">
+                <h2 className="text-3xl font-semibold tracking-tight sm:text-5xl">Make safe use normal, measurable, and public.</h2>
               </div>
               <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {[
                   {
                     icon: ShieldCheck,
                     title: "Publish clear guidance",
-                    text: "Universal executive-branch guidance is the minimum floor for safe experimentation.",
+                    text: "Clear executive-branch guidance is the floor for safe, confident experimentation.",
                   },
                   {
                     icon: Users,
                     title: "Train the workforce",
-                    text: "Employees need practical GenAI literacy, not just warnings about what not to do.",
+                    text: "Employees need practical GenAI literacy, not only warnings about what not to do.",
                   },
                   {
                     icon: Bot,
                     title: "Run public pilots",
-                    text: "Enterprise trials and sandboxes create measurable evidence before full deployment.",
+                    text: "Enterprise trials, sandboxes, and pilots create measurable evidence before full deployment.",
                   },
                   {
                     icon: SlidersHorizontal,
@@ -812,7 +922,7 @@ const AIStateGovernmentIndexPage = () => {
                     text: "A public action plan turns isolated experiments into a visible government strategy.",
                   },
                   {
-                    icon: Landmark,
+                    icon: Database,
                     title: "Make ownership permanent",
                     text: "Dedicated staff and offices help governments learn instead of rediscovering the same problems.",
                   },
@@ -821,23 +931,29 @@ const AIStateGovernmentIndexPage = () => {
                     title: "Lead transparently",
                     text: "Public evidence is part of responsible deployment, not a communications afterthought.",
                   },
-                ].map((item) => (
-                  <div key={item.title} className="site-corner border border-foreground/10 bg-background p-5">
-                    <item.icon className="h-5 w-5 text-[#1c7c74]" strokeWidth={1.6} />
+                ].map((item, index) => (
+                  <motion.div
+                    key={item.title}
+                    className="site-corner bg-background p-5"
+                    initial={{ opacity: 0, y: 22, filter: "blur(8px)" }}
+                    whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                    viewport={{ once: true, amount: 0.4 }}
+                    transition={{ duration: 0.58, ease: EASE_TEXT, delay: index * 0.05 }}
+                  >
+                    <item.icon className="h-5 w-5 text-foreground/58" strokeWidth={1.6} />
                     <h3 className="mt-4 text-xl font-semibold tracking-tight">{item.title}</h3>
                     <p className="mt-2 text-sm leading-relaxed text-foreground/62">{item.text}</p>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </div>
-          </section>
+          </RevealSection>
 
-          <section className="bg-background px-5 py-16 sm:px-8">
+          <RevealSection className="bg-background px-5 py-16 sm:px-8" scrollContainerRef={pageScrollRef}>
             <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[minmax(0,1fr)_420px]">
               <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-foreground/45">Methodology</p>
-                <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-5xl">Public evidence only.</h2>
-                <div className="mt-5 max-w-3xl space-y-4 text-sm leading-relaxed text-foreground/66">
+                <h2 className="text-3xl font-semibold tracking-tight sm:text-5xl">Public evidence only.</h2>
+                <div className="mt-5 w-full space-y-4 text-sm leading-relaxed text-foreground/66">
                   <p>
                     The benchmark scores publicly accessible evidence of generative AI activity inside executive-branch
                     state and territory government. Internal tools, private memos, or undocumented deployments do not
@@ -845,13 +961,15 @@ const AIStateGovernmentIndexPage = () => {
                   </p>
                   <p>
                     The raw preparedness score spans 15 criteria and 20 possible points across GenAI adoption,
-                    government infrastructure, and employee policy. The composite score keeps preparedness as the
-                    central signal while applying a resource-efficiency adjustment.
+                    government infrastructure, and employee policy. It does not count non-generative AI, machine
+                    learning, or natural-language processing initiatives unless the public evidence is specifically
+                    about GenAI.
                   </p>
+                  <p>The composite score keeps preparedness central while applying a resource-efficiency adjustment.</p>
                 </div>
               </div>
-              <div className="site-corner border border-foreground/10 bg-[#f6f4ec] p-5 dark:bg-card">
-                <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-foreground/45">Source files</p>
+              <div className="site-corner bg-card p-5">
+                <p className="text-sm font-medium text-foreground/55">Source files</p>
                 <div className="mt-4 space-y-2">
                   {aiIndexSources.map((source) => (
                     <a
@@ -867,8 +985,12 @@ const AIStateGovernmentIndexPage = () => {
                   ))}
                 </div>
               </div>
+              <p className="site-corner bg-card p-4 text-sm leading-relaxed text-foreground/62 lg:col-span-2">
+                {LAST_UPDATED_LABEL}. The dashboard should be read as a point-in-time public evidence benchmark, not a
+                live tracker of every internal state government AI initiative.
+              </p>
             </div>
-          </section>
+          </RevealSection>
         </motion.main>
 
         <Footer />

@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import ProjectModal from "@/components/ProjectModal";
 import SectionHeading from "@/components/SectionHeading";
 import { preloadImages } from "@/lib/imagePreload";
 import { featuredProjectIds, projectItems, type ProjectItem } from "@/lib/siteContent";
@@ -50,7 +49,6 @@ interface FeaturedProjectCardProps {
   isDesktop: boolean;
   activeIndex: number | null;
   onActivate: (index: number) => void;
-  onOpen: (index: number) => void;
 }
 
 const FeaturedProjectCard = ({
@@ -59,30 +57,33 @@ const FeaturedProjectCard = ({
   isDesktop,
   activeIndex,
   onActivate,
-  onOpen,
 }: FeaturedProjectCardProps) => {
-  const [mobileCardRef, isCenteredMobile] = useCenteredInFrame<HTMLDivElement>(!isDesktop);
+  const [mobileCardRef, isCenteredMobile] = useCenteredInFrame<HTMLAnchorElement>(!isDesktop);
   const isActive = isDesktop ? activeIndex === index : true;
   const isImageActive = isDesktop ? isActive : isCenteredMobile;
   const hasActive = activeIndex !== null;
 
-  const card = (
-    <motion.div
+  return (
+    <Link
       ref={mobileCardRef}
-      className="group relative aspect-[4/3] h-auto cursor-pointer overflow-hidden bg-background transition-[flex] duration-700 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none md:aspect-auto md:h-full md:min-h-0 md:flex-[1_1_0%]"
+      to={`/projects/${project.id}`}
+      className="group relative block aspect-[4/3] h-auto cursor-pointer overflow-hidden bg-background transition-[flex] duration-700 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none md:aspect-auto md:h-full md:min-h-0 md:flex-[1_1_0%]"
       style={{
         minWidth: 0,
         contain: "layout paint",
         flex: isDesktop ? (isActive ? "5.8 1 0%" : hasActive ? "0.9 1 0%" : "1 1 0%") : undefined,
       }}
+      onMouseEnter={() => isDesktop && onActivate(index)}
+      aria-label={`Read more about ${project.title}`}
+    >
+    <motion.div
+      className="relative h-full w-full"
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true, margin: "-80px" }}
       transition={{
         opacity: { duration: 0.55, ease, delay: index * 0.12 },
       }}
-      onMouseEnter={() => isDesktop && onActivate(index)}
-      onClick={() => isDesktop && onOpen(index)}
     >
       <img
         src={project.image}
@@ -143,22 +144,12 @@ const FeaturedProjectCard = ({
         )}
       </div>
     </motion.div>
+    </Link>
   );
-
-  if (!isDesktop) {
-    return (
-      <Link to={`/projects/${project.id}`} className="block">
-        {card}
-      </Link>
-    );
-  }
-
-  return card;
 };
 
 const ProjectsSection = () => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const [openProjectIndex, setOpenProjectIndex] = useState<number | null>(null);
   const [isDesktop, setIsDesktop] = useState(true);
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 768px)");
@@ -203,7 +194,6 @@ const ProjectsSection = () => {
               isDesktop={isDesktop}
               activeIndex={activeIndex}
               onActivate={setActiveIndex}
-              onOpen={setOpenProjectIndex}
             />
           );
         })}
@@ -237,12 +227,6 @@ const ProjectsSection = () => {
         </div>
       </div>
 
-      <ProjectModal
-        projects={projects}
-        currentIndex={openProjectIndex}
-        onClose={() => setOpenProjectIndex(null)}
-        onNavigate={setOpenProjectIndex}
-      />
     </section>
   );
 };

@@ -241,9 +241,7 @@ const projectUrl = (project) => absoluteUrl(projectLinkPath(project));
 
 const projectPrimaryImage = (project) => {
   const override = projectSeo[project.id]?.image;
-  const localProjectImage = `/seo/projects/${project.id}.jpg`;
-  const localProjectPath = localPublicPathFor(localProjectImage);
-  const image = override ?? (localProjectPath && fs.existsSync(localProjectPath) ? localProjectImage : project.image);
+  const image = override?.url?.startsWith("/seo/projects/") ? project.image : override ?? project.image;
   return normalizeImage(image, `${project.title} preview image`);
 };
 
@@ -513,14 +511,14 @@ const setTitle = (html, title) =>
 const setMeta = (html, selector, value) => {
   const escapedValue = escapeHtml(value);
   const expression = new RegExp(`(<meta\\s+${selector}\\s+content=")[^"]*(" ?/?>)`);
-  if (expression.test(html)) return html.replace(expression, `$1${escapedValue}$2`);
+  if (expression.test(html)) return html.replace(expression, (_, before, after) => `${before}${escapedValue}${after}`);
   return html.replace("</head>", `    <meta ${selector} content="${escapedValue}" />\n  </head>`);
 };
 
 const setLink = (html, rel, value, attrs = "") => {
   const escapedValue = escapeHtml(value);
   const expression = new RegExp(`(<link\\s+rel="${rel}"[^>]*href=")[^"]*("[^>]*>)`);
-  if (expression.test(html)) return html.replace(expression, `$1${escapedValue}$2`);
+  if (expression.test(html)) return html.replace(expression, (_, before, after) => `${before}${escapedValue}${after}`);
   return html.replace("</head>", `    <link rel="${rel}" href="${escapedValue}"${attrs} />\n  </head>`);
 };
 

@@ -3,7 +3,7 @@
   xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://isaacseiler.xyz/</loc>
-    <lastmod>2026-05-14</lastmod>
+    <lastmod>2026-05-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <image:image>
@@ -12,45 +12,45 @@
       <image:caption>Primary image for Isaac Seiler, Fulbright Scholar, Truman Scholar, and OpenAI ChatGPT Lab member.</image:caption>
     </image:image>
     <image:image>
-      <image:loc>https://isaacseiler.xyz/seo/projects/fulbright-focus-group-sponsored-by-openai.jpg</image:loc>
+      <image:loc>https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev/chatlab.jpeg</image:loc>
       <image:title>Fulbright Taiwan ChatGPT Lab with OpenAI Support</image:title>
       <image:caption>Isaac Seiler founded and led an OpenAI-supported Fulbright Taiwan ChatGPT Lab for educators.</image:caption>
     </image:image>
     <image:image>
-      <image:loc>https://isaacseiler.xyz/seo/projects/artificial-intelligence-in-state-government-index.jpg</image:loc>
+      <image:loc>https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev/aiindex.png</image:loc>
       <image:title>Artificial Intelligence in State Government Index</image:title>
       <image:caption>A public benchmark measuring generative AI adoption across U.S. states and territories.</image:caption>
     </image:image>
     <image:image>
-      <image:loc>https://isaacseiler.xyz/seo/projects/congressional-office-setup-100-day-report.jpg</image:loc>
+      <image:loc>https://isaacseiler.xyz/experience/potus.jpeg</image:loc>
       <image:title>Congressional Office Setup and 100 Day Report</image:title>
       <image:caption>Systems, staffing, communications, and metrics used to launch a new congressional office.</image:caption>
     </image:image>
     <image:image>
-      <image:loc>https://isaacseiler.xyz/seo/projects/senior-thesis-local-journalism.jpg</image:loc>
+      <image:loc>https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev/ainews.png</image:loc>
       <image:title>AI Platforms and Journalism Research</image:title>
       <image:caption>Honors research on AI, digital platforms, local journalism, democracy, and media policy.</image:caption>
     </image:image>
     <image:image>
-      <image:loc>https://isaacseiler.xyz/seo/projects/electric-vehicle-access-analysis.jpg</image:loc>
+      <image:loc>https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev/charging.png</image:loc>
       <image:title>Electric Vehicle Charging Access Analysis</image:title>
       <image:caption>GIS analysis of electric vehicle charging access, infrastructure, and transportation equity.</image:caption>
     </image:image>
   </url>
   <url>
     <loc>https://isaacseiler.xyz/projects</loc>
-    <lastmod>2026-05-14</lastmod>
+    <lastmod>2026-05-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.95</priority>
     <image:image>
-      <image:loc>https://isaacseiler.xyz/seo/projects/fulbright-focus-group-sponsored-by-openai.jpg</image:loc>
+      <image:loc>https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev/chatlab.jpeg</image:loc>
       <image:title>Projects</image:title>
       <image:caption>Research, AI education, public policy, journalism, campaign communications, and strategy projects by Isaac Seiler.</image:caption>
     </image:image>
   </url>
   <url>
     <loc>https://isaacseiler.xyz/experience</loc>
-    <lastmod>2026-05-14</lastmod>
+    <lastmod>2026-05-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.86</priority>
     <image:image>
@@ -61,7 +61,7 @@
   </url>
   <url>
     <loc>https://isaacseiler.xyz/credentials</loc>
-    <lastmod>2026-05-14</lastmod>
+    <lastmod>2026-05-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.84</priority>
     <image:image>
@@ -72,7 +72,7 @@
   </url>
   <url>
     <loc>https://isaacseiler.xyz/photos</loc>
-    <lastmod>2026-05-14</lastmod>
+    <lastmod>2026-05-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.82</priority>
     <image:image>
@@ -83,7 +83,7 @@
   </url>
   <url>
     <loc>https://isaacseiler.xyz/photos/map</loc>
-    <lastmod>2026-05-14</lastmod>
+    <lastmod>2026-05-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.68</priority>
     <image:image>
@@ -94,29 +94,29 @@
   </url>
   <url>
     <loc>https://isaacseiler.xyz/projects/fulbright-focus-group-sponsored-by-openai</loc>
-    <lastmod>2026-05-14</lastmod>
+    <lastmod>2026-05-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.92</priority>
     <image:image>
-      <image:loc>https://isaacseiler.xyz/seo/projects/fulbright-focus-group-sponsored-by-openai.jpg</image:loc>
+      <image:loc>https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev/chatlab.jpeg</image:loc>
       <image:title>Fulbright Taiwan Educator Lab with OpenAI Support</image:title>
       <image:caption>Isaac Seiler founded and led the Fulbright Taiwan ChatGPT Lab, an OpenAI-supported educator lab focused on practical, responsible ChatGPT use cases in education.</image:caption>
     </image:image>
   </url>
   <url>
     <loc>https://isaacseiler.xyz/projects/artificial-intelligence-in-state-government-index</loc>
-    <lastmod>2026-05-14</lastmod>
+    <lastmod>2026-05-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.78</priority>
     <image:image>
-      <image:loc>https://isaacseiler.xyz/seo/projects/artificial-intelligence-in-state-government-index.jpg</image:loc>
+      <image:loc>https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev/aiindex.png</image:loc>
       <image:title>Artificial Intelligence in State Government Index</image:title>
       <image:caption>A public benchmark by Isaac Seiler measuring generative AI adoption, training, governance, pilots, transparency, and preparedness across U.S. states and territories.</image:caption>
     </image:image>
   </url>
   <url>
     <loc>https://isaacseiler.xyz/projects/ai-literacy-workshop-for-educators</loc>
-    <lastmod>2026-05-14</lastmod>
+    <lastmod>2026-05-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.78</priority>
     <image:image>
@@ -127,95 +127,95 @@
   </url>
   <url>
     <loc>https://isaacseiler.xyz/projects/senior-thesis-local-journalism</loc>
-    <lastmod>2026-05-14</lastmod>
+    <lastmod>2026-05-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.78</priority>
     <image:image>
-      <image:loc>https://isaacseiler.xyz/seo/projects/senior-thesis-local-journalism.jpg</image:loc>
+      <image:loc>https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev/ainews.png</image:loc>
       <image:title>AI Platforms and Journalism Research</image:title>
       <image:caption>Isaac Seiler&apos;s honors thesis analyzed AI, digital platforms, local journalism, democratic accountability, media policy, and newsroom labor through qualitative interviews.</image:caption>
     </image:image>
   </url>
   <url>
     <loc>https://isaacseiler.xyz/projects/congressional-office-setup-100-day-report</loc>
-    <lastmod>2026-05-14</lastmod>
+    <lastmod>2026-05-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.78</priority>
     <image:image>
-      <image:loc>https://isaacseiler.xyz/seo/projects/congressional-office-setup-100-day-report.jpg</image:loc>
+      <image:loc>https://isaacseiler.xyz/experience/potus.jpeg</image:loc>
       <image:title>Congressional Office Setup and 100 Day Report</image:title>
       <image:caption>Isaac Seiler helped stand up a new congressional office and produced early systems, staffing, metrics, communications, and first-100-day reporting.</image:caption>
     </image:image>
   </url>
   <url>
     <loc>https://isaacseiler.xyz/projects/electric-vehicle-access-analysis</loc>
-    <lastmod>2026-05-14</lastmod>
+    <lastmod>2026-05-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.78</priority>
     <image:image>
-      <image:loc>https://isaacseiler.xyz/seo/projects/electric-vehicle-access-analysis.jpg</image:loc>
+      <image:loc>https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev/charging.png</image:loc>
       <image:title>Electric Vehicle Charging Access Analysis</image:title>
       <image:caption>A GIS and quantitative analysis project by Isaac Seiler examining EV charging infrastructure access, charger density, income, race, and transportation equity.</image:caption>
     </image:image>
   </url>
   <url>
     <loc>https://isaacseiler.xyz/projects/boehringer-cares-foundation-rebrand-strategy-shift</loc>
-    <lastmod>2026-05-14</lastmod>
+    <lastmod>2026-05-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.78</priority>
     <image:image>
-      <image:loc>https://isaacseiler.xyz/seo/projects/boehringer-cares-foundation-rebrand-strategy-shift.jpg</image:loc>
+      <image:loc>https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev/bicares.png</image:loc>
       <image:title>Boehringer Cares Foundation Rebrand and Strategy Shift</image:title>
       <image:caption>A full rebrand and strategic redirect for Boehringer Cares, spanning narrative, UX, visual identity, and internal communications.</image:caption>
     </image:image>
   </url>
   <url>
     <loc>https://isaacseiler.xyz/projects/communications-consultancy-supporting-local-candidates</loc>
-    <lastmod>2026-05-14</lastmod>
+    <lastmod>2026-05-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.78</priority>
     <image:image>
-      <image:loc>https://isaacseiler.xyz/seo/projects/communications-consultancy-supporting-local-candidates.jpg</image:loc>
+      <image:loc>https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev/politicalconsult.png</image:loc>
       <image:title>Communications Consultancy and Supporting Local Candidates</image:title>
       <image:caption>An independent consultancy effort supporting local candidates through campaign websites, digital strategy, and rapid-response communications.</image:caption>
     </image:image>
   </url>
   <url>
     <loc>https://isaacseiler.xyz/projects/political-reporting-at-washu</loc>
-    <lastmod>2026-05-14</lastmod>
+    <lastmod>2026-05-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.78</priority>
     <image:image>
-      <image:loc>https://isaacseiler.xyz/seo/projects/political-reporting-at-washu.jpg</image:loc>
+      <image:loc>https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev/reporting.png</image:loc>
       <image:title>Political Reporting at WashU</image:title>
       <image:caption>Student political reporting at WashU focused on protest, campus governance, elections, and institutional accountability.</image:caption>
     </image:image>
   </url>
   <url>
     <loc>https://isaacseiler.xyz/projects/2022-institute-for-nonprofit-news-index-survey</loc>
-    <lastmod>2026-05-14</lastmod>
+    <lastmod>2026-05-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.78</priority>
     <image:image>
-      <image:loc>https://isaacseiler.xyz/seo/projects/2022-institute-for-nonprofit-news-index-survey.jpg</image:loc>
+      <image:loc>https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev/nonprofitnews.png</image:loc>
       <image:title>The 2022 Institute for Nonprofit News Index Survey</image:title>
       <image:caption>A large-scale nonprofit news research project involving data collection, survey synthesis, and direct stakeholder outreach.</image:caption>
     </image:image>
   </url>
   <url>
     <loc>https://isaacseiler.xyz/projects/sustainable-development-health-access-report</loc>
-    <lastmod>2026-05-14</lastmod>
+    <lastmod>2026-05-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.78</priority>
     <image:image>
-      <image:loc>https://isaacseiler.xyz/seo/projects/sustainable-development-health-access-report.jpg</image:loc>
+      <image:loc>https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev/boehstrategy.png</image:loc>
       <image:title>Sustainable Development and Health Access Report</image:title>
       <image:caption>Strategy and communications work around health access policy at Boehringer Ingelheim, including an internal report and SDX partnership support.</image:caption>
     </image:image>
   </url>
   <url>
     <loc>https://isaacseiler.xyz/projects/stl-immigrant-refugee-support-grant-process</loc>
-    <lastmod>2026-05-14</lastmod>
+    <lastmod>2026-05-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.78</priority>
     <image:image>
@@ -226,18 +226,18 @@
   </url>
   <url>
     <loc>https://isaacseiler.xyz/projects/exclusive-interview-with-high-visibility-congressperson</loc>
-    <lastmod>2026-05-14</lastmod>
+    <lastmod>2026-05-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.78</priority>
     <image:image>
-      <image:loc>https://isaacseiler.xyz/seo/projects/exclusive-interview-with-high-visibility-congressperson.jpg</image:loc>
+      <image:loc>https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev/congressinterview.png</image:loc>
       <image:title>Exclusive Interview with High-Visibility Congressperson</image:title>
       <image:caption>Early access-driven political reporting on then-Congressman Peter Meijer during a volatile post-impeachment period.</image:caption>
     </image:image>
   </url>
   <url>
     <loc>https://isaacseiler.xyz/projects/first-personal-website</loc>
-    <lastmod>2026-05-14</lastmod>
+    <lastmod>2026-05-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.78</priority>
     <image:image>

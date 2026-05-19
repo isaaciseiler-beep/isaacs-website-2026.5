@@ -11,6 +11,15 @@ export const PREVIEW_IMAGE = {
   alt: "Isaac Seiler portfolio preview image",
 };
 
+const PROJECT_IMG_BASE = "https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev";
+const projectCardImages = {
+  aiIndex: `${PROJECT_IMG_BASE}/aiindex.png`,
+  aiNews: `${PROJECT_IMG_BASE}/ainews.png`,
+  charging: `${PROJECT_IMG_BASE}/charging.png`,
+  chatLab: `${PROJECT_IMG_BASE}/chatlab.jpeg`,
+  capHill: "/experience/potus.jpeg",
+};
+
 export const SAME_AS = [
   "https://www.linkedin.com/in/isaacseiler/",
   "https://substack.com/@isaacseiler",
@@ -46,7 +55,7 @@ export const topLevelPages = [
       "Research, AI education, public policy, journalism, campaign communications, and strategy projects by Isaac Seiler.",
     priority: "0.95",
     changefreq: "weekly",
-    image: { url: "/seo/projects/fulbright-focus-group-sponsored-by-openai.jpg" },
+    image: { url: projectCardImages.chatLab },
     keywords: [
       "Isaac Seiler projects",
       "ChatGPT Lab",
@@ -366,7 +375,7 @@ export const priorityImages = [
   },
   {
     id: "fulbright-chatgpt-lab-openai",
-    url: "/seo/projects/fulbright-focus-group-sponsored-by-openai.jpg",
+    url: projectCardImages.chatLab,
     page: "/projects/fulbright-focus-group-sponsored-by-openai",
     title: "Fulbright Taiwan ChatGPT Lab with OpenAI Support",
     alt: "Fulbright Taiwan ChatGPT Lab and OpenAI education project preview",
@@ -375,7 +384,7 @@ export const priorityImages = [
   },
   {
     id: "ai-state-government-index",
-    url: "/seo/projects/artificial-intelligence-in-state-government-index.jpg",
+    url: projectCardImages.aiIndex,
     page: "/projects/artificial-intelligence-in-state-government-index",
     title: "Artificial Intelligence in State Government Index",
     alt: "Artificial Intelligence in State Government Index project preview",
@@ -384,7 +393,7 @@ export const priorityImages = [
   },
   {
     id: "congressional-office-100-day-report",
-    url: "/seo/projects/congressional-office-setup-100-day-report.jpg",
+    url: projectCardImages.capHill,
     page: "/projects/congressional-office-setup-100-day-report",
     title: "Congressional Office Setup and 100 Day Report",
     alt: "Congressional Office Setup and 100 Day Report project preview",
@@ -393,7 +402,7 @@ export const priorityImages = [
   },
   {
     id: "ai-platforms-journalism-research",
-    url: "/seo/projects/senior-thesis-local-journalism.jpg",
+    url: projectCardImages.aiNews,
     page: "/projects/senior-thesis-local-journalism",
     title: "AI Platforms and Journalism Research",
     alt: "AI platforms and local journalism honors thesis project preview",
@@ -402,7 +411,7 @@ export const priorityImages = [
   },
   {
     id: "electric-vehicle-charging-access",
-    url: "/seo/projects/electric-vehicle-access-analysis.jpg",
+    url: projectCardImages.charging,
     page: "/projects/electric-vehicle-access-analysis",
     title: "Electric Vehicle Charging Access Analysis",
     alt: "Electric Vehicle Charging Access Analysis project preview",

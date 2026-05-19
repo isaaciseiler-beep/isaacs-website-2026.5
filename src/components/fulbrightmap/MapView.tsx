@@ -57,6 +57,7 @@ export default function MapView({
   highlightedPinId,
   loadingPins,
   anonymousUserId,
+  locked,
   onMapClick,
   onDeletePin,
 }: {
@@ -66,6 +67,7 @@ export default function MapView({
   highlightedPinId: string | null;
   loadingPins: boolean;
   anonymousUserId: string;
+  locked: boolean;
   onMapClick: (location: PendingLocation) => void;
   onDeletePin: (pinId: string) => void;
 }) {
@@ -150,6 +152,7 @@ export default function MapView({
         suppressMapClickRef.current = false;
         return;
       }
+      if (locked) return;
       onMapClick({ lat: event.lngLat.lat, lng: event.lngLat.lng });
     };
 
@@ -157,7 +160,7 @@ export default function MapView({
     return () => {
       map.off("click", handleClick);
     };
-  }, [onMapClick]);
+  }, [locked, onMapClick]);
 
   const openPopup = useCallback((pin: Pin, fly: boolean) => {
     const map = mapRef.current;
@@ -332,7 +335,7 @@ export default function MapView({
           {activePin ? (
             <PinPopup
               pin={activePin}
-              canDelete={canDeletePin(activePin, anonymousUserId)}
+              canDelete={!locked && canDeletePin(activePin, anonymousUserId)}
               onDelete={() => {
                 setActivePin(null);
                 onDeletePin(activePin.id);

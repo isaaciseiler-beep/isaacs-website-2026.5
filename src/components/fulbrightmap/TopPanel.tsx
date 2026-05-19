@@ -1,4 +1,4 @@
-import { Database, HardDrive } from "lucide-react";
+import { Database, HardDrive, Lock } from "lucide-react";
 
 import type { StorageMode } from "@/lib/fulbrightmap/types";
 import RandomSpotButton from "./RandomSpotButton";
@@ -7,11 +7,13 @@ export default function TopPanel({
   totalPins,
   storageMode,
   loading,
+  locked,
   onRandomSpot,
 }: {
   totalPins: number;
   storageMode: StorageMode;
   loading: boolean;
+  locked: boolean;
   onRandomSpot: () => void;
 }) {
   const ModeIcon = storageMode === "supabase" ? Database : HardDrive;
@@ -50,6 +52,15 @@ export default function TopPanel({
           <ModeIcon aria-hidden="true" className="h-3.5 w-3.5" />
           {storageMode === "local" ? "Local browser mode" : "Shared mode"}
         </span>
+        {locked ? (
+          <span
+            className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-2 text-xs text-white/75"
+            title="Adding and deleting spots are locked."
+          >
+            <Lock aria-hidden="true" className="h-3.5 w-3.5" />
+            Locked
+          </span>
+        ) : null}
       </div>
     </section>
   );

@@ -22,6 +22,8 @@ import {
 import type { PendingLocation, Pin } from "@/lib/fulbrightmap/types";
 import { getAnonymousUserId } from "@/lib/fulbrightmap/user";
 
+const MAP_LOCKED = true;
+
 function sortPinsNewestFirst(pins: Pin[]) {
   return [...pins].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
@@ -140,6 +142,7 @@ export default function FulbrightMapPage() {
 
   const handleMapClick = useCallback(
     (location: PendingLocation) => {
+      if (MAP_LOCKED) return;
       setPendingLocation(location);
     },
     [],
@@ -191,6 +194,8 @@ export default function FulbrightMapPage() {
   }
 
   async function handleDeletePin(pinId: string) {
+    if (MAP_LOCKED) return;
+
     const pin = pins.find((candidate) => candidate.id === pinId);
     if (!pin) return;
 
@@ -247,6 +252,7 @@ export default function FulbrightMapPage() {
         highlightedPinId={highlightedPinId}
         loadingPins={loadingPins}
         anonymousUserId={anonymousUserId}
+        locked={MAP_LOCKED}
         onMapClick={handleMapClick}
         onDeletePin={handleDeletePin}
       />
@@ -255,6 +261,7 @@ export default function FulbrightMapPage() {
         totalPins={pins.length}
         storageMode={storageMode}
         loading={loadingPins}
+        locked={MAP_LOCKED}
         onRandomSpot={chooseRandomSpot}
       />
 

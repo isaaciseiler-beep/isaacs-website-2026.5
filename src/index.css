@@ -192,7 +192,7 @@
 
   .home-intro-overlay {
     isolation: isolate;
-    pointer-events: auto;
+    pointer-events: none;
   }
 
   .home-intro-mask {

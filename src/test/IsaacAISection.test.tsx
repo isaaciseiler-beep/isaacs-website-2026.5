@@ -1,13 +1,14 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import IsaacAISection from "@/components/IsaacAISection";
+import { CHAT_LIMIT_MESSAGE } from "@/lib/chatClient";
 
 describe("IsaacAISection", () => {
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  it("keeps the chat frame fixed and caps a conversation at five user messages", async () => {
+  it("keeps the chat frame fixed and responds with a limit notice on the sixth user message", async () => {
     let replies = 0;
     const fetchMock = vi.fn(async () => {
       replies += 1;
@@ -26,7 +27,7 @@ describe("IsaacAISection", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     const { container } = render(<IsaacAISection />);
-    const input = screen.getByLabelText("Message 1 of 5");
+    const input = screen.getByPlaceholderText("Ask about my work");
     const submit = screen.getByLabelText("Ask Isaac AI");
     const frame = container.querySelector(".h-\\[340px\\]");
 
@@ -39,7 +40,14 @@ describe("IsaacAISection", () => {
     }
 
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(5));
-    expect(screen.getByText("5/5")).toBeInTheDocument();
+    expect(screen.queryByText("5/5")).not.toBeInTheDocument();
+    expect(input).not.toBeDisabled();
+
+    fireEvent.change(input, { target: { value: "Question 6" } });
+    fireEvent.click(submit);
+
+    await screen.findByText(CHAT_LIMIT_MESSAGE);
+    expect(fetchMock).toHaveBeenCalledTimes(5);
     expect(input).toBeDisabled();
     expect(frame).toHaveClass("h-[340px]", "md:h-[400px]");
   });

@@ -4,18 +4,17 @@ import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion"
 
 const headlineLines = [
   [
-    { text: "Building", x: 0, y: "top", delay: 0 },
-    { text: "at", x: 1, y: "top", delay: 0.15 },
-    { text: "the", x: 2, y: "top", delay: 0.28 },
+    { text: "Bridging", x: 1, y: "top", delay: 0 },
   ],
   [
-    { text: "intersection", x: 0, y: "middle", delay: 0.05 },
-    { text: "of", x: 1, y: "middle", delay: 0.18 },
-    { text: "AI", x: 2, y: "middle", delay: 0.25 },
+    { text: "the", x: 0, y: "middle", delay: 0.08 },
+    { text: "gap", x: 1, y: "middle", delay: 0.18 },
+    { text: "between", x: 2, y: "middle", delay: 0.28 },
   ],
   [
-    { text: "and", x: 0, y: "bottom", delay: 0.1 },
-    { text: "society.", x: 2, y: "bottom", delay: 0.22 },
+    { text: "humans", x: 0, y: "bottom", delay: 0.1 },
+    { text: "and", x: 1, y: "bottom", delay: 0.22 },
+    { text: "AI", x: 2, y: "bottom", delay: 0.32 },
   ],
 ] as const;
 
@@ -500,7 +499,7 @@ const HeroSection = ({ playIntro = false, introReady = true }: HeroSectionProps)
       >
         <h1
           className="block w-full max-w-[34rem] text-[clamp(2rem,10vw,2.7rem)] font-semibold leading-[0.85] tracking-tighter text-foreground md:max-w-6xl md:text-7xl lg:text-8xl"
-          aria-label="Building at the intersection of AI and society."
+          aria-label="Bridging the gap between humans and AI"
           data-intro={playIntro ? "play" : "skip"}
           data-ready={playIntro && introReady ? "true" : "false"}
         >
@@ -517,7 +516,7 @@ const HeroSection = ({ playIntro = false, introReady = true }: HeroSectionProps)
                   "--hero-x": `${offsets.x}px`,
                   "--hero-y": `${offsets.y}px`,
                   "--hero-correct-x": `${offsets.x < 0 ? 7 : -7}px`,
-                  "--hero-delay": "0s",
+                  "--hero-delay": `${animatedWord.delay}s`,
                   marginRight: wordIndex === line.length - 1 ? 0 : "0.25em",
                 } as CSSProperties;
 

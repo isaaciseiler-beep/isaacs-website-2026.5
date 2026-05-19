@@ -19,6 +19,8 @@ const AboutSection = lazy(() => import("@/components/AboutSection"));
 const Footer = lazy(() => import("@/components/Footer"));
 
 const HOME_INTRO_PREBOOT_CLASS = "home-intro-preboot";
+const HOME_INTRO_FAILSAFE_MS = 4200;
+const MOBILE_HOME_INTRO_FAILSAFE_MS = 2200;
 
 type IntroWindow = Window & {
   __homeIntroPreboot?: boolean;
@@ -69,6 +71,8 @@ const Index = () => {
   };
 
   const handleHomeIntroComplete = useCallback(() => {
+    (window as IntroWindow).__homeIntroPreboot = false;
+    document.documentElement.classList.remove(HOME_INTRO_PREBOOT_CLASS);
     setHomeIntroComplete(true);
   }, []);
 
@@ -78,6 +82,18 @@ const Index = () => {
     (window as IntroWindow).__homeIntroPreboot = false;
     document.documentElement.classList.remove(HOME_INTRO_PREBOOT_CLASS);
   }, [playHomeIntro]);
+
+  useEffect(() => {
+    if (!playHomeIntro || homeIntroComplete) return;
+
+    const isMobileViewport = window.matchMedia("(max-width: 767px)").matches;
+    const timer = window.setTimeout(
+      handleHomeIntroComplete,
+      isMobileViewport ? MOBILE_HOME_INTRO_FAILSAFE_MS : HOME_INTRO_FAILSAFE_MS,
+    );
+
+    return () => window.clearTimeout(timer);
+  }, [handleHomeIntroComplete, homeIntroComplete, playHomeIntro]);
 
   useLayoutEffect(() => {
     if (location.hash) return;

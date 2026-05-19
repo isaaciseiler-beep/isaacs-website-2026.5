@@ -4,9 +4,9 @@ import { ArrowUp } from "lucide-react";
 import AnimatedText from "@/components/AnimatedText";
 import { CONTACT_EMAIL } from "@/lib/site";
 import {
+  CHAT_LIMIT_MESSAGE,
   askSiteAssistant,
   countUserMessages,
-  isChatLimitReached,
   MAX_CHAT_USER_MESSAGES,
   type ChatRequestMessage,
   type ChatSource,
@@ -197,11 +197,13 @@ const IsaacAISection = () => {
   const headingInView = useInView(headingRef, { amount: 0.72, margin: "-80px" });
   const paneInView = useInView(paneRef, { amount: 0.42, margin: "-120px" });
 
-  const limitReached = isChatLimitReached(messages);
   const hasConversation = messages.length > 0 || isLoading;
   const userMessageCount = countUserMessages(messages);
-  const nextMessageNumber = Math.min(userMessageCount + 1, MAX_CHAT_USER_MESSAGES);
-  const inputLabel = `Message ${nextMessageNumber} of ${MAX_CHAT_USER_MESSAGES}`;
+  const hasLimitNotice = messages.some(
+    (message) => message.role === "assistant" && message.content === CHAT_LIMIT_MESSAGE,
+  );
+  const limitReached = hasLimitNotice || userMessageCount > MAX_CHAT_USER_MESSAGES;
+  const inputLabel = limitReached ? "AI assistant message limit reached" : "Ask about my work";
 
   const isMobileInputViewport = useCallback(
     () => window.matchMedia("(max-width: 767px), (pointer: coarse)").matches,
@@ -280,14 +282,29 @@ const IsaacAISection = () => {
     const prompt = query.trim();
     if (!prompt || isLoading || limitReached) return;
 
-    const requestId = requestIdRef.current + 1;
-    requestIdRef.current = requestId;
     const userMessage: ChatMessage = { id: createMessageId(), role: "user", content: prompt };
     const nextMessages = [...messages, userMessage];
     setMessages(nextMessages);
     setQuery("");
-    setIsLoading(true);
     setTypingMessageId(null);
+
+    if (userMessageCount >= MAX_CHAT_USER_MESSAGES) {
+      const assistantMessageId = createMessageId();
+      setMessages([
+        ...nextMessages,
+        {
+          id: assistantMessageId,
+          role: "assistant",
+          content: CHAT_LIMIT_MESSAGE,
+        },
+      ]);
+      setTypingMessageId(assistantMessageId);
+      return;
+    }
+
+    const requestId = requestIdRef.current + 1;
+    requestIdRef.current = requestId;
+    setIsLoading(true);
 
     try {
       const data = await askSiteAssistant(nextMessages.map(({ role, content }) => ({ role, content })));
@@ -408,9 +425,6 @@ const IsaacAISection = () => {
                 ref={inputPillRef}
                 className="site-corner relative flex min-h-11 w-full items-center bg-foreground/[0.045] transition-colors focus-within:bg-foreground/[0.07]"
               >
-                <span className="pointer-events-none absolute right-12 top-1.5 z-10 hidden font-mono text-[8px] leading-none text-foreground/34 md:block">
-                  {userMessageCount}/{MAX_CHAT_USER_MESSAGES}
-                </span>
                 <textarea
                   ref={textareaRef}
                   value={query}

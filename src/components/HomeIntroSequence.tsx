@@ -114,10 +114,25 @@ const HomeIntroSequence = ({ play, onComplete }: HomeIntroSequenceProps) => {
       return;
     }
 
-    const openTimer = window.setTimeout(() => setOpening(true), isMobileViewport ? 90 : 160);
-    const doneTimer = window.setTimeout(onComplete, introDurationMs);
+    let openTimer = 0;
+    let doneTimer = 0;
+    let firstFrame = 0;
+    let secondFrame = 0;
+    const openingDelayMs = isMobileViewport ? 90 : 160;
+    const completionDelayMs = Math.max(400, introDurationMs - openingDelayMs);
+
+    firstFrame = window.requestAnimationFrame(() => {
+      secondFrame = window.requestAnimationFrame(() => {
+        openTimer = window.setTimeout(() => {
+          setOpening(true);
+          doneTimer = window.setTimeout(onComplete, completionDelayMs);
+        }, openingDelayMs);
+      });
+    });
 
     return () => {
+      window.cancelAnimationFrame(firstFrame);
+      window.cancelAnimationFrame(secondFrame);
       window.clearTimeout(openTimer);
       window.clearTimeout(doneTimer);
     };

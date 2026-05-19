@@ -1,4 +1,5 @@
 export const MAX_CHAT_USER_MESSAGES = 5;
+export const CHAT_LIMIT_MESSAGE = "Interactions with this AI assistant are limited to 5 messages.";
 
 export type ChatRole = "user" | "assistant";
 

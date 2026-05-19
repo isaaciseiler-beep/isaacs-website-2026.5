@@ -14,6 +14,7 @@ const PhotoMapPage = lazy(() => import("./pages/PhotoMapPage.tsx"));
 const ProjectsPage = lazy(() => import("./pages/ProjectsPage.tsx"));
 const ProjectDetailPage = lazy(() => import("./pages/ProjectDetailPage.tsx"));
 const AIStateGovernmentIndexPage = lazy(() => import("./pages/AIStateGovernmentIndexPage.tsx"));
+const SeniorThesisLocalJournalismPage = lazy(() => import("./pages/SeniorThesisLocalJournalismPage.tsx"));
 const CredentialsPage = lazy(() => import("./pages/CredentialsPage.tsx"));
 const ExperiencePage = lazy(() => import("./pages/ExperiencePage.tsx"));
 const ExperienceGamePage = lazy(() => import("./pages/ExperienceGamePage.tsx"));
@@ -47,6 +48,7 @@ const AnimatedRoutes = () => {
             <Route path="/photos/map" element={<PhotoMapPage />} />
             <Route path="/projects" element={<ProjectsPage />} />
             <Route path="/projects/artificial-intelligence-in-state-government-index" element={<AIStateGovernmentIndexPage />} />
+            <Route path="/projects/senior-thesis-local-journalism" element={<SeniorThesisLocalJournalismPage />} />
             <Route path="/projects/:id" element={<ProjectDetailPage />} />
             <Route path="/credentials" element={<CredentialsPage />} />
             <Route path="/experience" element={<ExperiencePage />} />

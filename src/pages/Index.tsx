@@ -31,6 +31,15 @@ const trackedSectionIds = sitemapItems
   .map((item) => item.scrollTo)
   .filter((sectionId): sectionId is string => Boolean(sectionId));
 
+const homeSections = [
+  { id: "projects", offset: 30, clip: true },
+  { id: "about", offset: 26, clip: true },
+  { id: "news", offset: 24, clip: true },
+  { id: "photos", offset: 32, clip: true },
+  { id: "inspiration", offset: 22, clip: false },
+  { id: "isaac-ai", offset: 14, clip: false },
+] as const;
+
 const Index = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -58,7 +67,7 @@ const Index = () => {
   const [homeIntroComplete, setHomeIntroComplete] = useState(() => !playHomeIntro);
   const isMobile = useIsMobile();
   const location = useLocation();
-  const renderDeferredSections = !playHomeIntro || homeIntroComplete;
+  const sectionFallback = <div className="min-h-[100svh]" aria-hidden="true" />;
 
   const handleSidebarToggle = () => {
     setSearchOpen(false);
@@ -231,6 +240,23 @@ const Index = () => {
     }
   }, [homeIntroComplete, isMobile, location.hash, playHomeIntro]);
 
+  const renderHomeSection = (id: (typeof homeSections)[number]["id"]) => {
+    switch (id) {
+      case "projects":
+        return <ProjectsSection />;
+      case "about":
+        return <AboutSection revealEnabled={aboutRevealEnabled} />;
+      case "news":
+        return <NewsSection />;
+      case "photos":
+        return <PhotoSection />;
+      case "inspiration":
+        return <InspirationBoard />;
+      case "isaac-ai":
+        return <IsaacAISection />;
+    }
+  };
+
   return (
     <div className="relative">
       <Sidebar
@@ -257,19 +283,27 @@ const Index = () => {
       >
         <main>
           <div id="hero"><HeroSection playIntro={playHomeIntro} introReady={homeIntroComplete} /></div>
-          {renderDeferredSections ? (
-            <Suspense fallback={null}>
-              <ParallaxSection id="projects" offset={70}><ProjectsSection /></ParallaxSection>
-              <ParallaxSection id="about" offset={60}><AboutSection revealEnabled={aboutRevealEnabled} /></ParallaxSection>
-              <ParallaxSection id="news" offset={55}><NewsSection /></ParallaxSection>
-              <ParallaxSection id="photos" offset={80}><PhotoSection /></ParallaxSection>
-              <div id="inspiration">
-                <ParallaxSection offset={55} clip={false}><InspirationBoard /></ParallaxSection>
-              </div>
-              <ParallaxSection id="isaac-ai" offset={28} clip={false}><IsaacAISection /></ParallaxSection>
-              <Footer />
-            </Suspense>
-          ) : null}
+          <div className="home-card-stack">
+            {homeSections.map(({ id, offset, clip }, index) => (
+              <section
+                key={id}
+                id={id}
+                className="home-scroll-card-shell"
+                style={{ zIndex: index + 1 }}
+              >
+                <div className="home-scroll-card">
+                  <ParallaxSection offset={offset} clip={clip}>
+                    <Suspense fallback={sectionFallback}>
+                      {renderHomeSection(id)}
+                    </Suspense>
+                  </ParallaxSection>
+                </div>
+              </section>
+            ))}
+          </div>
+          <Suspense fallback={null}>
+            <Footer />
+          </Suspense>
         </main>
       </motion.div>
 

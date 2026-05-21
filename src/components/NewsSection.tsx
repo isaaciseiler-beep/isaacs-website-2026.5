@@ -53,7 +53,7 @@ const NewsSection = () => {
   };
 
   return (
-    <section className="pb-8 pt-12 md:pb-10">
+    <section className="pb-3 pt-12 md:pb-10">
       <div className="px-6 mb-6">
         <SectionHeading className="mb-0">News</SectionHeading>
       </div>

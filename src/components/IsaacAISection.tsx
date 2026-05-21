@@ -339,7 +339,7 @@ const IsaacAISection = () => {
   };
 
   return (
-    <section className="relative z-20 flex items-start px-6 pb-12 pt-10 md:pb-20 md:pt-16">
+    <section className="relative z-20 flex items-start px-6 pb-3 pt-3 md:pb-20 md:pt-16">
       <motion.div
         className="mx-auto flex w-full max-w-3xl flex-col items-center text-center"
         initial={{ opacity: 0, y: 18 }}

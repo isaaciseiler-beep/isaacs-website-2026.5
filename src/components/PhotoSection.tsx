@@ -70,7 +70,7 @@ const PhotoSection = () => {
   }, [hasAutoplayed, isPreviewInView, prefersReducedMotion]);
 
   return (
-    <section className="flex h-[calc(100svh-9.75rem)] min-h-[420px] flex-col py-0">
+    <section className="flex h-[calc(100svh-9.75rem)] min-h-[420px] flex-col pb-3 pt-0 md:pb-0">
       <div className="mb-5 flex shrink-0 items-end justify-between px-6 md:mb-6">
         <SectionHeading className="mb-0">Photos</SectionHeading>
       </div>

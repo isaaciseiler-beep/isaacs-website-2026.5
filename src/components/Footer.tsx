@@ -47,7 +47,7 @@ const socialLinks = [
 const Footer = () => {
   return (
     <footer id="footer" className="relative overflow-hidden bg-background">
-      <div className="relative z-10 px-6 pt-3 pb-6 flex flex-col items-center md:pt-16">
+      <div className="relative z-10 px-6 pt-0 pb-6 flex flex-col items-center md:pt-16">
         {/* Social icons centered */}
         <div className="flex items-center justify-center gap-5 mb-4">
           {socialLinks.map((link) => (

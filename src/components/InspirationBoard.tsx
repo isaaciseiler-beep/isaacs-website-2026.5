@@ -415,13 +415,13 @@ const InspirationBoard = () => {
     <section ref={sectionRef} className="relative" style={isMobile ? undefined : { minHeight: "120vh" }}>
       {isMobile ? (
         <div className="flex flex-col">
-          <div className="px-6 pt-3 pb-1 md:pt-12 md:pb-4">
+          <div className="px-6 pt-0 pb-0 md:pt-12 md:pb-4">
             <SectionHeading className="mb-0">Inspiration</SectionHeading>
           </div>
           <div className="relative">
             <div
               ref={carouselRef}
-              className="flex gap-6 overflow-x-auto scrollbar-hide px-6 pb-3 items-center md:pb-12"
+              className="flex gap-6 overflow-x-auto scrollbar-hide px-6 pb-0 items-center md:pb-12"
               style={{ scrollSnapType: "x mandatory", scrollPaddingLeft: 24 }}
             >
               {inspirationItems.map((item, i) => {

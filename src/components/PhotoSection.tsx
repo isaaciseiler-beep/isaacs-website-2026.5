@@ -70,15 +70,15 @@ const PhotoSection = () => {
   }, [hasAutoplayed, isPreviewInView, prefersReducedMotion]);
 
   return (
-    <section className="flex h-[calc(100svh-9.75rem)] min-h-[420px] flex-col pb-3 pt-0 md:pb-0">
+    <section className="flex h-auto min-h-0 flex-col pb-0 pt-0 md:h-[calc(100svh-9.75rem)] md:min-h-[420px]">
       <div className="mb-5 flex shrink-0 items-end justify-between px-6 md:mb-6">
         <SectionHeading className="mb-0">Photos</SectionHeading>
       </div>
 
-      <div className="min-h-0 flex-1 px-6">
+      <div className="px-6 md:min-h-0 md:flex-1">
         <div
           ref={previewRef}
-          className="site-corner group relative h-full min-h-0 w-full cursor-pointer overflow-hidden"
+          className="site-corner group relative aspect-[4/5] h-auto min-h-0 w-full cursor-pointer overflow-hidden md:aspect-auto md:h-full"
           onMouseEnter={() => setHovering(true)}
           onMouseLeave={() => setHovering(false)}
           onClick={() => setPreviewIdx(activeIdx)}

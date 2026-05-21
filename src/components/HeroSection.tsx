@@ -30,6 +30,7 @@ const TRAIL_SPAWN_INTERVAL_MS = 140;
 const TRAIL_SIDE_GUTTER = 18;
 const TRAIL_BOTTOM_GUTTER = 72;
 const FALLBACK_IMAGE_ASPECT = 4 / 3;
+const HEADLINE_WORD_COUNT = headlineLines.reduce((count, line) => count + line.length, 0);
 
 type VerticalLane = "top" | "middle" | "bottom";
 
@@ -339,6 +340,7 @@ const HeroSection = ({ playIntro = false, introReady = true }: HeroSectionProps)
   const hasMeasuredRef = useRef(false);
   const lastWindowWidthRef = useRef(0);
   const [wordOffsets, setWordOffsets] = useState<WordOffset[]>([]);
+  const [introMeasured, setIntroMeasured] = useState(false);
   const [trailEnabled, setTrailEnabled] = useState(() => !playIntro);
   const [supportsPointerTrail, setSupportsPointerTrail] = useState(false);
   let order = 0;
@@ -376,6 +378,7 @@ const HeroSection = ({ playIntro = false, introReady = true }: HeroSectionProps)
   useLayoutEffect(() => {
     if (!playIntro) {
       hasMeasuredRef.current = false;
+      setIntroMeasured(false);
       setWordOffsets([]);
       return;
     }
@@ -451,6 +454,7 @@ const HeroSection = ({ playIntro = false, introReady = true }: HeroSectionProps)
       hasMeasuredRef.current = true;
       lastWindowWidthRef.current = window.innerWidth;
       setWordOffsets((current) => (offsetsAreEqual(current, nextOffsets) ? current : nextOffsets));
+      setIntroMeasured(true);
     };
 
     let disposed = false;
@@ -488,6 +492,8 @@ const HeroSection = ({ playIntro = false, introReady = true }: HeroSectionProps)
     };
   }, [playIntro]);
 
+  const heroIntroReady = !playIntro || (introReady && introMeasured && wordOffsets.length >= HEADLINE_WORD_COUNT);
+
   return (
     <section ref={sectionRef} className="relative flex h-[100svh] min-h-[100svh] items-end overflow-hidden">
       <div className="absolute inset-0 bg-background" />
@@ -501,7 +507,7 @@ const HeroSection = ({ playIntro = false, introReady = true }: HeroSectionProps)
           className="block w-full max-w-[34rem] text-[clamp(2rem,10vw,2.7rem)] font-semibold leading-[0.85] tracking-tighter text-foreground md:max-w-6xl md:text-7xl lg:text-8xl"
           aria-label="Bridging the gap between humans and AI"
           data-intro={playIntro ? "play" : "skip"}
-          data-ready={playIntro && introReady ? "true" : "false"}
+          data-ready={heroIntroReady ? "true" : "false"}
         >
           {headlineLines.map((line, lineIndex) => (
             <span

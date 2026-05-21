@@ -53,7 +53,7 @@ const NewsSection = () => {
   };
 
   return (
-    <section className="py-12">
+    <section className="pb-8 pt-12 md:pb-10">
       <div className="px-6 mb-6">
         <SectionHeading className="mb-0">News</SectionHeading>
       </div>

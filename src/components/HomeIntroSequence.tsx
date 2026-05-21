@@ -6,9 +6,6 @@ const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const EASE_REVEAL: [number, number, number, number] = [0.19, 1, 0.22, 1];
 const FRAME_REVEAL_DELAY = 1.24;
 const FRAME_REVEAL_DURATION = 1.34;
-const MOBILE_INTRO_DURATION_MS = 1380;
-const MOBILE_FRAME_REVEAL_DELAY = 0.34;
-const MOBILE_FRAME_REVEAL_DURATION = 0.66;
 const OVERLAY_COLOR = "#f2ff9e";
 const CLOSED_FRAME_RADIUS = 8;
 const OPEN_FRAME_RADIUS = 0;
@@ -69,9 +66,9 @@ const HomeIntroSequence = ({ play, onComplete }: HomeIntroSequenceProps) => {
     return getViewportSize();
   });
   const isMobileViewport = viewport.width < 768;
-  const introDurationMs = isMobileViewport ? MOBILE_INTRO_DURATION_MS : INTRO_DURATION_MS;
-  const frameRevealDelay = isMobileViewport ? MOBILE_FRAME_REVEAL_DELAY : FRAME_REVEAL_DELAY;
-  const frameRevealDuration = isMobileViewport ? MOBILE_FRAME_REVEAL_DURATION : FRAME_REVEAL_DURATION;
+  const introDurationMs = INTRO_DURATION_MS;
+  const frameRevealDelay = FRAME_REVEAL_DELAY;
+  const frameRevealDuration = FRAME_REVEAL_DURATION;
 
   useLayoutEffect(() => {
     (window as Window & { __homeIntroPreboot?: boolean }).__homeIntroPreboot = false;
@@ -118,7 +115,7 @@ const HomeIntroSequence = ({ play, onComplete }: HomeIntroSequenceProps) => {
     let doneTimer = 0;
     let firstFrame = 0;
     let secondFrame = 0;
-    const openingDelayMs = isMobileViewport ? 90 : 160;
+    const openingDelayMs = 160;
     const completionDelayMs = Math.max(400, introDurationMs - openingDelayMs);
 
     firstFrame = window.requestAnimationFrame(() => {

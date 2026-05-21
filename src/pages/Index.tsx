@@ -20,7 +20,7 @@ const Footer = lazy(() => import("@/components/Footer"));
 
 const HOME_INTRO_PREBOOT_CLASS = "home-intro-preboot";
 const HOME_INTRO_FAILSAFE_MS = 4200;
-const MOBILE_HOME_INTRO_FAILSAFE_MS = 2200;
+const MOBILE_HOME_INTRO_FAILSAFE_MS = HOME_INTRO_FAILSAFE_MS;
 
 type IntroWindow = Window & {
   __homeIntroPreboot?: boolean;

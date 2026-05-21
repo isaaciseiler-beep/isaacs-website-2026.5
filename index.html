@@ -33,7 +33,7 @@
         const isHome = window.location.pathname === "/" || window.location.pathname === "";
         const canRunApp = window.location.protocol === "http:" || window.location.protocol === "https:";
         const isMobileViewport = window.matchMedia("(max-width: 767px)").matches;
-        const prebootTimeout = isMobileViewport ? 1600 : 3600;
+        const prebootTimeout = isMobileViewport ? 4200 : 3600;
 
         try {
           const shouldPlayIntro =

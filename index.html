@@ -32,15 +32,16 @@
       (() => {
         const isHome = window.location.pathname === "/" || window.location.pathname === "";
         const canRunApp = window.location.protocol === "http:" || window.location.protocol === "https:";
-        const isMobileViewport = window.matchMedia("(max-width: 767px)").matches;
+        const isMobileViewport =
+          window.matchMedia("(max-width: 899px)").matches ||
+          window.matchMedia("(hover: none) and (pointer: coarse)").matches;
         const prebootTimeout = isMobileViewport ? 4200 : 3600;
 
         try {
           const shouldPlayIntro =
             canRunApp &&
             isHome &&
-            !window.location.hash &&
-            !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+            !window.location.hash;
 
           if (shouldPlayIntro) {
             window.__homeIntroShouldPlay = true;

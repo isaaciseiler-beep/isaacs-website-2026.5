@@ -50,11 +50,9 @@ const Index = () => {
     if (typeof window === "undefined") return false;
 
     try {
-      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const introWindow = window as IntroWindow;
       const shouldPlay =
         !window.location.hash &&
-        !reduceMotion &&
         (introWindow.__homeIntroShouldPlay === true ||
           introWindow.__homeIntroPreboot === true ||
           document.documentElement.classList.contains(HOME_INTRO_PREBOOT_CLASS));
@@ -102,7 +100,9 @@ const Index = () => {
   useEffect(() => {
     if (!playHomeIntro || homeIntroComplete) return;
 
-    const isMobileViewport = window.matchMedia("(max-width: 767px)").matches;
+    const isMobileViewport =
+      window.matchMedia("(max-width: 899px)").matches ||
+      window.matchMedia("(hover: none) and (pointer: coarse)").matches;
     const timer = window.setTimeout(
       handleHomeIntroComplete,
       isMobileViewport ? MOBILE_HOME_INTRO_FAILSAFE_MS : HOME_INTRO_FAILSAFE_MS,
@@ -113,7 +113,12 @@ const Index = () => {
 
   useLayoutEffect(() => {
     if (location.hash) return;
-    if (!window.matchMedia("(max-width: 767px)").matches) return;
+    if (
+      !window.matchMedia("(max-width: 899px)").matches &&
+      !window.matchMedia("(hover: none) and (pointer: coarse)").matches
+    ) {
+      return;
+    }
 
     const previousScrollRestoration = window.history.scrollRestoration;
     window.history.scrollRestoration = "manual";
@@ -125,7 +130,9 @@ const Index = () => {
   }, [location.hash]);
 
   useEffect(() => {
-    const isMobileViewport = window.matchMedia("(max-width: 767px)").matches;
+    const isMobileViewport =
+      window.matchMedia("(max-width: 899px)").matches ||
+      window.matchMedia("(hover: none) and (pointer: coarse)").matches;
     if (isMobileViewport && playHomeIntro && !homeIntroComplete) return;
 
     let disposed = false;
@@ -263,6 +270,7 @@ const Index = () => {
         return <IsaacAISection />;
     }
   };
+  const holdMobileSections = isMobile && playHomeIntro && !homeIntroComplete;
 
   return (
     <div className="relative">
@@ -290,27 +298,31 @@ const Index = () => {
       >
         <main>
           <div id="hero"><HeroSection playIntro={playHomeIntro} introReady={playHomeIntro ? homeIntroHeroReady : true} /></div>
-          <div className="home-card-stack">
-            {homeSections.map(({ id, offset, clip }, index) => (
-              <section
-                key={id}
-                id={id}
-                className="home-scroll-card-shell"
-                style={{ zIndex: index + 1 }}
-              >
-                <div className="home-scroll-card">
-                  <ParallaxSection offset={isMobile ? 0 : offset} clip={isMobile ? false : clip}>
-                    <Suspense fallback={sectionFallback}>
-                      {renderHomeSection(id)}
-                    </Suspense>
-                  </ParallaxSection>
-                </div>
-              </section>
-            ))}
-          </div>
-          <Suspense fallback={null}>
-            <Footer />
-          </Suspense>
+          {!holdMobileSections && (
+            <>
+              <div className="home-card-stack">
+                {homeSections.map(({ id, offset, clip }, index) => (
+                  <section
+                    key={id}
+                    id={id}
+                    className="home-scroll-card-shell"
+                    style={{ zIndex: index + 1 }}
+                  >
+                    <div className="home-scroll-card">
+                      <ParallaxSection offset={isMobile ? 0 : offset} clip={isMobile ? false : clip}>
+                        <Suspense fallback={sectionFallback}>
+                          {renderHomeSection(id)}
+                        </Suspense>
+                      </ParallaxSection>
+                    </div>
+                  </section>
+                ))}
+              </div>
+              <Suspense fallback={null}>
+                <Footer />
+              </Suspense>
+            </>
+          )}
         </main>
       </motion.div>
 

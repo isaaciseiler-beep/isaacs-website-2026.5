@@ -2,10 +2,14 @@ import { useEffect, useId, useLayoutEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 const INTRO_DURATION_MS = 2940;
+const MOBILE_INTRO_DURATION_MS = 2600;
 const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const EASE_REVEAL: [number, number, number, number] = [0.19, 1, 0.22, 1];
 const FRAME_REVEAL_DELAY = 1.24;
 const FRAME_REVEAL_DURATION = 1.34;
+const MOBILE_HERO_REVEAL_DELAY = 0.96;
+const MOBILE_OVERLAY_FADE_DELAY = 1.08;
+const MOBILE_OVERLAY_FADE_DURATION = 1.08;
 const OVERLAY_COLOR = "#f2ff9e";
 const CLOSED_FRAME_RADIUS = 8;
 const OPEN_FRAME_RADIUS = 0;
@@ -66,10 +70,11 @@ const HomeIntroSequence = ({ play, onRevealHero, onComplete }: HomeIntroSequence
     if (typeof window === "undefined") return { width: 1, height: 1 };
     return getViewportSize();
   });
-  const isMobileViewport = viewport.width < 768;
-  const introDurationMs = INTRO_DURATION_MS;
+  const isMobileViewport = viewport.width < 900 || window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+  const introDurationMs = isMobileViewport ? MOBILE_INTRO_DURATION_MS : INTRO_DURATION_MS;
   const frameRevealDelay = FRAME_REVEAL_DELAY;
   const frameRevealDuration = FRAME_REVEAL_DURATION;
+  const heroRevealDelay = isMobileViewport ? MOBILE_HERO_REVEAL_DELAY : frameRevealDelay;
 
   useLayoutEffect(() => {
     (window as Window & { __homeIntroPreboot?: boolean }).__homeIntroPreboot = false;
@@ -124,7 +129,7 @@ const HomeIntroSequence = ({ play, onRevealHero, onComplete }: HomeIntroSequence
       secondFrame = window.requestAnimationFrame(() => {
         openTimer = window.setTimeout(() => {
           setOpening(true);
-          revealTimer = window.setTimeout(onRevealHero, frameRevealDelay * 1000);
+          revealTimer = window.setTimeout(onRevealHero, heroRevealDelay * 1000);
           doneTimer = window.setTimeout(onComplete, completionDelayMs);
         }, openingDelayMs);
       });
@@ -137,7 +142,7 @@ const HomeIntroSequence = ({ play, onRevealHero, onComplete }: HomeIntroSequence
       window.clearTimeout(revealTimer);
       window.clearTimeout(doneTimer);
     };
-  }, [frameRevealDelay, introDurationMs, isMobileViewport, onComplete, onRevealHero, play]);
+  }, [heroRevealDelay, introDurationMs, isMobileViewport, onComplete, onRevealHero, play]);
 
   useEffect(() => {
     if (!play) return;
@@ -169,31 +174,44 @@ const HomeIntroSequence = ({ play, onRevealHero, onComplete }: HomeIntroSequence
           aria-hidden="true"
           data-opening={opening ? "true" : "false"}
           initial={{ opacity: 1 }}
+          animate={
+            isMobileViewport
+              ? { opacity: opening ? [1, 1, 0] : 1 }
+              : { opacity: 1 }
+          }
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.16, ease: "easeOut" }}
+          transition={
+            isMobileViewport
+              ? { duration: MOBILE_OVERLAY_FADE_DURATION, delay: MOBILE_OVERLAY_FADE_DELAY, times: [0, 0.18, 1], ease: EASE_REVEAL }
+              : { duration: 0.16, ease: "easeOut" }
+          }
         >
-          <svg
-            className="home-intro-mask pointer-events-none fixed inset-0 z-[1]"
-            aria-hidden="true"
-            width={viewport.width}
-            height={viewport.height}
-            viewBox={`0 0 ${viewport.width} ${viewport.height}`}
-            preserveAspectRatio="none"
-          >
-            <defs>
-              <mask id={maskId} maskUnits="userSpaceOnUse">
-                <rect width={viewport.width} height={viewport.height} fill="white" />
-                <motion.rect
-                  fill="black"
-                  initial={closedAperture}
-                  animate={opening ? openAperture : closedAperture}
-                  transition={{ duration: frameRevealDuration, delay: frameRevealDelay, ease: EASE_REVEAL }}
-                />
-              </mask>
-            </defs>
+          {isMobileViewport ? (
+            <div className="pointer-events-none fixed inset-0 z-[1] bg-[#f2ff9e]" />
+          ) : (
+            <svg
+              className="home-intro-mask pointer-events-none fixed inset-0 z-[1]"
+              aria-hidden="true"
+              width={viewport.width}
+              height={viewport.height}
+              viewBox={`0 0 ${viewport.width} ${viewport.height}`}
+              preserveAspectRatio="none"
+            >
+              <defs>
+                <mask id={maskId} maskUnits="userSpaceOnUse">
+                  <rect width={viewport.width} height={viewport.height} fill="white" />
+                  <motion.rect
+                    fill="black"
+                    initial={closedAperture}
+                    animate={opening ? openAperture : closedAperture}
+                    transition={{ duration: frameRevealDuration, delay: frameRevealDelay, ease: EASE_REVEAL }}
+                  />
+                </mask>
+              </defs>
 
-            <rect width={viewport.width} height={viewport.height} fill={OVERLAY_COLOR} mask={`url(#${maskId})`} />
-          </svg>
+              <rect width={viewport.width} height={viewport.height} fill={OVERLAY_COLOR} mask={`url(#${maskId})`} />
+            </svg>
+          )}
 
           <div className="pointer-events-none fixed inset-0 z-[2] grid place-items-center">
             <motion.div

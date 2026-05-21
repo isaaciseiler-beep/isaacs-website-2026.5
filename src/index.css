@@ -248,7 +248,7 @@
     min-height: 100%;
   }
 
-  @media (max-width: 767px) {
+  @media (max-width: 899px), (hover: none) and (pointer: coarse) {
     .home-card-stack {
       isolation: auto;
     }
@@ -849,23 +849,6 @@
     opacity: 1;
     transform: translate3d(0, 0, 0) scale(1);
   }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  h1[data-intro="play"],
-  h1[data-intro="play"][data-ready="true"],
-  h1[data-intro="play"][data-ready="true"] .hero-kinetic-word,
-  .hero-kinetic-word {
-    animation: none;
-    opacity: 1;
-    transform: none;
-    filter: none;
-  }
-
-  .home-intro-overlay {
-    display: none;
-  }
-
 }
 
 .fulbright-pin-popup .mapboxgl-popup-content {

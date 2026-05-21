@@ -248,6 +248,31 @@
     min-height: 100%;
   }
 
+  @media (max-width: 767px) {
+    .home-card-stack {
+      isolation: auto;
+    }
+
+    .home-scroll-card-shell {
+      position: relative;
+      top: auto;
+      min-height: 0;
+      display: block;
+      overflow: visible;
+    }
+
+    .home-scroll-card {
+      min-height: 0;
+      overflow: visible;
+      will-change: auto;
+    }
+
+    .home-scroll-card > div,
+    .home-scroll-card > div > div {
+      min-height: 0;
+    }
+  }
+
   .site-header-xray {
     color: #fff;
     mix-blend-mode: normal;

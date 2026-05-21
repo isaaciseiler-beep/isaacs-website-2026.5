@@ -45,6 +45,7 @@ const Index = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("hero");
   const [aboutRevealEnabled, setAboutRevealEnabled] = useState(false);
+  const [homeIntroHeroReady, setHomeIntroHeroReady] = useState(false);
   const [playHomeIntro] = useState(() => {
     if (typeof window === "undefined") return false;
 
@@ -82,7 +83,12 @@ const Index = () => {
   const handleHomeIntroComplete = useCallback(() => {
     (window as IntroWindow).__homeIntroPreboot = false;
     document.documentElement.classList.remove(HOME_INTRO_PREBOOT_CLASS);
+    setHomeIntroHeroReady(true);
     setHomeIntroComplete(true);
+  }, []);
+
+  const handleHomeIntroRevealHero = useCallback(() => {
+    setHomeIntroHeroReady(true);
   }, []);
 
   useLayoutEffect(() => {
@@ -90,6 +96,7 @@ const Index = () => {
 
     (window as IntroWindow).__homeIntroPreboot = false;
     document.documentElement.classList.remove(HOME_INTRO_PREBOOT_CLASS);
+    setHomeIntroHeroReady(true);
   }, [playHomeIntro]);
 
   useEffect(() => {
@@ -282,7 +289,7 @@ const Index = () => {
         transition={{ duration: 0.56, ease: [0.22, 1, 0.36, 1] }}
       >
         <main>
-          <div id="hero"><HeroSection playIntro={playHomeIntro} introReady={homeIntroComplete} /></div>
+          <div id="hero"><HeroSection playIntro={playHomeIntro} introReady={playHomeIntro ? homeIntroHeroReady : true} /></div>
           <div className="home-card-stack">
             {homeSections.map(({ id, offset, clip }, index) => (
               <section
@@ -292,7 +299,7 @@ const Index = () => {
                 style={{ zIndex: index + 1 }}
               >
                 <div className="home-scroll-card">
-                  <ParallaxSection offset={offset} clip={clip}>
+                  <ParallaxSection offset={isMobile ? 0 : offset} clip={isMobile ? false : clip}>
                     <Suspense fallback={sectionFallback}>
                       {renderHomeSection(id)}
                     </Suspense>
@@ -316,7 +323,11 @@ const Index = () => {
       />
 
       {playHomeIntro && !homeIntroComplete && (
-        <HomeIntroSequence play={playHomeIntro} onComplete={handleHomeIntroComplete} />
+        <HomeIntroSequence
+          play={playHomeIntro}
+          onRevealHero={handleHomeIntroRevealHero}
+          onComplete={handleHomeIntroComplete}
+        />
       )}
     </div>
   );

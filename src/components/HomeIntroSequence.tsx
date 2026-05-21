@@ -17,6 +17,7 @@ const getViewportSize = () => ({
 
 interface HomeIntroSequenceProps {
   play: boolean;
+  onRevealHero: () => void;
   onComplete: () => void;
 }
 
@@ -57,7 +58,7 @@ const IntroLogoText = ({ opening }: { opening: boolean }) => (
   </div>
 );
 
-const HomeIntroSequence = ({ play, onComplete }: HomeIntroSequenceProps) => {
+const HomeIntroSequence = ({ play, onRevealHero, onComplete }: HomeIntroSequenceProps) => {
   const rawMaskId = useId();
   const maskId = `home-intro-mask-${rawMaskId.replace(/:/g, "")}`;
   const [opening, setOpening] = useState(false);
@@ -112,6 +113,7 @@ const HomeIntroSequence = ({ play, onComplete }: HomeIntroSequenceProps) => {
     }
 
     let openTimer = 0;
+    let revealTimer = 0;
     let doneTimer = 0;
     let firstFrame = 0;
     let secondFrame = 0;
@@ -122,6 +124,7 @@ const HomeIntroSequence = ({ play, onComplete }: HomeIntroSequenceProps) => {
       secondFrame = window.requestAnimationFrame(() => {
         openTimer = window.setTimeout(() => {
           setOpening(true);
+          revealTimer = window.setTimeout(onRevealHero, frameRevealDelay * 1000);
           doneTimer = window.setTimeout(onComplete, completionDelayMs);
         }, openingDelayMs);
       });
@@ -131,9 +134,10 @@ const HomeIntroSequence = ({ play, onComplete }: HomeIntroSequenceProps) => {
       window.cancelAnimationFrame(firstFrame);
       window.cancelAnimationFrame(secondFrame);
       window.clearTimeout(openTimer);
+      window.clearTimeout(revealTimer);
       window.clearTimeout(doneTimer);
     };
-  }, [introDurationMs, isMobileViewport, onComplete, play]);
+  }, [frameRevealDelay, introDurationMs, isMobileViewport, onComplete, onRevealHero, play]);
 
   useEffect(() => {
     if (!play) return;

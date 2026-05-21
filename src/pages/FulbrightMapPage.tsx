@@ -22,7 +22,11 @@ import {
 import type { PendingLocation, Pin } from "@/lib/fulbrightmap/types";
 import { getAnonymousUserId } from "@/lib/fulbrightmap/user";
 
-const MAP_LOCKED = true;
+const MAP_EDIT_CLOSES_AT = Date.parse("2026-05-21T13:00:00+08:00");
+
+function isMapClosed() {
+  return Date.now() >= MAP_EDIT_CLOSES_AT;
+}
 
 function sortPinsNewestFirst(pins: Pin[]) {
   return [...pins].sort(
@@ -54,6 +58,7 @@ export default function FulbrightMapPage() {
   const [highlightedPinId, setHighlightedPinId] = useState<string | null>(null);
   const [loadingPins, setLoadingPins] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [mapLocked, setMapLocked] = useState(isMapClosed);
   const [toast, setToast] = useState<ToastMessage | null>(null);
   const toastIdRef = useRef(0);
   const popupRequestNonceRef = useRef(0);
@@ -140,21 +145,73 @@ export default function FulbrightMapPage() {
     };
   }, [showToast, storageMode]);
 
+  useEffect(() => {
+    if (mapLocked) return;
+
+    const closeMap = () => {
+      setPendingLocation(null);
+      setMapLocked(true);
+      showToast({
+        tone: "info",
+        title: "Map closed",
+        detail: "Adding and deleting spots are now locked.",
+      });
+    };
+    const delay = MAP_EDIT_CLOSES_AT - Date.now();
+
+    if (delay <= 0) {
+      closeMap();
+      return;
+    }
+
+    const timer = window.setTimeout(closeMap, delay);
+    return () => window.clearTimeout(timer);
+  }, [mapLocked, showToast]);
+
   const handleMapClick = useCallback(
     (location: PendingLocation) => {
-      if (MAP_LOCKED) return;
+      if (mapLocked || isMapClosed()) {
+        setPendingLocation(null);
+        setMapLocked(true);
+        showToast({
+          tone: "info",
+          title: "Map closed",
+          detail: "Adding and deleting spots are now locked.",
+        });
+        return;
+      }
       setPendingLocation(location);
     },
-    [],
+    [mapLocked, showToast],
   );
 
   async function handleSubmit(values: AddPinFormValues) {
     if (!pendingLocation || !values.image) return;
+    if (mapLocked || isMapClosed()) {
+      setPendingLocation(null);
+      setMapLocked(true);
+      showToast({
+        tone: "info",
+        title: "Map closed",
+        detail: "Adding and deleting spots are now locked.",
+      });
+      return;
+    }
 
     setSubmitting(true);
 
     try {
       const imageUrl = await uploadImage(values.image, anonymousUserId);
+      if (isMapClosed()) {
+        setPendingLocation(null);
+        setMapLocked(true);
+        showToast({
+          tone: "info",
+          title: "Map closed",
+          detail: "Adding and deleting spots are now locked.",
+        });
+        return;
+      }
       const pin = await createPin({
         ...pendingLocation,
         authorName: values.authorName,
@@ -194,7 +251,15 @@ export default function FulbrightMapPage() {
   }
 
   async function handleDeletePin(pinId: string) {
-    if (MAP_LOCKED) return;
+    if (mapLocked || isMapClosed()) {
+      setMapLocked(true);
+      showToast({
+        tone: "info",
+        title: "Map closed",
+        detail: "Adding and deleting spots are now locked.",
+      });
+      return;
+    }
 
     const pin = pins.find((candidate) => candidate.id === pinId);
     if (!pin) return;
@@ -252,7 +317,7 @@ export default function FulbrightMapPage() {
         highlightedPinId={highlightedPinId}
         loadingPins={loadingPins}
         anonymousUserId={anonymousUserId}
-        locked={MAP_LOCKED}
+        locked={mapLocked}
         onMapClick={handleMapClick}
         onDeletePin={handleDeletePin}
       />
@@ -261,7 +326,7 @@ export default function FulbrightMapPage() {
         totalPins={pins.length}
         storageMode={storageMode}
         loading={loadingPins}
-        locked={MAP_LOCKED}
+        locked={mapLocked}
         onRandomSpot={chooseRandomSpot}
       />
 

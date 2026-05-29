@@ -215,64 +215,6 @@
     border-radius: var(--site-corner-radius);
   }
 
-  .home-card-stack {
-    position: relative;
-    isolation: isolate;
-    background: hsl(var(--background));
-  }
-
-  .home-scroll-card-shell {
-    position: sticky;
-    top: 0;
-    min-height: 100svh;
-    display: flex;
-    align-items: stretch;
-    overflow: hidden;
-    transform: translate3d(0, 0, 0);
-    backface-visibility: hidden;
-  }
-
-  .home-scroll-card {
-    position: relative;
-    width: 100%;
-    min-height: 100svh;
-    overflow: hidden;
-    background: hsl(var(--background));
-    transform: translate3d(0, 0, 0);
-    backface-visibility: hidden;
-    will-change: transform;
-  }
-
-  .home-scroll-card > div,
-  .home-scroll-card > div > div {
-    min-height: 100%;
-  }
-
-  @media (max-width: 899px), (hover: none) and (pointer: coarse) {
-    .home-card-stack {
-      isolation: auto;
-    }
-
-    .home-scroll-card-shell {
-      position: relative;
-      top: auto;
-      min-height: 0;
-      display: block;
-      overflow: visible;
-    }
-
-    .home-scroll-card {
-      min-height: 0;
-      overflow: visible;
-      will-change: auto;
-    }
-
-    .home-scroll-card > div,
-    .home-scroll-card > div > div {
-      min-height: 0;
-    }
-  }
-
   .site-header-xray {
     color: #fff;
     mix-blend-mode: normal;
@@ -792,18 +734,6 @@
   .light .homepage-cta:hover,
   .light .homepage-cta:hover * {
     color: hsl(var(--highlight));
-  }
-}
-
-@media (max-width: 767px) {
-  .home-scroll-card {
-    min-height: 100svh;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .home-scroll-card-shell {
-    position: relative;
   }
 }
 

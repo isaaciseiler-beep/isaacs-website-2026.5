@@ -53,7 +53,7 @@ const NewsSection = () => {
   };
 
   return (
-    <section className="pb-0 pt-12 md:pb-10">
+    <section className="pb-0 pt-0 md:pb-10">
       <div className="px-6 mb-6">
         <SectionHeading className="mb-0">News</SectionHeading>
       </div>
@@ -84,9 +84,9 @@ const NewsSection = () => {
                       src={item.imageUrl}
                       alt={item.title}
                       className="absolute inset-0 h-full w-full object-cover grayscale transition-all duration-700 ease-out group-hover:scale-[1.02] group-hover:grayscale-0"
-                      loading="eager"
+                      loading={index < 3 ? "eager" : "lazy"}
                       decoding="async"
-                      fetchpriority={index < 4 ? "high" : "low"}
+                      fetchpriority={index < 3 ? "high" : "low"}
                     />
                   )}
                   <div className="absolute inset-0 bg-[linear-gradient(to_top,hsl(var(--image-scrim)/0.94)_0%,hsl(var(--image-scrim)/0.48)_48%,transparent_100%)]" />
@@ -96,7 +96,7 @@ const NewsSection = () => {
                         src={item.logoUrl}
                         alt={item.logoAlt}
                         className="h-full w-auto max-w-[120px] object-contain opacity-90 brightness-0 invert transition-opacity duration-200 group-hover:opacity-100"
-                        loading="eager"
+                        loading={index < 3 ? "eager" : "lazy"}
                         decoding="async"
                         fetchpriority="low"
                       />

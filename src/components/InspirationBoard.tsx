@@ -415,7 +415,7 @@ const InspirationBoard = () => {
     <section ref={sectionRef} className="relative" style={isMobile ? undefined : { minHeight: "120vh" }}>
       {isMobile ? (
         <div className="flex flex-col">
-          <div className="px-6 pt-12 pb-0 md:pb-4">
+          <div className="px-6 pb-0 pt-0 md:pb-4">
             <SectionHeading className="mb-0">Inspiration</SectionHeading>
           </div>
           <div className="relative">
@@ -484,7 +484,7 @@ const InspirationBoard = () => {
         </div>
       ) : (
       <div className="sticky top-0 h-screen flex flex-col overflow-visible z-30">
-        <div className="px-6 pt-[68px] pb-4">
+        <div className="px-6 pb-4 pt-0">
           <SectionHeading className="mb-0">Inspiration</SectionHeading>
         </div>
 

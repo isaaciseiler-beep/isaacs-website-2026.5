@@ -138,10 +138,10 @@ const AboutSection = ({ revealEnabled = true }: AboutSectionProps) => {
   };
 
   return (
-    <section ref={sectionRef} className="py-12 px-6">
+    <section ref={sectionRef} className="px-6 py-0">
       <SectionHeading>About</SectionHeading>
 
-      <div className="w-full max-w-[1600px]">
+      <div className="w-full">
         <div className="flex flex-col-reverse items-center gap-10 md:grid md:grid-cols-[minmax(0,1fr)_clamp(320px,34vw,520px)] md:items-center md:gap-12">
           <div className="min-w-0 w-full self-center pr-0 md:pr-4 md:flex md:items-center">
             <div

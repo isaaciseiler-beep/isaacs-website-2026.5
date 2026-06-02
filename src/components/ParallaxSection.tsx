@@ -9,7 +9,7 @@ interface ParallaxSectionProps {
   clip?: boolean;
 }
 
-const ParallaxSection = ({ children, offset = 60, className, id, clip = true }: ParallaxSectionProps) => {
+const ParallaxSection = ({ children, offset = 40, className, id, clip = true }: ParallaxSectionProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = useReducedMotion();
   const { scrollYProgress } = useScroll({
@@ -17,7 +17,7 @@ const ParallaxSection = ({ children, offset = 60, className, id, clip = true }: 
     offset: ["start end", "end start"],
   });
 
-  const y = useTransform(scrollYProgress, [0, 0.16, 0.84, 1], [offset, offset * 0.05, -offset * 0.05, -offset]);
+  const y = useTransform(scrollYProgress, [0, 0.18, 0.82, 1], [offset, offset * 0.04, -offset * 0.04, -offset]);
 
   return (
     <div ref={ref} id={id} className={className} style={clip ? { overflow: "hidden" } : undefined}>

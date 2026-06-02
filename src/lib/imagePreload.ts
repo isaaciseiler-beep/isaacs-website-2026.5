@@ -3,8 +3,11 @@ type PrioritizedImage = HTMLImageElement & { fetchPriority?: FetchPriority };
 type PrioritizedLink = HTMLLinkElement & { fetchPriority?: FetchPriority };
 
 interface PreloadImageOptions {
+  batchSize?: number;
   decode?: boolean;
+  fallbackDelay?: number;
   fetchPriority?: FetchPriority;
+  idleTimeout?: number;
   linkPreload?: boolean;
 }
 
@@ -71,6 +74,7 @@ export const preloadImage = (src: string, options: PreloadImageOptions = {}) => 
     const image = new Image() as PrioritizedImage;
     image.decoding = "async";
     image.fetchPriority = options.fetchPriority ?? "auto";
+    image.loading = "eager";
     image.onload = async () => {
       if (options.decode && "decode" in image) {
         try {
@@ -96,19 +100,22 @@ export const scheduleImagePreloads = (
   if (typeof window === "undefined") return;
 
   const queue = [...new Set([...srcs].filter(Boolean))];
+  const batchSize = Math.max(1, options.batchSize ?? 4);
+  const fallbackDelay = options.fallbackDelay ?? 160;
+  const idleTimeout = options.idleTimeout ?? 900;
   let index = 0;
 
   const runBatch = () => {
-    const batch = queue.slice(index, index + 4);
+    const batch = queue.slice(index, index + batchSize);
     index += batch.length;
     batch.forEach((src) => void preloadImage(src, options));
 
     if (index >= queue.length) return;
 
     if ("requestIdleCallback" in window) {
-      window.requestIdleCallback(runBatch, { timeout: 900 });
+      window.requestIdleCallback(runBatch, { timeout: idleTimeout });
     } else {
-      window.setTimeout(runBatch, 160);
+      window.setTimeout(runBatch, fallbackDelay);
     }
   };
 

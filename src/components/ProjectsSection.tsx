@@ -88,8 +88,9 @@ const FeaturedProjectCard = ({
       <img
         src={project.image}
         alt={project.title}
-        loading="eager"
+        loading={index < 2 ? "eager" : "lazy"}
         decoding="async"
+        fetchpriority={index < 2 ? "high" : "low"}
         className={`absolute inset-0 h-full w-full object-cover transform-gpu transition-[filter,transform] duration-700 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] group-hover:grayscale-0 group-focus-within:grayscale-0 ${
           isImageActive ? "scale-[1.025] grayscale-0" : "scale-100 grayscale"
         }`}

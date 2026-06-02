@@ -10,13 +10,21 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { preloadImages, scheduleImagePreloads } from "@/lib/imagePreload";
 import { HEADER_SCROLL_OFFSET, scrollToPageSection } from "@/lib/scroll";
 
-const ProjectsSection = lazy(() => import("@/components/ProjectsSection"));
-const NewsSection = lazy(() => import("@/components/NewsSection"));
-const PhotoSection = lazy(() => import("@/components/PhotoSection"));
-const InspirationBoard = lazy(() => import("@/components/InspirationBoard"));
-const IsaacAISection = lazy(() => import("@/components/IsaacAISection"));
-const AboutSection = lazy(() => import("@/components/AboutSection"));
-const Footer = lazy(() => import("@/components/Footer"));
+const loadProjectsSection = () => import("@/components/ProjectsSection");
+const loadNewsSection = () => import("@/components/NewsSection");
+const loadPhotoSection = () => import("@/components/PhotoSection");
+const loadInspirationBoard = () => import("@/components/InspirationBoard");
+const loadIsaacAISection = () => import("@/components/IsaacAISection");
+const loadAboutSection = () => import("@/components/AboutSection");
+const loadFooter = () => import("@/components/Footer");
+
+const ProjectsSection = lazy(loadProjectsSection);
+const NewsSection = lazy(loadNewsSection);
+const PhotoSection = lazy(loadPhotoSection);
+const InspirationBoard = lazy(loadInspirationBoard);
+const IsaacAISection = lazy(loadIsaacAISection);
+const AboutSection = lazy(loadAboutSection);
+const Footer = lazy(loadFooter);
 
 const HOME_INTRO_PREBOOT_CLASS = "home-intro-preboot";
 const HOME_INTRO_FAILSAFE_MS = 4200;
@@ -30,6 +38,23 @@ type IntroWindow = Window & {
 const trackedSectionIds = sitemapItems
   .map((item) => item.scrollTo)
   .filter((sectionId): sectionId is string => Boolean(sectionId));
+
+const homeSectionFrame = "home-section-frame";
+const homeSectionFrameFirst = `${homeSectionFrame} home-section-frame--first`;
+const homeSectionFrameLast = `${homeSectionFrame} home-section-frame--last`;
+const homeSectionFallback = <div className="home-section-skeleton" aria-hidden="true" />;
+
+const preloadDeferredHomeSections = () => {
+  void Promise.all([
+    loadProjectsSection(),
+    loadAboutSection(),
+    loadNewsSection(),
+    loadPhotoSection(),
+    loadInspirationBoard(),
+    loadIsaacAISection(),
+    loadFooter(),
+  ]);
+};
 
 const Index = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -124,9 +149,22 @@ const Index = () => {
     const isMobileViewport =
       window.matchMedia("(max-width: 899px)").matches ||
       window.matchMedia("(hover: none) and (pointer: coarse)").matches;
-    if (isMobileViewport && playHomeIntro && !homeIntroComplete) return;
+
+    if (isMobileViewport && playHomeIntro && !homeIntroComplete) {
+      const timer = window.setTimeout(preloadDeferredHomeSections, 600);
+      return () => window.clearTimeout(timer);
+    }
+
+    preloadDeferredHomeSections();
+  }, [homeIntroComplete, playHomeIntro]);
+
+  useEffect(() => {
+    const isMobileViewport =
+      window.matchMedia("(max-width: 899px)").matches ||
+      window.matchMedia("(hover: none) and (pointer: coarse)").matches;
 
     let disposed = false;
+    let preloadTimer: number | undefined;
 
     const preloadHomepageImages = async () => {
       const [
@@ -147,31 +185,55 @@ const Index = () => {
         .map((id) => projectItems.find((project) => project.id === id)?.image)
         .filter((image): image is string => Boolean(image));
       const photoCovers = albums.map(coverFor);
-      const newsAssets = newsItems.flatMap((item) => [item.imageUrl, item.logoUrl]).filter((src): src is string => Boolean(src));
+      const criticalNewsCount = isMobileViewport ? 2 : 4;
+      const criticalProjectCount = isMobileViewport ? 2 : featuredProjectImages.length;
+      const criticalPhotoCount = isMobileViewport ? 2 : Math.min(photoCovers.length, 6);
+      const criticalNewsAssets = newsItems
+        .slice(0, criticalNewsCount)
+        .flatMap((item) => [item.imageUrl, item.logoUrl])
+        .filter((src): src is string => Boolean(src));
+      const deferredNewsAssets = newsItems
+        .slice(criticalNewsCount)
+        .flatMap((item) => [item.imageUrl, item.logoUrl])
+        .filter((src): src is string => Boolean(src));
       const inspirationAssets = inspirationItems.map((item) => item.imageUrl).filter((src): src is string => Boolean(src));
 
-      if (isMobileViewport) {
-        scheduleImagePreloads([headshotUrl, ...featuredProjectImages.slice(0, 2), ...photoCovers.slice(0, 2)], {
-          decode: true,
-          fetchPriority: "low",
-        });
-      } else {
-        void preloadImages([headshotUrl, ...featuredProjectImages.slice(0, 4), ...photoCovers.slice(0, 4)], {
-          decode: true,
-          fetchPriority: "high",
-          linkPreload: true,
-        });
-      }
-
-      scheduleImagePreloads([...photoCovers.slice(isMobileViewport ? 2 : 4), ...newsAssets, ...inspirationAssets, ...featuredProjectImages.slice(isMobileViewport ? 2 : 4)], {
+      void preloadImages([
+        headshotUrl,
+        ...featuredProjectImages.slice(0, criticalProjectCount),
+        ...photoCovers.slice(0, criticalPhotoCount),
+        ...criticalNewsAssets,
+      ], {
         decode: true,
+        fetchPriority: isMobileViewport ? "low" : "high",
+        linkPreload: !isMobileViewport,
+      });
+
+      scheduleImagePreloads([
+        ...photoCovers.slice(criticalPhotoCount),
+        ...deferredNewsAssets,
+        ...inspirationAssets,
+        ...featuredProjectImages.slice(criticalProjectCount),
+      ], {
+        batchSize: isMobileViewport ? 4 : 8,
+        decode: true,
+        fallbackDelay: isMobileViewport ? 160 : 80,
         fetchPriority: "low",
+        idleTimeout: isMobileViewport ? 900 : 260,
       });
     };
 
-    void preloadHomepageImages();
+    if (isMobileViewport && playHomeIntro && !homeIntroComplete) {
+      preloadTimer = window.setTimeout(() => {
+        void preloadHomepageImages();
+      }, 600);
+    } else {
+      void preloadHomepageImages();
+    }
+
     return () => {
       disposed = true;
+      if (preloadTimer) window.clearTimeout(preloadTimer);
     };
   }, [homeIntroComplete, playHomeIntro]);
 
@@ -272,15 +334,15 @@ const Index = () => {
         <main>
           <div id="hero"><HeroSection playIntro={playHomeIntro} introReady={playHomeIntro ? homeIntroHeroReady : true} /></div>
           {renderDeferredSections ? (
-            <Suspense fallback={null}>
-              <ParallaxSection id="projects" offset={70}><ProjectsSection /></ParallaxSection>
-              <ParallaxSection id="about" offset={60}><AboutSection revealEnabled={aboutRevealEnabled} /></ParallaxSection>
-              <ParallaxSection id="news" offset={55}><NewsSection /></ParallaxSection>
-              <ParallaxSection id="photos" offset={80}><PhotoSection /></ParallaxSection>
-              <div id="inspiration">
-                <ParallaxSection offset={55} clip={false}><InspirationBoard /></ParallaxSection>
+            <Suspense fallback={homeSectionFallback}>
+              <ParallaxSection id="projects" className={homeSectionFrameFirst} offset={34}><ProjectsSection /></ParallaxSection>
+              <ParallaxSection id="about" className={homeSectionFrame} offset={30}><AboutSection revealEnabled={aboutRevealEnabled} /></ParallaxSection>
+              <ParallaxSection id="news" className={homeSectionFrame} offset={28}><NewsSection /></ParallaxSection>
+              <ParallaxSection id="photos" className={homeSectionFrame} offset={34}><PhotoSection /></ParallaxSection>
+              <div id="inspiration" className={homeSectionFrame}>
+                <ParallaxSection offset={28} clip={false}><InspirationBoard /></ParallaxSection>
               </div>
-              <ParallaxSection id="isaac-ai" offset={28} clip={false}><IsaacAISection /></ParallaxSection>
+              <ParallaxSection id="isaac-ai" className={homeSectionFrameLast} offset={18} clip={false}><IsaacAISection /></ParallaxSection>
               <Footer />
             </Suspense>
           ) : null}

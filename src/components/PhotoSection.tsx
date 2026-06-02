@@ -70,7 +70,7 @@ const PhotoSection = () => {
   }, [hasAutoplayed, isPreviewInView, prefersReducedMotion]);
 
   return (
-    <section className="flex h-auto min-h-0 flex-col pb-0 pt-12 md:h-[calc(100svh-9.75rem)] md:min-h-[420px] md:pt-0">
+    <section className="flex h-auto min-h-0 flex-col pb-0 pt-0 md:h-[calc(100svh-9.75rem)] md:min-h-[420px]">
       <div className="mb-5 flex shrink-0 items-end justify-between px-6 md:mb-6">
         <SectionHeading className="mb-0">Photos</SectionHeading>
       </div>
@@ -95,9 +95,9 @@ const PhotoSection = () => {
                 transform: shouldFlipPhotos ? "scale(1.02)" : "scale(1)",
                 transition: "opacity 140ms ease-out, filter 600ms ease-out, transform 900ms cubic-bezier(0.16,1,0.3,1)",
               }}
-              loading="eager"
+              loading={idx < 2 ? "eager" : "lazy"}
               decoding="async"
-              fetchpriority={idx < 4 ? "high" : "auto"}
+              fetchpriority={idx < 2 ? "high" : "low"}
             />
           ))}
         </div>

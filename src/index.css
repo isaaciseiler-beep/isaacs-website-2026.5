@@ -215,6 +215,36 @@
     border-radius: var(--site-corner-radius);
   }
 
+  .home-section-frame {
+    margin-block: clamp(4.75rem, 9.5vw, 8rem);
+  }
+
+  .home-section-frame--first {
+    margin-top: clamp(5.25rem, 10vw, 8.5rem);
+  }
+
+  .home-section-frame--last {
+    margin-bottom: clamp(5.25rem, 10vw, 8.5rem);
+  }
+
+  .home-section-skeleton {
+    min-height: 100svh;
+  }
+
+  @media (max-width: 767px) {
+    .home-section-frame {
+      margin-block: 4rem;
+    }
+
+    .home-section-frame--first {
+      margin-top: 4.25rem;
+    }
+
+    .home-section-frame--last {
+      margin-bottom: 4.25rem;
+    }
+  }
+
   .site-header-xray {
     color: #fff;
     mix-blend-mode: normal;

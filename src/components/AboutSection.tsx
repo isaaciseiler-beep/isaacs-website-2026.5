@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { motion, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion";
+import { motion, useInView, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import SectionHeading from "@/components/SectionHeading";
 import headshotUrl from "@/assets/headshot.jpg";
@@ -27,6 +27,7 @@ const AboutSection = ({ revealEnabled = true }: AboutSectionProps) => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const pillRef = useRef<HTMLDivElement>(null);
   const [hasDeployedPopdown, setHasDeployedPopdown] = useState(false);
+  const pillInView = useInView(pillRef, { amount: 0.82, margin: "0px 0px -18% 0px", once: true });
   const headshotRotX = useSpring(useMotionValue(0), { stiffness: 120, damping: 18, mass: 0.6 });
   const headshotRotY = useSpring(useMotionValue(0), { stiffness: 120, damping: 18, mass: 0.6 });
   const photoSize = "clamp(320px, 34vw, 520px)";
@@ -84,31 +85,8 @@ const AboutSection = ({ revealEnabled = true }: AboutSectionProps) => {
   }, []);
 
   useEffect(() => {
-    if (!revealEnabled || hasDeployedPopdown) return;
-
-    const handleScrollTrigger = () => {
-      const pill = pillRef.current;
-      if (!pill) return;
-
-      const rect = pill.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
-      const isVisible = rect.top < viewportHeight && rect.bottom > 0;
-      const hasBufferBelow = rect.bottom <= viewportHeight * 0.8;
-
-      if (isVisible && hasBufferBelow) {
-        setHasDeployedPopdown(true);
-      }
-    };
-
-    handleScrollTrigger();
-    window.addEventListener("scroll", handleScrollTrigger, { passive: true });
-    window.addEventListener("resize", handleScrollTrigger);
-
-    return () => {
-      window.removeEventListener("scroll", handleScrollTrigger);
-      window.removeEventListener("resize", handleScrollTrigger);
-    };
-  }, [hasDeployedPopdown, revealEnabled]);
+    if (revealEnabled && pillInView) setHasDeployedPopdown(true);
+  }, [pillInView, revealEnabled]);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -197,11 +175,11 @@ const AboutSection = ({ revealEnabled = true }: AboutSectionProps) => {
           <motion.div
             className="group/headshot relative w-full justify-self-end self-center"
             style={{ width: photoSize, perspective: 900 }}
-            initial={{ opacity: 0, scale: 0.95, filter: "blur(8px)" }}
-            animate={revealEnabled ? undefined : { opacity: 0, scale: 0.95, filter: "blur(8px)" }}
-            whileInView={revealEnabled ? { opacity: 1, scale: 1, filter: "blur(0px)" } : undefined}
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={revealEnabled ? undefined : { opacity: 0, scale: 0.98 }}
+            whileInView={revealEnabled ? { opacity: 1, scale: 1 } : undefined}
             viewport={revealEnabled ? { once: true, margin: "-60px" } : undefined}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
             onPointerMove={handleHeadshotMove}
             onPointerLeave={handleHeadshotLeave}
           >
@@ -219,24 +197,26 @@ const AboutSection = ({ revealEnabled = true }: AboutSectionProps) => {
                 alt="Portrait"
                 className="h-full w-full object-cover"
                 style={{ filter: headshotFilter }}
-                loading="lazy"
+                loading="eager"
                 decoding="async"
-                fetchpriority="auto"
+                fetchpriority="high"
               />
             </motion.div>
           </motion.div>
         </div>
 
         {/* Status pill + pop-down CTA */}
-        <div className="mt-8 md:mt-10 relative group/pill">
+        <motion.div
+          className="group/pill relative mt-8 inline-block max-w-full md:mt-10"
+          initial={{ opacity: 0, y: 14, filter: "blur(6px)" }}
+          whileInView={revealEnabled ? { opacity: 1, y: 0, filter: "blur(0px)" } : undefined}
+          animate={revealEnabled ? undefined : { opacity: 0, y: 14, filter: "blur(6px)" }}
+          viewport={revealEnabled ? { once: true, amount: 0.72, margin: "-40px" } : undefined}
+          transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
+        >
           <div
             ref={pillRef}
-            className={`relative z-10 flex w-full items-center gap-3 border-2 border-foreground bg-background px-6 py-3.5 transition-colors duration-300 group-hover/pill:border-foreground/85 ${hasDeployedPopdown ? "border-b-0" : ""}`}
-            style={{
-              borderRadius: hasDeployedPopdown
-                ? "var(--site-corner-radius) var(--site-corner-radius) 0 0"
-                : "var(--site-corner-radius)",
-            }}
+            className="relative z-10 inline-flex max-w-full items-center gap-3 rounded-full border-2 border-foreground bg-background px-5 py-3 transition-colors duration-300 group-hover/pill:border-foreground/85 md:px-6"
           >
             <motion.span
               className="rounded-full w-2.5 h-2.5 bg-foreground transition-colors duration-300 shrink-0"
@@ -247,12 +227,12 @@ const AboutSection = ({ revealEnabled = true }: AboutSectionProps) => {
                 ease: "easeInOut",
               }}
             />
-            <span className="text-base md:text-lg font-light tracking-[0.02em] text-foreground transition-colors duration-300">
+            <span className="min-w-0 text-base font-light leading-snug tracking-[0.02em] text-foreground transition-colors duration-300 md:text-lg">
               Currently in the market for tech roles starting Summer 2026
             </span>
           </div>
 
-          <div className="absolute left-0 right-0 z-0 pointer-events-none" style={{ top: "100%" }}>
+          <div className="pointer-events-none absolute left-0 z-0 w-full" style={{ top: "calc(100% + 6px)" }}>
             <motion.div
               initial="closed"
               animate={hasDeployedPopdown ? "open" : "closed"}
@@ -260,8 +240,7 @@ const AboutSection = ({ revealEnabled = true }: AboutSectionProps) => {
               className="overflow-hidden"
             >
               <button
-                className="get-in-touch-cta homepage-cta relative pointer-events-auto h-full w-full cursor-pointer overflow-hidden bg-primary transition-colors duration-300 group-hover/pill:bg-accent"
-                style={{ borderRadius: "0 0 var(--site-corner-radius) var(--site-corner-radius)" }}
+                className="get-in-touch-cta homepage-cta relative pointer-events-auto h-full w-full cursor-pointer overflow-hidden rounded-full bg-primary transition-colors duration-300 group-hover/pill:bg-accent"
                 onClick={() => window.location.href = CONTACT_MAILTO}
               >
                 <motion.span
@@ -278,7 +257,7 @@ const AboutSection = ({ revealEnabled = true }: AboutSectionProps) => {
               </button>
             </motion.div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

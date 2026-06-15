@@ -3,11 +3,10 @@ import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import SectionHeading from "@/components/SectionHeading";
-import { preloadImages, scheduleImagePreloads } from "@/lib/imagePreload";
+import { preloadImages } from "@/lib/imagePreload";
 import { featuredProjectIds, projectItems, type ProjectItem } from "@/lib/siteContent";
 
 const GAP = 3;
-const ease = [0.16, 1, 0.3, 1] as [number, number, number, number];
 const EXPAND_EASE = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
 const useCenteredInFrame = <T extends HTMLElement>(enabled: boolean) => {
@@ -76,21 +75,13 @@ const FeaturedProjectCard = ({
       onMouseEnter={() => isDesktop && onActivate(index)}
       aria-label={`Read more about ${project.title}`}
     >
-    <motion.div
-      className="relative h-full w-full"
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{
-        opacity: { duration: 0.55, ease, delay: index * 0.12 },
-      }}
-    >
+    <div className="relative h-full w-full bg-foreground/[0.04]">
       <img
         src={project.image}
         alt={project.title}
-        loading={index < 2 ? "eager" : "lazy"}
+        loading="eager"
         decoding="async"
-        fetchpriority={index < 2 ? "high" : "low"}
+        fetchpriority="high"
         className={`absolute inset-0 h-full w-full object-cover transform-gpu transition-[filter,transform] duration-700 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] group-hover:grayscale-0 group-focus-within:grayscale-0 ${
           isImageActive ? "scale-[1.025] grayscale-0" : "scale-100 grayscale"
         }`}
@@ -144,7 +135,7 @@ const FeaturedProjectCard = ({
           </span>
         )}
       </div>
-    </motion.div>
+    </div>
     </Link>
   );
 };
@@ -168,20 +159,12 @@ const ProjectsSection = () => {
   );
 
   useEffect(() => {
-    const isMobileViewport = window.matchMedia("(max-width: 767px)").matches;
-    const criticalCount = isMobileViewport ? 1 : 2;
     const projectImages = projects.map((project) => project.image);
 
-    void preloadImages(projectImages.slice(0, criticalCount), {
+    void preloadImages(projectImages, {
       decode: true,
       fetchPriority: "high",
-      linkPreload: !isMobileViewport,
-    });
-    scheduleImagePreloads(projectImages.slice(criticalCount), {
-      batchSize: 2,
-      decode: false,
-      fetchPriority: "low",
-      idleTimeout: isMobileViewport ? 1000 : 600,
+      linkPreload: true,
     });
   }, [projects]);
 

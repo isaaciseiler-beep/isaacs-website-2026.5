@@ -23,9 +23,9 @@ describe("search index", () => {
     expect(titlesFor("taiwan travel photos", "photos")).toContain("Taiwan");
   });
 
-  it("includes primary site pages in the search index", () => {
-    expect(titlesFor("photo map", "pages")).toContain("Photo Map");
-    expect(titlesFor("resume timeline", "pages")).toContain("Experience");
+  it("does not return primary site pages in the search index", () => {
+    expect(searchSite("photo map").some((group) => String(group.category) === "pages")).toBe(false);
+    expect(searchSite("resume timeline").some((group) => String(group.category) === "pages")).toBe(false);
   });
 
   it("surfaces inspiration items through hidden tags", () => {

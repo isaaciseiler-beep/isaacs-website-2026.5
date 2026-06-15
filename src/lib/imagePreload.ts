@@ -45,7 +45,12 @@ const warmOrigin = (src: string) => {
 
 const addPreloadHint = (src: string, fetchPriority: FetchPriority) => {
   const href = normalizeSrc(src);
-  if (!href || document.querySelector(`link[rel="preload"][as="image"][href="${href}"]`)) return;
+  if (
+    !href ||
+    [...document.querySelectorAll<HTMLLinkElement>('link[rel="preload"][as="image"]')].some((link) => link.href === href)
+  ) {
+    return;
+  }
 
   const link = document.createElement("link") as PrioritizedLink;
   link.rel = "preload";

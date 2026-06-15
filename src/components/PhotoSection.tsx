@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import SectionHeading from "@/components/SectionHeading";
 import PhotoPreview from "@/components/PhotoPreview";
 import { albums, coverFor } from "@/lib/photoAlbums";
-import { preloadImages, scheduleImagePreloads } from "@/lib/imagePreload";
+import { preloadImages } from "@/lib/imagePreload";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const photos = albums.map((a, i) => ({
@@ -20,6 +20,7 @@ const PhotoSection = () => {
   const [activeIdx, setActiveIdx] = useState(0);
   const [hasAutoplayed, setHasAutoplayed] = useState(false);
   const [isCycling, setIsCycling] = useState(false);
+  const [coversReady, setCoversReady] = useState(false);
   const previewRef = useRef<HTMLDivElement | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isMobile = useIsMobile();
@@ -29,26 +30,16 @@ const PhotoSection = () => {
   const activePhoto = photos[activeIdx] ?? photos[0];
 
   useEffect(() => {
-    const isMobileViewport = window.matchMedia("(max-width: 767px)").matches;
-    const criticalCount = isMobileViewport ? 1 : 2;
     const imageUrls = photos.map((photo) => photo.image);
 
-    void preloadImages(imageUrls.slice(0, criticalCount), {
-      decode: !isMobileViewport,
-      fetchPriority: "high",
-      linkPreload: !isMobileViewport,
-    });
-    scheduleImagePreloads(imageUrls.slice(criticalCount), {
-      batchSize: isMobileViewport ? 2 : 3,
+    void preloadImages(imageUrls, {
       decode: false,
-      fallbackDelay: isMobileViewport ? 240 : 160,
-      fetchPriority: "low",
-      idleTimeout: isMobileViewport ? 1200 : 700,
-    });
+      fetchPriority: "auto",
+    }).then(() => setCoversReady(true));
   }, []);
 
   useEffect(() => {
-    if (prefersReducedMotion || hasAutoplayed || !isPreviewInView) {
+    if (prefersReducedMotion || hasAutoplayed || !isPreviewInView || !coversReady) {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
       setIsCycling(false);
@@ -78,7 +69,7 @@ const PhotoSection = () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     };
-  }, [hasAutoplayed, isPreviewInView, prefersReducedMotion]);
+  }, [coversReady, hasAutoplayed, isPreviewInView, prefersReducedMotion]);
 
   return (
     <section className="flex h-auto min-h-0 flex-col pb-0 pt-0 md:h-[calc(100svh-9.75rem)] md:min-h-[420px]">
@@ -89,7 +80,7 @@ const PhotoSection = () => {
       <div className="px-6 md:min-h-0 md:flex-1">
         <div
           ref={previewRef}
-          className="site-corner group relative aspect-[4/5] h-auto min-h-0 w-full cursor-pointer overflow-hidden md:aspect-auto md:h-full"
+          className="site-corner group relative aspect-[4/5] h-auto min-h-0 w-full cursor-pointer overflow-hidden bg-foreground/[0.05] md:aspect-auto md:h-full"
           onMouseEnter={() => setHovering(true)}
           onMouseLeave={() => setHovering(false)}
           onClick={() => setPreviewIdx(activeIdx)}
@@ -104,9 +95,9 @@ const PhotoSection = () => {
               transform: shouldFlipPhotos ? "scale(1.02)" : "scale(1)",
               transition: "filter 600ms ease-out, transform 900ms cubic-bezier(0.16,1,0.3,1)",
             }}
-            loading={activeIdx < 2 ? "eager" : "lazy"}
+            loading="eager"
             decoding="async"
-            fetchpriority={activeIdx < 2 ? "high" : "low"}
+            fetchpriority={activeIdx === 0 ? "high" : "auto"}
           />
         </div>
       </div>

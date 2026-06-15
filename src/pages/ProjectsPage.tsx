@@ -5,6 +5,7 @@ import { ArrowUp } from "lucide-react";
 import Footer from "@/components/Footer";
 import Sidebar from "@/components/Sidebar";
 import SiteHeader from "@/components/SiteHeader";
+import { preloadImages } from "@/lib/imagePreload";
 import { projectItems, type ProjectItem } from "@/lib/siteContent";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -74,6 +75,7 @@ const ProjectCard = ({ project, index, isMobile, revealImmediately, onOpen }: Pr
           alt={project.title}
           loading={index < 4 ? "eager" : "lazy"}
           decoding="async"
+          fetchpriority={index < 6 ? "high" : "auto"}
           className="h-full w-full object-cover grayscale transition-all duration-500 md:group-hover:grayscale-0"
           animate={isMobile ? { filter: isColor ? "grayscale(0%)" : "grayscale(100%)" } : undefined}
           transition={{ duration: 0.6, ease: EASE }}
@@ -112,10 +114,9 @@ const ProjectsPage = () => {
   };
 
   useEffect(() => {
-    filteredProjects.forEach((project) => {
-      const image = new Image();
-      image.decoding = "async";
-      image.src = project.image;
+    void preloadImages(filteredProjects.map((project) => project.image), {
+      decode: false,
+      fetchPriority: "auto",
     });
   }, [filteredProjects]);
 

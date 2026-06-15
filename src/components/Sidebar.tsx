@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, Laptop, Mail, Moon, Sun } from "lucide-react";
+import { ChevronRight, Mail, Moon, Sun } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTheme, type Theme } from "@/components/ThemeProvider";
 import SearchTrigger from "@/components/SearchOverlay";
@@ -11,9 +11,8 @@ const EASE: [number, number, number, number] = [0.19, 1, 0.22, 1];
 const EASE_TEXT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 const themeOptions = [
-  { value: "dark" as const, label: "Dark", icon: Moon },
   { value: "light" as const, label: "Light", icon: Sun },
-  { value: "system" as const, label: "System", icon: Laptop },
+  { value: "dark" as const, label: "Dark", icon: Moon },
 ];
 
 const ThemeSwitch = () => {
@@ -25,14 +24,14 @@ const ThemeSwitch = () => {
     const rect = switchRef.current?.getBoundingClientRect();
     if (!rect) return;
 
-    const index = Math.min(2, Math.max(0, Math.floor(((clientX - rect.left) / rect.width) * themeOptions.length)));
+    const index = Math.min(themeOptions.length - 1, Math.max(0, Math.floor(((clientX - rect.left) / rect.width) * themeOptions.length)));
     setTheme(themeOptions[index].value);
   };
 
   return (
     <div
       ref={switchRef}
-      className="theme-switch site-corner relative grid h-10 w-[184px] grid-cols-3 overflow-hidden bg-foreground/10 p-1 shadow-[inset_0_0_0_1px_hsl(var(--foreground)/0.07)]"
+      className="theme-switch site-corner relative grid h-10 w-[132px] grid-cols-2 overflow-hidden bg-foreground/10 p-1 shadow-[inset_0_0_0_1px_hsl(var(--foreground)/0.07)]"
       role="radiogroup"
       aria-label="Appearance"
       onPointerDown={(event) => {
@@ -50,7 +49,7 @@ const ThemeSwitch = () => {
         initial={false}
         animate={{ x: `${activeIndex * 100}%` }}
         transition={{ duration: 0.42, ease: EASE_TEXT }}
-        style={{ left: 4, width: "calc((100% - 8px) / 3)" }}
+        style={{ left: 4, width: "calc((100% - 8px) / 2)" }}
       />
       {themeOptions.map((opt) => {
         const active = theme === opt.value;

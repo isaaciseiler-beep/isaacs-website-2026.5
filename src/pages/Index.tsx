@@ -197,8 +197,8 @@ const Index = () => {
 
     raiseTier(1);
     const timers = [
-      window.setTimeout(() => raiseTier(2), 420),
-      window.setTimeout(() => raiseTier(3), 1500),
+      window.setTimeout(() => raiseTier(2), 180),
+      window.setTimeout(() => raiseTier(3), 900),
     ];
     const loadAll = () => raiseTier(3);
 
@@ -237,7 +237,6 @@ const Index = () => {
         .filter((image): image is string => Boolean(image));
       const photoCovers = albums.map(coverFor);
       const criticalNewsCount = isMobileViewport ? 1 : 2;
-      const criticalProjectCount = isMobileViewport ? 1 : 2;
       const criticalPhotoCount = isMobileViewport ? 1 : 2;
       const criticalNewsAssets = newsItems
         .slice(0, criticalNewsCount)
@@ -250,7 +249,8 @@ const Index = () => {
       const inspirationAssets = inspirationItems.map((item) => item.imageUrl).filter((src): src is string => Boolean(src));
 
       void preloadImages([
-        ...featuredProjectImages.slice(0, criticalProjectCount),
+        headshotUrl,
+        ...featuredProjectImages,
       ], {
         decode: true,
         fetchPriority: "high",
@@ -258,13 +258,11 @@ const Index = () => {
       });
 
       scheduleImagePreloads([
-        headshotUrl,
         ...criticalNewsAssets,
         ...photoCovers.slice(0, criticalPhotoCount),
         ...photoCovers.slice(criticalPhotoCount),
         ...deferredNewsAssets,
         ...inspirationAssets,
-        ...featuredProjectImages.slice(criticalProjectCount),
       ], {
         batchSize: isMobileViewport ? 3 : 5,
         decode: false,

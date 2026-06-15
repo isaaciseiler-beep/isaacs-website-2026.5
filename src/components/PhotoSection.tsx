@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import SectionHeading from "@/components/SectionHeading";
 import PhotoPreview from "@/components/PhotoPreview";
 import { albums, coverFor } from "@/lib/photoAlbums";
-import { preloadImages } from "@/lib/imagePreload";
+import { preloadImages, scheduleImagePreloads } from "@/lib/imagePreload";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const photos = albums.map((a, i) => ({
@@ -26,13 +26,24 @@ const PhotoSection = () => {
   const prefersReducedMotion = useReducedMotion();
   const isPreviewInView = useInView(previewRef, { amount: 0.55 });
   const shouldFlipPhotos = !prefersReducedMotion && (isCycling || (!isMobile && hovering));
+  const activePhoto = photos[activeIdx] ?? photos[0];
 
   useEffect(() => {
     const isMobileViewport = window.matchMedia("(max-width: 767px)").matches;
-    void preloadImages(photos.slice(0, isMobileViewport ? 2 : photos.length).map((photo) => photo.image), {
+    const criticalCount = isMobileViewport ? 1 : 2;
+    const imageUrls = photos.map((photo) => photo.image);
+
+    void preloadImages(imageUrls.slice(0, criticalCount), {
       decode: !isMobileViewport,
-      fetchPriority: isMobileViewport ? "low" : "high",
+      fetchPriority: "high",
       linkPreload: !isMobileViewport,
+    });
+    scheduleImagePreloads(imageUrls.slice(criticalCount), {
+      batchSize: isMobileViewport ? 2 : 3,
+      decode: false,
+      fallbackDelay: isMobileViewport ? 240 : 160,
+      fetchPriority: "low",
+      idleTimeout: isMobileViewport ? 1200 : 700,
     });
   }, []);
 
@@ -83,23 +94,20 @@ const PhotoSection = () => {
           onMouseLeave={() => setHovering(false)}
           onClick={() => setPreviewIdx(activeIdx)}
         >
-          {photos.map((photo, idx) => (
-            <img
-              key={photo.id}
-              src={photo.image}
-              alt={photo.title}
-              className="absolute inset-0 w-full h-full object-cover"
-              style={{
-                opacity: idx === activeIdx ? 1 : 0,
-                filter: shouldFlipPhotos ? "grayscale(0%)" : "grayscale(100%)",
-                transform: shouldFlipPhotos ? "scale(1.02)" : "scale(1)",
-                transition: "opacity 140ms ease-out, filter 600ms ease-out, transform 900ms cubic-bezier(0.16,1,0.3,1)",
-              }}
-              loading={idx < 2 ? "eager" : "lazy"}
-              decoding="async"
-              fetchpriority={idx < 2 ? "high" : "low"}
-            />
-          ))}
+          <img
+            key={activePhoto.id}
+            src={activePhoto.image}
+            alt={activePhoto.title}
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{
+              filter: shouldFlipPhotos ? "grayscale(0%)" : "grayscale(100%)",
+              transform: shouldFlipPhotos ? "scale(1.02)" : "scale(1)",
+              transition: "filter 600ms ease-out, transform 900ms cubic-bezier(0.16,1,0.3,1)",
+            }}
+            loading={activeIdx < 2 ? "eager" : "lazy"}
+            decoding="async"
+            fetchpriority={activeIdx < 2 ? "high" : "low"}
+          />
         </div>
       </div>
 

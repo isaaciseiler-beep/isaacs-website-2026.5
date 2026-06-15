@@ -8,6 +8,7 @@ import { useTheme } from "@/components/ThemeProvider";
 
 const EASE_TEXT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const DARK_SURFACE_LUMINANCE = 0.5;
+const INK_SAMPLE_INTERVAL_MS = 96;
 
 interface SiteHeaderProps {
   open: boolean;
@@ -150,6 +151,8 @@ const SiteHeader = ({ open, onToggle, searchOpen, onSearchOpen, onSearchClose }:
 
   useEffect(() => {
     let frame = 0;
+    let throttleTimer: number | undefined;
+    let lastSampleAt = 0;
     const timers: number[] = [];
 
     const inkForRect = (rect: DOMRect, header: HTMLElement) => {
@@ -167,6 +170,7 @@ const SiteHeader = ({ open, onToggle, searchOpen, onSearchOpen, onSearchClose }:
 
     const updateInk = () => {
       frame = 0;
+      lastSampleAt = performance.now();
       const header = headerRef.current;
       if (!header) return;
 
@@ -183,9 +187,23 @@ const SiteHeader = ({ open, onToggle, searchOpen, onSearchOpen, onSearchClose }:
       setSearchInk((current) => (current === nextSearchInk ? current : nextSearchInk));
     };
 
-    const scheduleUpdate = () => {
+    const requestUpdate = () => {
       if (frame) return;
       frame = window.requestAnimationFrame(updateInk);
+    };
+
+    const scheduleUpdate = () => {
+      const wait = Math.max(0, INK_SAMPLE_INTERVAL_MS - (performance.now() - lastSampleAt));
+      if (wait > 0) {
+        if (throttleTimer) return;
+        throttleTimer = window.setTimeout(() => {
+          throttleTimer = undefined;
+          requestUpdate();
+        }, wait);
+        return;
+      }
+
+      requestUpdate();
     };
 
     updateInk();
@@ -205,6 +223,7 @@ const SiteHeader = ({ open, onToggle, searchOpen, onSearchOpen, onSearchClose }:
 
     return () => {
       if (frame) window.cancelAnimationFrame(frame);
+      if (throttleTimer) window.clearTimeout(throttleTimer);
       timers.forEach((timer) => window.clearTimeout(timer));
       observer.disconnect();
       window.removeEventListener("scroll", scheduleUpdate);

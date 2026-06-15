@@ -2,8 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRight, RotateCcw } from "lucide-react";
-import mapboxgl, { type LngLatLike } from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
+import type { LngLatLike, Map as MapboxMap, Marker as MapboxMarker } from "mapbox-gl";
 import Sidebar from "@/components/Sidebar";
 import SiteHeader from "@/components/SiteHeader";
 import { photoMapEntries, photoMapInitialView, type PhotoMapEntry } from "@/lib/photoMap";
@@ -21,8 +20,11 @@ const WORLD_LAND_LAYER = "photo-map-world-land";
 const WORLD_BORDER_LAYER = "photo-map-world-borders";
 const WORLD_BORDER_DISPUTED_LAYER = "photo-map-world-borders-disputed";
 
+type MapboxModule = typeof import("mapbox-gl");
+type MapboxGL = MapboxModule["default"];
+
 type MarkerEntry = {
-  marker: mapboxgl.Marker;
+  marker: MapboxMarker;
   element: HTMLButtonElement;
 };
 
@@ -64,6 +66,16 @@ const darkMapPalette: MapPalette = {
 
 const stopMarkerEvent = (event: Event) => event.stopPropagation();
 
+let mapboxPromise: Promise<MapboxModule> | null = null;
+
+const loadMapbox = () => {
+  mapboxPromise ??= Promise.all([
+    import("mapbox-gl"),
+    import("mapbox-gl/dist/mapbox-gl.css"),
+  ]).then(([module]) => module);
+  return mapboxPromise;
+};
+
 const getMapPalette = (): MapPalette =>
   document.documentElement.classList.contains("dark") ? darkMapPalette : lightMapPalette;
 
@@ -73,7 +85,7 @@ const defaultMapView = (isMobile: boolean) => ({
   zoom: isMobile ? 0.48 : photoMapInitialView.zoom,
 });
 
-const addWorldGeographyLayers = (map: mapboxgl.Map, palette: MapPalette) => {
+const addWorldGeographyLayers = (map: MapboxMap, palette: MapPalette) => {
   try {
     if (!map.getSource(WORLD_SOURCE)) {
       map.addSource(WORLD_SOURCE, {
@@ -140,7 +152,7 @@ const addWorldGeographyLayers = (map: mapboxgl.Map, palette: MapPalette) => {
   }
 };
 
-const applyMapPalette = (map: mapboxgl.Map) => {
+const applyMapPalette = (map: MapboxMap) => {
   const palette = getMapPalette();
   const layers = map.getStyle().layers ?? [];
 
@@ -195,7 +207,8 @@ const applyMapPalette = (map: mapboxgl.Map) => {
 const PhotoMapPage = () => {
   const mapboxToken = getMapboxToken();
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<mapboxgl.Map | null>(null);
+  const mapRef = useRef<MapboxMap | null>(null);
+  const mapboxRef = useRef<MapboxGL | null>(null);
   const markerEntriesRef = useRef<Map<string, MarkerEntry>>(new Map());
   const mapLoadedRef = useRef(false);
   const selectedLocationOffsetRef = useRef<() => [number, number]>(() => [0, 0]);
@@ -225,48 +238,68 @@ const PhotoMapPage = () => {
   useEffect(() => {
     if (!containerRef.current || mapRef.current || !mapboxToken) return;
 
-    mapboxgl.accessToken = mapboxToken;
-    const initialView = defaultMapView(isMobile);
+    let disposed = false;
     const markerEntries = markerEntriesRef.current;
-    const map = new mapboxgl.Map({
-      container: containerRef.current,
-      style: MONOCHROME_MAP_STYLE,
-      center: initialView.center,
-      zoom: initialView.zoom,
-      minZoom: 0.35,
-      maxZoom: 12,
-      pitch: initialView.pitch,
-      bearing: initialView.bearing,
-      projection: { name: "globe" },
-      attributionControl: false,
-      fadeDuration: 0,
-    });
 
-    mapRef.current = map;
-    map.addControl(new mapboxgl.AttributionControl({ compact: true }), "bottom-right");
+    const initializeMap = async () => {
+      try {
+        const mapboxModule = await loadMapbox();
+        if (disposed || !containerRef.current || mapRef.current) return;
 
-    const handleLoad = () => {
-      mapLoadedRef.current = true;
-      applyMapPalette(map);
-      setMapError(null);
-      setMapReady(true);
-    };
-    const handleError = () => {
-      if (!mapLoadedRef.current) {
-        setMapError("The map could not load. Check that the Mapbox token is available.");
+        const mapbox = mapboxModule.default;
+        mapboxRef.current = mapbox;
+        mapbox.accessToken = mapboxToken;
+
+        const initialView = defaultMapView(isMobile);
+        const map = new mapbox.Map({
+          container: containerRef.current,
+          style: MONOCHROME_MAP_STYLE,
+          center: initialView.center,
+          zoom: initialView.zoom,
+          minZoom: 0.35,
+          maxZoom: 12,
+          pitch: initialView.pitch,
+          bearing: initialView.bearing,
+          projection: { name: "globe" },
+          attributionControl: false,
+          fadeDuration: 0,
+        });
+
+        mapRef.current = map;
+        map.addControl(new mapbox.AttributionControl({ compact: true }), "bottom-right");
+
+        const handleLoad = () => {
+          mapLoadedRef.current = true;
+          applyMapPalette(map);
+          setMapError(null);
+          setMapReady(true);
+        };
+        const handleError = () => {
+          if (!mapLoadedRef.current) {
+            setMapError("The map could not load. Check that the Mapbox token is available.");
+          }
+        };
+
+        map.on("load", handleLoad);
+        map.on("style.load", () => applyMapPalette(map));
+        map.on("error", handleError);
+        map.on("click", () => setActiveEntryId(null));
+      } catch {
+        if (!disposed) {
+          setMapError("The map library could not load.");
+        }
       }
     };
 
-    map.on("load", handleLoad);
-    map.on("style.load", () => applyMapPalette(map));
-    map.on("error", handleError);
-    map.on("click", () => setActiveEntryId(null));
+    void initializeMap();
 
     return () => {
+      disposed = true;
       markerEntries.forEach(({ marker }) => marker.remove());
       markerEntries.clear();
-      map.remove();
+      mapRef.current?.remove();
       mapRef.current = null;
+      mapboxRef.current = null;
       mapLoadedRef.current = false;
     };
   }, [isMobile, mapboxToken]);
@@ -319,9 +352,10 @@ const PhotoMapPage = () => {
   };
 
   useEffect(() => {
-    if (!mapReady || !mapRef.current) return;
+    if (!mapReady || !mapRef.current || !mapboxRef.current) return;
 
     const map = mapRef.current;
+    const mapbox = mapboxRef.current;
     const entries = markerEntriesRef.current;
 
     photoMapEntries.forEach((entry) => {
@@ -357,7 +391,7 @@ const PhotoMapPage = () => {
       });
 
       root.appendChild(button);
-      const marker = new mapboxgl.Marker({ element: root, anchor: "center", clickTolerance: 8 })
+      const marker = new mapbox.Marker({ element: root, anchor: "center", clickTolerance: 8 })
         .setLngLat(entry.coordinates)
         .addTo(map);
       entries.set(entry.id, { marker, element: button });

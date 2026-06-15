@@ -219,9 +219,9 @@ const AboutSection = ({ revealEnabled = true }: AboutSectionProps) => {
                 alt="Portrait"
                 className="h-full w-full object-cover"
                 style={{ filter: headshotFilter }}
-                loading="eager"
+                loading="lazy"
                 decoding="async"
-                fetchpriority="high"
+                fetchpriority="auto"
               />
             </motion.div>
           </motion.div>

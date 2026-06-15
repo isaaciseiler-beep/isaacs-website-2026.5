@@ -91,9 +91,9 @@ const AlbumCover = ({ album, onClick }: { album: Album; onClick: () => void }) =
               filter: hovering ? "grayscale(0%)" : "grayscale(100%)",
               transition: "opacity 150ms ease-out, filter 500ms ease-out",
             }}
-            loading="eager"
+            loading="lazy"
             decoding="async"
-            fetchpriority="auto"
+            fetchpriority="low"
           />
         ))}
       </div>
@@ -137,14 +137,14 @@ const FeaturedHero = () => {
             transition={{ duration: 0.6, ease: EASE, delay: 0.08 }}
             className="aspect-[4/3] overflow-hidden"
           >
-            <img src={featuredPhotos.pairLeft} alt="" className="w-full h-full object-cover" loading="eager" decoding="async" fetchpriority="high" />
+            <img src={featuredPhotos.pairLeft} alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" fetchpriority="low" />
           </motion.div>
           <motion.div
             {...fade}
             transition={{ duration: 0.6, ease: EASE, delay: 0.14 }}
             className="aspect-[4/3] overflow-hidden"
           >
-            <img src={featuredPhotos.pairRight} alt="" className="w-full h-full object-cover" loading="eager" decoding="async" fetchpriority="high" />
+            <img src={featuredPhotos.pairRight} alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" fetchpriority="low" />
           </motion.div>
         </div>
 
@@ -155,7 +155,7 @@ const FeaturedHero = () => {
             transition={{ duration: 0.6, ease: EASE, delay: 0.2 }}
             className="aspect-[4/3] overflow-hidden"
           >
-            <img src={featuredPhotos.bottom} alt="" className="w-full h-full object-cover" loading="eager" decoding="async" fetchpriority="high" />
+            <img src={featuredPhotos.bottom} alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" fetchpriority="low" />
           </motion.div>
           {/* Floating 70%-scale 4:3 sitting between row 2 and row 3, right-aligned with buffer */}
           <motion.div
@@ -169,7 +169,7 @@ const FeaturedHero = () => {
               transform: "translateY(-50%)",
             }}
           >
-            <img src={featuredPhotos.overlap} alt="" className="w-full h-full object-cover" loading="eager" decoding="async" fetchpriority="high" />
+            <img src={featuredPhotos.overlap} alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" fetchpriority="low" />
           </motion.div>
         </div>
       </div>
@@ -232,12 +232,19 @@ const PhotosPage = () => {
       featuredPhotos.bottom,
     ];
 
-    void preloadImages([...featured, ...albums.map(coverFor)], {
+    void preloadImages([featuredPhotos.hero], {
       decode: true,
       fetchPriority: "high",
       linkPreload: true,
     });
-  }, []);
+    scheduleImagePreloads([...featured.slice(1), ...albums.map(coverFor)], {
+      batchSize: isMobile ? 2 : 4,
+      decode: false,
+      fallbackDelay: isMobile ? 240 : 160,
+      fetchPriority: "low",
+      idleTimeout: isMobile ? 1200 : 800,
+    });
+  }, [isMobile]);
 
   useEffect(() => {
     if (!currentAlbum) return;
@@ -358,9 +365,9 @@ const PhotosPage = () => {
                                 <img
                                   src={photo}
                                   alt=""
-                                  loading={row.startIdx + pi < 4 ? "eager" : "lazy"}
+                                  loading={row.startIdx + pi < 2 ? "eager" : "lazy"}
                                   decoding="async"
-                                  fetchpriority={row.startIdx + pi < 4 ? "high" : "auto"}
+                                  fetchpriority={row.startIdx + pi < 2 ? "high" : "auto"}
                                   className="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-700 ease-out"
                                 />
                               </div>
@@ -384,9 +391,9 @@ const PhotosPage = () => {
                           <img
                             src={photo}
                             alt=""
-                            loading={row.startIdx < 4 ? "eager" : "lazy"}
+                            loading={row.startIdx < 2 ? "eager" : "lazy"}
                             decoding="async"
-                            fetchpriority={row.startIdx < 4 ? "high" : "auto"}
+                            fetchpriority={row.startIdx < 2 ? "high" : "auto"}
                             className="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-700 ease-out"
                           />
                         </div>

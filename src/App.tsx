@@ -1,14 +1,11 @@
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import Index from "./pages/Index.tsx";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { Toaster } from "@/components/ui/toaster";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import ChatOrb from "@/components/ChatOrb";
 
+const ChatOrb = lazy(() => import("@/components/ChatOrb"));
 const PhotosPage = lazy(() => import("./pages/PhotosPage.tsx"));
 const PhotoMapPage = lazy(() => import("./pages/PhotoMapPage.tsx"));
 const ProjectsPage = lazy(() => import("./pages/ProjectsPage.tsx"));
@@ -64,25 +61,45 @@ const AnimatedRoutes = () => {
 
 const ChatOrbGate = () => {
   const location = useLocation();
+  const [shouldLoad, setShouldLoad] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.scrollY > 10;
+  });
+
+  useEffect(() => {
+    if (location.pathname === "/experience/arcade") {
+      setShouldLoad(false);
+      return;
+    }
+
+    setShouldLoad(window.scrollY > 10);
+    if (window.scrollY > 10) return;
+
+    const load = () => setShouldLoad(true);
+    window.addEventListener("scroll", load, { once: true, passive: true });
+    return () => window.removeEventListener("scroll", load);
+  }, [location.pathname]);
 
   if (location.pathname === "/experience/arcade") {
     return null;
   }
 
-  return <ChatOrb />;
+  if (!shouldLoad) return null;
+
+  return (
+    <Suspense fallback={null}>
+      <ChatOrb />
+    </Suspense>
+  );
 };
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <AnimatedRoutes />
-          <ChatOrbGate />
-        </BrowserRouter>
-      </TooltipProvider>
+      <BrowserRouter>
+        <AnimatedRoutes />
+        <ChatOrbGate />
+      </BrowserRouter>
     </ThemeProvider>
   </QueryClientProvider>
 );

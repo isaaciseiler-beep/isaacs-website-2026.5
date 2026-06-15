@@ -1,12 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import "mapbox-gl/dist/mapbox-gl.css";
+import { Suspense, lazy, useCallback, useEffect, useRef, useState } from "react";
 
 import AddPinForm, {
   type AddPinFormValues,
 } from "@/components/fulbrightmap/AddPinForm";
-import MapView from "@/components/fulbrightmap/MapView";
 import SetupScreen from "@/components/fulbrightmap/SetupScreen";
 import Toast, { type ToastMessage } from "@/components/fulbrightmap/Toast";
 import TopPanel from "@/components/fulbrightmap/TopPanel";
@@ -23,6 +21,7 @@ import type { PendingLocation, Pin } from "@/lib/fulbrightmap/types";
 import { getAnonymousUserId } from "@/lib/fulbrightmap/user";
 
 const MAP_EDIT_CLOSES_AT = Date.parse("2026-05-21T13:00:00+08:00");
+const MapView = lazy(() => import("@/components/fulbrightmap/MapView"));
 
 function isMapClosed() {
   return Date.now() >= MAP_EDIT_CLOSES_AT;
@@ -310,17 +309,29 @@ export default function FulbrightMapPage() {
 
   return (
     <main className="relative min-h-[100svh] overflow-hidden bg-neutral-950">
-      <MapView
-        token={mapboxToken}
-        pins={pins}
-        popupRequest={popupRequest}
-        highlightedPinId={highlightedPinId}
-        loadingPins={loadingPins}
-        anonymousUserId={anonymousUserId}
-        locked={mapLocked}
-        onMapClick={handleMapClick}
-        onDeletePin={handleDeletePin}
-      />
+      <Suspense
+        fallback={
+          <div className="grid min-h-[100svh] place-items-center bg-neutral-950 p-5 text-center text-white">
+            <div>
+              <div className="mx-auto h-10 w-10 animate-pulse rounded-full bg-white/80 shadow-lg shadow-black/30" />
+              <div className="mt-4 text-lg font-semibold">Preparing the map</div>
+              <p className="mt-1 text-sm leading-5 text-white/65">Loading New Taipei and shared spots.</p>
+            </div>
+          </div>
+        }
+      >
+        <MapView
+          token={mapboxToken}
+          pins={pins}
+          popupRequest={popupRequest}
+          highlightedPinId={highlightedPinId}
+          loadingPins={loadingPins}
+          anonymousUserId={anonymousUserId}
+          locked={mapLocked}
+          onMapClick={handleMapClick}
+          onDeletePin={handleDeletePin}
+        />
+      </Suspense>
 
       <TopPanel
         totalPins={pins.length}

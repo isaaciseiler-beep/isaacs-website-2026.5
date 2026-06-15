@@ -3,12 +3,22 @@ import type { CSSProperties } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRight, Search, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { hasSearchResults, searchSite, type SearchResult } from "@/lib/searchIndex";
+import type { SearchGroup, SearchResult } from "@/lib/searchIndex";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const EASE: [number, number, number, number] = [0.19, 1, 0.22, 1];
 const EASE_TEXT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const SEARCH_BAR_TRANSITION = { duration: 0.68, ease: EASE };
+const EMPTY_SEARCH_GROUPS: SearchGroup[] = [];
+
+type SearchIndexModule = typeof import("@/lib/searchIndex");
+
+let searchIndexPromise: Promise<SearchIndexModule> | null = null;
+
+const loadSearchIndex = () => {
+  searchIndexPromise ??= import("@/lib/searchIndex");
+  return searchIndexPromise;
+};
 
 interface SearchTriggerProps {
   variant?: "header" | "sidebar";
@@ -62,15 +72,16 @@ const ResultCard = ({
 );
 
 interface SearchPanelProps {
-  groups: ReturnType<typeof searchSite>;
+  groups: SearchGroup[];
   hasQuery: boolean;
   hasResults: boolean;
   onClose: () => void;
   onSelect: (result: SearchResult) => void;
   open: boolean;
+  searchReady: boolean;
 }
 
-export const SearchPanel = ({ groups, hasQuery, hasResults, onClose, onSelect, open }: SearchPanelProps) => {
+export const SearchPanel = ({ groups, hasQuery, hasResults, onClose, onSelect, open, searchReady }: SearchPanelProps) => {
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -99,7 +110,11 @@ export const SearchPanel = ({ groups, hasQuery, hasResults, onClose, onSelect, o
           >
             <div className="pointer-events-none absolute inset-x-0 top-20 z-10 h-12 bg-[linear-gradient(to_bottom,hsl(var(--background))_0%,hsl(var(--background)/0.82)_34%,hsl(var(--background)/0)_100%)] md:top-20" />
             <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-10 pt-5 scrollbar-hide md:pb-12 md:pt-8">
-              {!hasQuery ? null : (
+              {!hasQuery ? null : !searchReady ? (
+                <div className="grid min-h-[220px] place-items-center">
+                  <p className="text-[28px] font-medium leading-none text-foreground/30 md:text-sm md:leading-normal">Searching</p>
+                </div>
+              ) : (
                 <div>
                   {hasResults ? (
                     groups.map((group) =>
@@ -149,15 +164,19 @@ const SearchTrigger = ({
 }: SearchTriggerProps) => {
   const [internalOpen, setInternalOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [searchIndexModule, setSearchIndexModule] = useState<SearchIndexModule | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const isControlled = typeof open === "boolean";
   const panelOpen = isControlled ? open : internalOpen;
-  const groups = useMemo(() => searchSite(query, 5), [query]);
   const trimmedQuery = query.trim();
+  const groups = useMemo(
+    () => (searchIndexModule ? searchIndexModule.searchSite(query, 5) : EMPTY_SEARCH_GROUPS),
+    [query, searchIndexModule],
+  );
   const hasQuery = trimmedQuery.length > 0;
-  const hasResults = hasSearchResults(groups);
+  const hasResults = searchIndexModule ? searchIndexModule.hasSearchResults(groups) : false;
   const firstResult = groups.find((group) => group.results.length)?.results[0];
   const expandedSearchWidth = isMobile ? "calc(100vw - 3rem)" : "calc(var(--site-panel-width) - 3rem)";
 
@@ -169,6 +188,7 @@ const SearchTrigger = ({
   };
 
   const handleOpen = () => {
+    void loadSearchIndex().then(setSearchIndexModule);
     setOpen(true);
   };
 
@@ -189,6 +209,19 @@ const SearchTrigger = ({
   const handleEnter = () => {
     if (firstResult) handleSelect(firstResult);
   };
+
+  useEffect(() => {
+    if (!panelOpen && !trimmedQuery) return;
+
+    let active = true;
+    void loadSearchIndex().then((module) => {
+      if (active) setSearchIndexModule(module);
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [panelOpen, trimmedQuery]);
 
   useEffect(() => {
     if (!panelOpen || variant !== "header") return;
@@ -269,6 +302,7 @@ const SearchTrigger = ({
           onClose={handleClose}
           onSelect={handleSelect}
           open={panelOpen}
+          searchReady={Boolean(searchIndexModule)}
         />
       ) : null}
     </>

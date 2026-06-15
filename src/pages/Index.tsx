@@ -44,16 +44,16 @@ const homeSectionFrameFirst = `${homeSectionFrame} home-section-frame--first`;
 const homeSectionFrameLast = `${homeSectionFrame} home-section-frame--last`;
 const homeSectionFallback = <div className="home-section-skeleton" aria-hidden="true" />;
 
-const preloadDeferredHomeSections = () => {
-  void Promise.all([
-    loadProjectsSection(),
-    loadAboutSection(),
-    loadNewsSection(),
-    loadPhotoSection(),
-    loadInspirationBoard(),
-    loadIsaacAISection(),
-    loadFooter(),
-  ]);
+const preloadCoreHomeSections = () => {
+  void Promise.all([loadProjectsSection(), loadAboutSection()]);
+};
+
+const preloadSecondaryHomeSections = () => {
+  void Promise.all([loadNewsSection(), loadPhotoSection()]);
+};
+
+const preloadRemainingHomeSections = () => {
+  void Promise.all([loadInspirationBoard(), loadIsaacAISection(), loadFooter()]);
 };
 
 const Index = () => {
@@ -62,6 +62,7 @@ const Index = () => {
   const [activeSection, setActiveSection] = useState("hero");
   const [aboutRevealEnabled, setAboutRevealEnabled] = useState(false);
   const [homeIntroHeroReady, setHomeIntroHeroReady] = useState(false);
+  const [homeSectionTier, setHomeSectionTier] = useState(0);
   const [playHomeIntro] = useState(() => {
     if (typeof window === "undefined") return false;
 
@@ -150,13 +151,63 @@ const Index = () => {
       window.matchMedia("(max-width: 899px)").matches ||
       window.matchMedia("(hover: none) and (pointer: coarse)").matches;
 
+    const warmSections = () => {
+      preloadCoreHomeSections();
+
+      const preloadLowerSections = () => {
+        preloadSecondaryHomeSections();
+
+        const preloadFinalSections = () => preloadRemainingHomeSections();
+        if ("requestIdleCallback" in window) {
+          window.requestIdleCallback(preloadFinalSections, { timeout: isMobileViewport ? 1800 : 1200 });
+        } else {
+          window.setTimeout(preloadFinalSections, isMobileViewport ? 1200 : 800);
+        }
+      };
+
+      if ("requestIdleCallback" in window) {
+        window.requestIdleCallback(preloadLowerSections, { timeout: isMobileViewport ? 1200 : 700 });
+      } else {
+        window.setTimeout(preloadLowerSections, isMobileViewport ? 800 : 420);
+      }
+    };
+
     if (isMobileViewport && playHomeIntro && !homeIntroComplete) {
-      const timer = window.setTimeout(preloadDeferredHomeSections, 600);
+      const timer = window.setTimeout(warmSections, 600);
       return () => window.clearTimeout(timer);
     }
 
-    preloadDeferredHomeSections();
+    warmSections();
   }, [homeIntroComplete, playHomeIntro]);
+
+  useEffect(() => {
+    if (!renderDeferredSections) {
+      setHomeSectionTier(0);
+      return;
+    }
+
+    const raiseTier = (tier: number) => {
+      setHomeSectionTier((current) => Math.max(current, tier));
+    };
+
+    if (location.hash) {
+      raiseTier(3);
+      return;
+    }
+
+    raiseTier(1);
+    const timers = [
+      window.setTimeout(() => raiseTier(2), 420),
+      window.setTimeout(() => raiseTier(3), 1500),
+    ];
+    const loadAll = () => raiseTier(3);
+
+    window.addEventListener("scroll", loadAll, { once: true, passive: true });
+    return () => {
+      timers.forEach((timer) => window.clearTimeout(timer));
+      window.removeEventListener("scroll", loadAll);
+    };
+  }, [location.hash, renderDeferredSections]);
 
   useEffect(() => {
     const isMobileViewport =
@@ -185,9 +236,9 @@ const Index = () => {
         .map((id) => projectItems.find((project) => project.id === id)?.image)
         .filter((image): image is string => Boolean(image));
       const photoCovers = albums.map(coverFor);
-      const criticalNewsCount = isMobileViewport ? 2 : 4;
-      const criticalProjectCount = isMobileViewport ? 2 : featuredProjectImages.length;
-      const criticalPhotoCount = isMobileViewport ? 2 : Math.min(photoCovers.length, 6);
+      const criticalNewsCount = isMobileViewport ? 1 : 2;
+      const criticalProjectCount = isMobileViewport ? 1 : 2;
+      const criticalPhotoCount = isMobileViewport ? 1 : 2;
       const criticalNewsAssets = newsItems
         .slice(0, criticalNewsCount)
         .flatMap((item) => [item.imageUrl, item.logoUrl])
@@ -199,27 +250,27 @@ const Index = () => {
       const inspirationAssets = inspirationItems.map((item) => item.imageUrl).filter((src): src is string => Boolean(src));
 
       void preloadImages([
-        headshotUrl,
         ...featuredProjectImages.slice(0, criticalProjectCount),
-        ...photoCovers.slice(0, criticalPhotoCount),
-        ...criticalNewsAssets,
       ], {
         decode: true,
-        fetchPriority: isMobileViewport ? "low" : "high",
+        fetchPriority: "high",
         linkPreload: !isMobileViewport,
       });
 
       scheduleImagePreloads([
+        headshotUrl,
+        ...criticalNewsAssets,
+        ...photoCovers.slice(0, criticalPhotoCount),
         ...photoCovers.slice(criticalPhotoCount),
         ...deferredNewsAssets,
         ...inspirationAssets,
         ...featuredProjectImages.slice(criticalProjectCount),
       ], {
-        batchSize: isMobileViewport ? 4 : 8,
-        decode: true,
-        fallbackDelay: isMobileViewport ? 160 : 80,
+        batchSize: isMobileViewport ? 3 : 5,
+        decode: false,
+        fallbackDelay: isMobileViewport ? 220 : 140,
         fetchPriority: "low",
-        idleTimeout: isMobileViewport ? 900 : 260,
+        idleTimeout: isMobileViewport ? 1200 : 700,
       });
     };
 
@@ -292,14 +343,14 @@ const Index = () => {
     const sectionId = location.hash.replace("#", "");
     if (!sectionId) return;
 
-    const timers = [80, 360, 760].map((delay) =>
+    const timers = [80, 360, 760, 1400, 2200].map((delay) =>
       window.setTimeout(() => scrollToPageSection(sectionId), delay),
     );
 
     return () => {
       timers.forEach((timer) => window.clearTimeout(timer));
     };
-  }, [location.hash]);
+  }, [homeSectionTier, location.hash]);
 
   useEffect(() => {
     if (!playHomeIntro || homeIntroComplete || isMobile || location.hash || window.scrollY > 80) {
@@ -334,17 +385,27 @@ const Index = () => {
         <main>
           <div id="hero"><HeroSection playIntro={playHomeIntro} introReady={playHomeIntro ? homeIntroHeroReady : true} /></div>
           {renderDeferredSections ? (
-            <Suspense fallback={homeSectionFallback}>
-              <ParallaxSection id="projects" className={homeSectionFrameFirst} offset={34}><ProjectsSection /></ParallaxSection>
-              <ParallaxSection id="about" className={homeSectionFrame} offset={30}><AboutSection revealEnabled={aboutRevealEnabled} /></ParallaxSection>
-              <ParallaxSection id="news" className={homeSectionFrame} offset={28}><NewsSection /></ParallaxSection>
-              <ParallaxSection id="photos" className={homeSectionFrame} offset={34}><PhotoSection /></ParallaxSection>
-              <div id="inspiration" className={homeSectionFrame}>
-                <ParallaxSection offset={28} clip={false}><InspirationBoard /></ParallaxSection>
-              </div>
-              <ParallaxSection id="isaac-ai" className={homeSectionFrameLast} offset={18} clip={false}><IsaacAISection /></ParallaxSection>
-              <Footer />
-            </Suspense>
+            <>
+              <Suspense fallback={homeSectionFallback}>
+                <ParallaxSection id="projects" className={homeSectionFrameFirst} offset={34}><ProjectsSection /></ParallaxSection>
+              </Suspense>
+              {homeSectionTier >= 2 ? (
+                <Suspense fallback={homeSectionFallback}>
+                  <ParallaxSection id="about" className={homeSectionFrame} offset={30}><AboutSection revealEnabled={aboutRevealEnabled} /></ParallaxSection>
+                  <ParallaxSection id="news" className={homeSectionFrame} offset={28}><NewsSection /></ParallaxSection>
+                  <ParallaxSection id="photos" className={homeSectionFrame} offset={34}><PhotoSection /></ParallaxSection>
+                </Suspense>
+              ) : null}
+              {homeSectionTier >= 3 ? (
+                <Suspense fallback={homeSectionFallback}>
+                  <div id="inspiration" className={homeSectionFrame}>
+                    <ParallaxSection offset={28} clip={false}><InspirationBoard /></ParallaxSection>
+                  </div>
+                  <ParallaxSection id="isaac-ai" className={homeSectionFrameLast} offset={18} clip={false}><IsaacAISection /></ParallaxSection>
+                  <Footer />
+                </Suspense>
+              ) : null}
+            </>
           ) : null}
         </main>
       </motion.div>

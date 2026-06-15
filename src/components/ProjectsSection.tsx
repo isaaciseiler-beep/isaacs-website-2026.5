@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import SectionHeading from "@/components/SectionHeading";
-import { preloadImages } from "@/lib/imagePreload";
+import { preloadImages, scheduleImagePreloads } from "@/lib/imagePreload";
 import { featuredProjectIds, projectItems, type ProjectItem } from "@/lib/siteContent";
 
 const GAP = 3;
@@ -168,10 +168,20 @@ const ProjectsSection = () => {
   );
 
   useEffect(() => {
-    void preloadImages(projects.map((project) => project.image), {
+    const isMobileViewport = window.matchMedia("(max-width: 767px)").matches;
+    const criticalCount = isMobileViewport ? 1 : 2;
+    const projectImages = projects.map((project) => project.image);
+
+    void preloadImages(projectImages.slice(0, criticalCount), {
       decode: true,
       fetchPriority: "high",
-      linkPreload: true,
+      linkPreload: !isMobileViewport,
+    });
+    scheduleImagePreloads(projectImages.slice(criticalCount), {
+      batchSize: 2,
+      decode: false,
+      fetchPriority: "low",
+      idleTimeout: isMobileViewport ? 1000 : 600,
     });
   }, [projects]);
 

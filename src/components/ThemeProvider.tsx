@@ -11,7 +11,7 @@ interface ThemeContextType {
 }
 
 const ThemeContext = createContext<ThemeContextType>({
-  theme: "system",
+  theme: "light",
   resolvedTheme: "light",
   setTheme: () => {},
 });
@@ -21,8 +21,8 @@ export const useTheme = () => useContext(ThemeContext);
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [theme, setTheme] = useState<Theme>(() => {
     const storedTheme = window.localStorage.getItem(STORAGE_KEY);
-    if (storedTheme === "dark" || storedTheme === "light" || storedTheme === "system") return storedTheme;
-    return "system";
+    if (storedTheme === "dark" || storedTheme === "light") return storedTheme;
+    return "light";
   });
   const [systemTheme, setSystemTheme] = useState<ResolvedTheme>(() =>
     window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light",

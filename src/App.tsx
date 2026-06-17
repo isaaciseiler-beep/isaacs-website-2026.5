@@ -22,6 +22,24 @@ const queryClient = new QueryClient();
 
 const PAGE_TRANSITION_EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 
+const RouteFallback = () => {
+  const location = useLocation();
+
+  if (location.pathname === "/fulbrightmap") {
+    return (
+      <main className="grid min-h-[100svh] place-items-center bg-neutral-950 p-5 text-center text-white">
+        <div>
+          <div className="mx-auto h-10 w-10 animate-pulse rounded-full bg-white/80 shadow-lg shadow-black/30" />
+          <div className="mt-4 text-lg font-semibold">Preparing the map</div>
+          <p className="mt-1 text-sm leading-5 text-white/65">Loading New Taipei and shared spots.</p>
+        </div>
+      </main>
+    );
+  }
+
+  return null;
+};
+
 const AnimatedRoutes = () => {
   const location = useLocation();
   const prefersReducedMotion = useReducedMotion();
@@ -38,7 +56,7 @@ const AnimatedRoutes = () => {
           ease: PAGE_TRANSITION_EASE,
         }}
       >
-        <Suspense fallback={null}>
+        <Suspense fallback={<RouteFallback />}>
           <Routes location={location}>
             <Route path="/" element={<Index />} />
             <Route path="/photos" element={<PhotosPage />} />

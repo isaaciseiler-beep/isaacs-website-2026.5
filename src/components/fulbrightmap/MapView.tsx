@@ -89,7 +89,7 @@ export default function MapView({
 
     const map = new mapboxgl.Map({
       container: containerRef.current,
-      style: "mapbox://styles/mapbox/standard",
+      style: "mapbox://styles/mapbox/dark-v11",
       center: NEW_TAIPEI_CENTER,
       zoom: 10,
       minZoom: 8,

@@ -87,16 +87,31 @@ export default function MapView({
     const markerEntries = markerEntriesRef.current;
     mapboxgl.accessToken = token;
 
-    const map = new mapboxgl.Map({
-      container: containerRef.current,
-      style: "mapbox://styles/mapbox/dark-v11",
-      center: NEW_TAIPEI_CENTER,
-      zoom: 10,
-      minZoom: 8,
-      maxZoom: 18,
-      maxBounds: NEW_TAIPEI_BOUNDS,
-      attributionControl: false,
-    });
+    if (!mapboxgl.supported()) {
+      setMapError(
+        "The map could not start because this browser does not support WebGL. Try another browser or turn WebGL back on.",
+      );
+      return;
+    }
+
+    let map: mapboxgl.Map;
+
+    try {
+      map = new mapboxgl.Map({
+        container: containerRef.current,
+        style: "mapbox://styles/mapbox/dark-v11",
+        center: NEW_TAIPEI_CENTER,
+        zoom: 10,
+        minZoom: 8,
+        maxZoom: 18,
+        maxBounds: NEW_TAIPEI_BOUNDS,
+        attributionControl: false,
+      });
+    } catch (error) {
+      console.error("Fulbright map failed to initialize", error);
+      setMapError("The map could not start. Refresh once or try another browser.");
+      return;
+    }
 
     mapRef.current = map;
     map.addControl(new mapboxgl.NavigationControl({ visualizePitch: true }), "top-left");

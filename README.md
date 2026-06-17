@@ -10,7 +10,6 @@ Personal portfolio for [Isaac Seiler](https://isaacseiler.xyz), built to present
 - Project case studies covering AI governance, local journalism, public-sector research, communications strategy, and reporting.
 - A grounded AI assistant that answers from local knowledge files in `knowledge/`.
 - Photo and map routes for visual work and location-based storytelling.
-- An unlinked Fulbright map for sharing favorite spots in New Taipei with optional Supabase persistence.
 - SEO assets, sitemap files, Open Graph previews, `llms.txt`, and structured metadata.
 
 ## Tech Stack
@@ -66,33 +65,6 @@ The assistant uses Vercel Serverless Functions in `api/chat.ts` and reads ground
 - `How can I contact Isaac?`
 - `Tell me about the Fulbright educator lab.`
 
-### Fulbright Map
-
-The unlinked map page lives at `/fulbrightmap`. It shares favorite spots in New Taipei with Mapbox markers, image uploads, and optional Supabase persistence.
-
-Required for Mapbox:
-
-```bash
-VITE_MAPBOX_ACCESS_TOKEN=pk_your_token_here
-```
-
-Supported fallback names:
-
-```bash
-NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=pk_your_token_here
-VITE_MAPBOX_TOKEN=pk_your_token_here
-MAPBOX_ACCESS_TOKEN=pk_your_token_here
-```
-
-Required for shared pins:
-
-```bash
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your_anon_key
-```
-
-Without Supabase values, the map runs in local browser mode and stores pins in `localStorage`. The database and storage setup lives in `supabase/fulbrightmap-schema.sql`.
-
 ## Scripts
 
 ```bash
@@ -112,4 +84,3 @@ After deploying, verify:
 - The homepage loads quickly on mobile and desktop.
 - Project pages render their case-study content and preview assets.
 - The chat answers from public knowledge and redirects private or sensitive questions.
-- `/fulbrightmap` shows either collaborative Supabase mode or explicit local browser mode.

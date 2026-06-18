@@ -17,6 +17,12 @@ const ACCESS_CODE = "9999";
 const AUTH_STORAGE_KEY = "strike-tracker:authorized";
 const LOCAL_STATUS = "Device cache";
 const LIVE_STATUS = "Online";
+const POLLING_STATUS = "Online polling";
+
+function getStatusError(error: unknown) {
+  if (error instanceof Error && error.message) return error.message;
+  return "Save failed";
+}
 
 const StrikeTrackerPage = () => {
   const [code, setCode] = useState("");
@@ -82,13 +88,24 @@ const StrikeTrackerPage = () => {
         setSyncMessage("Live sync online");
       },
       onError: () => {
-        setStorageMode("local");
-        setSyncMessage(LOCAL_STATUS);
+        setSyncMessage(POLLING_STATUS);
       },
     });
 
+    const pollingInterval = window.setInterval(() => {
+      void getStrikeTrackerCounts().then(({ counts: nextCounts, mode }) => {
+        if (!active || mode !== "live") return;
+        setCounts(nextCounts);
+        setStorageMode("live");
+        setSyncMessage((currentMessage) =>
+          currentMessage === "Live sync online" ? currentMessage : POLLING_STATUS,
+        );
+      });
+    }, 2500);
+
     return () => {
       active = false;
+      window.clearInterval(pollingInterval);
       unsubscribe();
     };
   }, [authorized]);
@@ -116,9 +133,8 @@ const StrikeTrackerPage = () => {
       setCounts(nextCounts);
       setStorageMode(mode);
       setSyncMessage(mode === "live" ? "Live sync online" : "Local mode");
-    } catch {
-      setStorageMode("local");
-      setSyncMessage(LOCAL_STATUS);
+    } catch (saveError) {
+      setSyncMessage(`Save failed: ${getStatusError(saveError)}`);
     } finally {
       setIsSaving(false);
     }
@@ -133,10 +149,8 @@ const StrikeTrackerPage = () => {
       setCounts(nextCounts);
       setStorageMode(mode);
       setSyncMessage(mode === "live" ? "Live sync online" : "Local mode");
-    } catch {
-      setCounts(initialStrikeTrackerCounts);
-      setStorageMode("local");
-      setSyncMessage(LOCAL_STATUS);
+    } catch (resetError) {
+      setSyncMessage(`Reset failed: ${getStatusError(resetError)}`);
     } finally {
       setIsSaving(false);
     }

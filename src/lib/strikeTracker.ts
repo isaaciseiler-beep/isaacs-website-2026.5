@@ -82,6 +82,14 @@ function readLocalFallback() {
   return { counts: readLocalStrikeTrackerCounts(), mode: "local" as const };
 }
 
+function getSupabaseErrorMessage(error: unknown) {
+  if (error instanceof Error) return error.message;
+  if (error && typeof error === "object" && "message" in error) {
+    return String((error as { message: unknown }).message);
+  }
+  return "Supabase request failed";
+}
+
 export async function getStrikeTrackerCounts(): Promise<{
   counts: StrikeTrackerCounts;
   mode: StrikeTrackerMode;
@@ -123,20 +131,14 @@ export async function incrementStrikeCount(name: StrikeTrackerName) {
     });
 
     if (error) {
-      const current = readLocalStrikeTrackerCounts();
-      const next = { ...current, [name]: current[name] + 1 };
-      writeLocalStrikeTrackerCounts(next);
-      return { counts: next, mode: "local" as const };
+      throw new Error(getSupabaseErrorMessage(error));
     }
 
     const counts = normalizeCounts(data ?? []);
     writeLocalStrikeTrackerCounts(counts);
     return { counts, mode: "live" as const };
-  } catch {
-    const current = readLocalStrikeTrackerCounts();
-    const next = { ...current, [name]: current[name] + 1 };
-    writeLocalStrikeTrackerCounts(next);
-    return { counts: next, mode: "local" as const };
+  } catch (error) {
+    throw new Error(getSupabaseErrorMessage(error));
   }
 }
 
@@ -152,16 +154,14 @@ export async function resetStrikeCounts() {
     const { data, error } = await supabase.rpc("reset_strike_counts");
 
     if (error) {
-      writeLocalStrikeTrackerCounts(initialStrikeTrackerCounts);
-      return { counts: initialStrikeTrackerCounts, mode: "local" as const };
+      throw new Error(getSupabaseErrorMessage(error));
     }
 
     const counts = normalizeCounts(data ?? []);
     writeLocalStrikeTrackerCounts(counts);
     return { counts, mode: "live" as const };
-  } catch {
-    writeLocalStrikeTrackerCounts(initialStrikeTrackerCounts);
-    return { counts: initialStrikeTrackerCounts, mode: "local" as const };
+  } catch (error) {
+    throw new Error(getSupabaseErrorMessage(error));
   }
 }
 

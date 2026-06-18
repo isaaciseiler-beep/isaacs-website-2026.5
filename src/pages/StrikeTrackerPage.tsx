@@ -1,42 +1,27 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { Plus, RotateCcw } from "lucide-react";
+import {
+  getStrikeTrackerCounts,
+  incrementStrikeCount,
+  initialStrikeTrackerCounts,
+  readLocalStrikeTrackerCounts,
+  resetStrikeCounts,
+  strikeTrackerNames,
+  subscribeToStrikeTrackerCounts,
+  type StrikeTrackerCounts,
+  type StrikeTrackerMode,
+  type StrikeTrackerName,
+} from "@/lib/strikeTracker";
 
 const ACCESS_CODE = "9999";
 const AUTH_STORAGE_KEY = "strike-tracker:authorized";
-const COUNTS_STORAGE_KEY = "strike-tracker:counts";
-const names = ["Ricky", "Perry", "John", "Yasser", "Isaac"] as const;
-
-type PersonName = (typeof names)[number];
-type Counts = Record<PersonName, number>;
-
-const initialCounts = names.reduce(
-  (counts, name) => ({
-    ...counts,
-    [name]: 0,
-  }),
-  {} as Counts,
-);
-
-const readStoredCounts = () => {
-  if (typeof window === "undefined") return initialCounts;
-
-  try {
-    const parsed = JSON.parse(window.localStorage.getItem(COUNTS_STORAGE_KEY) ?? "{}") as Partial<Counts>;
-    return names.reduce(
-      (counts, name) => ({
-        ...counts,
-        [name]: Number.isFinite(parsed[name]) ? Number(parsed[name]) : 0,
-      }),
-      {} as Counts,
-    );
-  } catch {
-    return initialCounts;
-  }
-};
 
 const StrikeTrackerPage = () => {
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
+  const [syncMessage, setSyncMessage] = useState("");
+  const [storageMode, setStorageMode] = useState<StrikeTrackerMode>("local");
+  const [isSaving, setIsSaving] = useState(false);
   const [authorized, setAuthorized] = useState(() => {
     if (typeof window === "undefined") return false;
     return (
@@ -44,9 +29,21 @@ const StrikeTrackerPage = () => {
       window.sessionStorage.getItem(AUTH_STORAGE_KEY) === "true"
     );
   });
-  const [counts, setCounts] = useState<Counts>(readStoredCounts);
+  const [counts, setCounts] = useState<StrikeTrackerCounts>(
+    readLocalStrikeTrackerCounts,
+  );
 
-  const total = useMemo(() => names.reduce((sum, name) => sum + counts[name], 0), [counts]);
+  const total = useMemo(
+    () => strikeTrackerNames.reduce((sum, name) => sum + counts[name], 0),
+    [counts],
+  );
+  const statusPrefix = storageMode === "live" ? "Live sync" : "Local mode";
+  const statusDetail =
+    syncMessage && syncMessage !== "Local mode" && syncMessage !== "Live sync online"
+      ? syncMessage
+      : storageMode === "live"
+        ? "Online"
+        : "Device cache";
 
   useEffect(() => {
     document.title = "Strike Tracker";
@@ -55,8 +52,44 @@ const StrikeTrackerPage = () => {
   useEffect(() => {
     if (!authorized || typeof window === "undefined") return;
     window.localStorage.setItem(AUTH_STORAGE_KEY, "true");
-    window.localStorage.setItem(COUNTS_STORAGE_KEY, JSON.stringify(counts));
-  }, [authorized, counts]);
+  }, [authorized]);
+
+  useEffect(() => {
+    if (!authorized) return;
+
+    let active = true;
+    setSyncMessage("Loading shared data...");
+
+    void getStrikeTrackerCounts()
+      .then(({ counts: nextCounts, mode }) => {
+        if (!active) return;
+        setCounts(nextCounts);
+        setStorageMode(mode);
+        setSyncMessage(mode === "live" ? "Live sync online" : "Local mode");
+      })
+      .catch((error: Error) => {
+        if (!active) return;
+        setStorageMode("local");
+        setSyncMessage(error.message);
+      });
+
+    const unsubscribe = subscribeToStrikeTrackerCounts({
+      onUpdate: (nextCounts) => {
+        setCounts(nextCounts);
+        setStorageMode("live");
+        setSyncMessage("Live sync online");
+      },
+      onError: (message) => {
+        setStorageMode("local");
+        setSyncMessage(message);
+      },
+    });
+
+    return () => {
+      active = false;
+      unsubscribe();
+    };
+  }, [authorized]);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -72,15 +105,37 @@ const StrikeTrackerPage = () => {
     setCode("");
   };
 
-  const addStrike = (name: PersonName) => {
-    setCounts((current) => ({
-      ...current,
-      [name]: current[name] + 1,
-    }));
+  const addStrike = async (name: StrikeTrackerName) => {
+    setIsSaving(true);
+    setSyncMessage(storageMode === "live" ? "Saving..." : "Saving locally...");
+
+    try {
+      const { counts: nextCounts, mode } = await incrementStrikeCount(name);
+      setCounts(nextCounts);
+      setStorageMode(mode);
+      setSyncMessage(mode === "live" ? "Live sync online" : "Local mode");
+    } catch (error) {
+      setSyncMessage(error instanceof Error ? error.message : "Could not save strike.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const resetCounts = () => {
-    setCounts(initialCounts);
+  const handleResetCounts = async () => {
+    setIsSaving(true);
+    setSyncMessage(storageMode === "live" ? "Resetting..." : "Resetting locally...");
+
+    try {
+      const { counts: nextCounts, mode } = await resetStrikeCounts();
+      setCounts(nextCounts);
+      setStorageMode(mode);
+      setSyncMessage(mode === "live" ? "Live sync online" : "Local mode");
+    } catch (error) {
+      setCounts(initialStrikeTrackerCounts);
+      setSyncMessage(error instanceof Error ? error.message : "Could not reset counts.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -156,15 +211,16 @@ const StrikeTrackerPage = () => {
               <button
                 type="button"
                 aria-label="Reset all counts"
-                onClick={resetCounts}
-                className="grid h-14 w-14 place-items-center border-2 border-b-[#222] border-l-white border-r-[#222] border-t-white bg-[#c6c6c6] text-[#101010] shadow-[inset_-2px_-2px_0_#777,inset_2px_2px_0_#fff] active:border-b-white active:border-l-[#222] active:border-r-white active:border-t-[#222]"
+                onClick={handleResetCounts}
+                disabled={isSaving}
+                className="grid h-14 w-14 place-items-center border-2 border-b-[#222] border-l-white border-r-[#222] border-t-white bg-[#c6c6c6] text-[#101010] shadow-[inset_-2px_-2px_0_#777,inset_2px_2px_0_#fff] active:border-b-white active:border-l-[#222] active:border-r-white active:border-t-[#222] disabled:opacity-60"
               >
                 <RotateCcw className="h-6 w-6" strokeWidth={2.5} />
               </button>
             </div>
 
             <div className="space-y-2">
-              {names.map((name) => (
+              {strikeTrackerNames.map((name) => (
                 <div
                   key={name}
                   className="grid min-h-[76px] grid-cols-[1fr_72px_62px] items-center gap-2 border-2 border-b-[#4a4a4a] border-l-white border-r-[#4a4a4a] border-t-white bg-[#c6c6c6] p-2 shadow-[inset_-2px_-2px_0_#8a8a8a,inset_2px_2px_0_#f8f8f8]"
@@ -182,7 +238,8 @@ const StrikeTrackerPage = () => {
                     type="button"
                     aria-label={`Add strike for ${name}`}
                     onClick={() => addStrike(name)}
-                    className="grid h-14 w-14 place-items-center border-2 border-b-[#250018] border-l-[#ffb2e4] border-r-[#250018] border-t-[#ffb2e4] bg-[#ff2ea6] text-white shadow-[inset_-2px_-2px_0_#8c005a,inset_2px_2px_0_#ff9bdd] active:border-b-[#ffb2e4] active:border-l-[#250018] active:border-r-[#ffb2e4] active:border-t-[#250018]"
+                    disabled={isSaving}
+                    className="grid h-14 w-14 place-items-center border-2 border-b-[#250018] border-l-[#ffb2e4] border-r-[#250018] border-t-[#ffb2e4] bg-[#ff2ea6] text-white shadow-[inset_-2px_-2px_0_#8c005a,inset_2px_2px_0_#ff9bdd] active:border-b-[#ffb2e4] active:border-l-[#250018] active:border-r-[#ffb2e4] active:border-t-[#250018] disabled:opacity-60"
                   >
                     <Plus className="h-8 w-8" strokeWidth={3} />
                   </button>
@@ -191,8 +248,8 @@ const StrikeTrackerPage = () => {
             </div>
 
             <div className="mt-auto pt-2">
-              <div className="border-2 border-b-white border-l-[#3f3f3f] border-r-white border-t-[#3f3f3f] bg-[#f7f129] px-2 py-1 text-[10px] font-black uppercase tracking-[0.12em]">
-                System armed // 1996 mode
+              <div className="truncate border-2 border-b-white border-l-[#3f3f3f] border-r-white border-t-[#3f3f3f] bg-[#f7f129] px-2 py-1 text-[10px] font-black uppercase tracking-[0.12em]">
+                {statusPrefix} // {statusDetail}
               </div>
             </div>
           </section>

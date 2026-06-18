@@ -2,10 +2,12 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
-import mapboxgl, {
-  type LngLatLike,
-  type MapMouseEvent,
-  type PaddingOptions,
+import type {
+  LngLatLike,
+  Map as MapboxMap,
+  MapMouseEvent,
+  Marker as MapboxMarker,
+  PaddingOptions,
 } from "mapbox-gl";
 
 import { canDeletePin } from "@/lib/fulbrightmap/storage";
@@ -18,10 +20,31 @@ const NEW_TAIPEI_BOUNDS: [[number, number], [number, number]] = [
   [122.15, 25.42],
 ];
 
+type MapboxModule = typeof import("mapbox-gl");
+type MapboxGL = MapboxModule["default"];
+
 type MarkerEntry = {
-  marker: mapboxgl.Marker;
+  marker: MapboxMarker;
   root: HTMLDivElement;
   button: HTMLButtonElement;
+};
+
+let mapboxPromise: Promise<MapboxModule> | null = null;
+
+const loadMapbox = () => {
+  if (!mapboxPromise) {
+    mapboxPromise = Promise.all([
+      import("mapbox-gl"),
+      import("mapbox-gl/dist/mapbox-gl.css"),
+    ])
+      .then(([mapboxModule]) => mapboxModule)
+      .catch((error) => {
+        mapboxPromise = null;
+        throw error;
+      });
+  }
+
+  return mapboxPromise;
 };
 
 function stopMarkerEvent(event: Event) {
@@ -72,7 +95,8 @@ export default function MapView({
   onDeletePin: (pinId: string) => void;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<mapboxgl.Map | null>(null);
+  const mapRef = useRef<MapboxMap | null>(null);
+  const mapboxRef = useRef<MapboxGL | null>(null);
   const suppressMapClickRef = useRef(false);
   const markerEntriesRef = useRef<Map<string, MarkerEntry>>(new Map());
   const pinsRef = useRef<Pin[]>(pins);
@@ -84,56 +108,99 @@ export default function MapView({
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
+    let cancelled = false;
+    let loaded = false;
     const markerEntries = markerEntriesRef.current;
-    mapboxgl.accessToken = token;
 
-    if (!mapboxgl.supported()) {
-      setMapError(
-        "The map could not start because this browser does not support WebGL. Try another browser or turn WebGL back on.",
-      );
-      return;
-    }
+    const initializeMap = async () => {
+      try {
+        const mapboxModule = await loadMapbox();
+        if (cancelled || !containerRef.current || mapRef.current) return;
 
-    let map: mapboxgl.Map;
+        const mapbox = mapboxModule.default;
+        mapboxRef.current = mapbox;
+        mapbox.accessToken = token;
 
-    try {
-      map = new mapboxgl.Map({
-        container: containerRef.current,
-        style: "mapbox://styles/mapbox/dark-v11",
-        center: NEW_TAIPEI_CENTER,
-        zoom: 10,
-        minZoom: 8,
-        maxZoom: 18,
-        maxBounds: NEW_TAIPEI_BOUNDS,
-        attributionControl: false,
-      });
-    } catch (error) {
-      console.error("Fulbright map failed to initialize", error);
-      setMapError("The map could not start. Refresh once or try another browser.");
-      return;
-    }
+        if (!mapbox.supported()) {
+          setMapError(
+            "The map could not start because this browser does not support WebGL. Try another browser or turn WebGL back on.",
+          );
+          return;
+        }
 
-    mapRef.current = map;
-    map.addControl(new mapboxgl.NavigationControl({ visualizePitch: true }), "top-left");
-    map.addControl(new mapboxgl.AttributionControl({ compact: true }), "bottom-left");
+        let map: MapboxMap;
 
-    const handleLoad = () => {
-      setMapReady(true);
+        try {
+          map = new mapbox.Map({
+            container: containerRef.current,
+            style: "mapbox://styles/mapbox/dark-v11",
+            center: NEW_TAIPEI_CENTER,
+            zoom: 10,
+            minZoom: 8,
+            maxZoom: 18,
+            maxBounds: NEW_TAIPEI_BOUNDS,
+            attributionControl: false,
+          });
+        } catch (error) {
+          console.error("Fulbright map failed to initialize", error);
+          setMapError("The map could not start. Refresh once or try another browser.");
+          return;
+        }
+
+        if (cancelled) {
+          map.remove();
+          return;
+        }
+
+        mapRef.current = map;
+        map.addControl(new mapbox.NavigationControl({ visualizePitch: true }), "top-left");
+        map.addControl(new mapbox.AttributionControl({ compact: true }), "bottom-left");
+
+        const handleLoad = () => {
+          loaded = true;
+          setMapError(null);
+          setMapReady(true);
+        };
+        const handleError = (event: { error?: Error }) => {
+          console.error("Fulbright map runtime error", event.error ?? event);
+          if (loaded) return;
+
+          const message = event.error?.message ?? "";
+          const tokenRejected =
+            message.includes("401") ||
+            message.includes("403") ||
+            message.toLowerCase().includes("unauthorized");
+
+          setMapError(
+            tokenRejected
+              ? "The map could not load because the Mapbox token was rejected."
+              : "The map could not load. Refresh once or check that the browser is not blocking Mapbox.",
+          );
+        };
+
+        map.on("load", handleLoad);
+        map.on("error", handleError);
+      } catch (error) {
+        console.error("Fulbright map library failed to load", error);
+        if (!cancelled) {
+          setMapError(
+            "The map library could not load. Refresh once or check that the browser is not blocking Mapbox.",
+          );
+        }
+      }
     };
-    const handleError = () => {
-      setMapError("The map could not load. Check that your Mapbox token is valid.");
-    };
 
-    map.on("load", handleLoad);
-    map.on("error", handleError);
+    void initializeMap();
 
     return () => {
+      cancelled = true;
       markerEntries.forEach(({ marker }) => {
         marker.remove();
       });
       markerEntries.clear();
-      map.remove();
+      mapRef.current?.remove();
       mapRef.current = null;
+      mapboxRef.current = null;
     };
   }, [token]);
 
@@ -218,7 +285,8 @@ export default function MapView({
 
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !mapReady) return;
+    const mapbox = mapboxRef.current;
+    if (!map || !mapbox || !mapReady) return;
 
     const entries = markerEntriesRef.current;
     const nextPinIds = new Set(pins.map((pin) => pin.id));
@@ -275,7 +343,7 @@ export default function MapView({
 
       root.appendChild(button);
 
-      const marker = new mapboxgl.Marker({
+      const marker = new mapbox.Marker({
         element: root,
         anchor: "center",
         clickTolerance: 8,

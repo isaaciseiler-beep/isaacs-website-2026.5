@@ -2,7 +2,7 @@ import { AlertCircle, CheckCircle2, Info, X } from "lucide-react";
 
 export type ToastMessage = {
   id: number;
-  tone: "success" | "error" | "info";
+  tone: "success" | "error" | "info" | "warning";
   title: string;
   detail?: string;
 };
@@ -11,12 +11,14 @@ const ICONS = {
   success: CheckCircle2,
   error: AlertCircle,
   info: Info,
+  warning: AlertCircle,
 };
 
 const TONES = {
   success: "border-white/20 bg-neutral-950/80 text-white",
   error: "border-white/20 bg-neutral-950/80 text-white",
   info: "border-white/20 bg-neutral-950/75 text-white",
+  warning: "border-white/20 bg-neutral-950/80 text-white",
 };
 
 export default function Toast({
@@ -28,7 +30,8 @@ export default function Toast({
 }) {
   if (!toast) return null;
 
-  const Icon = ICONS[toast.tone];
+  const Icon = ICONS[toast.tone] ?? Info;
+  const toneClass = TONES[toast.tone] ?? TONES.info;
 
   return (
     <div className="pointer-events-none fixed inset-x-4 top-4 z-[80] flex justify-center sm:top-6">
@@ -36,7 +39,7 @@ export default function Toast({
         role="status"
         className={[
           "pointer-events-auto flex w-full max-w-md items-start gap-3 rounded-2xl border px-4 py-3 shadow-2xl backdrop-blur-xl",
-          TONES[toast.tone],
+          toneClass,
         ].join(" ")}
       >
         <Icon aria-hidden="true" className="mt-0.5 h-5 w-5 shrink-0" />

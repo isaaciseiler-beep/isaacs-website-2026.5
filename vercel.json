@@ -83,6 +83,10 @@
     {
       "source": "/fulbrightmap",
       "destination": "/index.html"
+    },
+    {
+      "source": "/strike-tracker",
+      "destination": "/index.html"
     }
   ],
   "functions": {

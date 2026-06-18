@@ -78,6 +78,10 @@ export function writeLocalStrikeTrackerCounts(counts: StrikeTrackerCounts) {
   window.localStorage.setItem(LOCAL_COUNTS_KEY, JSON.stringify(counts));
 }
 
+function readLocalFallback() {
+  return { counts: readLocalStrikeTrackerCounts(), mode: "local" as const };
+}
+
 export async function getStrikeTrackerCounts(): Promise<{
   counts: StrikeTrackerCounts;
   mode: StrikeTrackerMode;
@@ -87,39 +91,53 @@ export async function getStrikeTrackerCounts(): Promise<{
     return { counts: readLocalStrikeTrackerCounts(), mode: "local" };
   }
 
-  const { data, error } = await supabase
-    .from(SUPABASE_TABLE)
-    .select("name, count")
-    .order("name", { ascending: true });
+  try {
+    const { data, error } = await supabase
+      .from(SUPABASE_TABLE)
+      .select("name, count")
+      .order("name", { ascending: true });
 
-  if (error) throw new Error(error.message);
+    if (error) return readLocalFallback();
 
-  const counts = normalizeCounts(data ?? []);
-  writeLocalStrikeTrackerCounts(counts);
-  return { counts, mode: "live" };
+    const counts = normalizeCounts(data ?? []);
+    writeLocalStrikeTrackerCounts(counts);
+    return { counts, mode: "live" };
+  } catch {
+    return readLocalFallback();
+  }
 }
 
 export async function incrementStrikeCount(name: StrikeTrackerName) {
   const supabase = getSupabaseClient();
 
   if (!supabase) {
-    const next = {
-      ...readLocalStrikeTrackerCounts(),
-      [name]: readLocalStrikeTrackerCounts()[name] + 1,
-    };
+    const current = readLocalStrikeTrackerCounts();
+    const next = { ...current, [name]: current[name] + 1 };
     writeLocalStrikeTrackerCounts(next);
     return { counts: next, mode: "local" as const };
   }
 
-  const { data, error } = await supabase.rpc("increment_strike_count", {
-    strike_name: name,
-  });
+  try {
+    const { data, error } = await supabase.rpc("increment_strike_count", {
+      strike_name: name,
+    });
 
-  if (error) throw new Error(error.message);
+    if (error) {
+      const current = readLocalStrikeTrackerCounts();
+      const next = { ...current, [name]: current[name] + 1 };
+      writeLocalStrikeTrackerCounts(next);
+      return { counts: next, mode: "local" as const };
+    }
 
-  const counts = normalizeCounts(data ?? []);
-  writeLocalStrikeTrackerCounts(counts);
-  return { counts, mode: "live" as const };
+    const counts = normalizeCounts(data ?? []);
+    writeLocalStrikeTrackerCounts(counts);
+    return { counts, mode: "live" as const };
+  } catch {
+    const current = readLocalStrikeTrackerCounts();
+    const next = { ...current, [name]: current[name] + 1 };
+    writeLocalStrikeTrackerCounts(next);
+    return { counts: next, mode: "local" as const };
+  }
 }
 
 export async function resetStrikeCounts() {
@@ -130,13 +148,21 @@ export async function resetStrikeCounts() {
     return { counts: initialStrikeTrackerCounts, mode: "local" as const };
   }
 
-  const { data, error } = await supabase.rpc("reset_strike_counts");
+  try {
+    const { data, error } = await supabase.rpc("reset_strike_counts");
 
-  if (error) throw new Error(error.message);
+    if (error) {
+      writeLocalStrikeTrackerCounts(initialStrikeTrackerCounts);
+      return { counts: initialStrikeTrackerCounts, mode: "local" as const };
+    }
 
-  const counts = normalizeCounts(data ?? []);
-  writeLocalStrikeTrackerCounts(counts);
-  return { counts, mode: "live" as const };
+    const counts = normalizeCounts(data ?? []);
+    writeLocalStrikeTrackerCounts(counts);
+    return { counts, mode: "live" as const };
+  } catch {
+    writeLocalStrikeTrackerCounts(initialStrikeTrackerCounts);
+    return { counts: initialStrikeTrackerCounts, mode: "local" as const };
+  }
 }
 
 export function subscribeToStrikeTrackerCounts({

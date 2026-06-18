@@ -15,6 +15,8 @@ import {
 
 const ACCESS_CODE = "9999";
 const AUTH_STORAGE_KEY = "strike-tracker:authorized";
+const LOCAL_STATUS = "Device cache";
+const LIVE_STATUS = "Online";
 
 const StrikeTrackerPage = () => {
   const [code, setCode] = useState("");
@@ -42,8 +44,8 @@ const StrikeTrackerPage = () => {
     syncMessage && syncMessage !== "Local mode" && syncMessage !== "Live sync online"
       ? syncMessage
       : storageMode === "live"
-        ? "Online"
-        : "Device cache";
+        ? LIVE_STATUS
+        : LOCAL_STATUS;
 
   useEffect(() => {
     document.title = "Strike Tracker";
@@ -67,10 +69,10 @@ const StrikeTrackerPage = () => {
         setStorageMode(mode);
         setSyncMessage(mode === "live" ? "Live sync online" : "Local mode");
       })
-      .catch((error: Error) => {
+      .catch(() => {
         if (!active) return;
         setStorageMode("local");
-        setSyncMessage(error.message);
+        setSyncMessage(LOCAL_STATUS);
       });
 
     const unsubscribe = subscribeToStrikeTrackerCounts({
@@ -79,9 +81,9 @@ const StrikeTrackerPage = () => {
         setStorageMode("live");
         setSyncMessage("Live sync online");
       },
-      onError: (message) => {
+      onError: () => {
         setStorageMode("local");
-        setSyncMessage(message);
+        setSyncMessage(LOCAL_STATUS);
       },
     });
 
@@ -114,8 +116,9 @@ const StrikeTrackerPage = () => {
       setCounts(nextCounts);
       setStorageMode(mode);
       setSyncMessage(mode === "live" ? "Live sync online" : "Local mode");
-    } catch (error) {
-      setSyncMessage(error instanceof Error ? error.message : "Could not save strike.");
+    } catch {
+      setStorageMode("local");
+      setSyncMessage(LOCAL_STATUS);
     } finally {
       setIsSaving(false);
     }
@@ -130,9 +133,10 @@ const StrikeTrackerPage = () => {
       setCounts(nextCounts);
       setStorageMode(mode);
       setSyncMessage(mode === "live" ? "Live sync online" : "Local mode");
-    } catch (error) {
+    } catch {
       setCounts(initialStrikeTrackerCounts);
-      setSyncMessage(error instanceof Error ? error.message : "Could not reset counts.");
+      setStorageMode("local");
+      setSyncMessage(LOCAL_STATUS);
     } finally {
       setIsSaving(false);
     }

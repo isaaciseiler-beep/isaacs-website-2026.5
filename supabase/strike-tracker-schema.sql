@@ -48,6 +48,7 @@ language plpgsql
 security definer
 set search_path = public
 as $$
+#variable_conflict use_column
 begin
   if strike_name not in ('Ricky', 'Perry', 'John', 'Yasser', 'Isaac') then
     raise exception 'Unknown Strike Tracker name: %', strike_name;
@@ -55,7 +56,7 @@ begin
 
   insert into public.strike_tracker_counts as counts (name, count, updated_at)
   values (strike_name, 1, now())
-  on conflict (name)
+  on conflict on constraint strike_tracker_counts_pkey
   do update set
     count = counts.count + 1,
     updated_at = now();
@@ -73,6 +74,7 @@ language plpgsql
 security definer
 set search_path = public
 as $$
+#variable_conflict use_column
 begin
   update public.strike_tracker_counts
   set count = 0,

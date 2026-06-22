@@ -22,7 +22,7 @@ Year: 2025
 Type: PROJECT
 Summary: Isaac Seiler founded and led the Fulbright Taiwan ChatGPT Lab, an OpenAI-supported educator lab focused on practical, responsible ChatGPT use cases in education.
 Keywords: Fulbright Taiwan Educator Lab with OpenAI Support, PROJECT, 2025, A six-session educator lab with OpenAI/ChatGPT for Education support, focused on practical and responsible uses of ChatGPT in education., ChatGPT Lab, OpenAI for Education, ChatGPT for Education, Fulbright Taiwan, Fulbright ChatGPT Lab, OpenAI education newsletter, AI in education, teacher AI training, 100 Chats Project, OpenAI, ChatGPT, Fulbright Taiwan, AI education, teacher training
-Primary image: https://isaacseiler.xyz/seo/projects/fulbright-focus-group-sponsored-by-openai.jpg
+Primary image: https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev/chatlab.jpeg
 Links:
   - Substack Post: https://edunewsletter.openai.com/p/top-chats-from-the-fulbright-taiwan
   - Fulbright Taiwan ChatGPT Lab Notion Page: https://notion.so/ChatGPT-Lab-x-Fulbright-Taiwan-261aaef174d680579138e8c1c658ab41
@@ -35,7 +35,7 @@ Year: 2025
 Type: RESEARCH
 Summary: A public benchmark by Isaac Seiler measuring generative AI adoption, training, governance, pilots, transparency, and preparedness across U.S. states and territories.
 Keywords: Artificial Intelligence in State Government Index, RESEARCH, 2025, A public-information benchmark measuring how state and territory governments are actually responding to generative AI., AI state government index, generative AI government, state AI governance, Council of State Governments, GenAI preparedness, public sector AI, AI policy benchmark, generative AI, state government, AI governance, public policy
-Primary image: https://isaacseiler.xyz/seo/projects/artificial-intelligence-in-state-government-index.jpg
+Primary image: https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev/aiindex.png
 Links:
   - The GenAI Benchmark: https://docs.google.com/spreadsheets/d/1BhOYYJF75hnKdcfi5IejWD8tHovsdnay/edit?usp=sharing&ouid=107923489516143255873&rtpof=true&sd=true
   - Study Methodology and Background: https://docs.google.com/document/d/1jvnT2yJo47LchswQmj4DRZGEHYOoMGZB/edit
@@ -61,7 +61,7 @@ Year: 2025
 Type: RESEARCH
 Summary: Isaac Seiler's honors thesis analyzed AI, digital platforms, local journalism, democratic accountability, media policy, and newsroom labor through qualitative interviews.
 Keywords: AI Platforms and Journalism Research, RESEARCH, 2025, A qualitative honors thesis on the structural decline of local journalism in Australia and its implications for democracy, labor, and media policy., AI journalism research, AI platforms journalism, local journalism thesis, digital platforms, media policy, Australia journalism, qualitative interviews, AI, journalism, digital platforms, local news, media policy
-Primary image: https://isaacseiler.xyz/seo/projects/senior-thesis-local-journalism.jpg
+Primary image: https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev/ainews.png
 Links:
   - Final Thesis Draft: https://drive.google.com/file/d/1Z6-RR1Zw7z2RieJwVHdk0yOtycRIN1ia/view?usp=sharing
 
@@ -72,7 +72,7 @@ Year: 2025
 Type: WORK
 Summary: Isaac Seiler helped stand up a new congressional office and produced early systems, staffing, metrics, communications, and first-100-day reporting.
 Keywords: Congressional Office Setup and 100 Day Report, WORK, 2025, A report capturing the systems, staffing, and benchmarks used to stand up a brand-new congressional office from zero., congressional office setup, 100 day report, Capitol Hill communications, House office operations, public service communications, Congress, communications, public service, operations
-Primary image: https://isaacseiler.xyz/seo/projects/congressional-office-setup-100-day-report.jpg
+Primary image: https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev/caphill.png
 Links:
   - 100 Day Report Executive Summary: https://drive.google.com/file/d/1gdSr7RjjmidqJkLTWkyIbesVPIkECizn/view
 
@@ -83,7 +83,7 @@ Year: 2024
 Type: RESEARCH
 Summary: A GIS and quantitative analysis project by Isaac Seiler examining EV charging infrastructure access, charger density, income, race, and transportation equity.
 Keywords: Electric Vehicle Charging Access Analysis, RESEARCH, 2024, A GIS and quantitative analysis project examining EV infrastructure access and where structural charger gaps remain., EV charging access, electric vehicle infrastructure, GIS EV charging, transportation equity, charger density, spatial analysis, electric vehicles, GIS, transportation infrastructure, equity analysis
-Primary image: https://isaacseiler.xyz/seo/projects/electric-vehicle-access-analysis.jpg
+Primary image: https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev/charging.png
 Links:
   - Initial Report: https://drive.google.com/file/d/11lfGLY0n4XqNRCgFE3Yk_ph7zb2OlH3d/view?usp=sharing
   - Presentation Poster with Spatial Analysis: https://drive.google.com/file/d/1a8RYeorbJRYYcGRrFKe6x2rKmQMft95j/view?usp=sharing
@@ -95,7 +95,7 @@ Year: 2025
 Type: WORK
 Summary: A full rebrand and strategic redirect for Boehringer Cares, spanning narrative, UX, visual identity, and internal communications.
 Keywords: Boehringer Cares Foundation Rebrand and Strategy Shift, WORK, 2025, A full rebrand and strategic redirect for Boehringer Cares, spanning narrative, UX, visual identity, and internal communications., Boehringer Cares Foundation, foundation rebrand, CSR communications, employee volunteering, communications strategy, brand strategy, foundation communications, CSR, UX
-Primary image: https://isaacseiler.xyz/seo/projects/boehringer-cares-foundation-rebrand-strategy-shift.jpg
+Primary image: https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev/bicares.png
 Links:
   - Revamped Boehringer Cares Website: https://www.boehringer-ingelheim.com/us/boehringer-ingelheim-cares-foundation
 
@@ -106,7 +106,7 @@ Year: 2024
 Type: WORK
 Summary: An independent consultancy effort supporting local candidates through campaign websites, digital strategy, and rapid-response communications.
 Keywords: Communications Consultancy and Supporting Local Candidates, WORK, 2024, An independent consultancy effort supporting local candidates through campaign websites, digital strategy, and rapid-response communications., campaign communications, local candidate website, digital strategy, rapid response communications, Tustin school board campaign, campaigns, communications, local elections, digital strategy
-Primary image: https://isaacseiler.xyz/seo/projects/communications-consultancy-supporting-local-candidates.jpg
+Primary image: https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev/politicalconsult.png
 Links:
   - Allyson's Campaign Website: https://www.allysonfortustin.com/
 
@@ -117,7 +117,7 @@ Year: 2024
 Type: REPORTING
 Summary: Student political reporting at WashU focused on protest, campus governance, elections, and institutional accountability.
 Keywords: Political Reporting at WashU, REPORTING, 2024, Student political reporting at WashU focused on protest, campus governance, elections, and institutional accountability., WashU political reporting, student journalism, campus politics, free speech, student protest reporting, journalism, campus politics, WashU, student media
-Primary image: https://isaacseiler.xyz/seo/projects/political-reporting-at-washu.jpg
+Primary image: https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev/reporting.png
 Links:
   - Suspended student protesters speak out: https://www.studlife.com/news/2024/09/18/disorienting-suspended-student-protesters-speak-out
   - WashU ABS respond to racist text messages after election: https://www.studlife.com/news/2024/12/04/washu-abs-respond-to-racist-text-messages-after-election-discuss-combating-hate
@@ -133,7 +133,7 @@ Year: 2022
 Type: RESEARCH
 Summary: A large-scale nonprofit news research project involving data collection, survey synthesis, and direct stakeholder outreach.
 Keywords: The 2022 Institute for Nonprofit News Index Survey, RESEARCH, 2022, A large-scale nonprofit news research project involving data collection, survey synthesis, and direct stakeholder outreach., Institute for Nonprofit News, INN Index, nonprofit news research, survey synthesis, journalism data, nonprofit journalism, survey research, newsrooms, media economics
-Primary image: https://isaacseiler.xyz/seo/projects/2022-institute-for-nonprofit-news-index-survey.jpg
+Primary image: https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev/nonprofitnews.png
 Links:
   - 2022 INN Index Report: https://inn.org/research/inn-index/inn-index-2022/about-the-index/
 
@@ -144,7 +144,7 @@ Year: 2024
 Type: PROJECT
 Summary: Strategy and communications work around health access policy at Boehringer Ingelheim, including an internal report and SDX partnership support.
 Keywords: Sustainable Development and Health Access Report, PROJECT, 2024, Strategy and communications work around health access policy at Boehringer Ingelheim, including an internal report and SDX partnership support., health access report, sustainable development communications, Boehringer Ingelheim, SDX, corporate sustainability strategy, health access, sustainable development, communications strategy
-Primary image: https://isaacseiler.xyz/seo/projects/sustainable-development-health-access-report.jpg
+Primary image: https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev/boehstrategy.png
 Links:
   - SDX Brandon Hall Group Award Announcement: https://www.boehringer-ingelheim.com/us/about-us/sustainable-development/more-potential/boehringer-wins-10-brandon-hall-group-awards
   - Boehringer's Sustainable Development Strategy: https://www.boehringer-ingelheim.com/us/about-us/sustainable-development
@@ -168,7 +168,7 @@ Year: 2021
 Type: REPORTING
 Summary: Early access-driven political reporting on then-Congressman Peter Meijer during a volatile post-impeachment period.
 Keywords: Exclusive Interview with High-Visibility Congressperson, REPORTING, 2021, Early access-driven political reporting on then-Congressman Peter Meijer during a volatile post-impeachment period., Peter Meijer interview, political reporting, Congress interview, impeachment vote, Calvin Chimes, political reporting, Congress, interview journalism
-Primary image: https://isaacseiler.xyz/seo/projects/exclusive-interview-with-high-visibility-congressperson.jpg
+Primary image: https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev/congressinterview.png
 Links:
   - Rep. Meijer defends filibuster, merit-based immigration, vote for impeachment: https://calvinchimes.org/2021/04/08/rep-meijer-defends-filibuster-merit-based-immigration-vote-for-impeachment/
   - Rep. Meijer faces censures, primary challenge over impeachment vote: https://calvinchimes.org/2021/02/24/rep-meijer-faces-censures-primary-challenge-over-impeachment-vote/

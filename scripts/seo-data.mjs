@@ -15,9 +15,15 @@ const PROJECT_IMG_BASE = "https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev";
 const projectCardImages = {
   aiIndex: `${PROJECT_IMG_BASE}/aiindex.png`,
   aiNews: `${PROJECT_IMG_BASE}/ainews.png`,
+  biCares: `${PROJECT_IMG_BASE}/bicares.png`,
+  boehStrategy: `${PROJECT_IMG_BASE}/boehstrategy.png`,
   charging: `${PROJECT_IMG_BASE}/charging.png`,
   chatLab: `${PROJECT_IMG_BASE}/chatlab.jpeg`,
-  capHill: "/experience/potus.jpeg",
+  capHill: `${PROJECT_IMG_BASE}/caphill.png`,
+  congressInterview: `${PROJECT_IMG_BASE}/congressinterview.png`,
+  nonprofitNews: `${PROJECT_IMG_BASE}/nonprofitnews.png`,
+  politicalConsult: `${PROJECT_IMG_BASE}/politicalconsult.png`,
+  reporting: `${PROJECT_IMG_BASE}/reporting.png`,
 };
 
 export const SAME_AS = [
@@ -147,7 +153,7 @@ export const projectSeo = {
     description:
       "Isaac Seiler founded and led the Fulbright Taiwan ChatGPT Lab, an OpenAI-supported educator lab focused on practical, responsible ChatGPT use cases in education.",
     image: {
-      url: "/seo/projects/fulbright-focus-group-sponsored-by-openai.jpg",
+      url: projectCardImages.chatLab,
       alt: "Fulbright Taiwan ChatGPT Lab and OpenAI education project preview",
     },
     keywords: [
@@ -169,7 +175,7 @@ export const projectSeo = {
     description:
       "A public benchmark by Isaac Seiler measuring generative AI adoption, training, governance, pilots, transparency, and preparedness across U.S. states and territories.",
     image: {
-      url: "/seo/projects/artificial-intelligence-in-state-government-index.jpg",
+      url: projectCardImages.aiIndex,
       alt: "Artificial Intelligence in State Government Index project preview",
     },
     keywords: [
@@ -188,7 +194,7 @@ export const projectSeo = {
     description:
       "Isaac Seiler helped stand up a new congressional office and produced early systems, staffing, metrics, communications, and first-100-day reporting.",
     image: {
-      url: "/seo/projects/congressional-office-setup-100-day-report.jpg",
+      url: projectCardImages.capHill,
       alt: "Congressional Office Setup and 100 Day Report project preview",
     },
     keywords: [
@@ -205,7 +211,7 @@ export const projectSeo = {
     description:
       "Isaac Seiler's honors thesis analyzed AI, digital platforms, local journalism, democratic accountability, media policy, and newsroom labor through qualitative interviews.",
     image: {
-      url: "/seo/projects/senior-thesis-local-journalism.jpg",
+      url: projectCardImages.aiNews,
       alt: "AI platforms and local journalism honors thesis project preview",
     },
     keywords: [
@@ -224,7 +230,7 @@ export const projectSeo = {
     description:
       "A GIS and quantitative analysis project by Isaac Seiler examining EV charging infrastructure access, charger density, income, race, and transportation equity.",
     image: {
-      url: "/seo/projects/electric-vehicle-access-analysis.jpg",
+      url: projectCardImages.charging,
       alt: "Electric Vehicle Charging Access Analysis project preview",
     },
     keywords: [
@@ -239,7 +245,7 @@ export const projectSeo = {
   },
   "boehringer-cares-foundation-rebrand-strategy-shift": {
     image: {
-      url: "/seo/projects/boehringer-cares-foundation-rebrand-strategy-shift.jpg",
+      url: projectCardImages.biCares,
       alt: "Boehringer Cares Foundation rebrand and strategy project preview",
     },
     keywords: [
@@ -253,7 +259,7 @@ export const projectSeo = {
   },
   "political-reporting-at-washu": {
     image: {
-      url: "/seo/projects/political-reporting-at-washu.jpg",
+      url: projectCardImages.reporting,
       alt: "Political Reporting at WashU project preview",
     },
     keywords: [
@@ -267,7 +273,7 @@ export const projectSeo = {
   },
   "communications-consultancy-supporting-local-candidates": {
     image: {
-      url: "/seo/projects/communications-consultancy-supporting-local-candidates.jpg",
+      url: projectCardImages.politicalConsult,
       alt: "Campaign communications consultancy project preview",
     },
     keywords: [
@@ -281,7 +287,7 @@ export const projectSeo = {
   },
   "2022-institute-for-nonprofit-news-index-survey": {
     image: {
-      url: "/seo/projects/2022-institute-for-nonprofit-news-index-survey.jpg",
+      url: projectCardImages.nonprofitNews,
       alt: "Institute for Nonprofit News Index Survey project preview",
     },
     keywords: [
@@ -295,7 +301,7 @@ export const projectSeo = {
   },
   "exclusive-interview-with-high-visibility-congressperson": {
     image: {
-      url: "/seo/projects/exclusive-interview-with-high-visibility-congressperson.jpg",
+      url: projectCardImages.congressInterview,
       alt: "Exclusive political interview reporting project preview",
     },
     keywords: [
@@ -309,7 +315,7 @@ export const projectSeo = {
   },
   "sustainable-development-health-access-report": {
     image: {
-      url: "/seo/projects/sustainable-development-health-access-report.jpg",
+      url: projectCardImages.boehStrategy,
       alt: "Sustainable Development and Health Access Report project preview",
     },
     keywords: [

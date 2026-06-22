@@ -202,7 +202,7 @@ Links:
    Alt: Artificial Intelligence in State Government Index project preview
    Caption: A public benchmark measuring generative AI adoption across U.S. states and territories.
 4. Congressional Office Setup and 100 Day Report
-   URL: https://isaacseiler.xyz/experience/potus.jpeg
+   URL: https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev/caphill.png
    Page: https://isaacseiler.xyz/projects/congressional-office-setup-100-day-report
    Alt: Congressional Office Setup and 100 Day Report project preview
    Caption: Systems, staffing, communications, and metrics used to launch a new congressional office.

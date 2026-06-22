@@ -241,7 +241,7 @@ const projectUrl = (project) => absoluteUrl(projectLinkPath(project));
 
 const projectPrimaryImage = (project) => {
   const override = projectSeo[project.id]?.image;
-  const image = override?.url?.startsWith("/seo/projects/") ? project.image : override ?? project.image;
+  const image = override ?? project.image;
   return normalizeImage(image, `${project.title} preview image`);
 };
 

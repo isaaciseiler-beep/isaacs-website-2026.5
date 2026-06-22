@@ -72,7 +72,12 @@ const loadMapbox = () => {
   mapboxPromise ??= Promise.all([
     import("mapbox-gl"),
     import("mapbox-gl/dist/mapbox-gl.css"),
-  ]).then(([module]) => module);
+  ])
+    .then(([module]) => module)
+    .catch((error) => {
+      mapboxPromise = null;
+      throw error;
+    });
   return mapboxPromise;
 };
 
@@ -249,6 +254,11 @@ const PhotoMapPage = () => {
         const mapbox = mapboxModule.default;
         mapboxRef.current = mapbox;
         mapbox.accessToken = mapboxToken;
+
+        if (!mapbox.supported()) {
+          setMapError("The map could not start because this browser does not support WebGL.");
+          return;
+        }
 
         const initialView = defaultMapView(isMobile);
         const map = new mapbox.Map({

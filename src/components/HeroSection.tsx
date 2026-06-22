@@ -160,7 +160,7 @@ const CursorImageTrail = ({ enabled }: { enabled: boolean }) => {
     const loadTrailImages = async () => {
       const [
         headshotModule,
-        { albums, albumPhotos },
+        { curatedPicks },
         { scheduleImagePreloads },
         { projectItems },
       ] = await Promise.all([
@@ -173,15 +173,17 @@ const CursorImageTrail = ({ enabled }: { enabled: boolean }) => {
 
       const images = [
         headshotModule.default,
-        ...projectItems.map((project) => project.image),
-        ...albums.flatMap(albumPhotos),
+        ...projectItems.slice(0, 8).map((project) => project.image),
+        ...curatedPicks.map((pick) => pick.url),
       ].filter((src): src is string => Boolean(src));
       const nextImages = shuffleImages([...new Set(images)]);
 
       setShuffledImages(nextImages);
       scheduleImagePreloads(nextImages, {
-        decode: true,
+        batchSize: 3,
+        decode: false,
         fetchPriority: "low",
+        idleTimeout: 1500,
       });
       nextImages.forEach((src) => loadImageMetric(src, imageMetricsRef.current));
     };

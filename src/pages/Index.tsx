@@ -235,6 +235,8 @@ const Index = () => {
       const featuredProjectImages = featuredProjectIds
         .map((id) => projectItems.find((project) => project.id === id)?.image)
         .filter((image): image is string => Boolean(image));
+      const criticalProjectImages = featuredProjectImages.slice(0, isMobileViewport ? 1 : 2);
+      const deferredProjectImages = featuredProjectImages.slice(criticalProjectImages.length);
       const photoCovers = albums.map(coverFor);
       const criticalNewsCount = isMobileViewport ? 1 : 2;
       const criticalPhotoCount = isMobileViewport ? 1 : 2;
@@ -250,7 +252,7 @@ const Index = () => {
 
       void preloadImages([
         headshotUrl,
-        ...featuredProjectImages,
+        ...criticalProjectImages,
       ], {
         decode: true,
         fetchPriority: "high",
@@ -258,6 +260,7 @@ const Index = () => {
       });
 
       scheduleImagePreloads([
+        ...deferredProjectImages,
         ...criticalNewsAssets,
         ...photoCovers.slice(0, criticalPhotoCount),
         ...photoCovers.slice(criticalPhotoCount),

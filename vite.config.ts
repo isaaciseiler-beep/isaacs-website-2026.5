@@ -41,4 +41,17 @@ export default defineConfig(({ mode }) => ({
     },
     dedupe: ["react", "react-dom", "react/jsx-runtime", "react/jsx-dev-runtime", "@tanstack/react-query", "@tanstack/query-core"],
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes("node_modules")) return undefined;
+          if (id.includes("mapbox-gl")) return "mapbox";
+          if (id.includes("recharts")) return "charts";
+          if (id.includes("@react-three") || id.includes("/three/")) return "three";
+          return undefined;
+        },
+      },
+    },
+  },
 }));

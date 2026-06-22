@@ -126,7 +126,7 @@ export const experienceEntries: ExperienceEntry[] = [
     organization: "Isaac Seiler Strategies",
     role: "Founder and Consultant",
     period: "Jan 2024-Apr 2025",
-    image: "https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev/politicalconsult.png",
+    image: "/project-images/politicalconsult.jpg",
     paragraphs: [
       "I founded an independent consultancy supporting local and federal candidates through campaign websites, digital strategy, and rapid-response communications.",
       "One campaign I supported was Allyson Damikolas for Tustin Unified School Board in California, where I led digital and communications strategy and built the campaign website as a central hub for messaging, organizing, and voter-facing information.",
@@ -159,7 +159,7 @@ export const experienceEntries: ExperienceEntry[] = [
     role: "Communications Strategy and Operations",
     period: "Nov 2022-Jun 2023",
     location: "Washington DC-Baltimore Area",
-    image: "https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev/caphill.png",
+    image: "/project-images/caphill.jpg",
     paragraphs: [
       "I helped build the communications function for a new congressional office from the ground up.",
       "I created workflows, managed press outreach, organized events and official travel, and helped the office reach 350,000 people weekly.",
@@ -222,7 +222,7 @@ export const experienceEntries: ExperienceEntry[] = [
     role: "Digital Platforms and Journalism Research",
     period: "Dec 2021-Sep 2022",
     location: "Grand Rapids, Michigan, United States",
-    image: "https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev/nonprofitnews.png",
+    image: "/project-images/nonprofitnews.jpg",
     paragraphs: [
       "I contributed to research on nonprofit newsrooms and digital ecosystems for the 2022 INN Index.",
       "I cleaned, synthesized, and organized complex data from 100+ editors, helping make newsroom trends easier to understand and compare.",

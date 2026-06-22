@@ -67,6 +67,28 @@ const scoreBands = [
 const TOP_PERFORMER_GREEN = "hsl(var(--foreground))";
 
 type RankedState = AiIndexState & { rank: number };
+type ChartPayload<TPayload = Record<string, unknown>> = {
+  color?: string;
+  dataKey?: string | number;
+  name?: string | number;
+  payload?: TPayload;
+  value?: number | string;
+};
+type DashboardTooltipProps = {
+  active?: boolean;
+  label?: string | number;
+  payload?: ChartPayload<{ state?: string }>[];
+};
+type ResourceDatum = {
+  budget: number;
+  composite: number;
+  state: string;
+  workforce: number;
+};
+type ResourceTooltipProps = {
+  active?: boolean;
+  payload?: ChartPayload<ResourceDatum>[];
+};
 
 const average = (values: number[]) => values.reduce((sum, value) => sum + value, 0) / values.length;
 const percent = (count: number, total: number) => Math.round((count / total) * 100);
@@ -243,13 +265,13 @@ const ChartReveal = ({
   );
 };
 
-const DashboardTooltip = ({ active, payload, label }: any) => {
+const DashboardTooltip = ({ active, payload, label }: DashboardTooltipProps) => {
   if (!active || !payload?.length) return null;
 
   return (
     <div className="site-corner bg-background px-3 py-2 text-xs shadow-xl">
       <div className="font-medium text-foreground/65">{label ?? payload[0]?.payload?.state}</div>
-      {payload.map((item: any) => (
+      {payload.map((item) => (
         <div key={item.name ?? item.dataKey} className="mt-1 flex items-center gap-2 text-foreground/70">
           <span className="h-2 w-2 rounded-full" style={{ backgroundColor: item.color }} />
           <span>
@@ -317,7 +339,7 @@ const TopPerformersVisual = ({ states }: { states: RankedState[] }) => {
   );
 };
 
-const ResourceTooltip = ({ active, payload }: any) => {
+const ResourceTooltip = ({ active, payload }: ResourceTooltipProps) => {
   if (!active || !payload?.length) return null;
 
   const state = payload[0]?.payload;

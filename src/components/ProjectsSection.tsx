@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import SectionHeading from "@/components/SectionHeading";
-import { preloadImages } from "@/lib/imagePreload";
 import { featuredProjectIds, projectItems, type ProjectItem } from "@/lib/siteContent";
 
 const GAP = 3;
@@ -79,9 +78,9 @@ const FeaturedProjectCard = ({
       <img
         src={project.image}
         alt={project.title}
-        loading="eager"
+        loading={index < 2 ? "eager" : "lazy"}
         decoding="async"
-        fetchpriority="high"
+        fetchpriority={index < 2 ? "high" : "low"}
         className={`absolute inset-0 h-full w-full object-cover transform-gpu transition-[filter,transform] duration-700 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] group-hover:grayscale-0 group-focus-within:grayscale-0 ${
           isImageActive ? "scale-[1.025] grayscale-0" : "scale-100 grayscale"
         }`}
@@ -157,16 +156,6 @@ const ProjectsSection = () => {
         .filter((project): project is ProjectItem => Boolean(project)),
     [],
   );
-
-  useEffect(() => {
-    const projectImages = projects.map((project) => project.image);
-
-    void preloadImages(projectImages, {
-      decode: true,
-      fetchPriority: "high",
-      linkPreload: true,
-    });
-  }, [projects]);
 
   return (
     <section data-work-scroll-content className="flex h-auto flex-col py-0 md:h-[calc(100svh-9.75rem)] md:min-h-[420px]">

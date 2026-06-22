@@ -1,24 +1,24 @@
-const PROJECT_IMG_BASE = "https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev";
+const PROJECT_IMG_BASE = "/project-images";
+const PROJECT_FILE_BASE = "https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev";
 const projectImg = {
-  aiClassroom: `${PROJECT_IMG_BASE}/f05b7a06585e56e473e9e8ea2affa7b0.jpg`,
-  aiIndex: `${PROJECT_IMG_BASE}/aiindex.png`,
-  aiNews: `${PROJECT_IMG_BASE}/ainews.png`,
-  biCares: `${PROJECT_IMG_BASE}/bicares.png`,
-  boehStrategy: `${PROJECT_IMG_BASE}/boehstrategy.png`,
-  capHill: `${PROJECT_IMG_BASE}/caphill.png`,
-  charging: `${PROJECT_IMG_BASE}/charging.png`,
-  chatLab: `${PROJECT_IMG_BASE}/chatlab.jpeg`,
-  congressInterview: `${PROJECT_IMG_BASE}/congressinterview.png`,
-  firstWebsite: `${PROJECT_IMG_BASE}/My%20personal%20portfolio.png`,
-  firstWebsitePreview: `${PROJECT_IMG_BASE}/firstwebsitepreview.png`,
-  gisPoster: `${PROJECT_IMG_BASE}/GIS%20Poster.png`,
-  gisUsIncome: `${PROJECT_IMG_BASE}/usmap1.png`,
-  gisUsRace: `${PROJECT_IMG_BASE}/usmap2.png`,
-  nonprofitNews: `${PROJECT_IMG_BASE}/nonprofitnews.png`,
-  philanthropyLab: `${PROJECT_IMG_BASE}/MLTM-3287_1025.jpg`,
-  politicalConsult: `${PROJECT_IMG_BASE}/politicalconsult.png`,
-  reporting: `${PROJECT_IMG_BASE}/reporting.png`,
-  workshopReference: `${PROJECT_IMG_BASE}/AI%20Workshop%20Reference%20Sheet.png`,
+  aiClassroom: `${PROJECT_IMG_BASE}/ai-classroom.jpg`,
+  aiIndex: `${PROJECT_IMG_BASE}/aiindex.jpg`,
+  aiNews: `${PROJECT_IMG_BASE}/ainews.jpg`,
+  biCares: `${PROJECT_IMG_BASE}/bicares.jpg`,
+  boehStrategy: `${PROJECT_IMG_BASE}/boehstrategy.jpg`,
+  capHill: `${PROJECT_IMG_BASE}/caphill.jpg`,
+  charging: `${PROJECT_IMG_BASE}/charging.jpg`,
+  chatLab: `${PROJECT_IMG_BASE}/chatlab.jpg`,
+  congressInterview: `${PROJECT_IMG_BASE}/congressinterview.jpg`,
+  firstWebsite: `${PROJECT_IMG_BASE}/firstwebsite.jpg`,
+  firstWebsitePreview: `${PROJECT_IMG_BASE}/firstwebsitepreview.jpg`,
+  gisPoster: `${PROJECT_IMG_BASE}/gis-poster.jpg`,
+  gisUsIncome: `${PROJECT_IMG_BASE}/usmap1.jpg`,
+  gisUsRace: `${PROJECT_IMG_BASE}/usmap2.jpg`,
+  nonprofitNews: `${PROJECT_IMG_BASE}/nonprofitnews.jpg`,
+  philanthropyLab: `${PROJECT_IMG_BASE}/philanthropy-lab.jpg`,
+  politicalConsult: `${PROJECT_IMG_BASE}/politicalconsult.jpg`,
+  reporting: `${PROJECT_IMG_BASE}/reporting.jpg`,
 };
 
 export interface NewsItem {
@@ -353,14 +353,6 @@ export const projectItems: ProjectItem[] = [
           "The session started from educator skepticism rather than brushing past it. I framed AI as a set of systems that can support planning, differentiation, feedback, and student exploration when teachers understand the tradeoffs and keep professional judgment in the loop.",
           "The presentation moved from fundamentals to practice: what AI is, how large language models work, why models can be useful and unreliable at the same time, and how educators can design classroom uses around clear learning goals instead of novelty.",
         ],
-        media: [
-          {
-            type: "image",
-            src: projectImg.workshopReference,
-            alt: "AI 101 reference sheet for educators",
-            caption: "A one-page reference sheet condensed the core AI concepts, vocabulary, usage principles, and follow-up resources into a practical takeaway.",
-          },
-        ],
       },
       {
         heading: "Core Principles",
@@ -380,7 +372,7 @@ export const projectItems: ProjectItem[] = [
         media: [
           {
             type: "pdf",
-            src: `${PROJECT_IMG_BASE}/Artificial%20Intelligence%20in%20the%20Classroom.pdf`,
+            src: `${PROJECT_FILE_BASE}/Artificial%20Intelligence%20in%20the%20Classroom.pdf`,
             title: "Artificial Intelligence in the Classroom",
           },
         ],
@@ -391,7 +383,7 @@ export const projectItems: ProjectItem[] = [
           "The materials drew from my Fulbright Taiwan ChatGPT Lab work and from AI fluency training resources, especially the idea that responsible use starts with understanding systems well enough to use them deliberately.",
         ],
         links: [
-          { label: "Workshop Slide Deck", href: `${PROJECT_IMG_BASE}/Artificial%20Intelligence%20in%20the%20Classroom.pdf` },
+          { label: "Workshop Slide Deck", href: `${PROJECT_FILE_BASE}/Artificial%20Intelligence%20in%20the%20Classroom.pdf` },
           { label: "Anthropic AI Fluency Foundations Course", href: "https://lnkd.in/gnUB8D7M" },
         ],
       },

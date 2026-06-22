@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { preloadImage } from "@/lib/imagePreload";
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
@@ -24,6 +25,16 @@ const PhotoPreview = ({ images, currentIndex, onClose, onNavigate }: PhotoPrevie
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [currentIndex, handleKeyDown]);
+
+  useEffect(() => {
+    if (currentIndex === null) return;
+
+    [images[currentIndex - 1], images[currentIndex + 1]]
+      .filter((src): src is string => Boolean(src))
+      .forEach((src) => {
+        void preloadImage(src, { decode: false, fetchPriority: "low" });
+      });
+  }, [currentIndex, images]);
 
   const progress = currentIndex !== null ? (currentIndex + 1) / images.length : 0;
 
@@ -56,6 +67,9 @@ const PhotoPreview = ({ images, currentIndex, onClose, onNavigate }: PhotoPrevie
             key={currentIndex}
             src={images[currentIndex]}
             alt=""
+            loading="eager"
+            decoding="async"
+            fetchpriority="high"
             className="site-corner relative z-10 max-w-[90vw] max-h-[85vh] object-contain"
             initial={{ opacity: 0, scale: 0.97 }}
             animate={{ opacity: 1, scale: 1 }}

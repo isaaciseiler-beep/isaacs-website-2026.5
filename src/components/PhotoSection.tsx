@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import SectionHeading from "@/components/SectionHeading";
 import PhotoPreview from "@/components/PhotoPreview";
 import { albums, coverFor } from "@/lib/photoAlbums";
-import { preloadImages } from "@/lib/imagePreload";
+import { preloadImage, scheduleImagePreloads } from "@/lib/imagePreload";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const photos = albums.map((a, i) => ({
@@ -31,12 +31,19 @@ const PhotoSection = () => {
 
   useEffect(() => {
     const imageUrls = photos.map((photo) => photo.image);
+    const [firstImage, ...remainingImages] = imageUrls;
 
-    void preloadImages(imageUrls, {
+    void preloadImage(firstImage, {
       decode: false,
-      fetchPriority: "auto",
+      fetchPriority: "high",
     }).then(() => setCoversReady(true));
-  }, []);
+    scheduleImagePreloads(remainingImages, {
+      batchSize: isMobile ? 2 : 3,
+      decode: false,
+      fetchPriority: "low",
+      idleTimeout: isMobile ? 1500 : 1000,
+    });
+  }, [isMobile]);
 
   useEffect(() => {
     if (prefersReducedMotion || hasAutoplayed || !isPreviewInView || !coversReady) {

@@ -36,7 +36,7 @@ const AlbumCover = ({ album, onClick }: { album: Album; onClick: () => void }) =
     if (!hovering) return;
 
     photos.slice(0, 4).forEach((src) => {
-      void preloadImage(src, { decode: true, fetchPriority: "high" }).then((loaded) => {
+      void preloadImage(src, { decode: false, fetchPriority: "low" }).then((loaded) => {
         if (!loaded) return;
         setDecodedSrcs((current) => {
           if (current.has(src)) return current;
@@ -188,6 +188,7 @@ const PhotosPage = () => {
 
   const filtered = filter === "All" ? albums : albums.filter((a) => a.continent === filter);
   const currentAlbum = openAlbum ? albums.find((a) => a.location === openAlbum) : null;
+  const currentAlbumPhotos = useMemo(() => (currentAlbum ? albumPhotos(currentAlbum) : []), [currentAlbum]);
 
   useEffect(() => {
     const albumFolder = searchParams.get("album");
@@ -221,7 +222,7 @@ const PhotosPage = () => {
     return rows;
   };
 
-  const previewImages = currentAlbum ? albumPhotos(currentAlbum) : [];
+  const previewImages = currentAlbumPhotos;
 
   useEffect(() => {
     const featured = [
@@ -248,11 +249,13 @@ const PhotosPage = () => {
 
   useEffect(() => {
     if (!currentAlbum) return;
-    scheduleImagePreloads(albumPhotos(currentAlbum), {
-      decode: true,
+    scheduleImagePreloads(currentAlbumPhotos.slice(0, isMobile ? 4 : 6), {
+      batchSize: isMobile ? 2 : 3,
+      decode: false,
       fetchPriority: "low",
+      idleTimeout: isMobile ? 1400 : 900,
     });
-  }, [currentAlbum]);
+  }, [currentAlbum, currentAlbumPhotos, isMobile]);
 
   const handleSidebarToggle = () => {
     setSearchOpen(false);
@@ -348,7 +351,7 @@ const PhotosPage = () => {
                 </motion.button>
 
                 <div className="site-corner flex flex-col gap-[3px] overflow-hidden">
-                  {buildRows(albumPhotos(currentAlbum), albums.indexOf(currentAlbum)).map((row, rowIdx) => {
+                  {buildRows(currentAlbumPhotos, albums.indexOf(currentAlbum)).map((row, rowIdx) => {
                     if (row.layout === "pair") {
                       return (
                         <div key={rowIdx} className="grid grid-cols-2 gap-[3px]">
@@ -367,7 +370,7 @@ const PhotosPage = () => {
                                   alt=""
                                   loading={row.startIdx + pi < 2 ? "eager" : "lazy"}
                                   decoding="async"
-                                  fetchpriority={row.startIdx + pi < 2 ? "high" : "auto"}
+                                  fetchpriority={row.startIdx + pi < 2 ? "high" : "low"}
                                   className="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-700 ease-out"
                                 />
                               </div>
@@ -393,7 +396,7 @@ const PhotosPage = () => {
                             alt=""
                             loading={row.startIdx < 2 ? "eager" : "lazy"}
                             decoding="async"
-                            fetchpriority={row.startIdx < 2 ? "high" : "auto"}
+                            fetchpriority={row.startIdx < 2 ? "high" : "low"}
                             className="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-700 ease-out"
                           />
                         </div>

@@ -11,19 +11,19 @@ export const PREVIEW_IMAGE = {
   alt: "Isaac Seiler portfolio preview image",
 };
 
-const PROJECT_IMG_BASE = "https://pub-fa8ebd83ba8d4bf99e2e7f12e394fc2f.r2.dev";
+const PROJECT_IMG_BASE = "/project-images";
 const projectCardImages = {
-  aiIndex: `${PROJECT_IMG_BASE}/aiindex.png`,
-  aiNews: `${PROJECT_IMG_BASE}/ainews.png`,
-  biCares: `${PROJECT_IMG_BASE}/bicares.png`,
-  boehStrategy: `${PROJECT_IMG_BASE}/boehstrategy.png`,
-  charging: `${PROJECT_IMG_BASE}/charging.png`,
-  chatLab: `${PROJECT_IMG_BASE}/chatlab.jpeg`,
-  capHill: `${PROJECT_IMG_BASE}/caphill.png`,
-  congressInterview: `${PROJECT_IMG_BASE}/congressinterview.png`,
-  nonprofitNews: `${PROJECT_IMG_BASE}/nonprofitnews.png`,
-  politicalConsult: `${PROJECT_IMG_BASE}/politicalconsult.png`,
-  reporting: `${PROJECT_IMG_BASE}/reporting.png`,
+  aiIndex: `${PROJECT_IMG_BASE}/aiindex.jpg`,
+  aiNews: `${PROJECT_IMG_BASE}/ainews.jpg`,
+  biCares: `${PROJECT_IMG_BASE}/bicares.jpg`,
+  boehStrategy: `${PROJECT_IMG_BASE}/boehstrategy.jpg`,
+  charging: `${PROJECT_IMG_BASE}/charging.jpg`,
+  chatLab: `${PROJECT_IMG_BASE}/chatlab.jpg`,
+  capHill: `${PROJECT_IMG_BASE}/caphill.jpg`,
+  congressInterview: `${PROJECT_IMG_BASE}/congressinterview.jpg`,
+  nonprofitNews: `${PROJECT_IMG_BASE}/nonprofitnews.jpg`,
+  politicalConsult: `${PROJECT_IMG_BASE}/politicalconsult.jpg`,
+  reporting: `${PROJECT_IMG_BASE}/reporting.jpg`,
 };
 
 export const SAME_AS = [

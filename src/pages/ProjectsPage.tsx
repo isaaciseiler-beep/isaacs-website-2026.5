@@ -5,7 +5,6 @@ import { ArrowUp } from "lucide-react";
 import Footer from "@/components/Footer";
 import Sidebar from "@/components/Sidebar";
 import SiteHeader from "@/components/SiteHeader";
-import { preloadImages } from "@/lib/imagePreload";
 import { projectItems, type ProjectItem } from "@/lib/siteContent";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -73,9 +72,9 @@ const ProjectCard = ({ project, index, isMobile, revealImmediately, onOpen }: Pr
         <motion.img
           src={project.image}
           alt={project.title}
-          loading={index < 4 ? "eager" : "lazy"}
+          loading={index < 2 ? "eager" : "lazy"}
           decoding="async"
-          fetchpriority={index < 6 ? "high" : "auto"}
+          fetchpriority={index < 2 ? "high" : "low"}
           className="h-full w-full object-cover grayscale transition-all duration-500 md:group-hover:grayscale-0"
           animate={isMobile ? { filter: isColor ? "grayscale(0%)" : "grayscale(100%)" } : undefined}
           transition={{ duration: 0.6, ease: EASE }}
@@ -112,13 +111,6 @@ const ProjectsPage = () => {
     setSidebarOpen(false);
     setSearchOpen(true);
   };
-
-  useEffect(() => {
-    void preloadImages(filteredProjects.map((project) => project.image), {
-      decode: false,
-      fetchPriority: "auto",
-    });
-  }, [filteredProjects]);
 
   useEffect(() => {
     const handleScroll = () => {

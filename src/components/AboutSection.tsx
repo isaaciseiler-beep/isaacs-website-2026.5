@@ -1,23 +1,8 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { motion, useInView, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion";
-import { ArrowUpRight } from "lucide-react";
+import { useLayoutEffect, useRef, useState } from "react";
+import { motion, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion";
 import SectionHeading from "@/components/SectionHeading";
 import headshotUrl from "@/assets/headshot.jpg";
 import { bioLines } from "@/lib/siteContent";
-import { CONTACT_MAILTO } from "@/lib/site";
-
-const popdownTextVariants = {
-  closed: { opacity: 0, y: -4 },
-  open: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      delay: 0.46,
-      duration: 0.28,
-      ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
-    },
-  },
-};
 
 interface AboutSectionProps {
   revealEnabled?: boolean;
@@ -25,23 +10,9 @@ interface AboutSectionProps {
 
 const AboutSection = ({ revealEnabled = true }: AboutSectionProps) => {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const pillRef = useRef<HTMLDivElement>(null);
-  const [hasDeployedPopdown, setHasDeployedPopdown] = useState(false);
-  const pillInView = useInView(pillRef, { amount: 0.82, margin: "0px 0px -18% 0px", once: true });
   const headshotRotX = useSpring(useMotionValue(0), { stiffness: 120, damping: 18, mass: 0.6 });
   const headshotRotY = useSpring(useMotionValue(0), { stiffness: 120, damping: 18, mass: 0.6 });
   const photoSize = "clamp(320px, 34vw, 520px)";
-  const popdownVariants = {
-    closed: { height: 0, y: -18 },
-    open: {
-      height: 44,
-      y: 0,
-      transition: {
-        duration: 0.58,
-        ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
-      },
-    },
-  };
 
   // Auto-fit the bio text inside a fixed-height box matching the headshot.
   const bioBoxRef = useRef<HTMLDivElement>(null);
@@ -83,10 +54,6 @@ const AboutSection = ({ revealEnabled = true }: AboutSectionProps) => {
       window.removeEventListener("resize", fit);
     };
   }, []);
-
-  useEffect(() => {
-    if (revealEnabled && pillInView) setHasDeployedPopdown(true);
-  }, [pillInView, revealEnabled]);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -204,60 +171,6 @@ const AboutSection = ({ revealEnabled = true }: AboutSectionProps) => {
             </motion.div>
           </motion.div>
         </div>
-
-        {/* Status pill + pop-down CTA */}
-        <motion.div
-          className="group/pill relative mt-8 inline-block max-w-full md:mt-10"
-          initial={{ opacity: 0, y: 14, filter: "blur(6px)" }}
-          whileInView={revealEnabled ? { opacity: 1, y: 0, filter: "blur(0px)" } : undefined}
-          animate={revealEnabled ? undefined : { opacity: 0, y: 14, filter: "blur(6px)" }}
-          viewport={revealEnabled ? { once: true, amount: 0.72, margin: "-40px" } : undefined}
-          transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <div
-            ref={pillRef}
-            className="relative z-10 inline-flex max-w-full items-center gap-3 rounded-full border-2 border-foreground bg-background px-5 py-3 transition-colors duration-300 group-hover/pill:border-foreground/85 md:px-6"
-          >
-            <motion.span
-              className="rounded-full w-2.5 h-2.5 bg-foreground transition-colors duration-300 shrink-0"
-              animate={{ scale: [1, 1.4, 1] }}
-              transition={{
-                duration: 2.2,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-            />
-            <span className="min-w-0 text-base font-light leading-snug tracking-[0.02em] text-foreground transition-colors duration-300 md:text-lg">
-              Currently in the market for tech roles starting Summer 2026
-            </span>
-          </div>
-
-          <div className="pointer-events-none absolute left-0 z-0 w-full" style={{ top: "calc(100% + 6px)" }}>
-            <motion.div
-              initial="closed"
-              animate={hasDeployedPopdown ? "open" : "closed"}
-              variants={popdownVariants}
-              className="overflow-hidden"
-            >
-              <button
-                className="get-in-touch-cta homepage-cta relative pointer-events-auto h-full w-full cursor-pointer overflow-hidden rounded-full bg-primary transition-colors duration-300 group-hover/pill:bg-accent"
-                onClick={() => window.location.href = CONTACT_MAILTO}
-              >
-                <motion.span
-                  variants={popdownTextVariants}
-                  initial="closed"
-                  animate={hasDeployedPopdown ? "open" : "closed"}
-                  className="relative z-10 flex h-full items-center justify-center px-6 text-sm font-mono tracking-[0.2em] uppercase transition-colors duration-300"
-                >
-                  Get in touch
-                  <span className="inline-flex overflow-hidden max-w-0 opacity-0 transition-all duration-300 ease-out group-hover/pill:max-w-[2rem] group-hover/pill:opacity-100">
-                    <ArrowUpRight className="w-4 h-4 ml-2 shrink-0" strokeWidth={1.5} />
-                  </span>
-                </motion.span>
-              </button>
-            </motion.div>
-          </div>
-        </motion.div>
       </div>
     </section>
   );

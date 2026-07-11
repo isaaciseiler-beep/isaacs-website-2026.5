@@ -1,10 +1,15 @@
-import { createLovableConfig } from "lovable-agent-playwright-config/config";
+import { defineConfig } from "@playwright/test";
 
-export default createLovableConfig({
-  // Add your custom playwright configuration overrides here
-  // Example:
-  // timeout: 60000,
-  // use: {
-  //   baseURL: 'http://localhost:3000',
-  // },
+export default defineConfig({
+  testDir: "./tests/e2e",
+  timeout: 60000,
+  use: {
+    baseURL: "http://127.0.0.1:4173",
+  },
+  webServer: {
+    command: "npm run preview -- --host 127.0.0.1 --port 4173",
+    reuseExistingServer: !process.env.CI,
+    timeout: 60000,
+    url: "http://127.0.0.1:4173",
+  },
 });

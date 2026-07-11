@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 import chatHandler from "./api/chat";
+import strikeTrackerHandler from "./api/strike-tracker";
 
 const applyEnv = (key: string, value?: string) => {
   const trimmed = value?.trim();
@@ -20,6 +21,16 @@ const localApiPlugin = (mode: string): Plugin => ({
       applyEnv("OPENAI_API_KEY", env.OPENAI_API_KEY);
       applyEnv("OPENAI_CHAT_MODEL", env.OPENAI_CHAT_MODEL);
       void chatHandler(request, response);
+    });
+    server.middlewares.use("/api/strike-tracker", (request, response) => {
+      const env = loadEnv(mode, process.cwd(), "");
+      applyEnv("STRIKE_TRACKER_ACCESS_CODE", env.STRIKE_TRACKER_ACCESS_CODE);
+      applyEnv("SUPABASE_URL", env.SUPABASE_URL);
+      applyEnv("SUPABASE_ANON_KEY", env.SUPABASE_ANON_KEY);
+      applyEnv("SUPABASE_SERVICE_ROLE_KEY", env.SUPABASE_SERVICE_ROLE_KEY);
+      applyEnv("VITE_SUPABASE_URL", env.VITE_SUPABASE_URL);
+      applyEnv("VITE_SUPABASE_ANON_KEY", env.VITE_SUPABASE_ANON_KEY);
+      void strikeTrackerHandler(request, response);
     });
   },
 });
@@ -48,7 +59,7 @@ export default defineConfig(({ mode }) => ({
           if (!id.includes("node_modules")) return undefined;
           if (id.includes("mapbox-gl")) return "mapbox";
           if (id.includes("recharts")) return "charts";
-          if (id.includes("@react-three") || id.includes("/three/")) return "three";
+          if (id.includes("@supabase")) return "supabase";
           return undefined;
         },
       },

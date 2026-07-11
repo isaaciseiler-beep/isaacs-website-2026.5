@@ -65,12 +65,26 @@ The assistant uses Vercel Serverless Functions in `api/chat.ts` and reads ground
 - `How can I contact Isaac?`
 - `Tell me about the Fulbright educator lab.`
 
+### Strike Tracker
+
+```bash
+STRIKE_TRACKER_ACCESS_CODE=replace-this
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your_anon_key
+# SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+```
+
+The Strike Tracker uses `api/strike-tracker.ts` for shared reads and writes. The page falls back to device-local counts when server storage is unavailable.
+
 ## Scripts
 
 ```bash
 npm run dev       # Start local development
 npm run build     # Build production assets and generated project previews
+npm run check     # Run lint, typecheck, unit tests, build, and browser smoke tests
 npm run preview   # Preview the production build
+npm run typecheck # Run TypeScript without emitting files
+npm run test:e2e  # Run Playwright smoke tests against the production preview
 npm run test      # Run Vitest tests
 npm run lint      # Run ESLint
 ```

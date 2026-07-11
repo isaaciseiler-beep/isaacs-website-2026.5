@@ -1,19 +1,19 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { Plus, RotateCcw } from "lucide-react";
 import {
+  authorizeStrikeTracker,
+  clearStrikeTrackerAccessCode,
   getStrikeTrackerCounts,
   incrementStrikeCount,
-  initialStrikeTrackerCounts,
   readLocalStrikeTrackerCounts,
   resetStrikeCounts,
+  readStrikeTrackerAccessCode,
   strikeTrackerNames,
-  subscribeToStrikeTrackerCounts,
   type StrikeTrackerCounts,
   type StrikeTrackerMode,
   type StrikeTrackerName,
 } from "@/lib/strikeTracker";
 
-const ACCESS_CODE = "9999";
 const AUTH_STORAGE_KEY = "strike-tracker:authorized";
 const LOCAL_STATUS = "Device cache";
 const LIVE_STATUS = "Online";
@@ -30,11 +30,13 @@ const StrikeTrackerPage = () => {
   const [syncMessage, setSyncMessage] = useState("");
   const [storageMode, setStorageMode] = useState<StrikeTrackerMode>("local");
   const [isSaving, setIsSaving] = useState(false);
+  const [isAuthorizing, setIsAuthorizing] = useState(false);
   const [authorized, setAuthorized] = useState(() => {
     if (typeof window === "undefined") return false;
     return (
-      window.localStorage.getItem(AUTH_STORAGE_KEY) === "true" ||
-      window.sessionStorage.getItem(AUTH_STORAGE_KEY) === "true"
+      Boolean(readStrikeTrackerAccessCode()) &&
+      (window.localStorage.getItem(AUTH_STORAGE_KEY) === "true" ||
+        window.sessionStorage.getItem(AUTH_STORAGE_KEY) === "true")
     );
   });
   const [counts, setCounts] = useState<StrikeTrackerCounts>(
@@ -81,47 +83,50 @@ const StrikeTrackerPage = () => {
         setSyncMessage(LOCAL_STATUS);
       });
 
-    const unsubscribe = subscribeToStrikeTrackerCounts({
-      onUpdate: (nextCounts) => {
-        setCounts(nextCounts);
-        setStorageMode("live");
-        setSyncMessage("Live sync online");
-      },
-      onError: () => {
-        setSyncMessage(POLLING_STATUS);
-      },
-    });
-
     const pollingInterval = window.setInterval(() => {
-      void getStrikeTrackerCounts().then(({ counts: nextCounts, mode }) => {
-        if (!active || mode !== "live") return;
-        setCounts(nextCounts);
-        setStorageMode("live");
-        setSyncMessage((currentMessage) =>
-          currentMessage === "Live sync online" ? currentMessage : POLLING_STATUS,
-        );
-      });
+      void getStrikeTrackerCounts()
+        .then(({ counts: nextCounts, mode }) => {
+          if (!active || mode !== "live") return;
+          setCounts(nextCounts);
+          setStorageMode("live");
+          setSyncMessage((currentMessage) =>
+            currentMessage === "Live sync online" ? currentMessage : POLLING_STATUS,
+          );
+        })
+        .catch(() => {
+          if (!active) return;
+          setStorageMode("local");
+          setSyncMessage(LOCAL_STATUS);
+        });
     }, 2500);
 
     return () => {
       active = false;
       window.clearInterval(pollingInterval);
-      unsubscribe();
     };
   }, [authorized]);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setIsAuthorizing(true);
+    setError("");
+    setSyncMessage("Checking access...");
 
-    if (code === ACCESS_CODE) {
+    try {
+      const { counts: nextCounts, mode, warning } = await authorizeStrikeTracker(code);
       window.localStorage.setItem(AUTH_STORAGE_KEY, "true");
+      setCounts(nextCounts);
+      setStorageMode(mode);
+      setSyncMessage(warning || (mode === "live" ? "Live sync online" : "Local mode"));
       setAuthorized(true);
-      setError("");
-      return;
+    } catch (accessError) {
+      window.localStorage.removeItem(AUTH_STORAGE_KEY);
+      clearStrikeTrackerAccessCode();
+      setError(getStatusError(accessError));
+      setCode("");
+    } finally {
+      setIsAuthorizing(false);
     }
-
-    setError("Wrong code");
-    setCode("");
   };
 
   const addStrike = async (name: StrikeTrackerName) => {
@@ -203,6 +208,7 @@ const StrikeTrackerPage = () => {
                 className="mt-2 h-14 w-full border-2 border-b-white border-l-[#3f3f3f] border-r-white border-t-[#3f3f3f] bg-[#f8f8f8] px-3 text-center text-3xl font-black tracking-[0.25em] text-[#101010] outline-none focus:bg-white"
                 autoComplete="off"
                 autoFocus
+                disabled={isAuthorizing}
               />
               {error ? (
                 <p className="mt-3 border border-[#8b0000] bg-[#f7f129] px-2 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-[#8b0000]">
@@ -211,6 +217,7 @@ const StrikeTrackerPage = () => {
               ) : null}
               <button
                 type="submit"
+                disabled={isAuthorizing}
                 className="mt-4 h-14 w-full border-2 border-b-[#222] border-l-white border-r-[#222] border-t-white bg-[#ff2ea6] text-sm font-black uppercase tracking-[0.18em] text-white shadow-[inset_-2px_-2px_0_#8c005a,inset_2px_2px_0_#ff9bdd] active:border-b-white active:border-l-[#222] active:border-r-white active:border-t-[#222] active:shadow-[inset_2px_2px_0_#8c005a]"
               >
                 Boot

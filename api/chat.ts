@@ -1,3 +1,4 @@
+import { readJsonBody, sendJson, type ApiRequest, type ApiResponse } from "./http.js";
 import { getAssistantGuidance, retrieveKnowledge } from "./knowledge.js";
 
 type ChatRole = "user" | "assistant";
@@ -17,29 +18,30 @@ const getEnvValue = (value?: string) => {
   return trimmed && trimmed !== "undefined" ? trimmed : undefined;
 };
 
-const json = (response: any, status = 200) => {
-  response.statusCode = status;
-  response.setHeader("Content-Type", "application/json");
+type OpenAITextPart = {
+  type?: string;
+  text?: string;
 };
 
-const readBody = async (request: any) => {
-  if (request.body && typeof request.body === "object") return request.body;
-  if (typeof request.body === "string") return JSON.parse(request.body || "{}");
-
-  const chunks: Buffer[] = [];
-  for await (const chunk of request) {
-    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
-  }
-  return JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}");
+type OpenAIOutputItem = {
+  content?: OpenAITextPart[];
 };
 
-const getResponseText = (payload: any) => {
+type OpenAIResponsePayload = {
+  output_text?: string;
+  output?: OpenAIOutputItem[];
+  error?: {
+    message?: string;
+  };
+};
+
+const getResponseText = (payload: OpenAIResponsePayload) => {
   if (typeof payload.output_text === "string") return payload.output_text;
 
   const textParts = payload.output
-    ?.flatMap((item: any) => item.content || [])
-    ?.filter((part: any) => part.type === "output_text" || part.type === "text")
-    ?.map((part: any) => part.text)
+    ?.flatMap((item) => item.content || [])
+    ?.filter((part) => part.type === "output_text" || part.type === "text")
+    ?.map((part) => part.text)
     ?.filter(Boolean);
 
   return textParts?.join("\n").trim() || "I could not generate a response.";
@@ -83,35 +85,31 @@ Your backend has already retrieved the most relevant knowledge chunks below. Tre
 ${guidance ? `Assistant guidance:\n${guidance}\n\n` : ""}Retrieved knowledge:
 ${context}`;
 
-export default async function handler(request: any, response: any) {
+export default async function handler(request: ApiRequest, response: ApiResponse) {
   if (request.method !== "POST") {
-    json(response, 405);
-    response.end(JSON.stringify({ error: "Method not allowed" }));
+    sendJson(response, 405, { error: "Method not allowed" });
     return;
   }
 
   const apiKey = getEnvValue(process.env.OPENAI_API) || getEnvValue(process.env.OPENAI_API_KEY);
   if (!apiKey) {
-    json(response, 503);
-    response.end(JSON.stringify({ error: "The AI assistant is not configured yet." }));
+    sendJson(response, 503, { error: "The AI assistant is not configured yet." });
     return;
   }
 
   try {
-    const body = await readBody(request);
+    const body = (await readJsonBody(request)) as { messages?: unknown };
     const messages = normalizeMessages(body.messages);
     const userMessages = messages.filter((message) => message.role === "user");
     const latestMessage = userMessages[userMessages.length - 1];
 
     if (!latestMessage?.content?.trim()) {
-      json(response, 400);
-      response.end(JSON.stringify({ error: "A user message is required." }));
+      sendJson(response, 400, { error: "A user message is required." });
       return;
     }
 
     if (userMessages.length > MAX_USER_MESSAGES) {
-      json(response, 400);
-      response.end(JSON.stringify({ error: "This prototype supports up to five questions per conversation." }));
+      sendJson(response, 400, { error: "This prototype supports up to five questions per conversation." });
       return;
     }
 
@@ -146,28 +144,21 @@ export default async function handler(request: any, response: any) {
       }),
     });
 
-    const payload = await openAiResponse.json();
+    const payload = (await openAiResponse.json()) as OpenAIResponsePayload;
     if (!openAiResponse.ok) {
       console.error("OpenAI request failed", openAiResponse.status, payload.error?.message || payload);
-      json(response, 502);
-      response.end(JSON.stringify({ error: "The AI assistant is temporarily unavailable." }));
+      sendJson(response, 502, { error: "The AI assistant is temporarily unavailable." });
       return;
     }
 
-    json(response);
-    response.end(
-      JSON.stringify({
-        message: getResponseText(payload),
-        sources: retrieved.map(({ id, title, source, url }) => ({ id, title, source, url })),
-      }),
-    );
+    sendJson(response, 200, {
+      message: getResponseText(payload),
+      sources: retrieved.map(({ id, title, source, url }) => ({ id, title, source, url })),
+    });
   } catch (error) {
     console.error("Chat handler failed", error);
-    json(response, 500);
-    response.end(
-      JSON.stringify({
-        error: "The AI assistant is temporarily unavailable.",
-      }),
-    );
+    sendJson(response, 500, {
+      error: "The AI assistant is temporarily unavailable.",
+    });
   }
 }

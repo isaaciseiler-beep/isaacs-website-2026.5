@@ -1,6 +1,7 @@
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+import { scheduleImagePreloads } from "@/lib/imagePreload";
 
 const headlineLines = [
   [
@@ -161,12 +162,10 @@ const CursorImageTrail = ({ enabled }: { enabled: boolean }) => {
       const [
         headshotModule,
         { curatedPicks },
-        { scheduleImagePreloads },
         { projectItems },
       ] = await Promise.all([
         import("@/assets/headshot.jpg"),
         import("@/lib/photoAlbums"),
-        import("@/lib/imagePreload"),
         import("@/lib/siteContent"),
       ]);
       if (disposed) return;

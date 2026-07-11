@@ -83,6 +83,6 @@ Allow: /
 Disallow: /fulbrightmap
 Disallow: /api/
 
-Sitemap: https://isaacseiler.xyz/sitemap.xml
-Sitemap: https://isaacseiler.xyz/image-sitemap.xml
-Host: https://isaacseiler.xyz
+Sitemap: https://www.isaacseiler.xyz/sitemap.xml
+Sitemap: https://www.isaacseiler.xyz/image-sitemap.xml
+Host: https://www.isaacseiler.xyz

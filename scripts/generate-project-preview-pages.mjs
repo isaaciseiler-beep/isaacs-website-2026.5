@@ -256,6 +256,9 @@ const sectionLinks = (project) =>
     .flatMap((section) => section.links ?? [])
     .filter((link) => link.href && link.label);
 
+const sectionHeadings = (project) =>
+  textList((project.sections ?? []).map((section) => section.heading));
+
 const projectKeywords = (project) =>
   textList([
     project.title,
@@ -272,6 +275,8 @@ const enrichedProject = (project) => {
     ...project,
     seoTitle: override.title ?? `${project.title} | Isaac Seiler`,
     seoDescription: override.description ?? project.summary,
+    searchIntent: override.searchIntent ?? override.description ?? project.summary,
+    proofPoints: textList(override.proofPoints ?? []),
     seoImage: projectPrimaryImage(project),
     keywords: projectKeywords(project),
     about: override.about ?? [project.source, "Isaac Seiler project"],
@@ -313,6 +318,16 @@ const breadcrumbFor = (items) => ({
   })),
 });
 
+const siteNavigationItems = () =>
+  topLevelPages.map((page, index) => ({
+    "@type": "SiteNavigationElement",
+    "@id": `${absoluteUrl(page.path)}#navigation-link`,
+    position: index + 1,
+    name: page.navTitle,
+    description: page.sitelinkDescription ?? page.description,
+    url: absoluteUrl(page.path),
+  }));
+
 const globalGraph = () => [
   {
     "@type": "WebSite",
@@ -323,6 +338,7 @@ const globalGraph = () => [
     description: SITE_DESCRIPTION,
     inLanguage: "en-US",
     publisher: { "@id": `${SITE_URL}/#person` },
+    hasPart: topLevelPages.map((page) => ({ "@id": `${absoluteUrl(page.path)}#webpage` })),
   },
   {
     "@type": "Person",
@@ -364,6 +380,7 @@ const globalGraph = () => [
       url: absoluteUrl(page.path),
     })),
   },
+  ...siteNavigationItems(),
 ];
 
 const imageObjectFor = (image) => ({
@@ -371,6 +388,7 @@ const imageObjectFor = (image) => ({
   "@id": `${image.url}#image`,
   url: image.url,
   contentUrl: image.url,
+  thumbnailUrl: image.url,
   width: image.width,
   height: image.height,
   encodingFormat: image.type,
@@ -403,16 +421,27 @@ const projectStructuredData = (project) => ({
       name: project.title,
       headline: project.title,
       description: project.seoDescription,
+      abstract: project.searchIntent,
       image: {
         "@id": `${project.seoImage.url}#image`,
       },
+      thumbnailUrl: project.seoImage.url,
       dateCreated: project.year,
+      datePublished: `${project.year}-01-01`,
       author: { "@id": `${SITE_URL}/#person` },
       creator: { "@id": `${SITE_URL}/#person` },
       keywords: project.keywords.join(", "),
       about: project.about.map((name) => ({ "@type": "Thing", name })),
+      mentions: project.keywords.slice(0, 12).map((name) => ({ "@type": "Thing", name })),
+      hasPart: sectionHeadings(project).map((heading, index) => ({
+        "@type": "CreativeWork",
+        position: index + 1,
+        name: heading,
+        isPartOf: { "@id": `${projectUrl(project)}#creativework` },
+      })),
       mainEntityOfPage: `${projectUrl(project)}#webpage`,
       sameAs: unique(project.sameAs),
+      isAccessibleForFree: true,
     },
     {
       "@type": "WebPage",
@@ -422,7 +451,14 @@ const projectStructuredData = (project) => ({
       description: project.seoDescription,
       isPartOf: { "@id": `${SITE_URL}/#website` },
       about: { "@id": `${projectUrl(project)}#creativework` },
+      mainEntity: { "@id": `${projectUrl(project)}#creativework` },
       primaryImageOfPage: { "@id": `${project.seoImage.url}#image` },
+      thumbnailUrl: project.seoImage.url,
+      significantLink: unique([
+        absoluteUrl("/projects"),
+        absoluteUrl("/experience"),
+        ...sectionLinks(project).map((link) => link.href),
+      ]),
       breadcrumb: { "@id": `${projectUrl(project)}#breadcrumb` },
     },
   ],
@@ -444,6 +480,7 @@ const projectsPageStructuredData = () => ({
       description: topPageByPath.get("/projects").description,
       isPartOf: { "@id": `${SITE_URL}/#website` },
       about: { "@id": `${SITE_URL}/#person` },
+      hasPart: enrichedProjects.map((project) => ({ "@id": `${projectUrl(project)}#webpage` })),
       mainEntity: {
         "@type": "ItemList",
         name: "Isaac Seiler project archive",
@@ -490,6 +527,9 @@ const pageStructuredData = (page) => {
         width: image.width,
         height: image.height,
       },
+      significantLink: topLevelPages
+        .filter((candidate) => candidate.path !== page.path)
+        .map((candidate) => absoluteUrl(candidate.path)),
     },
   ];
 
@@ -514,6 +554,10 @@ const setMeta = (html, selector, value) => {
   if (expression.test(html)) return html.replace(expression, (_, before, after) => `${before}${escapedValue}${after}`);
   return html.replace("</head>", `    <meta ${selector} content="${escapedValue}" />\n  </head>`);
 };
+
+const setMetaByName = (html, name, value) => setMeta(html, `name="${name}"`, value);
+const setMetaByProperty = (html, property, value) => setMeta(html, `property="${property}"`, value);
+const setMetaByItemprop = (html, itemprop, value) => setMeta(html, `itemprop="${itemprop}"`, value);
 
 const setLink = (html, rel, value, attrs = "") => {
   const escapedValue = escapeHtml(value);
@@ -549,31 +593,62 @@ const applyHead = (html, route) => {
   let nextHtml = removeJsonLd(html);
   nextHtml = setTitle(nextHtml, route.title);
   nextHtml = setLink(nextHtml, "canonical", absoluteUrl(route.path));
-  nextHtml = setMeta(nextHtml, 'name="description"', route.description);
-  nextHtml = setMeta(nextHtml, 'name="keywords"', route.keywords.join(", "));
-  nextHtml = setMeta(nextHtml, 'property="og:title"', route.title);
-  nextHtml = setMeta(nextHtml, 'property="og:description"', route.description);
-  nextHtml = setMeta(nextHtml, 'property="og:type"', route.ogType ?? "website");
-  nextHtml = setMeta(nextHtml, 'property="og:url"', absoluteUrl(route.path));
-  nextHtml = setMeta(nextHtml, 'property="og:image"', image.url);
-  nextHtml = setMeta(nextHtml, 'property="og:image:secure_url"', image.url);
-  nextHtml = setMeta(nextHtml, 'property="og:image:type"', image.type);
-  nextHtml = setMeta(nextHtml, 'property="og:image:width"', String(image.width));
-  nextHtml = setMeta(nextHtml, 'property="og:image:height"', String(image.height));
-  nextHtml = setMeta(nextHtml, 'property="og:image:alt"', image.alt);
-  nextHtml = setMeta(nextHtml, 'name="twitter:title"', route.title);
-  nextHtml = setMeta(nextHtml, 'name="twitter:description"', route.description);
-  nextHtml = setMeta(nextHtml, 'name="twitter:image"', image.url);
-  nextHtml = setMeta(nextHtml, 'name="twitter:image:alt"', image.alt);
-  nextHtml = setMeta(nextHtml, 'name="robots"', route.robots ?? "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1");
+  nextHtml = setLink(nextHtml, "image_src", image.url);
+  nextHtml = setMetaByName(nextHtml, "description", route.description);
+  nextHtml = setMetaByName(nextHtml, "keywords", route.keywords.join(", "));
+  nextHtml = setMetaByName(nextHtml, "robots", route.robots ?? "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1");
+  nextHtml = setMetaByProperty(nextHtml, "og:title", route.title);
+  nextHtml = setMetaByProperty(nextHtml, "og:description", route.description);
+  nextHtml = setMetaByProperty(nextHtml, "og:type", route.ogType ?? "website");
+  nextHtml = setMetaByProperty(nextHtml, "og:url", absoluteUrl(route.path));
+  nextHtml = setMetaByProperty(nextHtml, "og:site_name", SITE_NAME);
+  nextHtml = setMetaByProperty(nextHtml, "og:image", image.url);
+  nextHtml = setMetaByProperty(nextHtml, "og:image:url", image.url);
+  nextHtml = setMetaByProperty(nextHtml, "og:image:secure_url", image.url);
+  nextHtml = setMetaByProperty(nextHtml, "og:image:type", image.type);
+  nextHtml = setMetaByProperty(nextHtml, "og:image:width", String(image.width));
+  nextHtml = setMetaByProperty(nextHtml, "og:image:height", String(image.height));
+  nextHtml = setMetaByProperty(nextHtml, "og:image:alt", image.alt);
+  nextHtml = setMetaByName(nextHtml, "twitter:card", "summary_large_image");
+  nextHtml = setMetaByName(nextHtml, "twitter:title", route.title);
+  nextHtml = setMetaByName(nextHtml, "twitter:description", route.description);
+  nextHtml = setMetaByName(nextHtml, "twitter:image", image.url);
+  nextHtml = setMetaByName(nextHtml, "twitter:image:alt", image.alt);
+  nextHtml = setMetaByItemprop(nextHtml, "name", route.title);
+  nextHtml = setMetaByItemprop(nextHtml, "description", route.description);
+  nextHtml = setMetaByItemprop(nextHtml, "image", image.url);
+  if (route.ogType === "article") {
+    nextHtml = setMetaByProperty(nextHtml, "article:author", SITE_NAME);
+    nextHtml = setMetaByProperty(nextHtml, "article:section", route.section ?? "Projects");
+    nextHtml = setMetaByProperty(nextHtml, "article:published_time", route.year ? `${route.year}-01-01` : "");
+  }
   nextHtml = insertPrimaryImagePreload(nextHtml, image);
   return insertJsonLd(nextHtml, route.structuredData);
 };
 
 const renderNav = () => `
       <nav aria-label="Primary">
-        ${topLevelPages.map((page) => `<a href="${escapeHtml(page.path)}">${escapeHtml(page.navTitle)}</a>`).join("\n        ")}
+        ${topLevelPages
+          .map(
+            (page) =>
+              `<a href="${escapeHtml(page.path)}" title="${escapeHtml(page.sitelinkDescription ?? page.description)}">${escapeHtml(page.navTitle)}</a>`,
+          )
+          .join("\n        ")}
       </nav>`;
+
+const renderSitelinkCandidates = () => `
+      <section aria-label="Important site sections">
+        <h2>Important Sections</h2>
+        <ul>
+          ${topLevelPages
+            .filter((page) => page.path !== "/")
+            .map(
+              (page) =>
+                `<li><a href="${escapeHtml(page.path)}">${escapeHtml(page.navTitle)}</a>: ${escapeHtml(page.sitelinkDescription ?? page.description)}</li>`,
+            )
+            .join("")}
+        </ul>
+      </section>`;
 
 const renderPriorityImages = () => `
       <section>
@@ -601,6 +676,7 @@ const renderHomepageFallback = () => `
       ${renderNav()}
       <h1>Isaac Seiler</h1>
       <p>${escapeHtml(SITE_DESCRIPTION)}</p>
+      ${renderSitelinkCandidates()}
       <section>
         <h2>Key Site Sections</h2>
         <ul>
@@ -626,6 +702,15 @@ const renderProjectsFallback = () => `
       ${renderNav()}
       <h1>Projects by Isaac Seiler</h1>
       <p>${escapeHtml(topPageByPath.get("/projects").description)}</p>
+      <section>
+        <h2>Core Project Areas</h2>
+        <ul>
+          <li>AI education and OpenAI-supported educator work.</li>
+          <li>Public-sector AI adoption, governance, and state government benchmarking.</li>
+          <li>Journalism, digital platforms, qualitative research, and media policy.</li>
+          <li>Public service, congressional operations, campaign communications, and strategy.</li>
+        </ul>
+      </section>
       ${enrichedProjects.map(renderProjectSummary).join("")}
     </main>`;
 
@@ -636,7 +721,24 @@ const renderProjectFallback = (project) => `
       <article>
         <h1>${escapeHtml(project.title)}</h1>
         <p>${escapeHtml(project.seoDescription)}</p>
+        <section>
+          <h2>Project Snapshot</h2>
+          <ul>
+            <li>Project type: ${escapeHtml(project.source)}</li>
+            <li>Year: ${escapeHtml(project.year)}</li>
+            <li>Primary topics: ${escapeHtml(project.about.join(", "))}</li>
+            <li>Search focus: ${escapeHtml(project.searchIntent)}</li>
+          </ul>
+        </section>
         <img src="${escapeHtml(htmlImageSrc(project.seoImage.url))}" alt="${escapeHtml(project.seoImage.alt)}" width="${project.seoImage.width}" height="${project.seoImage.height}" loading="eager" decoding="async" fetchpriority="high" />
+        ${
+          project.proofPoints.length
+            ? `<section>
+          <h2>Key Proof Points</h2>
+          <ul>${project.proofPoints.map((point) => `<li>${escapeHtml(point)}</li>`).join("")}</ul>
+        </section>`
+            : ""
+        }
         ${(project.sections ?? [])
           .map(
             (section) => `
@@ -656,6 +758,14 @@ const renderProjectFallback = (project) => `
         </section>`,
           )
           .join("")}
+        <section>
+          <h2>Related Isaac Seiler Sections</h2>
+          <ul>
+            <li><a href="/projects">All projects</a></li>
+            <li><a href="/experience">Experience</a></li>
+            <li><a href="/credentials">Credentials</a></li>
+          </ul>
+        </section>
       </article>
     </main>`;
 
@@ -704,6 +814,8 @@ const routeForProject = (project) => ({
   keywords: project.keywords,
   image: project.seoImage,
   ogType: "article",
+  section: project.source,
+  year: project.year,
   structuredData: projectStructuredData(project),
 });
 

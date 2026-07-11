@@ -1,4 +1,4 @@
-export const SITE_URL = "https://isaacseiler.xyz";
+export const SITE_URL = "https://www.isaacseiler.xyz";
 export const SITE_NAME = "Isaac Seiler";
 export const SITE_DESCRIPTION =
   "Isaac Seiler is a Fulbright Scholar, Truman Scholar, and OpenAI ChatGPT Lab member working across AI education, public technology, journalism, communications, and research.";
@@ -38,8 +38,10 @@ export const topLevelPages = [
   {
     path: "/",
     navTitle: "Home",
-    title: "Isaac Seiler | AI, Public Technology, Communications, and Fulbright Work",
+    title: "Isaac Seiler | AI Education, Public Technology, OpenAI ChatGPT Lab",
     description: SITE_DESCRIPTION,
+    sitelinkDescription:
+      "Overview of Isaac Seiler's AI education, public technology, communications, research, photography, and credentials.",
     priority: "1.0",
     changefreq: "weekly",
     image: PREVIEW_IMAGE,
@@ -56,9 +58,11 @@ export const topLevelPages = [
   {
     path: "/projects",
     navTitle: "Projects",
-    title: "Projects | Isaac Seiler",
+    title: "Projects | Isaac Seiler AI, Public Technology, Journalism, and Communications Work",
     description:
       "Research, AI education, public policy, journalism, campaign communications, and strategy projects by Isaac Seiler.",
+    sitelinkDescription:
+      "Standalone case studies on AI education, public-sector AI, journalism research, communications, and civic technology.",
     priority: "0.95",
     changefreq: "weekly",
     image: { url: projectCardImages.chatLab },
@@ -77,6 +81,8 @@ export const topLevelPages = [
     title: "Experience | Isaac Seiler",
     description:
       "Isaac Seiler's experience across OpenAI's ChatGPT Lab, Fulbright Taiwan, the Council of State Governments, Boehringer Ingelheim, Congress, campaigns, and journalism.",
+    sitelinkDescription:
+      "Work history across OpenAI, Fulbright Taiwan, state government AI, Congress, communications, and journalism.",
     priority: "0.86",
     changefreq: "monthly",
     image: { url: "/experience/oai.jpg" },
@@ -95,6 +101,8 @@ export const topLevelPages = [
     title: "Credentials | Isaac Seiler",
     description:
       "A concise profile of Isaac Seiler's AI, public service, communications, research, Fulbright, Truman, and OpenAI credentials.",
+    sitelinkDescription:
+      "Fulbright, Truman, Rhodes finalist, OpenAI ChatGPT Lab, research, communications, and public-service proof points.",
     priority: "0.84",
     changefreq: "monthly",
     image: PREVIEW_IMAGE,
@@ -112,6 +120,8 @@ export const topLevelPages = [
     title: "Photos | Isaac Seiler",
     description:
       "Travel photography by Isaac Seiler, with albums from Taiwan, Japan, Hong Kong, Iceland, Australia, New Zealand, Portugal, Thailand, Vietnam, Korea, and more.",
+    sitelinkDescription:
+      "Travel photography albums from Taiwan, Japan, Hong Kong, Iceland, Australia, New Zealand, Portugal, and more.",
     priority: "0.82",
     changefreq: "weekly",
     image: {
@@ -132,6 +142,8 @@ export const topLevelPages = [
     title: "Photo Map | Isaac Seiler",
     description:
       "An interactive map for browsing Isaac Seiler's travel photography by place, album, and geography.",
+    sitelinkDescription:
+      "A mapped interface for exploring Isaac Seiler's travel photography by place, geography, and album.",
     priority: "0.68",
     changefreq: "monthly",
     image: {
@@ -152,6 +164,13 @@ export const projectSeo = {
     title: "Fulbright Taiwan ChatGPT Lab with OpenAI Support | Isaac Seiler",
     description:
       "Isaac Seiler founded and led the Fulbright Taiwan ChatGPT Lab, an OpenAI-supported educator lab focused on practical, responsible ChatGPT use cases in education.",
+    searchIntent:
+      "OpenAI-supported Fulbright Taiwan educator lab, ChatGPT for Education, teacher AI training, and practical classroom AI use cases.",
+    proofPoints: [
+      "Founded and led a six-session Fulbright Taiwan ChatGPT Lab for educators.",
+      "Designed curriculum around practical, responsible ChatGPT use in classrooms.",
+      "Connected the work to OpenAI for Education and published educator use cases.",
+    ],
     image: {
       url: projectCardImages.chatLab,
       alt: "Fulbright Taiwan ChatGPT Lab and OpenAI education project preview",
@@ -174,6 +193,13 @@ export const projectSeo = {
     title: "Artificial Intelligence in State Government Index | Isaac Seiler",
     description:
       "A public benchmark by Isaac Seiler measuring generative AI adoption, training, governance, pilots, transparency, and preparedness across U.S. states and territories.",
+    searchIntent:
+      "AI state government index, public-sector generative AI adoption, state AI governance, training, pilots, sandboxes, and transparency.",
+    proofPoints: [
+      "Built a 15-criteria GenAI Preparedness Score from publicly verifiable evidence.",
+      "Benchmarked all U.S. states and territories on AI governance and adoption signals.",
+      "Published state-by-state analysis with recommendations for lawmakers.",
+    ],
     image: {
       url: projectCardImages.aiIndex,
       alt: "Artificial Intelligence in State Government Index project preview",
@@ -193,6 +219,13 @@ export const projectSeo = {
     title: "Congressional Office Setup and 100 Day Report | Isaac Seiler",
     description:
       "Isaac Seiler helped stand up a new congressional office and produced early systems, staffing, metrics, communications, and first-100-day reporting.",
+    searchIntent:
+      "Congressional office setup, first 100 day report, Capitol Hill communications, office operations, and public-service reporting.",
+    proofPoints: [
+      "Helped build operational systems for a new congressional office.",
+      "Collected and verified office-wide first-100-day performance metrics.",
+      "Designed and coordinated the release of the final public report.",
+    ],
     image: {
       url: projectCardImages.capHill,
       alt: "Congressional Office Setup and 100 Day Report project preview",
@@ -210,6 +243,13 @@ export const projectSeo = {
     title: "AI Platforms and Journalism Research | Isaac Seiler",
     description:
       "Isaac Seiler's honors thesis analyzed AI, digital platforms, local journalism, democratic accountability, media policy, and newsroom labor through qualitative interviews.",
+    searchIntent:
+      "AI platforms journalism research, local journalism thesis, digital platforms, media policy, democratic accountability, and qualitative interviews.",
+    proofPoints: [
+      "Conducted 17 semi-structured interviews with journalists, editors, owners, and media experts.",
+      "Analyzed AI, digital platforms, labor, democratic accountability, and local news economics.",
+      "Produced an honors thesis grounded in qualitative coding and media-policy research.",
+    ],
     image: {
       url: projectCardImages.aiNews,
       alt: "AI platforms and local journalism honors thesis project preview",
@@ -229,6 +269,13 @@ export const projectSeo = {
     title: "Electric Vehicle Charging Access Analysis | Isaac Seiler",
     description:
       "A GIS and quantitative analysis project by Isaac Seiler examining EV charging infrastructure access, charger density, income, race, and transportation equity.",
+    searchIntent:
+      "EV charging access analysis, electric vehicle infrastructure, GIS, charger density, income, race, and transportation equity.",
+    proofPoints: [
+      "Combined spatial datasets to analyze EV charger access and infrastructure gaps.",
+      "Compared charger proximity with income, race, and regional variables.",
+      "Produced maps, charts, and written interpretation for transportation-equity analysis.",
+    ],
     image: {
       url: projectCardImages.charging,
       alt: "Electric Vehicle Charging Access Analysis project preview",
